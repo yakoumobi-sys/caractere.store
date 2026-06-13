@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { -webkit-font-smoothing: antialiased; overflow-x: hidden; color: #1d1d1f; background: #fff; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 22s linear infinite; }
+
+.apple-grid { display: grid; gap: 2px; background: rgba(0,0,0,0.06); border-radius: 18px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
+.apple-grid-cell { background: #fff; transition: background 0.2s; }
+.apple-grid-cell:hover { background: #fafafa; }
+
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.3s ease; }
+.faq-answer.open { max-height: 220px; padding-bottom: 18px; }
+
+.mob-menu { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); z-index: 200; flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+.mob-menu.open { display: flex; }
