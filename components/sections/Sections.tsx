@@ -8,7 +8,7 @@ export function HeroSection({ config }: { config: Record<string, string> }) {
   return (
     <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 bg-white">
       <div className="mb-11 mx-auto flex justify-center">
-        <img src="/logo.jpg" alt="Caractere Store" style={{height:'90px',width:'auto',objectFit:'contain'}} />
+        <img src="https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/logo.jpg" alt="Caractere Store" style={{height:'90px',width:'auto',objectFit:'contain'}} />
       </div>
       <span className="text-[13px] font-medium text-brand-gray mb-[18px] block">Personnalisation Textile — Alger</span>
       <h1 className="text-[clamp(42px,7vw,86px)] font-bold leading-[1.04] tracking-tight text-brand-dark max-w-[760px] mx-auto mb-[22px]">{titre}</h1>
