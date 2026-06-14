@@ -17,7 +17,7 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-11 h-14 bg-white/[0.88] backdrop-blur-xl border-b border-black/[0.08]">
         <Link href="/" className="flex items-center no-underline">
-          <Image src="/logo.jpg" alt="Caractere Store" width={120} height={40} style={{objectFit:'contain',height:'34px',width:'auto'}} priority />
+          <Image src="https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/logo.jpg" alt="Caractere Store" width={120} height={40} style={{objectFit:'contain',height:'34px',width:'auto'}} priority />
         </Link>
         <ul className="hidden md:flex gap-7 list-none items-center">
           {links.map(l => (
