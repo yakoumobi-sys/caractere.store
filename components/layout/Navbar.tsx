@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const links = [
   { href: '/#services', label: 'Services' },
@@ -15,7 +16,9 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-11 h-14 bg-white/[0.88] backdrop-blur-xl border-b border-black/[0.08]">
-        <Link href="/" className="text-[15px] font-bold tracking-tight text-brand-dark no-underline">Caractère Store</Link>
+        <Link href="/" className="flex items-center no-underline">
+          <Image src="/logo.jpg" alt="Caractere Store" width={120} height={40} style={{objectFit:'contain',height:'34px',width:'auto'}} priority />
+        </Link>
         <ul className="hidden md:flex gap-7 list-none items-center">
           {links.map(l => (
             <li key={l.href}>
@@ -33,7 +36,8 @@ export default function Navbar() {
         </button>
       </nav>
       <div className={`mob-menu ${open ? 'open' : ''}`}>
-        <button className="absolute top-4 right-5 bg-black/[0.06] border-none w-8 h-8 rounded-full text-base cursor-pointer flex items-center justify-center" onClick={() => setOpen(false)}>✕</button>
+        <button className="absolute top-4 right-5 bg-black/[0.06] border-none w-8 h-8 rounded-full text-base cursor-pointer flex items-center justify-center" onClick={() => setOpen(false)}>x</button>
+        <Image src="/logo.jpg" alt="Caractere Store" width={140} height={50} style={{objectFit:'contain'}} />
         {links.map(l => (
           <a key={l.href} href={l.href} className="text-[26px] font-bold text-brand-dark no-underline tracking-tight" onClick={() => setOpen(false)}>{l.label}</a>
         ))}
