@@ -2,7 +2,7 @@
 
 Site vitrine B2B + Interface admin + Dashboard commandes.
 Stack : Next.js 14 · Tailwind CSS · TypeScript · Supabase · Resend
-
+ 
 ---
 
 ## 🚀 MISE EN LIGNE (étape par étape)
