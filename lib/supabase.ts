@@ -1,13 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Client public (côté navigateur)
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://aijlvbipvqnvbywxhlbd.supabase.co'
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpamx2YmlwdnFudmJ5d3hobGJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyOTk2MjQsImV4cCI6MjA5Njg3NTYyNH0.ilXsLDDazyEiE3_KUnIAlG7_dDDtbAAwoJXoyeixIck'
 
-// Client admin (côté serveur uniquement — service role)
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
 export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY
 )
