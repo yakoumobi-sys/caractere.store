@@ -50,14 +50,45 @@ export default function ConfigurateurPage() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    const fallbackProduits = [
+      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:850,actif:true,ordre:1},
+      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:1400,actif:true,ordre:2},
+      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:1800,actif:true,ordre:3},
+      {id:'4',nom:'Gilet de securite',emoji:'🦺',description:'Haute visibilite',prix_base:1600,actif:true,ordre:4},
+      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:900,actif:true,ordre:5},
+      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:650,actif:true,ordre:6},
+      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1200,actif:true,ordre:7},
+    ]
+    const fallbackCouleurs = [
+      {id:'1',nom:'Blanc',hex:'#FFFFFF',actif:true,ordre:1},
+      {id:'2',nom:'Noir',hex:'#1d1d1f',actif:true,ordre:2},
+      {id:'3',nom:'Marine',hex:'#1B2A4A',actif:true,ordre:3},
+      {id:'4',nom:'Gris',hex:'#9E9E9E',actif:true,ordre:4},
+      {id:'5',nom:'Bordeaux',hex:'#6D1A2A',actif:true,ordre:5},
+      {id:'6',nom:'Vert bouteille',hex:'#1B4D3E',actif:true,ordre:6},
+      {id:'7',nom:'Beige',hex:'#D4B896',actif:true,ordre:7},
+    ]
+    const fallbackTailles = [
+      {id:'1',nom:'XS',actif:true,ordre:1},
+      {id:'2',nom:'S',actif:true,ordre:2},
+      {id:'3',nom:'M',actif:true,ordre:3},
+      {id:'4',nom:'L',actif:true,ordre:4},
+      {id:'5',nom:'XL',actif:true,ordre:5},
+      {id:'6',nom:'XXL',actif:true,ordre:6},
+      {id:'7',nom:'XXXL',actif:true,ordre:7},
+    ]
     Promise.all([
       supabase.from('produits').select('*').eq('actif',true).order('ordre'),
       supabase.from('couleurs').select('*').eq('actif',true).order('ordre'),
       supabase.from('tailles').select('*').eq('actif',true).order('ordre'),
     ]).then(([p,c,t]) => {
-      setProduits(p.data ?? [])
-      setCouleurs(c.data ?? [])
-      setTailles(t.data ?? [])
+      setProduits(p.data && p.data.length > 0 ? p.data : fallbackProduits)
+      setCouleurs(c.data && c.data.length > 0 ? c.data : fallbackCouleurs)
+      setTailles(t.data && t.data.length > 0 ? t.data : fallbackTailles)
+    }).catch(() => {
+      setProduits(fallbackProduits)
+      setCouleurs(fallbackCouleurs)
+      setTailles(fallbackTailles)
     })
   }, [])
 
