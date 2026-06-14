@@ -7,8 +7,8 @@ export function HeroSection({ config }: { config: Record<string, string> }) {
   const sous = config['hero_sous_titre'] ?? "Vêtements personnalisés, DTF, broderie — de 1 à 10 000 pièces. Simulation et devis gratuits."
   return (
     <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 bg-white">
-      <div className="w-[90px] h-[90px] bg-brand-dark rounded-[22px] flex items-center justify-center mb-11 mx-auto">
-        <span className="text-white text-[28px] font-bold tracking-tight">C</span>
+      <div className="mb-11 mx-auto flex justify-center">
+        <img src="/logo.jpg" alt="Caractere Store" style={{height:'90px',width:'auto',objectFit:'contain'}} />
       </div>
       <span className="text-[13px] font-medium text-brand-gray mb-[18px] block">Personnalisation Textile — Alger</span>
       <h1 className="text-[clamp(42px,7vw,86px)] font-bold leading-[1.04] tracking-tight text-brand-dark max-w-[760px] mx-auto mb-[22px]">{titre}</h1>
