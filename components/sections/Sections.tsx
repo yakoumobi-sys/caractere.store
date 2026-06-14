@@ -4,13 +4,13 @@ import type { Produit } from '@/types'
 // ── HERO ──
 export function HeroSection({ config }: { config: Record<string, string> }) {
   const titre = config['hero_titre'] ?? 'Habillez votre équipe. Faites-le bien.'
-  const sous = config['hero_sous_titre'] ?? 'Broderie, DTF, uniformes — de 10 à 10 000 pièces. Devis gratuit sous 24h.'
+  const sous = config['hero_sous_titre'] ?? "Vêtements personnalisés, DTF, broderie — de 1 à 10 000 pièces. Simulation et devis gratuits."
   return (
     <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 bg-white">
       <div className="w-[90px] h-[90px] bg-brand-dark rounded-[22px] flex items-center justify-center mb-11 mx-auto">
         <span className="text-white text-[28px] font-bold tracking-tight">C</span>
       </div>
-      <span className="text-[13px] font-medium text-brand-gray mb-[18px] block">Impression & Broderie Professionnelle — Alger</span>
+      <span className="text-[13px] font-medium text-brand-gray mb-[18px] block">Personnalisation Textile — Alger</span>
       <h1 className="text-[clamp(42px,7vw,86px)] font-bold leading-[1.04] tracking-tight text-brand-dark max-w-[760px] mx-auto mb-[22px]">{titre}</h1>
       <p className="text-[19px] font-light text-brand-gray leading-relaxed max-w-[500px] mx-auto mb-11">{sous}</p>
       <div className="flex gap-3.5 justify-center flex-wrap mb-[72px]">
@@ -18,7 +18,7 @@ export function HeroSection({ config }: { config: Record<string, string> }) {
         <a href="/#produits" className="bg-transparent text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium border border-black/20 hover:border-black/50 transition-colors no-underline">Voir nos réalisations</a>
       </div>
       <div className="flex gap-14 justify-center flex-wrap pt-9 border-t border-black/[0.08] w-full max-w-[600px] mx-auto">
-        {[{n:'292K',l:'Abonnés Instagram'},{n:'5+',l:"Ans d'activité"},{n:'3–7j',l:'Délai production'},{n:'10',l:'Pièces minimum'}].map(s => (
+        {[{n:'297K',l:'Abonnés Instagram'},{n:'5+',l:"Ans d'activité"},{n:'3–5j',l:'Délai production'},{n:'1',l:'Pièce minimum'}].map(s => (
           <div key={s.l} className="text-center">
             <div className="text-[32px] font-bold tracking-tight leading-none">{s.n}</div>
             <div className="text-[12px] text-brand-gray mt-1">{s.l}</div>
@@ -31,7 +31,7 @@ export function HeroSection({ config }: { config: Record<string, string> }) {
 
 // ── MARQUEE ──
 export function MarqueeStrip() {
-  const items = ['BRODERIE PREMIUM','DTF 60CM','UNIFORMES B2B','LIVRAISON NATIONALE','DEVIS 24H','QUALITÉ GARANTIE','ALGER','10 PIÈCES MIN']
+  const items = ['BRODERIE PREMIUM','DTF 60CM','PERSONNALISATION TEXTILE','LIVRAISON NATIONALE','DEVIS GRATUIT','QUALITÉ GARANTIE','ALGER','1 PIÈCE MIN']
   const doubled = [...items, ...items]
   return (
     <div className="bg-brand-light py-[11px] overflow-hidden whitespace-nowrap border-t border-b border-black/[0.06]">
@@ -50,12 +50,12 @@ export function MarqueeStrip() {
 // ── SERVICES ──
 export function ServicesSection() {
   const services = [
-    {e:'🧵',n:'Broderie machine',d:"Logos nets, tenu dans le temps. Rendu 3D premium."},
-    {e:'🖨',n:'Impression DTF',d:"Designs full color jusqu'à 60cm. Motifs complexes."},
-    {e:'👔',n:'Uniformes complets',d:"De la conception à la livraison."},
+    {e:'🧵',n:'Broderie machine',d:"Logos nets, tenu dans le temps. Rendu 3D premium sur tous textiles."},
+    {e:'🖨',n:'Impression DTF',d:"Designs full color jusqu'à 60cm. Idéal pour motifs complexes."},
+    {e:'👔',n:'Uniformes complets',d:"De la conception à la livraison. Prise en charge totale de votre projet."},
     {e:'🎨',n:'Personnalisation',d:"Adaptation de votre charte graphique. Vectorisation gratuite."},
-    {e:'📦',n:'Commandes B2B',d:"À partir de 10 pièces, jusqu'à 10 000."},
-    {e:'🚚',n:'Livraison nationale',d:"Retrait atelier ou envoi partout en Algérie."},
+    {e:'📦',n:'Commandes B2B',d:"À partir de 1 pièce, jusqu'à 10 000. Tarifs dégressifs."},
+    {e:'🚚',n:'Livraison nationale',d:"Retrait atelier ou envoi partout en Algérie via partenaires."},
   ]
   return (
     <section id="services" className="py-28 px-6">
@@ -82,12 +82,12 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
     <section id="produits" className="py-28 px-6 bg-brand-light">
       <div className="max-w-[980px] mx-auto">
         <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Produits</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Les essentiels<br />de l'uniforme.</h2>
+        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Les essentiels<br />de l uniforme.</h2>
         <div className="flex bg-white rounded-xl overflow-hidden mb-10 mt-8 border border-black/[0.06]">
-          {['✓ Livraison nationale','✓ Devis sous 24h','✓ Qualité garantie'].map((item,i) => (
+          {['Livraison nationale','Devis gratuit','Qualite garantie'].map((item,i) => (
             <div key={i} className="flex-1 px-5 py-4 text-[13px] font-medium text-brand-dark flex items-center gap-2 border-r border-black/[0.06] last:border-r-0">
-              <span className="bg-brand-dark text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">{item.split(' ')[0]}</span>
-              {item.split(' ').slice(1).join(' ')}
+              <span className="bg-brand-dark text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">ok</span>
+              {item}
             </div>
           ))}
         </div>
@@ -101,9 +101,9 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-[20px] font-bold tracking-tight">{p.prix_base.toLocaleString('fr-FR')} DA</div>
-                    <div className="text-[11px] text-brand-gray mt-0.5">/ pièce</div>
+                    <div className="text-[11px] text-brand-gray mt-0.5">/ piece</div>
                   </div>
-                  <Link href="/configurateur" className="text-[13px] font-medium text-blue-600 no-underline hover:gap-2 transition-all">Configurer →</Link>
+                  <Link href="/configurateur" className="text-[13px] font-medium text-blue-600 no-underline hover:gap-2 transition-all">Configurer</Link>
                 </div>
               </div>
             </div>
@@ -117,16 +117,16 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
 // ── PROCESS ──
 export function ProcessSection() {
   const steps = [
-    {n:'1',t:'Devis gratuit',d:'Envoyez votre logo et quantités. Réponse sous 24h.'},
+    {n:'1',t:'Devis gratuit',d:'Envoyez votre logo et quantites. Reponse sous 24h.'},
     {n:'2',t:'Validation maquette',d:'On adapte votre design pour un rendu optimal.'},
-    {n:'3',t:'Production atelier',d:'Fabrication avec contrôle qualité à chaque étape.'},
-    {n:'4',t:'Livraison',d:"Expédition nationale ou retrait à l'atelier Alger."},
+    {n:'3',t:'Production atelier',d:'Fabrication avec controle qualite a chaque etape.'},
+    {n:'4',t:'Livraison',d:"Expedition nationale ou retrait a l atelier Alger."},
   ]
   return (
     <section className="py-28 px-6">
       <div className="max-w-[980px] mx-auto text-center">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Comment ça marche</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">De la commande<br />à la livraison.</h2>
+        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Comment ca marche</span>
+        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">De la commande<br />a la livraison.</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mt-[72px] relative">
           <div className="hidden md:block absolute top-5 left-[10%] right-[10%] h-px bg-black/10" />
           {steps.map(s => (
@@ -145,18 +145,18 @@ export function ProcessSection() {
 // ── WHY ──
 export function WhySection() {
   const items = [
-    {n:'01',t:'Atelier propre à Alger',d:'3 machines à broder, 2 imprimantes DTF. Aucun intermédiaire.'},
-    {n:'02',t:'Résultat garanti',d:'Toute commande non-conforme est reprise sans frais.'},
-    {n:'03',t:'À partir de 10 pièces',d:"Petites équipes ou grandes entreprises — on s'adapte."},
-    {n:'04',t:'Suivi WhatsApp en temps réel',d:'Pas de silence, pas de surprise.'},
+    {n:'01',t:'Atelier propre a Alger',d:'3 machines a broder, 2 imprimantes DTF. Aucun intermediaire.'},
+    {n:'02',t:'Resultat garanti',d:'Toute commande non-conforme est reprise sans frais.'},
+    {n:'03',t:'A partir de 1 piece',d:"Petites commandes ou grandes entreprises — on s adapte."},
+    {n:'04',t:'Suivi WhatsApp en temps reel',d:'Pas de silence, pas de surprise.'},
   ]
   return (
     <section className="py-28 px-6 bg-brand-light">
       <div className="max-w-[980px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[72px] items-center">
           <div>
-            <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Pourquoi Caractère</span>
-            <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">La différence<br />qui compte.</h2>
+            <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Pourquoi Caractere</span>
+            <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">La difference<br />qui compte.</h2>
             <div className="flex flex-col mt-9">
               {items.map(item => (
                 <div key={item.n} className="flex gap-[18px] py-6 border-b border-black/[0.07] first:border-t first:border-black/[0.07] items-start">
@@ -168,7 +168,7 @@ export function WhySection() {
           </div>
           <div className="bg-white rounded-[20px] p-11 border border-black/[0.06]">
             <div className="grid grid-cols-2 gap-[18px]">
-              {[{n:'292K',l:'Abonnés Instagram'},{n:'5+',l:"Ans d'activité"},{n:'20+',l:'Employés'},{n:'3–7j',l:'Délai production'}].map(s => (
+              {[{n:'297K',l:'Abonnes Instagram'},{n:'5+',l:"Ans d activite"},{n:'40+',l:'Employes'},{n:'3-5j',l:'Delai production'}].map(s => (
                 <div key={s.l} className="bg-brand-light rounded-[14px] p-6">
                   <div className="text-[36px] font-bold tracking-tight leading-none">{s.n}</div>
                   <div className="text-[12px] text-brand-gray mt-1.5">{s.l}</div>
@@ -176,7 +176,7 @@ export function WhySection() {
               ))}
             </div>
             <div className="flex flex-wrap gap-2 mt-[18px]">
-              {['Brother Pro','Inkfa DTF 30cm','XP600 60cm','Encres premium'].map(c => (
+              {['Brother Pro','DTF 60cm i3200','DTF 42cm XP600','Encres premium'].map(c => (
                 <span key={c} className="bg-brand-light rounded-full px-3.5 py-1.5 text-[12px] font-medium text-brand-dark border border-black/10">{c}</span>
               ))}
             </div>
@@ -190,20 +190,20 @@ export function WhySection() {
 // ── SECTEURS ──
 export function SecteursSection() {
   const s = [
-    {e:'🍽️',n:'Restauration & Hôtellerie',d:'Tabliers, polos et uniformes de service.'},
-    {e:'🏥',n:'Santé & Cliniques',d:'Blouses et tenues médicales brodées.'},
+    {e:'🍽️',n:'Restauration & Hotellerie',d:'Tabliers, polos et uniformes de service.'},
+    {e:'🏥',n:'Sante & Cliniques',d:'Blouses et tenues medicales brodees.'},
     {e:'🏗️',n:'BTP & Construction',d:'Gilets, t-shirts et vestes de chantier.'},
-    {e:'🏪',n:'Commerce & Retail',d:"Uniformes vendeurs et tenues d'équipe."},
-    {e:'🎓',n:'Éducation',d:'Tenues scolaires, clubs et associations.'},
-    {e:'⚽',n:'Sport & Événements',d:'Maillots et kits complets pour équipes.'},
-    {e:'🏭',n:'Industrie',d:'Vêtements de travail avec signalétique.'},
-    {e:'💼',n:'Corporate',d:'Polos premium pour équipes commerciales.'},
+    {e:'🏪',n:'Commerce & Retail',d:"Uniformes vendeurs et tenues d equipe."},
+    {e:'🎓',n:'Education',d:'Tenues scolaires, clubs et associations.'},
+    {e:'⚽',n:'Sport & Evenements',d:'Maillots et kits complets pour equipes.'},
+    {e:'🏭',n:'Industrie',d:'Vetements de travail avec signaletique.'},
+    {e:'💼',n:'Corporate',d:'Polos premium pour equipes commerciales.'},
   ]
   return (
     <section id="secteurs" className="py-28 px-6">
       <div className="max-w-[980px] mx-auto">
         <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">B2B</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Nous équipons<br />votre secteur.</h2>
+        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Nous equipons<br />votre secteur.</h2>
         <div className="apple-grid mt-[52px]" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
           {s.map((sec,i) => (
             <div key={i} className="apple-grid-cell p-7">
@@ -221,14 +221,14 @@ export function SecteursSection() {
 // ── TESTIMONIALS ──
 export function TestimonialsSection() {
   const t = [
-    {i:'K',n:'Karim B.',r:'Gérant',c:'Restaurant El Kef',txt:'80 polos brodés pour notre équipe de salle. Rendu impeccable, délai respecté, suivi WhatsApp rassurant. On recommande sans hésiter.'},
-    {i:'S',n:'Samira M.',r:'Directrice',c:'Clinique Al Chifa',txt:"Blouses brodées pour toute notre équipe médicale. La qualité du tissu et la précision sur le logo sont vraiment au-dessus de nos attentes."},
-    {i:'Y',n:'Yacine O.',r:'Directeur',c:'BTP Construct',txt:'120 gilets de chantier en 5 jours. Troisième commande chez Caractère — la régularité et le sérieux sont là à chaque fois.'},
+    {i:'K',n:'Karim B.',r:'Gerant',c:'Restaurant El Kef',txt:'80 polos brodes pour notre equipe de salle. Rendu impeccable, delai respecte, suivi WhatsApp rassurant. On recommande sans hesiter.'},
+    {i:'S',n:'Samira M.',r:'Directrice',c:'Clinique Al Chifa',txt:"Blouses brodees pour toute notre equipe medicale. La qualite du tissu et la precision sur le logo sont vraiment au-dessus de nos attentes."},
+    {i:'Y',n:'Yacine O.',r:'Directeur',c:'BTP Construct',txt:'120 gilets de chantier en 5 jours. Troisieme commande chez Caractere — la regularite et le serieux sont la a chaque fois.'},
   ]
   return (
     <section id="avis" className="py-28 px-6 bg-brand-light">
       <div className="max-w-[980px] mx-auto">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Témoignages</span>
+        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Temoignages</span>
         <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Ils nous font<br />confiance.</h2>
         <div className="apple-grid mt-[52px]" style={{gridTemplateColumns:'repeat(3,1fr)'}}>
           {t.map((tm,i) => (
@@ -251,12 +251,12 @@ export function TestimonialsSection() {
 export function CtaDarkSection() {
   return (
     <div className="bg-brand-dark py-28 px-6 text-center">
-      <span className="text-[11px] font-bold tracking-widest uppercase text-white/45 block mb-3.5">Prêt à démarrer ?</span>
-      <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-white max-w-[580px] mx-auto">Habillons vos<br />équipes ensemble.</h2>
-      <p className="text-[17px] font-light text-white/45 mt-[18px] mb-10 mx-auto max-w-[400px] leading-relaxed">Devis gratuit sous 24h. Sans engagement.</p>
+      <span className="text-[11px] font-bold tracking-widest uppercase text-white/45 block mb-3.5">Pret a demarrer ?</span>
+      <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-white max-w-[580px] mx-auto">Habillons vos<br />equipes ensemble.</h2>
+      <p className="text-[17px] font-light text-white/45 mt-[18px] mb-10 mx-auto max-w-[400px] leading-relaxed">Simulation et devis gratuits. Sans engagement.</p>
       <div className="flex gap-3.5 justify-center flex-wrap">
         <Link href="/configurateur" className="bg-white text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-100 transition-colors no-underline">Configurer ma commande</Link>
-        <a href="https://wa.me/213XXXXXXXXX" className="bg-transparent text-white/70 px-7 py-3.5 rounded-full text-[15px] font-medium border border-white/20 hover:border-white/50 hover:text-white transition-colors no-underline" target="_blank" rel="noopener noreferrer">💬 WhatsApp direct</a>
+        <a href="https://wa.me/213557440522" className="bg-transparent text-white/70 px-7 py-3.5 rounded-full text-[15px] font-medium border border-white/20 hover:border-white/50 hover:text-white transition-colors no-underline" target="_blank" rel="noopener noreferrer">WhatsApp direct</a>
       </div>
     </div>
   )
