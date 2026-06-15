@@ -195,14 +195,30 @@ export default function ConfigurateurPage() {
                   <div className="text-[22px] font-bold tracking-tight mb-1">Choisissez votre produit</div>
                   <div className="text-[14px] text-brand-gray mb-8">Sélectionnez le type de textile à personnaliser</div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-                    {produits.map(p => (
-                      <button key={p.id} onClick={() => up({produit:p})} className={`text-left p-5 rounded-2xl border-2 transition-all cursor-pointer bg-white ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
-                        <span className="text-[40px] block mb-3">{p.emoji}</span>
-                        <div className="text-[15px] font-semibold tracking-tight">{p.nom}</div>
-                        <div className="text-[12px] text-brand-gray mt-0.5">{p.description}</div>
-                        <div className="text-[14px] font-bold mt-2">dès {p.prix_base.toLocaleString('fr-FR')} DA</div>
-                      </button>
-                    ))}
+                    {produits.map(p => {
+                      const imgs: Record<string,string> = {
+                        'T-shirt': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80',
+                        'Polo': 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&q=80',
+                        'Gilet de travail': 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=80',
+                        'Gilet de securite': 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&q=80',
+                        'Casquette': 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80',
+                        'Totebag': 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&q=80',
+                        'Tablier': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80',
+                      }
+                      const imgUrl = imgs[p.nom] || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80'
+                      return (
+                        <button key={p.id} onClick={() => up({produit:p})} className={`text-left rounded-2xl border-2 transition-all cursor-pointer bg-white overflow-hidden ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
+                          <div className="w-full aspect-square overflow-hidden bg-brand-light">
+                            <img src={imgUrl} alt={p.nom} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="p-4">
+                            <div className="text-[15px] font-semibold tracking-tight">{p.nom}</div>
+                            <div className="text-[12px] text-brand-gray mt-0.5">{p.description}</div>
+                            <div className="text-[14px] font-bold mt-2">des {p.prix_base.toLocaleString('fr-FR')} DA</div>
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                   <div className="mb-8">
                     <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">Quantité</label>
