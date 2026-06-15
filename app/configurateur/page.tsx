@@ -202,7 +202,7 @@ export default function ConfigurateurPage() {
                         'Polo': BASE + '/IMG_5608.jpeg',
                         'Casquette': BASE + '/IMG_5609.jpeg',
                         'Totebag': BASE + '/IMG_5610.jpeg',
-                        'Gilet de travail': BASE + 'IMG_5611.jpeg',
+                        'Gilet de travail': BASE + 'IMG_5615.jpeg',
                         'Gilet de securite': BASE + '/images.jpg',
                         'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
                       }
