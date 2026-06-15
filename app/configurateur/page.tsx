@@ -51,13 +51,13 @@ export default function ConfigurateurPage() {
 
   useEffect(() => {
     const fallbackProduits = [
-      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:850,actif:true,ordre:1},
-      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:1400,actif:true,ordre:2},
-      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:1800,actif:true,ordre:3},
+      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:1950,actif:true,ordre:1},
+      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:2300,actif:true,ordre:2},
+      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:2500,actif:true,ordre:3},
       {id:'4',nom:'Gilet de securite',emoji:'🦺',description:'Haute visibilite',prix_base:1600,actif:true,ordre:4},
-      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:900,actif:true,ordre:5},
-      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:650,actif:true,ordre:6},
-      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1200,actif:true,ordre:7},
+      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:1200,actif:true,ordre:5},
+      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:950,actif:true,ordre:6},
+      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1500,actif:true,ordre:7},
     ]
     const fallbackCouleurs = [
       {id:'1',nom:'Blanc',hex:'#FFFFFF',actif:true,ordre:1},
@@ -198,12 +198,12 @@ export default function ConfigurateurPage() {
                     {produits.map(p => {
                       const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
-                        'T-shirt': BASE + '/IMG_5509.png',
-                        'Polo': BASE + '/IMG_5510.png',
-                        'Casquette': BASE + '/IMG_5511.png',
-                        'Totebag': BASE + '/IMG_5512.png',
-                        'Gilet de travail': BASE + '/IMG_5599.png',
-                        'Gilet de securite': BASE + '/IMG_5599.png',
+                        'T-shirt': BASE + '/tshirt.jpg',
+                        'Polo': BASE + '/polo.jpg',
+                        'Casquette': BASE + '/casquette.jpg',
+                        'Totebag': BASE + '/totebag.jpg',
+                        'Gilet de travail': BASE + '/gilet.jpg',
+                        'Gilet de securite': BASE + '/gilet.jpg',
                         'Tablier': BASE + '/IMG_5510.png',
                       }
                       const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
