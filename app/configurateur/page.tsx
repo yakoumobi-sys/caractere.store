@@ -25,8 +25,8 @@ interface OrderState {
 }
 
 const DEFAULT: OrderState = {
-  step: 1, produit: null, quantite: 1,
-  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M'],
+  step: 1, produit: null, quantite: 10,
+  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M','L','XL'],
   logoFile: null, logoUrl: null,
   position: 'Logo petit — côté cœur', technique: '🧵 Broderie',
   urgent: false, nom: '', entreprise: '', telephone: '', email: '', notes: ''
@@ -51,13 +51,13 @@ export default function ConfigurateurPage() {
 
   useEffect(() => {
     const fallbackProduits = [
-      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:1950,actif:true,ordre:1},
-      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:2300,actif:true,ordre:2},
-      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:2500,actif:true,ordre:3},
+      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:850,actif:true,ordre:1},
+      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:1400,actif:true,ordre:2},
+      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:1800,actif:true,ordre:3},
       {id:'4',nom:'Gilet de securite',emoji:'🦺',description:'Haute visibilite',prix_base:1600,actif:true,ordre:4},
-      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:1200,actif:true,ordre:5},
-      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:950,actif:true,ordre:6},
-      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1500,actif:true,ordre:7},
+      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:900,actif:true,ordre:5},
+      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:650,actif:true,ordre:6},
+      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1200,actif:true,ordre:7},
     ]
     const fallbackCouleurs = [
       {id:'1',nom:'Blanc',hex:'#FFFFFF',actif:true,ordre:1},
@@ -198,13 +198,13 @@ export default function ConfigurateurPage() {
                     {produits.map(p => {
                       const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
-                        'T-shirt': BASE + '/IMG_5607.jpeg',
-                        'Polo': BASE + '/IMG_5608.jpeg',
-                        'Casquette': BASE + '/IMG_5609.jpeg',
-                        'Totebag': BASE + '/IMG_5610.jpeg',
-                        'Gilet de travail': BASE + 'IMG_5615.jpeg',
-                        'Gilet de securite': BASE + '/images.jpg',
-                        'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
+                        'T-shirt': BASE + '/IMG_5509.png',
+                        'Polo': BASE + '/IMG_5510.png',
+                        'Casquette': BASE + '/IMG_5511.png',
+                        'Totebag': BASE + '/IMG_5512.png',
+                        'Gilet de travail': BASE + '/IMG_5599.png',
+                        'Gilet de securite': BASE + '/IMG_5599.png',
+                        'Tablier': BASE + '/IMG_5510.png',
                       }
                       const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
                       return (
@@ -287,18 +287,30 @@ export default function ConfigurateurPage() {
                   <div className="text-[14px] text-brand-gray mb-8">Où et comment apposer votre logo</div>
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Emplacement du logo</label>
                   <div className="grid grid-cols-2 gap-3 mb-8">
-                    {POSITIONS.map(p => (
+                    {POSITIONS.map(p => {
+                      const logoPos: Record<string,{x:number,y:number,w:number,h:number,back?:boolean}> = {
+                        'coeur':        {x:38, y:38, w:18, h:12},
+                        'coeur-dos':    {x:38, y:38, w:18, h:12, back:true},
+                        'poitrine':     {x:28, y:33, w:40, h:22},
+                        'poitrine-dos': {x:28, y:33, w:40, h:22, back:true},
+                      }
+                      const lp = logoPos[p.id] || {x:38,y:38,w:18,h:12}
+                      return (
                       <button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
-                       <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3">
-  <svg viewBox="0 0 100 100" className="w-16 h-16 text-brand-dark" fill="currentColor">
-    <path d="M35,10 L20,25 L30,28 L30,85 L70,85 L70,28 L80,25 L65,10 C65,10 58,18 50,18 C42,18 35,10 35,10 Z"/>
-  </svg>
-</div>
+                        <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3">
+                          <svg viewBox="0 0 100 115" className="w-3/4 h-3/4" fill="none">
+                            <path d="M32,8 L18,22 L28,26 L28,90 L72,90 L72,26 L82,22 L68,8 C65,14 58,18 50,18 C42,18 35,14 32,8 Z" fill="#1d1d1f" opacity="0.85"/>
+                            <rect x={lp.x} y={lp.y} width={lp.w} height={lp.h} rx="2" fill="white" opacity="0.95"/>
+                            <rect x={lp.x+1} y={lp.y+1} width={lp.w-2} height={lp.h-2} rx="1.5" fill="none" stroke="#1d1d1f" strokeWidth="0.8" strokeDasharray="2,1"/>
+                            {lp.back && <text x="50" y="108" textAnchor="middle" fontSize="6" fill="#6e6e73">+ dos</text>}
+                          </svg>
+                        </div>
                         <div className="text-[13px] font-semibold tracking-tight">{p.name}</div>
                         <div className="text-[11px] text-brand-gray mt-0.5">{p.desc}</div>
                         <span className={`inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full ${p.badge==='Standard'?'bg-brand-light text-brand-gray':'bg-brand-dark text-white'}`}>{p.badge}</span>
                       </button>
-                    ))}
+                      )
+                    })}
                   </div>
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Technique</label>
                   <div className="flex flex-wrap gap-2 mb-8">
