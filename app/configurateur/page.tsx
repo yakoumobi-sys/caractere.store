@@ -25,8 +25,8 @@ interface OrderState {
 }
 
 const DEFAULT: OrderState = {
-  step: 1, produit: null, quantite: 10,
-  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M','L','XL'],
+  step: 1, produit: null, quantite: 1,
+  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M'],
   logoFile: null, logoUrl: null,
   position: 'Logo petit — côté cœur', technique: '🧵 Broderie',
   urgent: false, nom: '', entreprise: '', telephone: '', email: '', notes: ''
