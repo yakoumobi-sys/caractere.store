@@ -289,7 +289,11 @@ export default function ConfigurateurPage() {
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {POSITIONS.map(p => (
                       <button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
-                        <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center text-[32px] mb-3">👕</div>
+                       <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3">
+  <svg viewBox="0 0 100 100" className="w-16 h-16 text-brand-dark" fill="currentColor">
+    <path d="M35,10 L20,25 L30,28 L30,85 L70,85 L70,28 L80,25 L65,10 C65,10 58,18 50,18 C42,18 35,10 35,10 Z"/>
+  </svg>
+</div>
                         <div className="text-[13px] font-semibold tracking-tight">{p.name}</div>
                         <div className="text-[11px] text-brand-gray mt-0.5">{p.desc}</div>
                         <span className={`inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full ${p.badge==='Standard'?'bg-brand-light text-brand-gray':'bg-brand-dark text-white'}`}>{p.badge}</span>
