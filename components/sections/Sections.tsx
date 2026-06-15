@@ -121,7 +121,7 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </div>
     </section>
