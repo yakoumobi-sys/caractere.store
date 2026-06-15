@@ -196,16 +196,17 @@ export default function ConfigurateurPage() {
                   <div className="text-[14px] text-brand-gray mb-8">Sélectionnez le type de textile à personnaliser</div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
                     {produits.map(p => {
+                      const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
-                        'T-shirt': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80',
-                        'Polo': 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&q=80',
-                        'Gilet de travail': 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=80',
-                        'Gilet de securite': 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&q=80',
-                        'Casquette': 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80',
-                        'Totebag': 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&q=80',
-                        'Tablier': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80',
+                        'T-shirt': BASE + '/IMG_5509.png',
+                        'Polo': BASE + '/IMG_5510.png',
+                        'Casquette': BASE + '/IMG_5511.png',
+                        'Totebag': BASE + '/IMG_5512.png',
+                        'Gilet de travail': BASE + '/IMG_5599.png',
+                        'Gilet de securite': BASE + '/IMG_5599.png',
+                        'Tablier': BASE + '/IMG_5510.png',
                       }
-                      const imgUrl = imgs[p.nom] || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80'
+                      const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
                       return (
                         <button key={p.id} onClick={() => up({produit:p})} className={`text-left rounded-2xl border-2 transition-all cursor-pointer bg-white overflow-hidden ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
                           <div className="w-full aspect-square overflow-hidden bg-brand-light">
