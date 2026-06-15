@@ -198,13 +198,13 @@ export default function ConfigurateurPage() {
                     {produits.map(p => {
                       const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
-                        'T-shirt': BASE + '/tshirt.jpg',
-                        'Polo': BASE + '/polo.jpg',
-                        'Casquette': BASE + '/casquette.jpg',
-                        'Totebag': BASE + '/totebag.jpg',
-                        'Gilet de travail': BASE + '/gilet.jpg',
-                        'Gilet de securite': BASE + '/gilet.jpg',
-                        'Tablier': BASE + '/IMG_5510.png',
+                        'T-shirt': BASE + '/IMG_5607.jpeg',
+                        'Polo': BASE + '/IMG_5608.jpeg',
+                        'Casquette': BASE + '/IMG_5609.jpeg',
+                        'Totebag': BASE + '/IMG_5610.jpeg',
+                        'Gilet de travail': BASE + 'IMG_5611.jpeg',
+                        'Gilet de securite': BASE + '/images.jpg',
+                        'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
                       }
                       const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
                       return (
