@@ -92,9 +92,23 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
           ))}
         </div>
         <div className="apple-grid" style={{gridTemplateColumns:'repeat(3,1fr)'}}>
-          {produits.map(p => (
+          {produits.map(p => {
+              const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
+              const imgs: Record<string,string> = {
+                'T-shirt': BASE + '/IMG_5509.png',
+                'Polo': BASE + '/IMG_5510.png',
+                'Casquette': BASE + '/IMG_5511.png',
+                'Totebag': BASE + '/IMG_5512.png',
+                'Gilet de travail': BASE + '/IMG_5599.png',
+                'Gilet de securite': BASE + '/IMG_5599.png',
+                'Tablier': BASE + '/IMG_5510.png',
+              }
+              const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
+              return (
             <div key={p.id} className="apple-grid-cell flex flex-col">
-              <div className="w-full aspect-square bg-brand-light flex items-center justify-center text-[64px]">{p.emoji}</div>
+              <div className="w-full aspect-square overflow-hidden bg-brand-light">
+                <img src={imgUrl} alt={p.nom} className="w-full h-full object-cover" />
+              </div>
               <div className="p-5 pb-6 flex-1 flex flex-col bg-white">
                 <div className="text-[16px] font-semibold tracking-tight mb-1">{p.nom}</div>
                 <p className="text-[13px] text-brand-gray mb-4 flex-1 leading-relaxed">{p.description}</p>
