@@ -184,10 +184,8 @@ export default function ConfigurateurPage() {
         ) : (
           <div className="max-w-[900px] mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-            {/* WIZARD */}
             <div className="lg:col-span-2">
 
-              {/* STEP 1 */}
               {order.step === 1 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Choisissez votre produit</div>
@@ -232,7 +230,6 @@ export default function ConfigurateurPage() {
                 </div>
               )}
 
-              {/* STEP 2 */}
               {order.step === 2 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Couleur & Tailles</div>
@@ -254,7 +251,6 @@ export default function ConfigurateurPage() {
                 </div>
               )}
 
-              {/* STEP 3 */}
               {order.step === 3 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Votre logo</div>
@@ -278,27 +274,22 @@ export default function ConfigurateurPage() {
                 </div>
               )}
 
-              {/* STEP 4 */}
               {order.step === 4 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Emplacement & Technique</div>
                   <div className="text-[14px] text-brand-gray mb-8">Où et comment apposer votre logo</div>
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Emplacement du logo</label>
                   <div className="grid grid-cols-2 gap-3 mb-8">
-                    {POSITIONS.map(p => {
-                      return (
-<button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
-  <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3 overflow-hidden">
-    <img src={`https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/${p.id}.jpg`} alt={p.name} className="w-full h-full object-cover rounded-xl" />
-  </div>
-
+                    {POSITIONS.map(p => (
+                      <button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
+                        <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3 overflow-hidden">
+                          <img src={`https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/${p.id}.jpg`} alt={p.name} className="w-full h-full object-cover rounded-xl" />
                         </div>
                         <div className="text-[13px] font-semibold tracking-tight">{p.name}</div>
                         <div className="text-[11px] text-brand-gray mt-0.5">{p.desc}</div>
                         <span className={`inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full ${p.badge==='Standard'?'bg-brand-light text-brand-gray':'bg-brand-dark text-white'}`}>{p.badge}</span>
                       </button>
-                      )
-                    })}
+                    ))}
                   </div>
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Technique</label>
                   <div className="flex flex-wrap gap-2 mb-8">
@@ -310,7 +301,6 @@ export default function ConfigurateurPage() {
                 </div>
               )}
 
-              {/* STEP 5 */}
               {order.step === 5 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Vos coordonnées</div>
@@ -343,7 +333,6 @@ export default function ConfigurateurPage() {
 
             </div>
 
-            {/* SUMMARY SIDEBAR */}
             <div className="hidden lg:block">
               <div className="bg-brand-light rounded-[20px] p-6 sticky top-32">
                 <div className="text-[13px] font-bold tracking-widest uppercase text-brand-gray mb-5">Résumé</div>
