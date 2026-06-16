@@ -286,22 +286,12 @@ export default function ConfigurateurPage() {
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Emplacement du logo</label>
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {POSITIONS.map(p => {
-                      const logoPos: Record<string,{x:number,y:number,w:number,h:number,back?:boolean}> = {
-                        'coeur':        {x:38, y:38, w:18, h:12},
-                        'coeur-dos':    {x:38, y:38, w:18, h:12, back:true},
-                        'poitrine':     {x:28, y:33, w:40, h:22},
-                        'poitrine-dos': {x:28, y:33, w:40, h:22, back:true},
-                      }
-                      const lp = logoPos[p.id] || {x:38,y:38,w:18,h:12}
                       return (
-                      <button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
-                        <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3">
-                          <svg viewBox="0 0 100 115" className="w-3/4 h-3/4" fill="none">
-                            <path d="M32,8 L18,22 L28,26 L28,90 L72,90 L72,26 L82,22 L68,8 C65,14 58,18 50,18 C42,18 35,14 32,8 Z" fill="#1d1d1f" opacity="0.85"/>
-                            <rect x={lp.x} y={lp.y} width={lp.w} height={lp.h} rx="2" fill="white" opacity="0.95"/>
-                            <rect x={lp.x+1} y={lp.y+1} width={lp.w-2} height={lp.h-2} rx="1.5" fill="none" stroke="#1d1d1f" strokeWidth="0.8" strokeDasharray="2,1"/>
-                            {lp.back && <text x="50" y="108" textAnchor="middle" fontSize="6" fill="#6e6e73">+ dos</text>}
-                          </svg>
+<button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
+  <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3 overflow-hidden">
+    <img src={`https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/${p.id}.jpg`} alt={p.name} className="w-full h-full object-cover rounded-xl" />
+  </div>
+
                         </div>
                         <div className="text-[13px] font-semibold tracking-tight">{p.name}</div>
                         <div className="text-[11px] text-brand-gray mt-0.5">{p.desc}</div>
