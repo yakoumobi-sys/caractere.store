@@ -25,20 +25,20 @@ interface OrderState {
 }
 
 const DEFAULT: OrderState = {
-  step: 1, produit: null, quantite: 10,
-  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M','L','XL'],
+  step: 1, produit: null, quantite: 1,
+  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M'],
   logoFile: null, logoUrl: null,
-  position: 'Logo petit — côté cœur', technique: '🧵 Broderie',
+  position: 'Logo petit — côté cœur', technique: '🖨️DTF',
   urgent: false, nom: '', entreprise: '', telephone: '', email: '', notes: ''
 }
 
 const POSITIONS = [
   {id:'coeur',name:'Logo petit — côté cœur',desc:'Broderie discrète avant gauche',badge:'Standard'},
-  {id:'coeur-dos',name:'Petit cœur + grand dos',desc:'Discret devant, impact dans le dos',badge:'+25%'},
+  {id:'coeur-dos',name:'Petit cœur + grand dos',desc:'Discret devant, impact dans le dos',badge:'Standard'},
   {id:'poitrine',name:'Logo grand — poitrine',desc:'Impression pleine poitrine centrée',badge:'Standard'},
-  {id:'poitrine-dos',name:'Grand poitrine + grand dos',desc:'Impact maximum avant et arrière',badge:'+30%'},
+  {id:'poitrine-dos',name:'Grand poitrine + grand dos',desc:'Impact maximum avant et arrière',badge:'Standard'},
 ]
-const TECHNIQUES = ['🧵 Broderie','🖨 DTF','🎨 Sérigraphie','💬 Conseil équipe']
+const TECHNIQUES = ['🧵 Broderie','🖨 DTF','💬 Conseil équipe']
 
 export default function ConfigurateurPage() {
   const [order, setOrder] = useState<OrderState>(DEFAULT)
@@ -51,13 +51,13 @@ export default function ConfigurateurPage() {
 
   useEffect(() => {
     const fallbackProduits = [
-      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:850,actif:true,ordre:1},
-      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:1400,actif:true,ordre:2},
-      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:1800,actif:true,ordre:3},
+      {id:'1',nom:'T-shirt',emoji:'👕',description:'100% coton, broderie ou DTF',prix_base:1950,actif:true,ordre:1},
+      {id:'2',nom:'Polo',emoji:'👔',description:'Pique coton premium',prix_base:2300,actif:true,ordre:2},
+      {id:'3',nom:'Gilet de travail',emoji:'🦺',description:'Gilet multipoches personnalise',prix_base:2500,actif:true,ordre:3},
       {id:'4',nom:'Gilet de securite',emoji:'🦺',description:'Haute visibilite',prix_base:1600,actif:true,ordre:4},
-      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:900,actif:true,ordre:5},
-      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:650,actif:true,ordre:6},
-      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1200,actif:true,ordre:7},
+      {id:'5',nom:'Casquette',emoji:'🧢',description:'Broderie structuree',prix_base:1200,actif:true,ordre:5},
+      {id:'6',nom:'Totebag',emoji:'👜',description:'Coton canvas DTF',prix_base:950,actif:true,ordre:6},
+      {id:'7',nom:'Tablier',emoji:'👨‍🍳',description:'Cuisine ou commerce',prix_base:1500,actif:true,ordre:7},
     ]
     const fallbackCouleurs = [
       {id:'1',nom:'Blanc',hex:'#FFFFFF',actif:true,ordre:1},
@@ -69,13 +69,11 @@ export default function ConfigurateurPage() {
       {id:'7',nom:'Beige',hex:'#D4B896',actif:true,ordre:7},
     ]
     const fallbackTailles = [
-      {id:'1',nom:'XS',actif:true,ordre:1},
       {id:'2',nom:'S',actif:true,ordre:2},
       {id:'3',nom:'M',actif:true,ordre:3},
       {id:'4',nom:'L',actif:true,ordre:4},
       {id:'5',nom:'XL',actif:true,ordre:5},
       {id:'6',nom:'XXL',actif:true,ordre:6},
-      {id:'7',nom:'XXXL',actif:true,ordre:7},
     ]
     Promise.all([
       supabase.from('produits').select('*').eq('actif',true).order('ordre'),
