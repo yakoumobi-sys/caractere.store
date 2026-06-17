@@ -16,7 +16,10 @@ export default function CommandesAdmin() {
   const [filter, setFilter] = useState('tous')
 
   useEffect(() => {
-    fetch('/api/commandes').then(r=>r.json()).then(setCommandes)
+    fetch('/api/commandes')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setCommandes(Array.isArray(data) ? data : []))
+      .catch(() => setCommandes([]))
   }, [])
 
   const updateStatut = async (id: string, statut: string) => {
