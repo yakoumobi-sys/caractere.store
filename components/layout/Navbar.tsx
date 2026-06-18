@@ -9,6 +9,8 @@ const links = [
   { href: '/#secteurs', label: 'Secteurs' },
   { href: '/#avis',     label: 'Avis'     },
   { href: '/#contact',  label: 'Contact'  },
+{ href: '/designer', label: 'Designer' },
+
 ]
 
 export default function Navbar() {
