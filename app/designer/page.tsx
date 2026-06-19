@@ -1,7 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
 import Navbar from '@/components/layout/Navbar'
-import Link from 'next/link'
 
 interface LogoLayer {
   id: string
@@ -89,6 +88,15 @@ const PRODUCTS = [
 ] as const
 
 type ProductId = typeof PRODUCTS[number]['id']
+
+// Mapping vers les noms produits tels qu'ils existent dans Supabase / configurateur
+const PRODUCT_NOM_MAP: Record<ProductId, string> = {
+  tshirt: 'T-shirt',
+  polo: 'Polo',
+  gilet: 'Gilet de travail',
+  casquette: 'Casquette',
+  totebag: 'Totebag',
+}
 
 const PRINT_ZONE = { left: 32, top: 22, width: 36, height: 40 }
 
@@ -228,6 +236,19 @@ export default function DesignerPage() {
     setActiveLayerId(sameView.length ? sameView[sameView.length - 1].id : null)
   }
 
+  function goToConfigurateur() {
+    try {
+      sessionStorage.setItem('designer_layers', JSON.stringify(layers))
+    } catch (e) {
+      console.warn('Impossible de sauvegarder les logos en session:', e)
+    }
+    const params = new URLSearchParams({
+      produit: PRODUCT_NOM_MAP[selectedProduct],
+      couleur: activeColorKey,
+    })
+    window.location.href = `/configurateur?${params.toString()}`
+  }
+
   return (
     <>
       <Navbar />
@@ -303,7 +324,6 @@ export default function DesignerPage() {
               >
                 <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
-                {/* Print zone guide */}
                 <div
                   className="absolute border-2 border-dashed border-red-400/70 pointer-events-none"
                   style={{ left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`, width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%` }}
@@ -521,14 +541,15 @@ export default function DesignerPage() {
 
               <div className="pt-4 border-t border-black/[0.08]">
                 <p className="text-[13px] text-brand-gray leading-relaxed mb-4">
-                  Une fois satisfait de votre design, continuez vers le configurateur pour choisir la quantité et finaliser votre commande.
+                  Une fois satisfait de votre design, continuez vers le configurateur pour choisir la taille et finaliser votre commande.
                 </p>
-                <Link
-                  href="/configurateur"
-                  className={`block text-center bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline ${layers.length === 0 ? 'opacity-40 pointer-events-none' : ''}`}
+                <button
+                  onClick={goToConfigurateur}
+                  disabled={layers.length === 0}
+                  className={`block w-full text-center bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors ${layers.length === 0 ? 'opacity-40 pointer-events-none' : ''}`}
                 >
                   Continuer vers la commande →
-                </Link>
+                </button>
               </div>
 
             </div>
