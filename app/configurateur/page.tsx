@@ -251,14 +251,14 @@ export default function ConfigurateurPage() {
                     {produits.map(p => {
                       const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
-                        'T-shirt': BASE + '/IMG_5607.jpeg',
-                        'Polo': BASE + '/IMG_5608.jpeg',
-                        'Casquette': BASE + '/IMG_5609.jpeg',
-                        'Totebag': BASE + '/IMG_5610.jpeg',
-                        'Gilet de travail': BASE + '/IMG_5611.jpeg',
-                        'Gilet de securite': BASE + '/images.jpg',
-                        'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
-                      }
+  'T-shirt': BASE + '/Tshirt.jpeg',
+  'Polo': BASE + '/Polo.jpeg',
+  'Casquette': BASE + '/Casquette.jpeg',
+  'Totebag': BASE + '/Totebag.jpeg',
+  'Gilet de travail': BASE + '/Gilet.jpeg',
+  'Gilet de securite': BASE + '/images.jpg',
+  'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
+}
                       const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
                       return (
                         <button key={p.id} onClick={() => up({produit:p})} className={`text-left rounded-2xl border-2 transition-all cursor-pointer bg-white overflow-hidden ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
