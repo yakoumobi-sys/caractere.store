@@ -7,6 +7,7 @@ interface LogoLayer {
   id: string
   src: string
   name: string
+  view: 'front' | 'back'
   x: number
   y: number
   scale: number
@@ -20,8 +21,16 @@ const PRODUCTS = [
     label: 'T-shirt',
     emoji: '👕',
     colors: {
-      Blanc: { hex: '#FFFFFF', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg' },
-      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg' },
+      Blanc: {
+        hex: '#FFFFFF',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg',
+      },
+      Noir: {
+        hex: '#1d1d1f',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg',
+      },
     },
   },
   {
@@ -29,8 +38,16 @@ const PRODUCTS = [
     label: 'Polo',
     emoji: '🎽',
     colors: {
-      Blanc: { hex: '#FFFFFF', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg' },
-      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg' },
+      Blanc: {
+        hex: '#FFFFFF',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg',
+      },
+      Noir: {
+        hex: '#1d1d1f',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg',
+      },
     },
   },
   {
@@ -38,7 +55,11 @@ const PRODUCTS = [
     label: 'Gilet',
     emoji: '🦺',
     colors: {
-      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg' },
+      Noir: {
+        hex: '#1d1d1f',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg',
+      },
     },
   },
   {
@@ -46,7 +67,11 @@ const PRODUCTS = [
     label: 'Casquette',
     emoji: '🧢',
     colors: {
-      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg' },
+      Noir: {
+        hex: '#1d1d1f',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg',
+      },
     },
   },
   {
@@ -54,7 +79,11 @@ const PRODUCTS = [
     label: 'Totebag',
     emoji: '👜',
     colors: {
-      Naturel: { hex: '#e8dfc8', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg' },
+      Naturel: {
+        hex: '#e8dfc8',
+        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg',
+        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg',
+      },
     },
   },
 ] as const
@@ -70,6 +99,7 @@ function makeId() {
 export default function DesignerPage() {
   const [selectedProduct, setSelectedProduct] = useState<ProductId>('tshirt')
   const [selectedColor, setSelectedColor] = useState<string>('Blanc')
+  const [view, setView] = useState<'front' | 'back'>('front')
   const [layers, setLayers] = useState<LogoLayer[]>([])
   const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
@@ -78,9 +108,12 @@ export default function DesignerPage() {
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
 
   const currentProduct = PRODUCTS.find(p => p.id === selectedProduct)!
-  const currentColors = currentProduct.colors as Record<string, { hex: string; img: string }>
+  const currentColors = currentProduct.colors as Record<string, { hex: string; front: string; back: string }>
   const activeColorKey = currentColors[selectedColor] ? selectedColor : Object.keys(currentColors)[0]
-  const mockupImg = currentColors[activeColorKey].img
+  const activeColor = currentColors[activeColorKey]
+  const mockupImg = view === 'front' ? activeColor.front : activeColor.back
+
+  const visibleLayers = layers.filter(l => l.view === view)
   const activeLayer = layers.find(l => l.id === activeLayerId) ?? null
 
   function handleSelectProduct(id: ProductId) {
@@ -105,6 +138,7 @@ export default function DesignerPage() {
         id: makeId(),
         src: e.target?.result as string,
         name: file.name,
+        view,
         x: 50, y: 45, scale: 1, rotation: 0,
       }
       setLayers(ls => [...ls, newLayer])
@@ -116,18 +150,13 @@ export default function DesignerPage() {
   async function removeBackground(layerId: string) {
     const layer = layers.find(l => l.id === layerId)
     if (!layer) return
-
     updateLayer(layerId, { removingBg: true })
-
     try {
-      // Dynamic import — la librairie est chargée seulement quand nécessaire
       const { removeBackground: removeBg } = await import('@imgly/background-removal')
-
       const blob = await removeBg(layer.src, {
         publicPath: 'https://unpkg.com/@imgly/background-removal@1.4.5/dist/',
         debug: false,
       })
-
       const newSrc = URL.createObjectURL(blob)
       updateLayer(layerId, { src: newSrc, removingBg: false })
     } catch (err) {
@@ -152,11 +181,22 @@ export default function DesignerPage() {
     })
   }
 
+  function duplicateToOtherSide(id: string) {
+    setLayers(ls => {
+      const source = ls.find(l => l.id === id)
+      if (!source) return ls
+      const otherView = source.view === 'front' ? 'back' : 'front'
+      const copy: LogoLayer = { ...source, id: makeId(), view: otherView }
+      return [...ls, copy]
+    })
+  }
+
   function deleteLayer(id: string) {
     setLayers(ls => {
       const remaining = ls.filter(l => l.id !== id)
       if (activeLayerId === id) {
-        setActiveLayerId(remaining.length ? remaining[remaining.length - 1].id : null)
+        const sameView = remaining.filter(l => l.view === view)
+        setActiveLayerId(sameView.length ? sameView[sameView.length - 1].id : null)
       }
       return remaining
     })
@@ -182,16 +222,22 @@ export default function DesignerPage() {
 
   const onPointerUp = () => setDragging(false)
 
+  function switchView(next: 'front' | 'back') {
+    setView(next)
+    const sameView = layers.filter(l => l.view === next)
+    setActiveLayerId(sameView.length ? sameView[sameView.length - 1].id : null)
+  }
+
   return (
     <>
       <Navbar />
       <main className="pt-14 min-h-screen bg-white">
         <div className="max-w-[1100px] mx-auto px-6 py-10">
 
-          <div className="mb-8">
+          <div className="mb-6">
             <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Designer</span>
             <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le.</p>
+            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le sur le recto ou le verso.</p>
           </div>
 
           {/* PRODUCT SELECTOR */}
@@ -216,27 +262,65 @@ export default function DesignerPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
 
-            {/* CANVAS */}
+            {/* CANVAS COLUMN */}
             <div>
+              {/* TOOLBAR */}
+              <div className="bg-[#111] rounded-t-2xl px-2 py-2.5 flex items-center justify-around">
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="flex flex-col items-center gap-1 text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  <span className="text-[18px]">🖼️</span>
+                  <span className="text-[10px] font-semibold tracking-wide">IMAGES</span>
+                </button>
+                <div className="w-px h-8 bg-white/15" />
+                <button
+                  disabled
+                  title="Bientôt disponible"
+                  className="flex flex-col items-center gap-1 text-white/40 px-3 py-1.5 rounded-lg cursor-not-allowed"
+                >
+                  <span className="text-[18px]">🅰️</span>
+                  <span className="text-[10px] font-semibold tracking-wide">ADD TEXT</span>
+                </button>
+                <div className="w-px h-8 bg-white/15" />
+                <button
+                  disabled
+                  title="Bientôt disponible"
+                  className="flex flex-col items-center gap-1 text-white/40 px-3 py-1.5 rounded-lg cursor-not-allowed"
+                >
+                  <span className="text-[18px]">🎨</span>
+                  <span className="text-[10px] font-semibold tracking-wide">DESIGNS</span>
+                </button>
+              </div>
+
+              {/* STAGE */}
               <div
                 ref={stageRef}
-                className="relative w-full aspect-square bg-brand-light rounded-[24px] overflow-hidden select-none border border-black/[0.06]"
+                className="relative w-full aspect-square bg-brand-light overflow-hidden select-none border-x border-b border-black/[0.06] rounded-b-2xl"
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
               >
                 <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
-                {layers.length === 0 && (
+                {/* Print zone guide */}
+                <div
+                  className="absolute border-2 border-dashed border-red-400/70 pointer-events-none"
+                  style={{ left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`, width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%` }}
+                />
+
+                {visibleLayers.length === 0 && (
                   <div
-                    className="absolute border-2 border-dashed border-black/25 rounded-lg flex items-center justify-center"
+                    className="absolute flex flex-col items-center justify-center gap-2 cursor-pointer"
                     style={{ left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`, width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%` }}
+                    onClick={() => fileRef.current?.click()}
                   >
-                    <span className="text-[11px] font-medium text-brand-dark/50 bg-white/70 px-2 py-1 rounded">Zone d'impression</span>
+                    <span className="text-[36px] opacity-50">☁️</span>
+                    <span className="text-[11px] font-medium text-brand-dark/50 bg-white/70 px-2 py-1 rounded">Ajouter image</span>
                   </div>
                 )}
 
-                {layers.map(layer => (
+                {visibleLayers.map(layer => (
                   <div
                     key={layer.id}
                     onPointerDown={(e) => onPointerDown(e, layer)}
@@ -261,19 +345,49 @@ export default function DesignerPage() {
                     )}
                   </div>
                 ))}
+
+                {/* FRONT/BACK NAV */}
+                <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-2">
+                  <button
+                    onClick={() => switchView('front')}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-brand-dark disabled:opacity-30"
+                    disabled={view === 'front'}
+                  >
+                    ←
+                  </button>
+                  <div className="flex items-center gap-1 px-2 text-[12px] font-semibold text-brand-dark">
+                    <span>📄</span>
+                    <span>{view === 'front' ? '1' : '2'}/2</span>
+                  </div>
+                  <button
+                    onClick={() => switchView('back')}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-brand-dark disabled:opacity-30"
+                    disabled={view === 'back'}
+                  >
+                    →
+                  </button>
+                </div>
               </div>
 
-              <div
-                onClick={() => fileRef.current?.click()}
-                onDragOver={e => e.preventDefault()}
-                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
-                className="mt-4 border-2 border-dashed border-black/20 rounded-2xl p-6 text-center cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50"
-              >
-                <div className="text-[28px] mb-1">📁</div>
-                <div className="text-[14px] font-medium">{layers.length === 0 ? 'Glissez votre logo ici ou cliquez pour parcourir' : 'Ajouter un autre logo'}</div>
-                <div className="text-[11px] text-brand-gray mt-1">PNG, JPG — fond transparent recommandé</div>
-                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+              {/* View tabs */}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => switchView('front')}
+                  className={`flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all
+                    ${view === 'front' ? 'bg-brand-dark text-white' : 'bg-brand-light text-brand-gray hover:bg-black/5'}`}
+                >
+                  Avant / Front {layers.some(l => l.view === 'front') && '●'}
+                </button>
+                <button
+                  onClick={() => switchView('back')}
+                  className={`flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all
+                    ${view === 'back' ? 'bg-brand-dark text-white' : 'bg-brand-light text-brand-gray hover:bg-black/5'}`}
+                >
+                  Arrière / Back {layers.some(l => l.view === 'back') && '●'}
+                </button>
               </div>
+
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
             </div>
 
             {/* CONTROLS */}
@@ -297,12 +411,14 @@ export default function DesignerPage() {
                 </div>
               )}
 
-              {/* Layers list */}
-              {layers.length > 0 && (
+              {/* Layers list (current view only) */}
+              {visibleLayers.length > 0 && (
                 <div>
-                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">Logos ({layers.length})</label>
+                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">
+                    Logos sur {view === 'front' ? 'avant' : 'arrière'} ({visibleLayers.length})
+                  </label>
                   <div className="flex flex-col gap-2">
-                    {layers.map(layer => (
+                    {visibleLayers.map(layer => (
                       <div
                         key={layer.id}
                         onClick={() => setActiveLayerId(layer.id)}
@@ -315,6 +431,7 @@ export default function DesignerPage() {
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); duplicateLayer(layer.id) }}
+                          title="Dupliquer"
                           className="text-[11px] font-medium text-brand-dark px-2 py-1 rounded-md hover:bg-black/5 flex-shrink-0"
                         >
                           ⧉
@@ -331,7 +448,7 @@ export default function DesignerPage() {
                 </div>
               )}
 
-              {activeLayer && (
+              {activeLayer && activeLayer.view === view && (
                 <>
                   {/* Background remover */}
                   <div className="bg-brand-light rounded-2xl p-4">
@@ -388,18 +505,15 @@ export default function DesignerPage() {
                     />
                   </div>
 
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })}
-                      className="text-[13px] font-medium text-brand-dark underline"
-                    >
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    <button onClick={() => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })} className="text-[13px] font-medium text-brand-dark underline">
                       Réinitialiser
                     </button>
-                    <button
-                      onClick={() => duplicateLayer(activeLayer.id)}
-                      className="text-[13px] font-medium text-brand-dark underline"
-                    >
+                    <button onClick={() => duplicateLayer(activeLayer.id)} className="text-[13px] font-medium text-brand-dark underline">
                       Dupliquer
+                    </button>
+                    <button onClick={() => duplicateToOtherSide(activeLayer.id)} className="text-[13px] font-medium text-brand-dark underline">
+                      Copier vers {activeLayer.view === 'front' ? 'arrière' : 'avant'}
                     </button>
                   </div>
                 </>
