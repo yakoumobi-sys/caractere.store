@@ -1,3 +1,50 @@
+const PRODUCTS = [
+  {
+    id: 'tshirt',
+    label: 'T-shirt',
+    emoji: '👕',
+    colors: {
+      blanc: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg',
+      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg',
+    },
+  },
+  {
+    id: 'polo',
+    label: 'Polo',
+    emoji: '🎽',
+    colors: {
+      blanc: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg',
+      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg',
+    },
+  },
+  {
+    id: 'gilet',
+    label: 'Gilet',
+    emoji: '🦺',
+    colors: {
+      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg',
+    },
+  },
+  {
+    id: 'casquette',
+    label: 'Casquette',
+    emoji: '🧢',
+    colors: {
+      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg',
+    },
+  },
+  {
+    id: 'totebag',
+    label: 'Totebag',
+    emoji: '👜',
+    colors: {
+      naturel: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg',
+    },
+  },
+] as const
+
+type ProductId = typeof PRODUCTS[number]['id']
+
 'use client'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
