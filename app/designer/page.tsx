@@ -7,10 +7,11 @@ interface LogoLayer {
   id: string
   src: string
   name: string
-  x: number      // percentage from left of stage
-  y: number      // percentage from top of stage
-  scale: number  // 0.3 to 2.2
-  rotation: number // degrees
+  x: number
+  y: number
+  scale: number
+  rotation: number
+  removingBg?: boolean
 }
 
 const PRODUCTS = [
@@ -60,7 +61,6 @@ const PRODUCTS = [
 
 type ProductId = typeof PRODUCTS[number]['id']
 
-// Print zone defined as percentage of the stage bounding box
 const PRINT_ZONE = { left: 32, top: 22, width: 36, height: 40 }
 
 function makeId() {
@@ -80,21 +80,21 @@ export default function DesignerPage() {
   const currentProduct = PRODUCTS.find(p => p.id === selectedProduct)!
   const currentColors = currentProduct.colors as Record<string, { hex: string; img: string }>
   const activeColorKey = currentColors[selectedColor] ? selectedColor : Object.keys(currentColors)[0]
-  const activeColor = currentColors[activeColorKey]
-  const mockupImg = activeColor.img
-
+  const mockupImg = currentColors[activeColorKey].img
   const activeLayer = layers.find(l => l.id === activeLayerId) ?? null
 
   function handleSelectProduct(id: ProductId) {
     setSelectedProduct(id)
     const product = PRODUCTS.find(p => p.id === id)!
-    const firstColor = Object.keys(product.colors)[0]
-    setSelectedColor(firstColor)
+    setSelectedColor(Object.keys(product.colors)[0])
+  }
+
+  function updateLayer(id: string, patch: Partial<LogoLayer>) {
+    setLayers(ls => ls.map(l => (l.id === id ? { ...l, ...patch } : l)))
   }
 
   function updateActiveLayer(patch: Partial<LogoLayer>) {
-    if (!activeLayerId) return
-    setLayers(ls => ls.map(l => (l.id === activeLayerId ? { ...l, ...patch } : l)))
+    if (activeLayerId) updateLayer(activeLayerId, patch)
   }
 
   const handleFile = (file: File) => {
@@ -105,15 +105,36 @@ export default function DesignerPage() {
         id: makeId(),
         src: e.target?.result as string,
         name: file.name,
-        x: 50,
-        y: 45,
-        scale: 1,
-        rotation: 0,
+        x: 50, y: 45, scale: 1, rotation: 0,
       }
       setLayers(ls => [...ls, newLayer])
       setActiveLayerId(newLayer.id)
     }
     reader.readAsDataURL(file)
+  }
+
+  async function removeBackground(layerId: string) {
+    const layer = layers.find(l => l.id === layerId)
+    if (!layer) return
+
+    updateLayer(layerId, { removingBg: true })
+
+    try {
+      // Dynamic import — la librairie est chargée seulement quand nécessaire
+      const { removeBackground: removeBg } = await import('@imgly/background-removal')
+
+      const blob = await removeBg(layer.src, {
+        publicPath: 'https://unpkg.com/@imgly/background-removal@1.4.5/dist/',
+        debug: false,
+      })
+
+      const newSrc = URL.createObjectURL(blob)
+      updateLayer(layerId, { src: newSrc, removingBg: false })
+    } catch (err) {
+      console.error('Background removal failed:', err)
+      updateLayer(layerId, { removingBg: false })
+      alert('Erreur lors de la suppression du fond. Réessayez.')
+    }
   }
 
   function duplicateLayer(id: string) {
@@ -161,8 +182,6 @@ export default function DesignerPage() {
 
   const onPointerUp = () => setDragging(false)
 
-  const resetActive = () => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })
-
   return (
     <>
       <Navbar />
@@ -172,7 +191,7 @@ export default function DesignerPage() {
           <div className="mb-8">
             <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Designer</span>
             <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le. Dupliquez-le pour un second emplacement (ex: dos).</p>
+            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le.</p>
           </div>
 
           {/* PRODUCT SELECTOR */}
@@ -205,21 +224,13 @@ export default function DesignerPage() {
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
-                onPointerDownCapture={(e) => {
-                  // clicking the empty stage deselects the active layer
-                  if (e.target === stageRef.current) setActiveLayerId(null)
-                }}
               >
                 <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
-                {/* Print zone guide (visible only while no logo at all) */}
                 {layers.length === 0 && (
                   <div
                     className="absolute border-2 border-dashed border-black/25 rounded-lg flex items-center justify-center"
-                    style={{
-                      left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`,
-                      width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%`,
-                    }}
+                    style={{ left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`, width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%` }}
                   >
                     <span className="text-[11px] font-medium text-brand-dark/50 bg-white/70 px-2 py-1 rounded">Zone d'impression</span>
                   </div>
@@ -231,15 +242,21 @@ export default function DesignerPage() {
                     onPointerDown={(e) => onPointerDown(e, layer)}
                     className="absolute cursor-move touch-none"
                     style={{
-                      left: `${layer.x}%`,
-                      top: `${layer.y}%`,
+                      left: `${layer.x}%`, top: `${layer.y}%`,
                       transform: `translate(-50%, -50%) rotate(${layer.rotation}deg) scale(${layer.scale})`,
                       width: `${PRINT_ZONE.width}%`,
                       zIndex: layer.id === activeLayerId ? 10 : 1,
                     }}
                   >
-                    <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
-                    {layer.id === activeLayerId && (
+                    {layer.removingBg ? (
+                      <div className="w-full aspect-square flex flex-col items-center justify-center bg-white/80 rounded-lg gap-2">
+                        <div className="w-6 h-6 border-2 border-brand-dark border-t-transparent rounded-full animate-spin" />
+                        <span className="text-[10px] text-brand-gray font-medium">Suppression...</span>
+                      </div>
+                    ) : (
+                      <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
+                    )}
+                    {layer.id === activeLayerId && !layer.removingBg && (
                       <div className={`absolute inset-0 border-2 rounded ${dragging ? 'border-brand-dark' : 'border-brand-dark/50 border-dashed'}`} />
                     )}
                   </div>
@@ -283,9 +300,7 @@ export default function DesignerPage() {
               {/* Layers list */}
               {layers.length > 0 && (
                 <div>
-                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">
-                    Logos ({layers.length})
-                  </label>
+                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">Logos ({layers.length})</label>
                   <div className="flex flex-col gap-2">
                     {layers.map(layer => (
                       <div
@@ -300,14 +315,12 @@ export default function DesignerPage() {
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); duplicateLayer(layer.id) }}
-                          title="Dupliquer ce logo"
                           className="text-[11px] font-medium text-brand-dark px-2 py-1 rounded-md hover:bg-black/5 flex-shrink-0"
                         >
-                          ⧉ Dupliquer
+                          ⧉
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id) }}
-                          title="Supprimer ce logo"
                           className="text-[11px] text-red-500 font-medium px-1.5 flex-shrink-0"
                         >
                           ✕
@@ -320,6 +333,33 @@ export default function DesignerPage() {
 
               {activeLayer && (
                 <>
+                  {/* Background remover */}
+                  <div className="bg-brand-light rounded-2xl p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1">
+                        <div className="text-[13px] font-semibold text-brand-dark mb-0.5">Supprimer le fond</div>
+                        <div className="text-[11px] text-brand-gray leading-snug">IA locale, 100% gratuit. La 1ère utilisation télécharge le modèle (~40 sec).</div>
+                      </div>
+                      <button
+                        onClick={() => removeBackground(activeLayer.id)}
+                        disabled={!!activeLayer.removingBg}
+                        className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all
+                          ${activeLayer.removingBg
+                            ? 'bg-black/10 text-brand-gray cursor-not-allowed'
+                            : 'bg-brand-dark text-white hover:bg-neutral-800'}`}
+                      >
+                        {activeLayer.removingBg ? (
+                          <>
+                            <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                            En cours...
+                          </>
+                        ) : (
+                          <>✨ Supprimer</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Scale */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
@@ -349,11 +389,17 @@ export default function DesignerPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <button onClick={resetActive} className="text-[13px] font-medium text-brand-dark underline">
-                      Réinitialiser la position
+                    <button
+                      onClick={() => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })}
+                      className="text-[13px] font-medium text-brand-dark underline"
+                    >
+                      Réinitialiser
                     </button>
-                    <button onClick={() => duplicateLayer(activeLayer.id)} className="text-[13px] font-medium text-brand-dark underline">
-                      Dupliquer ce logo
+                    <button
+                      onClick={() => duplicateLayer(activeLayer.id)}
+                      className="text-[13px] font-medium text-brand-dark underline"
+                    >
+                      Dupliquer
                     </button>
                   </div>
                 </>
