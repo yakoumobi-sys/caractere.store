@@ -13,10 +13,18 @@ export function HeroSection({ config }: { config: Record<string, string> }) {
       <span className="text-[13px] font-medium text-brand-gray mb-[18px] block">Personnalisation Textile — Alger</span>
       <h1 className="text-[clamp(42px,7vw,86px)] font-bold leading-[1.04] tracking-tight text-brand-dark max-w-[760px] mx-auto mb-[22px]">{titre}</h1>
       <p className="text-[19px] font-light text-brand-gray leading-relaxed max-w-[500px] mx-auto mb-11">{sous}</p>
-      <div className="flex gap-3.5 justify-center flex-wrap mb-[72px]">
-        <Link href="/configurateur" className="bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline">Configurer ma commande</Link>
-        <a href="/#produits" className="bg-transparent text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium border border-black/20 hover:border-black/50 transition-colors no-underline">Voir nos réalisations</a>
-      </div>
+      <div className="flex flex-col gap-3.5 items-center">
+  <Link href="/configurateur" className="bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline">
+    Configurer ma commande
+  </Link>
+  <Link href="/designer" className="border-2 border-brand-dark text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-brand-dark hover:text-white transition-colors no-underline">
+    Open Designer ✏
+  </Link>
+  <a href="/#produits" className="bg-transparent border border-black/20 text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-brand-light transition-colors no-underline">
+    Voir nos réalisations
+  </a>
+</div>
+
       <div className="flex gap-14 justify-center flex-wrap pt-9 border-t border-black/[0.08] w-full max-w-[600px] mx-auto">
         {[{n:'297K',l:'Abonnés Instagram'},{n:'5+',l:"Ans d'activité"},{n:'3–5j',l:'Délai production'},{n:'1',l:'Pièce minimum'}].map(s => (
           <div key={s.l} className="text-center">
