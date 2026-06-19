@@ -4,6 +4,7 @@ import Navbar from '@/components/layout/Navbar'
 
 interface LogoLayer {
   id: string
+  type: 'image'
   src: string
   name: string
   view: 'front' | 'back'
@@ -12,6 +13,22 @@ interface LogoLayer {
   scale: number
   rotation: number
 }
+
+interface TextLayer {
+  id: string
+  type: 'text'
+  text: string
+  view: 'front' | 'back'
+  x: number
+  y: number
+  scale: number
+  rotation: number
+  color: string
+  fontFamily: string
+  fontWeight: number
+}
+
+type Layer = LogoLayer | TextLayer
 
 const PRODUCTS = [
   {
@@ -98,6 +115,14 @@ const PRODUCT_NOM_MAP: Record<ProductId, string> = {
 
 const PRINT_ZONE = { left: 32, top: 22, width: 36, height: 40 }
 
+const FONT_OPTIONS = [
+  { id: 'sans', label: 'Sans-serif', family: 'Helvetica, Arial, sans-serif' },
+  { id: 'serif', label: 'Serif', family: 'Georgia, "Times New Roman", serif' },
+  { id: 'script', label: 'Manuscrite', family: '"Brush Script MT", cursive' },
+]
+
+const TEXT_COLORS = ['#000000', '#FFFFFF', '#E11D48', '#2563EB', '#16A34A', '#D97706']
+
 function makeId() {
   return Math.random().toString(36).slice(2, 10)
 }
@@ -106,9 +131,10 @@ export default function DesignerPage() {
   const [selectedProduct, setSelectedProduct] = useState<ProductId>('tshirt')
   const [selectedColor, setSelectedColor] = useState<string>('Blanc')
   const [view, setView] = useState<'front' | 'back'>('front')
-  const [layers, setLayers] = useState<LogoLayer[]>([])
+  const [layers, setLayers] = useState<Layer[]>([])
   const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
+  const [showTextPanel, setShowTextPanel] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
@@ -128,11 +154,11 @@ export default function DesignerPage() {
     setSelectedColor(Object.keys(product.colors)[0])
   }
 
-  function updateLayer(id: string, patch: Partial<LogoLayer>) {
-    setLayers(ls => ls.map(l => (l.id === id ? { ...l, ...patch } : l)))
+  function updateLayer(id: string, patch: Partial<Layer>) {
+    setLayers(ls => ls.map(l => (l.id === id ? ({ ...l, ...patch } as Layer) : l)))
   }
 
-  function updateActiveLayer(patch: Partial<LogoLayer>) {
+  function updateActiveLayer(patch: Partial<Layer>) {
     if (activeLayerId) updateLayer(activeLayerId, patch)
   }
 
@@ -142,6 +168,7 @@ export default function DesignerPage() {
     reader.onload = (e) => {
       const newLayer: LogoLayer = {
         id: makeId(),
+        type: 'image',
         src: e.target?.result as string,
         name: file.name,
         view,
@@ -149,20 +176,37 @@ export default function DesignerPage() {
       }
       setLayers(ls => [...ls, newLayer])
       setActiveLayerId(newLayer.id)
+      setShowTextPanel(false)
     }
     reader.readAsDataURL(file)
+  }
+
+  function addTextLayer() {
+    const newLayer: TextLayer = {
+      id: makeId(),
+      type: 'text',
+      text: 'Votre texte',
+      view,
+      x: 50, y: 45, scale: 1, rotation: 0,
+      color: '#000000',
+      fontFamily: FONT_OPTIONS[0].family,
+      fontWeight: 700,
+    }
+    setLayers(ls => [...ls, newLayer])
+    setActiveLayerId(newLayer.id)
+    setShowTextPanel(true)
   }
 
   function duplicateLayer(id: string) {
     setLayers(ls => {
       const source = ls.find(l => l.id === id)
       if (!source) return ls
-      const copy: LogoLayer = {
+      const copy: Layer = {
         ...source,
         id: makeId(),
         x: Math.min(90, source.x + 8),
         y: Math.min(90, source.y + 8),
-      }
+      } as Layer
       setActiveLayerId(copy.id)
       return [...ls, copy]
     })
@@ -173,7 +217,7 @@ export default function DesignerPage() {
       const source = ls.find(l => l.id === id)
       if (!source) return ls
       const otherView = source.view === 'front' ? 'back' : 'front'
-      const copy: LogoLayer = { ...source, id: makeId(), view: otherView }
+      const copy: Layer = { ...source, id: makeId(), view: otherView } as Layer
       return [...ls, copy]
     })
   }
@@ -189,7 +233,7 @@ export default function DesignerPage() {
     })
   }
 
-  const onPointerDown = (e: React.PointerEvent, layer: LogoLayer) => {
+  const onPointerDown = (e: React.PointerEvent, layer: Layer) => {
     setActiveLayerId(layer.id)
     setDragging(true)
     dragStart.current = { x: e.clientX, y: e.clientY, tx: layer.x, ty: layer.y }
@@ -219,7 +263,7 @@ export default function DesignerPage() {
     try {
       sessionStorage.setItem('designer_layers', JSON.stringify(layers))
     } catch (e) {
-      console.warn('Impossible de sauvegarder les logos en session:', e)
+      console.warn('Impossible de sauvegarder en session:', e)
     }
     const params = new URLSearchParams({
       produit: PRODUCT_NOM_MAP[selectedProduct],
@@ -237,7 +281,7 @@ export default function DesignerPage() {
           <div className="mb-6">
             <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Designer</span>
             <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le sur le recto ou le verso.</p>
+            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, ajoutez logo ou texte, et positionnez sur le recto ou le verso.</p>
           </div>
 
           {/* PRODUCT SELECTOR */}
@@ -275,9 +319,8 @@ export default function DesignerPage() {
                 </button>
                 <div className="w-px h-8 bg-white/15" />
                 <button
-                  disabled
-                  title="Bientôt disponible"
-                  className="flex flex-col items-center gap-1 text-white/40 px-3 py-1.5 rounded-lg cursor-not-allowed"
+                  onClick={addTextLayer}
+                  className="flex flex-col items-center gap-1 text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
                 >
                   <span className="text-[18px]">🅰️</span>
                   <span className="text-[10px] font-semibold tracking-wide">ADD TEXT</span>
@@ -303,11 +346,6 @@ export default function DesignerPage() {
               >
                 <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
-                <div
-                  className="absolute border-2 border-dashed border-red-400/70 pointer-events-none"
-                  style={{ left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`, width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%` }}
-                />
-
                 {visibleLayers.length === 0 && (
                   <div
                     className="absolute flex flex-col items-center justify-center gap-2 cursor-pointer"
@@ -327,11 +365,27 @@ export default function DesignerPage() {
                     style={{
                       left: `${layer.x}%`, top: `${layer.y}%`,
                       transform: `translate(-50%, -50%) rotate(${layer.rotation}deg) scale(${layer.scale})`,
-                      width: `${PRINT_ZONE.width}%`,
+                      width: layer.type === 'image' ? `${PRINT_ZONE.width}%` : 'auto',
+                      maxWidth: `${PRINT_ZONE.width * 1.4}%`,
                       zIndex: layer.id === activeLayerId ? 10 : 1,
                     }}
                   >
-                    <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
+                    {layer.type === 'image' ? (
+                      <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
+                    ) : (
+                      <div
+                        className="whitespace-nowrap pointer-events-none px-2"
+                        style={{
+                          color: layer.color,
+                          fontFamily: layer.fontFamily,
+                          fontWeight: layer.fontWeight,
+                          fontSize: '28px',
+                          lineHeight: 1.1,
+                        }}
+                      >
+                        {layer.text}
+                      </div>
+                    )}
                     {layer.id === activeLayerId && (
                       <div className={`absolute inset-0 border-2 rounded ${dragging ? 'border-brand-dark' : 'border-brand-dark/50 border-dashed'}`} />
                     )}
@@ -403,31 +457,28 @@ export default function DesignerPage() {
                 </div>
               )}
 
-              {/* Layers list (current view only) */}
+              {/* Layers list */}
               {visibleLayers.length > 0 && (
                 <div>
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">
-                    Logos sur {view === 'front' ? 'avant' : 'arrière'} ({visibleLayers.length})
+                    Calques sur {view === 'front' ? 'avant' : 'arrière'} ({visibleLayers.length})
                   </label>
                   <div className="flex flex-col gap-2">
                     {visibleLayers.map(layer => (
                       <div
                         key={layer.id}
-                        onClick={() => setActiveLayerId(layer.id)}
+                        onClick={() => { setActiveLayerId(layer.id); setShowTextPanel(layer.type === 'text') }}
                         className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all
                           ${layer.id === activeLayerId ? 'border-brand-dark bg-brand-light' : 'border-black/10 bg-white hover:border-black/25'}`}
                       >
-                        <img src={layer.src} alt="" className="w-9 h-9 object-contain rounded-lg bg-white border border-black/5 flex-shrink-0" />
+                        {layer.type === 'image' ? (
+                          <img src={layer.src} alt="" className="w-9 h-9 object-contain rounded-lg bg-white border border-black/5 flex-shrink-0" />
+                        ) : (
+                          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-black/5 flex-shrink-0 text-[16px] font-bold">A</div>
+                        )}
                         <div className="flex-1 min-w-0">
-                          <div className="text-[12px] font-semibold truncate">{layer.name}</div>
+                          <div className="text-[12px] font-semibold truncate">{layer.type === 'image' ? layer.name : layer.text}</div>
                         </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); duplicateLayer(layer.id) }}
-                          title="Dupliquer"
-                          className="text-[11px] font-medium text-brand-dark px-2 py-1 rounded-md hover:bg-black/5 flex-shrink-0"
-                        >
-                          ⧉
-                        </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id) }}
                           className="text-[11px] text-red-500 font-medium px-1.5 flex-shrink-0"
@@ -442,6 +493,77 @@ export default function DesignerPage() {
 
               {activeLayer && activeLayer.view === view && (
                 <>
+                  {/* TEXT-SPECIFIC CONTROLS */}
+                  {activeLayer.type === 'text' && (
+                    <>
+                      <div>
+                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Texte</label>
+                        <input
+                          type="text"
+                          value={activeLayer.text}
+                          onChange={e => updateActiveLayer({ text: e.target.value })}
+                          className="w-full border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] focus:outline-none"
+                          placeholder="Votre texte"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Police</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {FONT_OPTIONS.map(f => (
+                            <button
+                              key={f.id}
+                              onClick={() => updateActiveLayer({ fontFamily: f.family })}
+                              style={{ fontFamily: f.family }}
+                              className={`px-3 py-2 rounded-xl text-[13px] border transition-all ${activeLayer.fontFamily === f.family ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white border-black/15 hover:border-black/30'}`}
+                            >
+                              {f.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Épaisseur</label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => updateActiveLayer({ fontWeight: 300 })}
+                            className={`flex-1 py-2.5 rounded-xl text-[13px] font-light border transition-all ${activeLayer.fontWeight === 300 ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white border-black/15 hover:border-black/30'}`}
+                          >
+                            Fin
+                          </button>
+                          <button
+                            onClick={() => updateActiveLayer({ fontWeight: 700 })}
+                            className={`flex-1 py-2.5 rounded-xl text-[13px] font-bold border transition-all ${activeLayer.fontWeight === 700 ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white border-black/15 hover:border-black/30'}`}
+                          >
+                            Gras
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Couleur du texte</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {TEXT_COLORS.map(c => (
+                            <button
+                              key={c}
+                              onClick={() => updateActiveLayer({ color: c })}
+                              className={`w-9 h-9 rounded-full border-2 transition-all ${activeLayer.color === c ? 'border-brand-dark scale-110' : 'border-black/10'}`}
+                              style={{ background: c, boxShadow: c === '#FFFFFF' ? 'inset 0 0 0 1px rgba(0,0,0,0.15)' : 'none' }}
+                            />
+                          ))}
+                          <input
+                            type="color"
+                            value={activeLayer.color}
+                            onChange={e => updateActiveLayer({ color: e.target.value })}
+                            className="w-9 h-9 rounded-full border-2 border-black/10 cursor-pointer"
+                            title="Couleur personnalisée"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   {/* Scale */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
@@ -449,7 +571,7 @@ export default function DesignerPage() {
                       <span className="text-[12px] text-brand-gray font-medium">{Math.round(activeLayer.scale * 100)}%</span>
                     </div>
                     <input
-                      type="range" min="0.3" max="2.2" step="0.05"
+                      type="range" min="0.3" max="2.5" step="0.05"
                       value={activeLayer.scale}
                       onChange={e => updateActiveLayer({ scale: parseFloat(e.target.value) })}
                       className="w-full accent-brand-dark"
@@ -470,17 +592,29 @@ export default function DesignerPage() {
                     />
                   </div>
 
-                  <div className="flex flex-wrap gap-x-4 gap-y-2">
-                    <button onClick={() => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })} className="text-[13px] font-medium text-brand-dark underline">
-                      Réinitialiser
+                  {/* BIG ACTION BUTTONS */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })}
+                      className="flex flex-col items-center justify-center gap-1 py-4 rounded-2xl border-2 border-black/15 bg-white hover:border-black/30 hover:bg-brand-light transition-all"
+                    >
+                      <span className="text-[20px]">↺</span>
+                      <span className="text-[12px] font-semibold text-brand-dark">Annuler</span>
                     </button>
-                    <button onClick={() => duplicateLayer(activeLayer.id)} className="text-[13px] font-medium text-brand-dark underline">
-                      Dupliquer
-                    </button>
-                    <button onClick={() => duplicateToOtherSide(activeLayer.id)} className="text-[13px] font-medium text-brand-dark underline">
-                      Copier vers {activeLayer.view === 'front' ? 'arrière' : 'avant'}
+                    <button
+                      onClick={() => duplicateLayer(activeLayer.id)}
+                      className="flex flex-col items-center justify-center gap-1 py-4 rounded-2xl border-2 border-black/15 bg-white hover:border-black/30 hover:bg-brand-light transition-all"
+                    >
+                      <span className="text-[20px]">⧉</span>
+                      <span className="text-[12px] font-semibold text-brand-dark">Dupliquer</span>
                     </button>
                   </div>
+                  <button
+                    onClick={() => duplicateToOtherSide(activeLayer.id)}
+                    className="text-[13px] font-medium text-brand-dark underline self-start"
+                  >
+                    Copier vers {activeLayer.view === 'front' ? 'arrière' : 'avant'}
+                  </button>
                 </>
               )}
 
