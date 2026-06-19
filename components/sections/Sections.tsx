@@ -103,14 +103,14 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
           {produits.map(p => {
               const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
               const imgs: Record<string,string> = {
-                'T-shirt': BASE + '/IMG_5509.png',
-                'Polo': BASE + '/IMG_5510.png',
-                'Casquette': BASE + '/IMG_5511.png',
-                'Totebag': BASE + '/IMG_5512.png',
-                'Gilet de travail': BASE + '/IMG_5599.png',
-                'Gilet de securite': BASE + '/IMG_5599.png',
-                'Tablier': BASE + '/IMG_5510.png',
-              }
+  'T-shirt': BASE + '/IMG_5850.jpeg',
+  'Polo': BASE + '/IMG_5851.jpeg',
+  'Casquette': BASE + '/IMG_5853.jpeg',
+  'Totebag': BASE + '/IMG_5854.jpeg',
+  'Gilet de travail': BASE + '/IMG_5852.jpeg',
+  'Gilet de securite': BASE + '/IMG_5852.jpeg',
+  'Tablier': BASE + '/IMG_5850.jpeg',
+}
               const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
               return (
             <div key={p.id} className="apple-grid-cell flex flex-col">
