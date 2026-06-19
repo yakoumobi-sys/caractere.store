@@ -3,10 +3,13 @@ import { useState, useRef } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Link from 'next/link'
 
-interface LogoTransform {
-  x: number      // percentage from left of print zone
-  y: number      // percentage from top of print zone
-  scale: number  // 0.3 to 2.5
+interface LogoLayer {
+  id: string
+  src: string
+  name: string
+  x: number      // percentage from left of stage
+  y: number      // percentage from top of stage
+  scale: number  // 0.3 to 2.2
   rotation: number // degrees
 }
 
@@ -57,16 +60,18 @@ const PRODUCTS = [
 
 type ProductId = typeof PRODUCTS[number]['id']
 
-// Print zone defined as percentage of the t-shirt image bounding box
-// Tuned for a centered-chest area on a standard front-facing tshirt photo
+// Print zone defined as percentage of the stage bounding box
 const PRINT_ZONE = { left: 32, top: 22, width: 36, height: 40 }
+
+function makeId() {
+  return Math.random().toString(36).slice(2, 10)
+}
 
 export default function DesignerPage() {
   const [selectedProduct, setSelectedProduct] = useState<ProductId>('tshirt')
   const [selectedColor, setSelectedColor] = useState<string>('Blanc')
-  const [logoSrc, setLogoSrc] = useState<string | null>(null)
-  const [logoName, setLogoName] = useState('')
-  const [transform, setTransform] = useState<LogoTransform>({ x: 50, y: 45, scale: 1, rotation: 0 })
+  const [layers, setLayers] = useState<LogoLayer[]>([])
+  const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -78,6 +83,8 @@ export default function DesignerPage() {
   const activeColor = currentColors[activeColorKey]
   const mockupImg = activeColor.img
 
+  const activeLayer = layers.find(l => l.id === activeLayerId) ?? null
+
   function handleSelectProduct(id: ProductId) {
     setSelectedProduct(id)
     const product = PRODUCTS.find(p => p.id === id)!
@@ -85,39 +92,76 @@ export default function DesignerPage() {
     setSelectedColor(firstColor)
   }
 
+  function updateActiveLayer(patch: Partial<LogoLayer>) {
+    if (!activeLayerId) return
+    setLayers(ls => ls.map(l => (l.id === activeLayerId ? { ...l, ...patch } : l)))
+  }
+
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) return
     const reader = new FileReader()
     reader.onload = (e) => {
-      setLogoSrc(e.target?.result as string)
-      setLogoName(file.name)
-      setTransform({ x: 50, y: 45, scale: 1, rotation: 0 })
+      const newLayer: LogoLayer = {
+        id: makeId(),
+        src: e.target?.result as string,
+        name: file.name,
+        x: 50,
+        y: 45,
+        scale: 1,
+        rotation: 0,
+      }
+      setLayers(ls => [...ls, newLayer])
+      setActiveLayerId(newLayer.id)
     }
     reader.readAsDataURL(file)
   }
 
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (!logoSrc) return
+  function duplicateLayer(id: string) {
+    setLayers(ls => {
+      const source = ls.find(l => l.id === id)
+      if (!source) return ls
+      const copy: LogoLayer = {
+        ...source,
+        id: makeId(),
+        x: Math.min(90, source.x + 8),
+        y: Math.min(90, source.y + 8),
+      }
+      setActiveLayerId(copy.id)
+      return [...ls, copy]
+    })
+  }
+
+  function deleteLayer(id: string) {
+    setLayers(ls => {
+      const remaining = ls.filter(l => l.id !== id)
+      if (activeLayerId === id) {
+        setActiveLayerId(remaining.length ? remaining[remaining.length - 1].id : null)
+      }
+      return remaining
+    })
+  }
+
+  const onPointerDown = (e: React.PointerEvent, layer: LogoLayer) => {
+    setActiveLayerId(layer.id)
     setDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY, tx: transform.x, ty: transform.y }
+    dragStart.current = { x: e.clientX, y: e.clientY, tx: layer.x, ty: layer.y }
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging || !stageRef.current) return
+    if (!dragging || !stageRef.current || !activeLayerId) return
     const rect = stageRef.current.getBoundingClientRect()
     const dxPct = ((e.clientX - dragStart.current.x) / rect.width) * 100
     const dyPct = ((e.clientY - dragStart.current.y) / rect.height) * 100
-    setTransform(t => ({
-      ...t,
+    updateActiveLayer({
       x: Math.min(95, Math.max(5, dragStart.current.tx + dxPct)),
       y: Math.min(95, Math.max(5, dragStart.current.ty + dyPct)),
-    }))
+    })
   }
 
   const onPointerUp = () => setDragging(false)
 
-  const reset = () => setTransform({ x: 50, y: 45, scale: 1, rotation: 0 })
+  const resetActive = () => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })
 
   return (
     <>
@@ -128,7 +172,7 @@ export default function DesignerPage() {
           <div className="mb-8">
             <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Designer</span>
             <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le.</p>
+            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le. Dupliquez-le pour un second emplacement (ex: dos).</p>
           </div>
 
           {/* PRODUCT SELECTOR */}
@@ -161,11 +205,15 @@ export default function DesignerPage() {
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
+                onPointerDownCapture={(e) => {
+                  // clicking the empty stage deselects the active layer
+                  if (e.target === stageRef.current) setActiveLayerId(null)
+                }}
               >
                 <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
-                {/* Print zone guide (visible only while no logo, subtle) */}
-                {!logoSrc && (
+                {/* Print zone guide (visible only while no logo at all) */}
+                {layers.length === 0 && (
                   <div
                     className="absolute border-2 border-dashed border-black/25 rounded-lg flex items-center justify-center"
                     style={{
@@ -177,36 +225,38 @@ export default function DesignerPage() {
                   </div>
                 )}
 
-                {logoSrc && (
+                {layers.map(layer => (
                   <div
-                    onPointerDown={onPointerDown}
+                    key={layer.id}
+                    onPointerDown={(e) => onPointerDown(e, layer)}
                     className="absolute cursor-move touch-none"
                     style={{
-                      left: `${transform.x}%`,
-                      top: `${transform.y}%`,
-                      transform: `translate(-50%, -50%) rotate(${transform.rotation}deg) scale(${transform.scale})`,
+                      left: `${layer.x}%`,
+                      top: `${layer.y}%`,
+                      transform: `translate(-50%, -50%) rotate(${layer.rotation}deg) scale(${layer.scale})`,
                       width: `${PRINT_ZONE.width}%`,
+                      zIndex: layer.id === activeLayerId ? 10 : 1,
                     }}
                   >
-                    <img src={logoSrc} alt="Votre logo" className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
-                    {dragging && <div className="absolute inset-0 border-2 border-brand-dark rounded" />}
+                    <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
+                    {layer.id === activeLayerId && (
+                      <div className={`absolute inset-0 border-2 rounded ${dragging ? 'border-brand-dark' : 'border-brand-dark/50 border-dashed'}`} />
+                    )}
                   </div>
-                )}
+                ))}
               </div>
 
-              {!logoSrc && (
-                <div
-                  onClick={() => fileRef.current?.click()}
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
-                  className="mt-4 border-2 border-dashed border-black/20 rounded-2xl p-8 text-center cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50"
-                >
-                  <div className="text-[32px] mb-2">📁</div>
-                  <div className="text-[14px] font-medium">Glissez votre logo ici ou cliquez pour parcourir</div>
-                  <div className="text-[11px] text-brand-gray mt-1">PNG, JPG — fond transparent recommandé</div>
-                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
-                </div>
-              )}
+              <div
+                onClick={() => fileRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
+                className="mt-4 border-2 border-dashed border-black/20 rounded-2xl p-6 text-center cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50"
+              >
+                <div className="text-[28px] mb-1">📁</div>
+                <div className="text-[14px] font-medium">{layers.length === 0 ? 'Glissez votre logo ici ou cliquez pour parcourir' : 'Ajouter un autre logo'}</div>
+                <div className="text-[11px] text-brand-gray mt-1">PNG, JPG — fond transparent recommandé</div>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+              </div>
             </div>
 
             {/* CONTROLS */}
@@ -230,27 +280,56 @@ export default function DesignerPage() {
                 </div>
               )}
 
-              {logoSrc && (
-                <>
-                  <div className="bg-brand-light rounded-2xl p-4 flex items-center gap-3">
-                    <img src={logoSrc} alt="" className="w-12 h-12 object-contain rounded-lg bg-white" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold truncate">{logoName}</div>
-                      <div className="text-[11px] text-brand-gray">Glissez sur le produit pour repositionner</div>
-                    </div>
-                    <button onClick={() => { setLogoSrc(null); setLogoName('') }} className="text-[12px] text-red-500 font-medium flex-shrink-0">Suppr.</button>
+              {/* Layers list */}
+              {layers.length > 0 && (
+                <div>
+                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">
+                    Logos ({layers.length})
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    {layers.map(layer => (
+                      <div
+                        key={layer.id}
+                        onClick={() => setActiveLayerId(layer.id)}
+                        className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all
+                          ${layer.id === activeLayerId ? 'border-brand-dark bg-brand-light' : 'border-black/10 bg-white hover:border-black/25'}`}
+                      >
+                        <img src={layer.src} alt="" className="w-9 h-9 object-contain rounded-lg bg-white border border-black/5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[12px] font-semibold truncate">{layer.name}</div>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); duplicateLayer(layer.id) }}
+                          title="Dupliquer ce logo"
+                          className="text-[11px] font-medium text-brand-dark px-2 py-1 rounded-md hover:bg-black/5 flex-shrink-0"
+                        >
+                          ⧉ Dupliquer
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id) }}
+                          title="Supprimer ce logo"
+                          className="text-[11px] text-red-500 font-medium px-1.5 flex-shrink-0"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              )}
 
+              {activeLayer && (
+                <>
                   {/* Scale */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray">Taille</label>
-                      <span className="text-[12px] text-brand-gray font-medium">{Math.round(transform.scale * 100)}%</span>
+                      <span className="text-[12px] text-brand-gray font-medium">{Math.round(activeLayer.scale * 100)}%</span>
                     </div>
                     <input
                       type="range" min="0.3" max="2.2" step="0.05"
-                      value={transform.scale}
-                      onChange={e => setTransform(t => ({ ...t, scale: parseFloat(e.target.value) }))}
+                      value={activeLayer.scale}
+                      onChange={e => updateActiveLayer({ scale: parseFloat(e.target.value) })}
                       className="w-full accent-brand-dark"
                     />
                   </div>
@@ -259,19 +338,24 @@ export default function DesignerPage() {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray">Rotation</label>
-                      <span className="text-[12px] text-brand-gray font-medium">{transform.rotation}°</span>
+                      <span className="text-[12px] text-brand-gray font-medium">{activeLayer.rotation}°</span>
                     </div>
                     <input
                       type="range" min="-45" max="45" step="1"
-                      value={transform.rotation}
-                      onChange={e => setTransform(t => ({ ...t, rotation: parseInt(e.target.value) }))}
+                      value={activeLayer.rotation}
+                      onChange={e => updateActiveLayer({ rotation: parseInt(e.target.value) })}
                       className="w-full accent-brand-dark"
                     />
                   </div>
 
-                  <button onClick={reset} className="text-[13px] font-medium text-brand-dark underline self-start">
-                    Réinitialiser la position
-                  </button>
+                  <div className="flex gap-4">
+                    <button onClick={resetActive} className="text-[13px] font-medium text-brand-dark underline">
+                      Réinitialiser la position
+                    </button>
+                    <button onClick={() => duplicateLayer(activeLayer.id)} className="text-[13px] font-medium text-brand-dark underline">
+                      Dupliquer ce logo
+                    </button>
+                  </div>
                 </>
               )}
 
@@ -281,7 +365,7 @@ export default function DesignerPage() {
                 </p>
                 <Link
                   href="/configurateur"
-                  className={`block text-center bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline ${!logoSrc ? 'opacity-40 pointer-events-none' : ''}`}
+                  className={`block text-center bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline ${layers.length === 0 ? 'opacity-40 pointer-events-none' : ''}`}
                 >
                   Continuer vers la commande →
                 </Link>
