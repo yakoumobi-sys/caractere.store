@@ -1,52 +1,5 @@
-const PRODUCTS = [
-  {
-    id: 'tshirt',
-    label: 'T-shirt',
-    emoji: '👕',
-    colors: {
-      blanc: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg',
-      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg',
-    },
-  },
-  {
-    id: 'polo',
-    label: 'Polo',
-    emoji: '🎽',
-    colors: {
-      blanc: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg',
-      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg',
-    },
-  },
-  {
-    id: 'gilet',
-    label: 'Gilet',
-    emoji: '🦺',
-    colors: {
-      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg',
-    },
-  },
-  {
-    id: 'casquette',
-    label: 'Casquette',
-    emoji: '🧢',
-    colors: {
-      noir: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg',
-    },
-  },
-  {
-    id: 'totebag',
-    label: 'Totebag',
-    emoji: '👜',
-    colors: {
-      naturel: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg',
-    },
-  },
-] as const
-
-type ProductId = typeof PRODUCTS[number]['id']
-
 'use client'
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Link from 'next/link'
 
@@ -57,22 +10,60 @@ interface LogoTransform {
   rotation: number // degrees
 }
 
-const TSHIRT_VIEWS = {
-  Blanc: { front: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&q=85' },
-  Noir:  { front: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=900&q=85' },
-}
+const PRODUCTS = [
+  {
+    id: 'tshirt',
+    label: 'T-shirt',
+    emoji: '👕',
+    colors: {
+      Blanc: { hex: '#FFFFFF', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg' },
+      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg' },
+    },
+  },
+  {
+    id: 'polo',
+    label: 'Polo',
+    emoji: '🎽',
+    colors: {
+      Blanc: { hex: '#FFFFFF', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg' },
+      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg' },
+    },
+  },
+  {
+    id: 'gilet',
+    label: 'Gilet',
+    emoji: '🦺',
+    colors: {
+      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg' },
+    },
+  },
+  {
+    id: 'casquette',
+    label: 'Casquette',
+    emoji: '🧢',
+    colors: {
+      Noir: { hex: '#1d1d1f', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg' },
+    },
+  },
+  {
+    id: 'totebag',
+    label: 'Totebag',
+    emoji: '👜',
+    colors: {
+      Naturel: { hex: '#e8dfc8', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg' },
+    },
+  },
+] as const
 
-const COULEURS = [
-  { nom: 'Blanc', hex: '#FFFFFF' },
-  { nom: 'Noir', hex: '#1d1d1f' },
-]
+type ProductId = typeof PRODUCTS[number]['id']
 
 // Print zone defined as percentage of the t-shirt image bounding box
 // Tuned for a centered-chest area on a standard front-facing tshirt photo
 const PRINT_ZONE = { left: 32, top: 22, width: 36, height: 40 }
 
 export default function DesignerPage() {
-  const [couleur, setCouleur] = useState('Blanc')
+  const [selectedProduct, setSelectedProduct] = useState<ProductId>('tshirt')
+  const [selectedColor, setSelectedColor] = useState<string>('Blanc')
   const [logoSrc, setLogoSrc] = useState<string | null>(null)
   const [logoName, setLogoName] = useState('')
   const [transform, setTransform] = useState<LogoTransform>({ x: 50, y: 45, scale: 1, rotation: 0 })
@@ -80,6 +71,19 @@ export default function DesignerPage() {
   const fileRef = useRef<HTMLInputElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
+
+  const currentProduct = PRODUCTS.find(p => p.id === selectedProduct)!
+  const currentColors = currentProduct.colors as Record<string, { hex: string; img: string }>
+  const activeColorKey = currentColors[selectedColor] ? selectedColor : Object.keys(currentColors)[0]
+  const activeColor = currentColors[activeColorKey]
+  const mockupImg = activeColor.img
+
+  function handleSelectProduct(id: ProductId) {
+    setSelectedProduct(id)
+    const product = PRODUCTS.find(p => p.id === id)!
+    const firstColor = Object.keys(product.colors)[0]
+    setSelectedColor(firstColor)
+  }
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) return
@@ -115,8 +119,6 @@ export default function DesignerPage() {
 
   const reset = () => setTransform({ x: 50, y: 45, scale: 1, rotation: 0 })
 
-  const tshirtImg = TSHIRT_VIEWS[couleur as keyof typeof TSHIRT_VIEWS]?.front ?? TSHIRT_VIEWS.Blanc.front
-
   return (
     <>
       <Navbar />
@@ -126,7 +128,27 @@ export default function DesignerPage() {
           <div className="mb-8">
             <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Designer</span>
             <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-            <p className="text-[14px] text-brand-gray mt-1">Uploadez votre logo et positionnez-le directement sur le t-shirt.</p>
+            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le.</p>
+          </div>
+
+          {/* PRODUCT SELECTOR */}
+          <div className="mb-6">
+            <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">Choisir un produit</p>
+            <div className="flex gap-3 flex-wrap">
+              {PRODUCTS.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handleSelectProduct(p.id)}
+                  className={`flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all min-w-[84px]
+                    ${selectedProduct === p.id
+                      ? 'border-brand-dark bg-brand-dark text-white shadow-md'
+                      : 'border-black/10 bg-white text-brand-dark hover:border-black/30'}`}
+                >
+                  <span className="text-2xl">{p.emoji}</span>
+                  <span className="text-[12px] font-medium">{p.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
@@ -140,7 +162,7 @@ export default function DesignerPage() {
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
               >
-                <img src={tshirtImg} alt="T-shirt" className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
+                <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
                 {/* Print zone guide (visible only while no logo, subtle) */}
                 {!logoSrc && (
@@ -191,20 +213,22 @@ export default function DesignerPage() {
             <div className="flex flex-col gap-7">
 
               {/* Color */}
-              <div>
-                <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">Couleur du t-shirt</label>
-                <div className="flex gap-3">
-                  {COULEURS.map(c => (
-                    <button
-                      key={c.nom}
-                      onClick={() => setCouleur(c.nom)}
-                      title={c.nom}
-                      className={`w-10 h-10 rounded-full border-2 transition-all ${couleur === c.nom ? 'border-brand-dark scale-110' : 'border-black/10'}`}
-                      style={{ background: c.hex, boxShadow: c.hex === '#FFFFFF' ? 'inset 0 0 0 1px rgba(0,0,0,0.12)' : 'none' }}
-                    />
-                  ))}
+              {Object.keys(currentColors).length > 1 && (
+                <div>
+                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">Couleur</label>
+                  <div className="flex gap-3">
+                    {Object.entries(currentColors).map(([name, c]) => (
+                      <button
+                        key={name}
+                        onClick={() => setSelectedColor(name)}
+                        title={name}
+                        className={`w-10 h-10 rounded-full border-2 transition-all ${activeColorKey === name ? 'border-brand-dark scale-110' : 'border-black/10'}`}
+                        style={{ background: c.hex, boxShadow: c.hex === '#FFFFFF' ? 'inset 0 0 0 1px rgba(0,0,0,0.12)' : 'none' }}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {logoSrc && (
                 <>
@@ -212,7 +236,7 @@ export default function DesignerPage() {
                     <img src={logoSrc} alt="" className="w-12 h-12 object-contain rounded-lg bg-white" />
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] font-semibold truncate">{logoName}</div>
-                      <div className="text-[11px] text-brand-gray">Glissez sur le t-shirt pour repositionner</div>
+                      <div className="text-[11px] text-brand-gray">Glissez sur le produit pour repositionner</div>
                     </div>
                     <button onClick={() => { setLogoSrc(null); setLogoName('') }} className="text-[12px] text-red-500 font-medium flex-shrink-0">Suppr.</button>
                   </div>
@@ -253,7 +277,7 @@ export default function DesignerPage() {
 
               <div className="pt-4 border-t border-black/[0.08]">
                 <p className="text-[13px] text-brand-gray leading-relaxed mb-4">
-                  Une fois satisfait de votre design, continuez vers le configurateur pour choisir le produit, la quantité et finaliser votre commande.
+                  Une fois satisfait de votre design, continuez vers le configurateur pour choisir la quantité et finaliser votre commande.
                 </p>
                 <Link
                   href="/configurateur"
