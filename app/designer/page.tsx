@@ -11,7 +11,6 @@ interface LogoLayer {
   y: number
   scale: number
   rotation: number
-  removingBg?: boolean
 }
 
 const PRODUCTS = [
@@ -89,7 +88,6 @@ const PRODUCTS = [
 
 type ProductId = typeof PRODUCTS[number]['id']
 
-// Mapping vers les noms produits tels qu'ils existent dans Supabase / configurateur
 const PRODUCT_NOM_MAP: Record<ProductId, string> = {
   tshirt: 'T-shirt',
   polo: 'Polo',
@@ -153,25 +151,6 @@ export default function DesignerPage() {
       setActiveLayerId(newLayer.id)
     }
     reader.readAsDataURL(file)
-  }
-
-  async function removeBackground(layerId: string) {
-    const layer = layers.find(l => l.id === layerId)
-    if (!layer) return
-    updateLayer(layerId, { removingBg: true })
-    try {
-      const { removeBackground: removeBg } = await import('@imgly/background-removal')
-      const blob = await removeBg(layer.src, {
-        publicPath: 'https://unpkg.com/@imgly/background-removal@1.4.5/dist/',
-        debug: false,
-      })
-      const newSrc = URL.createObjectURL(blob)
-      updateLayer(layerId, { src: newSrc, removingBg: false })
-    } catch (err) {
-      console.error('Background removal failed:', err)
-      updateLayer(layerId, { removingBg: false })
-      alert('Erreur lors de la suppression du fond. Réessayez.')
-    }
   }
 
   function duplicateLayer(id: string) {
@@ -352,15 +331,8 @@ export default function DesignerPage() {
                       zIndex: layer.id === activeLayerId ? 10 : 1,
                     }}
                   >
-                    {layer.removingBg ? (
-                      <div className="w-full aspect-square flex flex-col items-center justify-center bg-white/80 rounded-lg gap-2">
-                        <div className="w-6 h-6 border-2 border-brand-dark border-t-transparent rounded-full animate-spin" />
-                        <span className="text-[10px] text-brand-gray font-medium">Suppression...</span>
-                      </div>
-                    ) : (
-                      <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
-                    )}
-                    {layer.id === activeLayerId && !layer.removingBg && (
+                    <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
+                    {layer.id === activeLayerId && (
                       <div className={`absolute inset-0 border-2 rounded ${dragging ? 'border-brand-dark' : 'border-brand-dark/50 border-dashed'}`} />
                     )}
                   </div>
@@ -470,33 +442,6 @@ export default function DesignerPage() {
 
               {activeLayer && activeLayer.view === view && (
                 <>
-                  {/* Background remover */}
-                  <div className="bg-brand-light rounded-2xl p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-1">
-                        <div className="text-[13px] font-semibold text-brand-dark mb-0.5">Supprimer le fond</div>
-                        <div className="text-[11px] text-brand-gray leading-snug">IA locale, 100% gratuit. La 1ère utilisation télécharge le modèle (~40 sec).</div>
-                      </div>
-                      <button
-                        onClick={() => removeBackground(activeLayer.id)}
-                        disabled={!!activeLayer.removingBg}
-                        className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all
-                          ${activeLayer.removingBg
-                            ? 'bg-black/10 text-brand-gray cursor-not-allowed'
-                            : 'bg-brand-dark text-white hover:bg-neutral-800'}`}
-                      >
-                        {activeLayer.removingBg ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                            En cours...
-                          </>
-                        ) : (
-                          <>✨ Supprimer</>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
                   {/* Scale */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
