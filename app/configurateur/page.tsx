@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Produit, Couleur, Taille } from '@/types'
 import Navbar from '@/components/layout/Navbar'
-import Link from 'next/link'
 
 interface OrderState {
   step: number
@@ -47,6 +46,7 @@ export default function ConfigurateurPage() {
   const [tailles, setTailles] = useState<Taille[]>([])
   const [refCode, setRefCode] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fromDesigner, setFromDesigner] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -89,6 +89,54 @@ export default function ConfigurateurPage() {
       setTailles(fallbackTailles)
     })
   }, [])
+
+  // Récupère les infos venant du Designer (produit, couleur, logo) une fois
+  // que produits/couleurs sont chargés
+  useEffect(() => {
+    if (produits.length === 0 || couleurs.length === 0) return
+
+    const params = new URLSearchParams(window.location.search)
+    const produitNom = params.get('produit')
+    const couleurNom = params.get('couleur')
+
+    if (!produitNom) return // arrivée normale, rien à faire
+
+    const matchProduit = produits.find(p => p.nom === produitNom)
+    const matchCouleur = couleurs.find(c => c.nom === couleurNom)
+
+    setOrder(prev => ({
+      ...prev,
+      produit: matchProduit ?? prev.produit,
+      couleur: couleurNom ?? prev.couleur,
+      couleurHex: matchCouleur?.hex ?? prev.couleurHex,
+      step: 2,
+    }))
+
+    // Restaure le(s) logo(s) sauvegardés par le Designer
+    try {
+      const raw = sessionStorage.getItem('designer_layers')
+      if (raw) {
+        const layers = JSON.parse(raw)
+        if (Array.isArray(layers) && layers.length > 0) {
+          const first = layers[0]
+          fetch(first.src)
+            .then(res => res.blob())
+            .then(blob => {
+              const file = new File([blob], first.name || 'logo-designer.png', { type: blob.type })
+              setOrder(prev => ({ ...prev, logoFile: file, logoUrl: first.src }))
+            })
+            .catch(() => {})
+        }
+        sessionStorage.removeItem('designer_layers')
+      }
+    } catch (e) {
+      console.warn('Impossible de restaurer le logo du designer:', e)
+    }
+
+    setFromDesigner(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produits, couleurs])
 
   const up = (patch: Partial<OrderState>) => setOrder(prev => ({...prev,...patch}))
 
@@ -186,6 +234,15 @@ export default function ConfigurateurPage() {
 
             <div className="lg:col-span-2">
 
+              {fromDesigner && order.step === 2 && (
+                <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl px-4 py-3 flex items-center gap-3">
+                  <span className="text-[20px]">✨</span>
+                  <div className="text-[13px] text-green-800">
+                    <strong>{order.produit?.nom}</strong> {order.couleur} avec votre logo — déjà prêt depuis le Designer. Choisissez vos tailles pour continuer.
+                  </div>
+                </div>
+              )}
+
               {order.step === 1 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Choisissez votre produit</div>
@@ -254,7 +311,9 @@ export default function ConfigurateurPage() {
               {order.step === 3 && (
                 <div>
                   <div className="text-[22px] font-bold tracking-tight mb-1">Votre logo</div>
-                  <div className="text-[14px] text-brand-gray mb-8">Uploadez votre logo pour la personnalisation</div>
+                  <div className="text-[14px] text-brand-gray mb-8">
+                    {fromDesigner ? 'Logo récupéré depuis le Designer — vous pouvez le changer si besoin.' : 'Uploadez votre logo pour la personnalisation'}
+                  </div>
                   <div className="border-2 border-dashed border-black/20 rounded-2xl p-12 text-center mb-6 cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50" onClick={() => fileRef.current?.click()} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f)handleFile(f)}}>
                     <div className="text-[40px] mb-3">📁</div>
                     <div className="text-[15px] font-medium mb-1">Glissez votre logo ici</div>
