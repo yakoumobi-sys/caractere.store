@@ -151,7 +151,7 @@ export default function ConfigurateurPage() {
   const next = () => { up({step: order.step+1}); window.scrollTo({top:0,behavior:'smooth'}) }
   const prev = () => { up({step: order.step-1}); window.scrollTo({top:0,behavior:'smooth'}) }
 
-  const [uploadingLogo, setUploadingLogo] = useState(false)
+    const [uploadingLogo, setUploadingLogo] = useState(false)
   const handleFile = async (file: File) => {
     if (file.type.startsWith('image/')) {
       const r = new FileReader()
@@ -161,6 +161,17 @@ export default function ConfigurateurPage() {
       up({logoFile:file, logoUrl:null})
     }
     setUploadingLogo(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload-logo', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (data.url) up({ logoUploadUrl: data.url })
+    } catch (e) {
+      console.error('Logo upload failed', e)
+    }
+    setUploadingLogo(false)
+  }
     try {
       const fd = new FormData()
       fd.append('file', file)
