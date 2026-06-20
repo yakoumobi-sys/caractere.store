@@ -1,637 +1,236 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Navbar from '@/components/layout/Navbar'
+import Link from 'next/link'
 
 interface LogoLayer {
   id: string
-  type: 'image'
   src: string
-  name: string
-  view: 'front' | 'back'
   x: number
   y: number
   scale: number
   rotation: number
 }
 
-interface TextLayer {
-  id: string
-  type: 'text'
-  text: string
-  view: 'front' | 'back'
-  x: number
-  y: number
-  scale: number
-  rotation: number
-  color: string
-  fontFamily: string
-  fontWeight: number
-}
-
-type Layer = LogoLayer | TextLayer
+const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
 
 const PRODUCTS = [
-  {
-    id: 'tshirt',
-    label: 'T-shirt',
-    emoji: '👕',
-    colors: {
-      Blanc: {
-        hex: '#FFFFFF',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-blanc.jpg',
-      },
-      Noir: {
-        hex: '#1d1d1f',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-tshirt-noir.jpg',
-      },
-    },
-  },
-  {
-    id: 'polo',
-    label: 'Polo',
-    emoji: '🎽',
-    colors: {
-      Blanc: {
-        hex: '#FFFFFF',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-blanc.jpg',
-      },
-      Noir: {
-        hex: '#1d1d1f',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-polo-noir.jpg',
-      },
-    },
-  },
-  {
-    id: 'gilet',
-    label: 'Gilet',
-    emoji: '🦺',
-    colors: {
-      Noir: {
-        hex: '#1d1d1f',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-gilet.jpg',
-      },
-    },
-  },
-  {
-    id: 'casquette',
-    label: 'Casquette',
-    emoji: '🧢',
-    colors: {
-      Noir: {
-        hex: '#1d1d1f',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-casquette.jpg',
-      },
-    },
-  },
-  {
-    id: 'totebag',
-    label: 'Totebag',
-    emoji: '👜',
-    colors: {
-      Naturel: {
-        hex: '#e8dfc8',
-        front: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg',
-        back: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/mockup-totebag.jpg',
-      },
-    },
-  },
-] as const
-
-type ProductId = typeof PRODUCTS[number]['id']
-
-const PRODUCT_NOM_MAP: Record<ProductId, string> = {
-  tshirt: 'T-shirt',
-  polo: 'Polo',
-  gilet: 'Gilet de travail',
-  casquette: 'Casquette',
-  totebag: 'Totebag',
-}
-
-const PRINT_ZONE = { left: 32, top: 22, width: 36, height: 40 }
-
-const FONT_OPTIONS = [
-  { id: 'sans', label: 'Sans-serif', family: 'Helvetica, Arial, sans-serif' },
-  { id: 'serif', label: 'Serif', family: 'Georgia, "Times New Roman", serif' },
-  { id: 'script', label: 'Manuscrite', family: '"Brush Script MT", cursive' },
+  { id: 'tshirt',    name: 'T-shirt',  img: BASE + '/mockup-tshirt.jpg' },
+  { id: 'polo',      name: 'Polo',     img: BASE + '/mockup-polo.jpg' },
+  { id: 'gilet',     name: 'Gilet',    img: BASE + '/mockup-gilet.jpg' },
+  { id: 'casquette', name: 'Casquette',img: BASE + '/mockup-casquette.jpg' },
+  { id: 'totebag',   name: 'Totebag',  img: BASE + '/mockup-totebag.jpg' },
 ]
 
-const TEXT_COLORS = ['#000000', '#FFFFFF', '#E11D48', '#2563EB', '#16A34A', '#D97706']
-
-function makeId() {
-  return Math.random().toString(36).slice(2, 10)
-}
+const PRINT_ZONE = { left: 28, top: 20, width: 44, height: 40 }
+const BASE_W = 120 // px reference width for a layer at scale=1
 
 export default function DesignerPage() {
-  const [selectedProduct, setSelectedProduct] = useState<ProductId>('tshirt')
-  const [selectedColor, setSelectedColor] = useState<string>('Blanc')
-  const [view, setView] = useState<'front' | 'back'>('front')
-  const [layers, setLayers] = useState<Layer[]>([])
-  const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
-  const [dragging, setDragging] = useState(false)
-  const [showTextPanel, setShowTextPanel] = useState(false)
+  const [product, setProduct] = useState(PRODUCTS[0])
+  const [layers, setLayers] = useState<LogoLayer[]>([])
+  const [activeId, setActiveId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
+  const action = useRef<{ type: 'move'|'resize'|'rotate'|null, id: string, startX: number, startY: number, layer: LogoLayer } | null>(null)
 
-  const currentProduct = PRODUCTS.find(p => p.id === selectedProduct)!
-  const currentColors = currentProduct.colors as Record<string, { hex: string; front: string; back: string }>
-  const activeColorKey = currentColors[selectedColor] ? selectedColor : Object.keys(currentColors)[0]
-  const activeColor = currentColors[activeColorKey]
-  const mockupImg = view === 'front' ? activeColor.front : activeColor.back
+  const active = layers.find(l => l.id === activeId) || null
 
-  const visibleLayers = layers.filter(l => l.view === view)
-  const activeLayer = layers.find(l => l.id === activeLayerId) ?? null
-
-  function handleSelectProduct(id: ProductId) {
-    setSelectedProduct(id)
-    const product = PRODUCTS.find(p => p.id === id)!
-    setSelectedColor(Object.keys(product.colors)[0])
-  }
-
-  function updateLayer(id: string, patch: Partial<Layer>) {
-    setLayers(ls => ls.map(l => (l.id === id ? ({ ...l, ...patch } as Layer) : l)))
-  }
-
-  function updateActiveLayer(patch: Partial<Layer>) {
-    if (activeLayerId) updateLayer(activeLayerId, patch)
-  }
-
-  const handleFile = (file: File) => {
+  const addLogo = (file: File) => {
     if (!file.type.startsWith('image/')) return
     const reader = new FileReader()
     reader.onload = (e) => {
-      const newLayer: LogoLayer = {
-        id: makeId(),
-        type: 'image',
-        src: e.target?.result as string,
-        name: file.name,
-        view,
-        x: 50, y: 45, scale: 1, rotation: 0,
-      }
-      setLayers(ls => [...ls, newLayer])
-      setActiveLayerId(newLayer.id)
-      setShowTextPanel(false)
+      const id = Date.now().toString(36)
+      const layer: LogoLayer = { id, src: e.target?.result as string, x: 50, y: 45, scale: 1, rotation: 0 }
+      setLayers(prev => [...prev, layer])
+      setActiveId(id)
     }
     reader.readAsDataURL(file)
   }
 
-  function addTextLayer() {
-    const newLayer: TextLayer = {
-      id: makeId(),
-      type: 'text',
-      text: 'Votre texte',
-      view,
-      x: 50, y: 45, scale: 1, rotation: 0,
-      color: '#000000',
-      fontFamily: FONT_OPTIONS[0].family,
-      fontWeight: 700,
-    }
-    setLayers(ls => [...ls, newLayer])
-    setActiveLayerId(newLayer.id)
-    setShowTextPanel(true)
+  const updateLayer = (id: string, patch: Partial<LogoLayer>) => {
+    setLayers(prev => prev.map(l => l.id === id ? { ...l, ...patch } : l))
+  }
+  const removeLayer = (id: string) => {
+    setLayers(prev => prev.filter(l => l.id !== id))
+    if (activeId === id) setActiveId(null)
+  }
+  const duplicateLayer = (id: string) => {
+    const l = layers.find(x => x.id === id)
+    if (!l) return
+    const newId = Date.now().toString(36)
+    const copy = { ...l, id: newId, x: Math.min(90, l.x + 5), y: Math.min(90, l.y + 5) }
+    setLayers(prev => [...prev, copy])
+    setActiveId(newId)
   }
 
-  function duplicateLayer(id: string) {
-    setLayers(ls => {
-      const source = ls.find(l => l.id === id)
-      if (!source) return ls
-      const copy: Layer = {
-        ...source,
-        id: makeId(),
-        x: Math.min(90, source.x + 8),
-        y: Math.min(90, source.y + 8),
-      } as Layer
-      setActiveLayerId(copy.id)
-      return [...ls, copy]
-    })
-  }
-
-  function duplicateToOtherSide(id: string) {
-    setLayers(ls => {
-      const source = ls.find(l => l.id === id)
-      if (!source) return ls
-      const otherView = source.view === 'front' ? 'back' : 'front'
-      const copy: Layer = { ...source, id: makeId(), view: otherView } as Layer
-      return [...ls, copy]
-    })
-  }
-
-  function deleteLayer(id: string) {
-    setLayers(ls => {
-      const remaining = ls.filter(l => l.id !== id)
-      if (activeLayerId === id) {
-        const sameView = remaining.filter(l => l.view === view)
-        setActiveLayerId(sameView.length ? sameView[sameView.length - 1].id : null)
-      }
-      return remaining
-    })
-  }
-
-  const onPointerDown = (e: React.PointerEvent, layer: Layer) => {
-    setActiveLayerId(layer.id)
-    setDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY, tx: layer.x, ty: layer.y }
+  const startAction = (type: 'move'|'resize'|'rotate', id: string, e: React.PointerEvent) => {
+    e.stopPropagation()
+    const l = layers.find(x => x.id === id)
+    if (!l) return
+    setActiveId(id)
+    action.current = { type, id, startX: e.clientX, startY: e.clientY, layer: { ...l } }
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging || !stageRef.current || !activeLayerId) return
+    const a = action.current
+    if (!a || !stageRef.current) return
     const rect = stageRef.current.getBoundingClientRect()
-    const dxPct = ((e.clientX - dragStart.current.x) / rect.width) * 100
-    const dyPct = ((e.clientY - dragStart.current.y) / rect.height) * 100
-    updateActiveLayer({
-      x: Math.min(95, Math.max(5, dragStart.current.tx + dxPct)),
-      y: Math.min(95, Math.max(5, dragStart.current.ty + dyPct)),
-    })
-  }
+    const dx = e.clientX - a.startX
+    const dy = e.clientY - a.startY
 
-  const onPointerUp = () => setDragging(false)
-
-  function switchView(next: 'front' | 'back') {
-    setView(next)
-    const sameView = layers.filter(l => l.view === next)
-    setActiveLayerId(sameView.length ? sameView[sameView.length - 1].id : null)
-  }
-
-  function goToConfigurateur() {
-    try {
-      sessionStorage.setItem('designer_layers', JSON.stringify(layers))
-    } catch (e) {
-      console.warn('Impossible de sauvegarder en session:', e)
+    if (a.type === 'move') {
+      const dxPct = (dx / rect.width) * 100
+      const dyPct = (dy / rect.height) * 100
+      updateLayer(a.id, {
+        x: Math.min(95, Math.max(5, a.layer.x + dxPct)),
+        y: Math.min(95, Math.max(5, a.layer.y + dyPct)),
+      })
+    } else if (a.type === 'resize') {
+      const delta = (dx + dy) / 2
+      const newScale = Math.min(3, Math.max(0.2, a.layer.scale + delta / 100))
+      updateLayer(a.id, { scale: newScale })
+    } else if (a.type === 'rotate') {
+      const cx = rect.left + (a.layer.x / 100) * rect.width
+      const cy = rect.top + (a.layer.y / 100) * rect.height
+      const startAngle = Math.atan2(a.startY - cy, a.startX - cx)
+      const curAngle = Math.atan2(e.clientY - cy, e.clientX - cx)
+      const deltaDeg = (curAngle - startAngle) * (180 / Math.PI)
+      updateLayer(a.id, { rotation: Math.round(a.layer.rotation + deltaDeg) })
     }
-    const params = new URLSearchParams({
-      produit: PRODUCT_NOM_MAP[selectedProduct],
-      couleur: activeColorKey,
-    })
-    window.location.href = `/configurateur?${params.toString()}`
   }
+
+  const onPointerUp = () => { action.current = null }
 
   return (
     <>
       <Navbar />
-      <main className="pt-14 min-h-screen bg-white">
+      <main className="pt-14 min-h-screen bg-white" onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <div className="max-w-[1100px] mx-auto px-6 py-10">
 
-          <div className="mb-6">
+          <div className="mb-8">
             <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Designer</span>
             <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, ajoutez logo ou texte, et positionnez sur le recto ou le verso.</p>
+            <p className="text-[14px] text-brand-gray mt-1">Choisissez un produit, uploadez votre logo et positionnez-le.</p>
           </div>
 
-          {/* PRODUCT SELECTOR */}
-          <div className="mb-6">
-            <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">Choisir un produit</p>
-            <div className="flex gap-3 flex-wrap">
-              {PRODUCTS.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => handleSelectProduct(p.id)}
-                  className={`flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all min-w-[84px]
-                    ${selectedProduct === p.id
-                      ? 'border-brand-dark bg-brand-dark text-white shadow-md'
-                      : 'border-black/10 bg-white text-brand-dark hover:border-black/30'}`}
-                >
-                  <span className="text-2xl">{p.emoji}</span>
-                  <span className="text-[12px] font-medium">{p.label}</span>
-                </button>
-              ))}
-            </div>
+          {/* Product selector */}
+          <div className="flex gap-2 mb-6 flex-wrap">
+            {PRODUCTS.map(p => (
+              <button
+                key={p.id}
+                onClick={() => setProduct(p)}
+                className={`px-4 py-2 rounded-full text-[13px] font-medium border transition-all ${product.id === p.id ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-brand-dark border-black/15 hover:border-black/30'}`}
+              >
+                {p.name}
+              </button>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
 
-            {/* CANVAS COLUMN */}
+            {/* CANVAS */}
             <div>
-              {/* TOOLBAR */}
-              <div className="bg-[#111] rounded-t-2xl px-2 py-2.5 flex items-center justify-around">
-                <button
-                  onClick={() => fileRef.current?.click()}
-                  className="flex flex-col items-center gap-1 text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <span className="text-[18px]">🖼️</span>
-                  <span className="text-[10px] font-semibold tracking-wide">IMAGES</span>
-                </button>
-                <div className="w-px h-8 bg-white/15" />
-                <button
-                  onClick={addTextLayer}
-                  className="flex flex-col items-center gap-1 text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <span className="text-[18px]">🅰️</span>
-                  <span className="text-[10px] font-semibold tracking-wide">ADD TEXT</span>
-                </button>
-                <div className="w-px h-8 bg-white/15" />
-                <button
-                  disabled
-                  title="Bientôt disponible"
-                  className="flex flex-col items-center gap-1 text-white/40 px-3 py-1.5 rounded-lg cursor-not-allowed"
-                >
-                  <span className="text-[18px]">🎨</span>
-                  <span className="text-[10px] font-semibold tracking-wide">DESIGNS</span>
-                </button>
-              </div>
-
-              {/* STAGE */}
               <div
                 ref={stageRef}
-                className="relative w-full aspect-square bg-brand-light overflow-hidden select-none border-x border-b border-black/[0.06] rounded-b-2xl"
-                onPointerMove={onPointerMove}
-                onPointerUp={onPointerUp}
-                onPointerLeave={onPointerUp}
+                onClick={() => setActiveId(null)}
+                className="relative w-full aspect-square bg-brand-light rounded-[24px] overflow-hidden select-none border border-black/[0.06]"
               >
-                <img src={mockupImg} alt={currentProduct.label} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
+                <img src={product.img} alt={product.name} className="absolute inset-0 w-full h-full object-cover pointer-events-none" draggable={false} />
 
-                {visibleLayers.length === 0 && (
+                {layers.length === 0 && (
                   <div
-                    className="absolute flex flex-col items-center justify-center gap-2 cursor-pointer"
+                    className="absolute border-2 border-dashed border-black/25 rounded-lg flex items-center justify-center pointer-events-none"
                     style={{ left: `${PRINT_ZONE.left}%`, top: `${PRINT_ZONE.top}%`, width: `${PRINT_ZONE.width}%`, height: `${PRINT_ZONE.height}%` }}
-                    onClick={() => fileRef.current?.click()}
                   >
-                    <span className="text-[36px] opacity-50">☁️</span>
-                    <span className="text-[11px] font-medium text-brand-dark/50 bg-white/70 px-2 py-1 rounded">Ajouter image</span>
+                    <span className="text-[11px] font-medium text-brand-dark/50 bg-white/70 px-2 py-1 rounded">Zone d'impression</span>
                   </div>
                 )}
 
-                {visibleLayers.map(layer => (
-                  <div
-                    key={layer.id}
-                    onPointerDown={(e) => onPointerDown(e, layer)}
-                    className="absolute cursor-move touch-none"
-                    style={{
-                      left: `${layer.x}%`, top: `${layer.y}%`,
-                      transform: `translate(-50%, -50%) rotate(${layer.rotation}deg) scale(${layer.scale})`,
-                      width: layer.type === 'image' ? `${PRINT_ZONE.width}%` : 'auto',
-                      maxWidth: `${PRINT_ZONE.width * 1.4}%`,
-                      zIndex: layer.id === activeLayerId ? 10 : 1,
-                    }}
-                  >
-                    {layer.type === 'image' ? (
-                      <img src={layer.src} alt={layer.name} className="w-full h-auto pointer-events-none drop-shadow-md" draggable={false} />
-                    ) : (
-                      <div
-                        className="whitespace-nowrap pointer-events-none px-2"
-                        style={{
-                          color: layer.color,
-                          fontFamily: layer.fontFamily,
-                          fontWeight: layer.fontWeight,
-                          fontSize: '28px',
-                          lineHeight: 1.1,
-                        }}
-                      >
-                        {layer.text}
-                      </div>
-                    )}
-                    {layer.id === activeLayerId && (
-                      <div className={`absolute inset-0 border-2 rounded ${dragging ? 'border-brand-dark' : 'border-brand-dark/50 border-dashed'}`} />
-                    )}
-                  </div>
-                ))}
+                {layers.map(layer => {
+                  const isActive = layer.id === activeId
+                  const w = BASE_W * layer.scale
+                  return (
+                    <div
+                      key={layer.id}
+                      onClick={e => e.stopPropagation()}
+                      onPointerDown={e => startAction('move', layer.id, e)}
+                      className="absolute cursor-move touch-none"
+                      style={{
+                        left: `${layer.x}%`, top: `${layer.y}%`,
+                        width: w, height: w,
+                        transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
+                      }}
+                    >
+                      <img src={layer.src} alt="logo" className="w-full h-full object-contain pointer-events-none drop-shadow-md" draggable={false} />
 
-                {/* FRONT/BACK NAV */}
-                <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-2">
-                  <button
-                    onClick={() => switchView('front')}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-brand-dark disabled:opacity-30"
-                    disabled={view === 'front'}
-                  >
-                    ←
-                  </button>
-                  <div className="flex items-center gap-1 px-2 text-[12px] font-semibold text-brand-dark">
-                    <span>📄</span>
-                    <span>{view === 'front' ? '1' : '2'}/2</span>
-                  </div>
-                  <button
-                    onClick={() => switchView('back')}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-brand-dark disabled:opacity-30"
-                    disabled={view === 'back'}
-                  >
-                    →
-                  </button>
-                </div>
+                      {isActive && (
+                        <>
+                          <div className="absolute inset-0 border-2 border-brand-dark rounded pointer-events-none" />
+
+                          {/* Top-left: delete */}
+                          <button
+                            onPointerDown={e => e.stopPropagation()}
+                            onClick={e => { e.stopPropagation(); removeLayer(layer.id) }}
+                            className="absolute -top-3 -left-3 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-[13px] font-bold shadow-md hover:bg-red-600"
+                          >×</button>
+
+                          {/* Top-right: duplicate */}
+                          <button
+                            onPointerDown={e => e.stopPropagation()}
+                            onClick={e => { e.stopPropagation(); duplicateLayer(layer.id) }}
+                            className="absolute -top-3 -right-3 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[12px] shadow-md hover:bg-brand-light"
+                            title="Dupliquer"
+                          >⧉</button>
+
+                          {/* Bottom-left: rotate */}
+                          <div
+                            onPointerDown={e => startAction('rotate', layer.id, e)}
+                            className="absolute -bottom-3 -left-3 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[13px] shadow-md cursor-grab active:cursor-grabbing"
+                            title="Rotation"
+                          >↻</div>
+
+                          {/* Bottom-right: resize */}
+                          <div
+                            onPointerDown={e => startAction('resize', layer.id, e)}
+                            className="absolute -bottom-3 -right-3 w-7 h-7 bg-brand-dark rounded-full flex items-center justify-center text-white text-[12px] shadow-md cursor-nwse-resize"
+                            title="Redimensionner"
+                          >⤡</div>
+                        </>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
 
-              {/* View tabs */}
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => switchView('front')}
-                  className={`flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all
-                    ${view === 'front' ? 'bg-brand-dark text-white' : 'bg-brand-light text-brand-gray hover:bg-black/5'}`}
-                >
-                  Avant / Front {layers.some(l => l.view === 'front') && '●'}
-                </button>
-                <button
-                  onClick={() => switchView('back')}
-                  className={`flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all
-                    ${view === 'back' ? 'bg-brand-dark text-white' : 'bg-brand-light text-brand-gray hover:bg-black/5'}`}
-                >
-                  Arrière / Back {layers.some(l => l.view === 'back') && '●'}
-                </button>
-              </div>
-
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="mt-4 w-full border-2 border-dashed border-black/20 rounded-2xl p-6 text-center cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50"
+              >
+                <div className="text-[28px] mb-1">📁</div>
+                <div className="text-[14px] font-medium">Ajouter un logo</div>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) addLogo(f) }} />
+              </button>
             </div>
 
-            {/* CONTROLS */}
-            <div className="flex flex-col gap-7">
-
-              {/* Color */}
-              {Object.keys(currentColors).length > 1 && (
-                <div>
-                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">Couleur</label>
-                  <div className="flex gap-3">
-                    {Object.entries(currentColors).map(([name, c]) => (
-                      <button
-                        key={name}
-                        onClick={() => setSelectedColor(name)}
-                        title={name}
-                        className={`w-10 h-10 rounded-full border-2 transition-all ${activeColorKey === name ? 'border-brand-dark scale-110' : 'border-black/10'}`}
-                        style={{ background: c.hex, boxShadow: c.hex === '#FFFFFF' ? 'inset 0 0 0 1px rgba(0,0,0,0.12)' : 'none' }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Layers list */}
-              {visibleLayers.length > 0 && (
-                <div>
-                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-3">
-                    Calques sur {view === 'front' ? 'avant' : 'arrière'} ({visibleLayers.length})
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    {visibleLayers.map(layer => (
-                      <div
-                        key={layer.id}
-                        onClick={() => { setActiveLayerId(layer.id); setShowTextPanel(layer.type === 'text') }}
-                        className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all
-                          ${layer.id === activeLayerId ? 'border-brand-dark bg-brand-light' : 'border-black/10 bg-white hover:border-black/25'}`}
-                      >
-                        {layer.type === 'image' ? (
-                          <img src={layer.src} alt="" className="w-9 h-9 object-contain rounded-lg bg-white border border-black/5 flex-shrink-0" />
-                        ) : (
-                          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-black/5 flex-shrink-0 text-[16px] font-bold">A</div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[12px] font-semibold truncate">{layer.type === 'image' ? layer.name : layer.text}</div>
-                        </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id) }}
-                          className="text-[11px] text-red-500 font-medium px-1.5 flex-shrink-0"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeLayer && activeLayer.view === view && (
-                <>
-                  {/* TEXT-SPECIFIC CONTROLS */}
-                  {activeLayer.type === 'text' && (
-                    <>
-                      <div>
-                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Texte</label>
-                        <input
-                          type="text"
-                          value={activeLayer.text}
-                          onChange={e => updateActiveLayer({ text: e.target.value })}
-                          className="w-full border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] focus:outline-none"
-                          placeholder="Votre texte"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Police</label>
-                        <div className="flex gap-2 flex-wrap">
-                          {FONT_OPTIONS.map(f => (
-                            <button
-                              key={f.id}
-                              onClick={() => updateActiveLayer({ fontFamily: f.family })}
-                              style={{ fontFamily: f.family }}
-                              className={`px-3 py-2 rounded-xl text-[13px] border transition-all ${activeLayer.fontFamily === f.family ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white border-black/15 hover:border-black/30'}`}
-                            >
-                              {f.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Épaisseur</label>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => updateActiveLayer({ fontWeight: 300 })}
-                            className={`flex-1 py-2.5 rounded-xl text-[13px] font-light border transition-all ${activeLayer.fontWeight === 300 ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white border-black/15 hover:border-black/30'}`}
-                          >
-                            Fin
-                          </button>
-                          <button
-                            onClick={() => updateActiveLayer({ fontWeight: 700 })}
-                            className={`flex-1 py-2.5 rounded-xl text-[13px] font-bold border transition-all ${activeLayer.fontWeight === 700 ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white border-black/15 hover:border-black/30'}`}
-                          >
-                            Gras
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-2">Couleur du texte</label>
-                        <div className="flex gap-2 flex-wrap">
-                          {TEXT_COLORS.map(c => (
-                            <button
-                              key={c}
-                              onClick={() => updateActiveLayer({ color: c })}
-                              className={`w-9 h-9 rounded-full border-2 transition-all ${activeLayer.color === c ? 'border-brand-dark scale-110' : 'border-black/10'}`}
-                              style={{ background: c, boxShadow: c === '#FFFFFF' ? 'inset 0 0 0 1px rgba(0,0,0,0.15)' : 'none' }}
-                            />
-                          ))}
-                          <input
-                            type="color"
-                            value={activeLayer.color}
-                            onChange={e => updateActiveLayer({ color: e.target.value })}
-                            className="w-9 h-9 rounded-full border-2 border-black/10 cursor-pointer"
-                            title="Couleur personnalisée"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Scale */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray">Taille</label>
-                      <span className="text-[12px] text-brand-gray font-medium">{Math.round(activeLayer.scale * 100)}%</span>
-                    </div>
-                    <input
-                      type="range" min="0.3" max="2.5" step="0.05"
-                      value={activeLayer.scale}
-                      onChange={e => updateActiveLayer({ scale: parseFloat(e.target.value) })}
-                      className="w-full accent-brand-dark"
-                    />
-                  </div>
-
-                  {/* Rotation */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray">Rotation</label>
-                      <span className="text-[12px] text-brand-gray font-medium">{activeLayer.rotation}°</span>
-                    </div>
-                    <input
-                      type="range" min="-45" max="45" step="1"
-                      value={activeLayer.rotation}
-                      onChange={e => updateActiveLayer({ rotation: parseInt(e.target.value) })}
-                      className="w-full accent-brand-dark"
-                    />
-                  </div>
-
-                  {/* BIG ACTION BUTTONS */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => updateActiveLayer({ x: 50, y: 45, scale: 1, rotation: 0 })}
-                      className="flex flex-col items-center justify-center gap-1 py-4 rounded-2xl border-2 border-black/15 bg-white hover:border-black/30 hover:bg-brand-light transition-all"
-                    >
-                      <span className="text-[20px]">↺</span>
-                      <span className="text-[12px] font-semibold text-brand-dark">Annuler</span>
-                    </button>
-                    <button
-                      onClick={() => duplicateLayer(activeLayer.id)}
-                      className="flex flex-col items-center justify-center gap-1 py-4 rounded-2xl border-2 border-black/15 bg-white hover:border-black/30 hover:bg-brand-light transition-all"
-                    >
-                      <span className="text-[20px]">⧉</span>
-                      <span className="text-[12px] font-semibold text-brand-dark">Dupliquer</span>
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => duplicateToOtherSide(activeLayer.id)}
-                    className="text-[13px] font-medium text-brand-dark underline self-start"
-                  >
-                    Copier vers {activeLayer.view === 'front' ? 'arrière' : 'avant'}
-                  </button>
-                </>
-              )}
+            {/* SIDEBAR */}
+            <div className="flex flex-col gap-6">
+              <div>
+                <p className="text-[13px] text-brand-gray leading-relaxed">
+                  Cliquez sur votre logo pour le sélectionner. Glissez pour déplacer. Utilisez les poignées aux coins pour supprimer, dupliquer, tourner ou redimensionner.
+                </p>
+              </div>
 
               <div className="pt-4 border-t border-black/[0.08]">
-                <p className="text-[13px] text-brand-gray leading-relaxed mb-4">
-                  Une fois satisfait de votre design, continuez vers le configurateur pour choisir la taille et finaliser votre commande.
-                </p>
-                <button
-                  onClick={goToConfigurateur}
-                  disabled={layers.length === 0}
-                  className={`block w-full text-center bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors ${layers.length === 0 ? 'opacity-40 pointer-events-none' : ''}`}
+                <Link
+                  href="/configurateur"
+                  className={`block text-center bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline ${layers.length === 0 ? 'opacity-40 pointer-events-none' : ''}`}
                 >
                   Continuer vers la commande →
-                </button>
+                </Link>
               </div>
-
             </div>
+
           </div>
         </div>
       </main>
