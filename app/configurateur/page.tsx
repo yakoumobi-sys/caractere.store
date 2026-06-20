@@ -26,7 +26,7 @@ interface OrderState {
 const DEFAULT: OrderState = {
   step: 1, produit: null, quantite: 1,
   couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M'],
-  logoFile: null, logoUrl: null,
+  logoFile: null, logoUrl: null, logoUploadUrl: null,
   position: 'Logo petit — côté cœur', technique: '🖨️DTF',
   urgent: false, nom: '', entreprise: '', telephone: '', email: '', notes: ''
 }
