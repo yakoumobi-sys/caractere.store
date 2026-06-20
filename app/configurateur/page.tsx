@@ -48,6 +48,7 @@ export default function ConfigurateurPage() {
   const [refCode, setRefCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [fromDesigner, setFromDesigner] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -91,8 +92,6 @@ export default function ConfigurateurPage() {
     })
   }, [])
 
-  // Récupère les infos venant du Designer (produit, couleur, logo) une fois
-  // que produits/couleurs sont chargés
   useEffect(() => {
     if (produits.length === 0 || couleurs.length === 0) return
 
@@ -100,7 +99,7 @@ export default function ConfigurateurPage() {
     const produitNom = params.get('produit')
     const couleurNom = params.get('couleur')
 
-    if (!produitNom) return // arrivée normale, rien à faire
+    if (!produitNom) return
 
     const matchProduit = produits.find(p => p.nom === produitNom)
     const matchCouleur = couleurs.find(c => c.nom === couleurNom)
@@ -113,7 +112,6 @@ export default function ConfigurateurPage() {
       step: 2,
     }))
 
-    // Restaure le(s) logo(s) sauvegardés par le Designer
     try {
       const raw = sessionStorage.getItem('designer_layers')
       if (raw) {
@@ -136,7 +134,6 @@ export default function ConfigurateurPage() {
 
     setFromDesigner(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produits, couleurs])
 
   const up = (patch: Partial<OrderState>) => setOrder(prev => ({...prev,...patch}))
@@ -151,7 +148,6 @@ export default function ConfigurateurPage() {
   const next = () => { up({step: order.step+1}); window.scrollTo({top:0,behavior:'smooth'}) }
   const prev = () => { up({step: order.step-1}); window.scrollTo({top:0,behavior:'smooth'}) }
 
-    const [uploadingLogo, setUploadingLogo] = useState(false)
   const handleFile = async (file: File) => {
     if (file.type.startsWith('image/')) {
       const r = new FileReader()
@@ -161,17 +157,6 @@ export default function ConfigurateurPage() {
       up({logoFile:file, logoUrl:null})
     }
     setUploadingLogo(true)
-    try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/upload-logo', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (data.url) up({ logoUploadUrl: data.url })
-    } catch (e) {
-      console.error('Logo upload failed', e)
-    }
-    setUploadingLogo(false)
-  }
     try {
       const fd = new FormData()
       fd.append('file', file)
@@ -205,7 +190,7 @@ export default function ConfigurateurPage() {
         entreprise: order.entreprise,
         telephone: order.telephone,
         email: order.email,
-                notes: order.notes,
+        notes: order.notes,
         logo_url: order.logoUploadUrl,
         prix_unitaire: unit,
         prix_total: total,
@@ -276,14 +261,14 @@ export default function ConfigurateurPage() {
                     {produits.map(p => {
                       const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
-  'T-shirt': BASE + '/IMG_5850.jpeg',
-  'Polo': BASE + '/IMG_5851.jpeg',
-  'Casquette': BASE + '/IMG_5853.jpeg',
-  'Totebag': BASE + '/IMG_5854.jpeg',
-  'Gilet de travail': BASE + '/IMG_5852.jpeg',
-  'Gilet de securite': BASE + '/images.jpg',
-  'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
-}
+                        'T-shirt': BASE + '/IMG_5850.jpeg',
+                        'Polo': BASE + '/IMG_5851.jpeg',
+                        'Casquette': BASE + '/IMG_5853.jpeg',
+                        'Totebag': BASE + '/IMG_5854.jpeg',
+                        'Gilet de travail': BASE + '/IMG_5852.jpeg',
+                        'Gilet de securite': BASE + '/images.jpg',
+                        'Tablier': BASE + '/png-clipart-apron-apron-thumbnail.png',
+                      }
                       const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
                       return (
                         <button key={p.id} onClick={() => up({produit:p})} className={`text-left rounded-2xl border-2 transition-all cursor-pointer bg-white overflow-hidden ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
