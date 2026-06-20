@@ -335,6 +335,7 @@ export default function ConfigurateurPage() {
                     <div className="text-[11px] text-brand-gray/70 mt-2">AI · EPS · SVG · PDF · PNG · JPG</div>
                     <input ref={fileRef} type="file" className="hidden" accept=".ai,.eps,.svg,.pdf,.png,.jpg,.jpeg" onChange={e=>{const f=e.target.files?.[0];if(f)handleFile(f)}} />
                   </div>
+                  {uploadingLogo && <div className="text-[13px] text-brand-gray mb-4">Upload en cours...</div>}
                   {order.logoFile && (
                     <div className="bg-white border border-black/10 rounded-2xl p-4 flex items-center gap-4 mb-4">
                       {order.logoUrl && <img src={order.logoUrl} alt="Logo" className="w-16 h-16 object-contain rounded-xl bg-brand-light" />}
