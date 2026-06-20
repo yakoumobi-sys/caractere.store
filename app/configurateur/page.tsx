@@ -13,6 +13,7 @@ interface OrderState {
   tailles: string[]
   logoFile: File | null
   logoUrl: string | null
+  logoUploadUrl: string | null
   position: string
   technique: string
   urgent: boolean
