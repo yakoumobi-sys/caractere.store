@@ -194,7 +194,7 @@ export default function ConfigurateurPage() {
         entreprise: order.entreprise,
         telephone: order.telephone,
         email: order.email,
-        notes: order.notes,
+                notes: order.notes,
         logo_url: order.logoUploadUrl,
         prix_unitaire: unit,
         prix_total: total,
