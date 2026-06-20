@@ -195,6 +195,7 @@ export default function ConfigurateurPage() {
         telephone: order.telephone,
         email: order.email,
         notes: order.notes,
+        logo_url: order.logoUploadUrl,
         prix_unitaire: unit,
         prix_total: total,
       })
