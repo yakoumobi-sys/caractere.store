@@ -15,8 +15,8 @@ interface LogoLayer {
 const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
 
 const PRODUCTS = [
-  { id: 'tshirt',    name: 'T-shirt',  img: BASE + '/mockup-tshirt.jpg' },
-  { id: 'polo',      name: 'Polo',     img: BASE + '/mockup-polo.jpg' },
+  { id: 'tshirt',    name: 'T-shirt',  img: BASE + '/mockup-tshirt-blanc.jpg' },
+{ id: 'polo',      name: 'Polo',     img: BASE + '/mockup-polo-blanc.jpg' },
   { id: 'gilet',     name: 'Gilet',    img: BASE + '/mockup-gilet.jpg' },
   { id: 'casquette', name: 'Casquette',img: BASE + '/mockup-casquette.jpg' },
   { id: 'totebag',   name: 'Totebag',  img: BASE + '/mockup-totebag.jpg' },
