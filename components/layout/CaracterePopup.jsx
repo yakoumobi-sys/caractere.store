@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { X, Sparkles } from "lucide-react";
 
 // ─────────────────────────────────────────────
 // Config — edit copy, redirects & promo codes here
