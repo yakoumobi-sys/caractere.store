@@ -101,8 +101,12 @@ export default function CaracterePopup() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+      onClick={handleClose}
+    >
       <div
+        onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-[18rem] overflow-hidden rounded-2xl shadow-2xl"
         style={{
           background: "linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)",
