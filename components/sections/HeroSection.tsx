@@ -1,4 +1,4 @@
-export default function HeroSection({ config }) {
+export default function HeroSection({ config }: { config?: any }) {
   const cream = "#FFFFFF";
   const muted = "rgba(255,255,255,0.85)";
   const darkText = "#3A0E14"; // bordeaux très foncé, pour texte sur fond blanc
