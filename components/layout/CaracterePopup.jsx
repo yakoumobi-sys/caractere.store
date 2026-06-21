@@ -50,8 +50,7 @@ const SEGMENTS = [
 
 const SHOW_DELAY_MS = 5000; // délai avant affichage
 const COUNTDOWN_SECONDS = 60; // 1 minute
-const LOGO_URL = "/logo.png"; // ← remplace par le chemin réel de ton logo
-
+const LOGO_URL = "https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo.jpg";
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
