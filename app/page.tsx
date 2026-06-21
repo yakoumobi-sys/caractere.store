@@ -13,6 +13,7 @@ import TestimonialsSection from '@/components/sections/TestimonialsSection'
 import FaqSection from '@/components/sections/FaqSection'
 import CtaDarkSection from '@/components/sections/CtaDarkSection'
 import ContactSection from '@/components/sections/ContactSection'
+import CaracterePopup from "@/components/layout/CaracterePopup";
 
 export const revalidate = 60 // revalidate every 60 seconds
 
