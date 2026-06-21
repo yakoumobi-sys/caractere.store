@@ -32,6 +32,7 @@ export default async function HomePage() {
   const { produits, config } = await getData()
   return (
     <>
+<CaracterePopup />
       <Navbar />
       <main>
         <HeroSection config={config} />
