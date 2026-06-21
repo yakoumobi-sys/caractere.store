@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ─────────────────────────────────────────────
 // Config — edit copy, redirects & promo codes here
@@ -48,53 +48,103 @@ const SEGMENTS = [
   },
 ];
 
+const SHOW_DELAY_MS = 5000; // délai avant affichage
+const COUNTDOWN_SECONDS = 60; // 1 minute
+const LOGO_URL = "/logo.png"; // ← remplace par le chemin réel de ton logo
+
+function formatTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
 export default function CaracterePopup() {
+  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [applied, setApplied] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN_SECONDS);
 
-  if (!open) return null;
+  // Affiche le popup après un délai
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), SHOW_DELAY_MS);
+    return () => clearTimeout(t);
+  }, []);
 
-  const handleSelect = (segment) => setSelected(segment);
+  // Compte à rebours, démarre une fois le popup visible
+  useEffect(() => {
+    if (!visible || !open) return;
+    if (secondsLeft <= 0) return;
+    const interval = setInterval(() => {
+      setSecondsLeft((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [visible, open, secondsLeft]);
+
+  if (!visible || !open) return null;
+
+  const handleSelect = (segment) => {
+    setSelected(segment);
+    setApplied(false);
+  };
 
   const handleClose = () => setOpen(false);
 
+  const handleApplyPromo = () => {
+    if (!selected) return;
+    try {
+      localStorage.setItem("caractere_promo_code", selected.promoCode);
+      document.cookie = `caractere_promo_code=${selected.promoCode}; path=/; max-age=${60 * 60 * 24 * 7}`;
+    } catch (e) {
+      // localStorage indisponible (mode privé etc.) — on continue quand même
+    }
+    setApplied(true);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-[#FAF7F0] shadow-2xl">
+      <div className="relative w-full max-w-[18rem] overflow-hidden rounded-2xl bg-[#FAF7F0] shadow-2xl">
         {/* Close button */}
         <button
           onClick={handleClose}
           aria-label="Fermer"
-          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-stone-700 hover:bg-black/10 transition"
+          className="absolute right-2.5 top-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/5 text-stone-700 hover:bg-black/10 transition"
         >
           ✕
         </button>
 
-        {/* Header band */}
-        <div className="bg-[#1C1C1A] px-6 pt-7 pb-5 text-center">
-          <span className="font-serif text-2xl tracking-wide text-[#E8DCC0]">
-            Caractère
-          </span>
+        {/* Header band with logo */}
+        <div className="bg-[#1C1C1A] px-5 pt-5 pb-4 text-center">
+          <img
+            src={LOGO_URL}
+            alt="Caractère Store"
+            className="mx-auto h-9 w-auto object-contain"
+          />
         </div>
 
-        <div className="px-6 py-7">
+        {/* Countdown */}
+        <div className="bg-[#B8722E] py-1.5 text-center text-[11px] font-semibold tracking-wide text-white">
+          Offre valable {formatTime(secondsLeft)}
+        </div>
+
+        <div className="px-5 py-5">
           {!selected ? (
             <>
-              <h2 className="text-center text-xl font-semibold leading-snug text-stone-900">
+              <h2 className="text-center text-base font-semibold leading-snug text-stone-900">
                 Vous avez débloqué
                 <br />
                 <span className="text-[#B8722E]">-15% de réduction</span>
               </h2>
-              <p className="mt-2 text-center text-sm text-stone-600">
+              <p className="mt-1.5 text-center text-xs text-stone-600">
                 Dites-nous ce que vous cherchez pour récupérer votre code :
               </p>
 
-              <div className="mt-6 flex flex-col gap-2.5">
+              <div className="mt-4 flex flex-col gap-2">
                 {SEGMENTS.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => handleSelect(s)}
-                    className="rounded-full border border-stone-300 bg-white px-5 py-3 text-left text-sm font-medium text-stone-800 transition hover:border-[#1C1C1A] hover:bg-stone-50"
+                    className="rounded-full border border-stone-300 bg-white px-4 py-2.5 text-left text-xs font-medium text-stone-800 transition hover:border-[#1C1C1A] hover:bg-stone-50"
                   >
                     {s.label}
                   </button>
@@ -103,40 +153,54 @@ export default function CaracterePopup() {
 
               <button
                 onClick={handleClose}
-                className="mt-5 w-full text-center text-xs text-stone-400 underline hover:text-stone-600"
+                className="mt-4 w-full text-center text-[11px] text-stone-400 underline hover:text-stone-600"
               >
                 Non merci, je ne veux pas de réduction
               </button>
             </>
           ) : (
             <div className="flex flex-col items-center text-center">
-              <span className="mb-3 text-2xl">✨</span>
-              <h2 className="text-lg font-semibold text-stone-900">
+              <span className="mb-2 text-xl">✨</span>
+              <h2 className="text-sm font-semibold text-stone-900">
                 {selected.resultTitle}
               </h2>
-              <p className="mt-2 text-sm text-stone-600">
+              <p className="mt-1.5 text-xs text-stone-600">
                 {selected.resultBody}
               </p>
 
-              <div className="mt-5 w-full rounded-xl border-2 border-dashed border-[#B8722E] bg-[#FFF6EA] py-3">
-                <p className="text-[11px] uppercase tracking-wide text-stone-500">
+              <div className="mt-4 w-full rounded-xl border-2 border-dashed border-[#B8722E] bg-[#FFF6EA] py-2.5">
+                <p className="text-[10px] uppercase tracking-wide text-stone-500">
                   Votre code
                 </p>
-                <p className="text-xl font-bold tracking-widest text-[#B8722E]">
+                <p className="text-lg font-bold tracking-widest text-[#B8722E]">
                   {selected.promoCode}
                 </p>
               </div>
 
-              <a
-                href={selected.redirectUrl}
-                className="mt-5 w-full rounded-full bg-[#1C1C1A] py-3 text-sm font-semibold text-[#E8DCC0] transition hover:bg-stone-800"
-              >
-                Voir les produits ({selected.discount} appliqué)
-              </a>
+              {!applied ? (
+                <button
+                  onClick={handleApplyPromo}
+                  className="mt-4 w-full rounded-full bg-[#1C1C1A] py-2.5 text-xs font-semibold text-[#E8DCC0] transition hover:bg-stone-800"
+                >
+                  Appliquer le code promo
+                </button>
+              ) : (
+                <>
+                  <p className="mt-4 text-xs font-medium text-green-700">
+                    ✓ Code appliqué — {selected.discount} de réduction activée
+                  </p>
+                  <a
+                    href={`${selected.redirectUrl}?promo=${selected.promoCode}`}
+                    className="mt-3 w-full rounded-full bg-[#1C1C1A] py-2.5 text-xs font-semibold text-[#E8DCC0] transition hover:bg-stone-800"
+                  >
+                    Voir les produits
+                  </a>
+                </>
+              )}
 
               <button
                 onClick={() => setSelected(null)}
-                className="mt-3 text-xs text-stone-400 underline hover:text-stone-600"
+                className="mt-3 text-[11px] text-stone-400 underline hover:text-stone-600"
               >
                 Retour
               </button>
