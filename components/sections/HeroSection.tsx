@@ -1,18 +1,17 @@
 export default function HeroSection({ config }: { config?: any }) {
-  const cream = "#FFFFFF";
-  const muted = "rgba(255,255,255,0.85)";
-  const darkText = "#3A0E14"; // bordeaux très foncé, pour texte sur fond blanc
+  const LOGO_URL =
+    "https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png";
 
   return (
     <section
-      className="relative overflow-hidden px-6 pb-20 pt-16 text-center"
+      className="relative overflow-hidden px-6 pb-16 pt-14 text-center"
       style={{
         background: "linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)",
       }}
     >
-      {/* Halo lumineux derrière le titre, plus clair que le fond */}
+      {/* Halo lumineux */}
       <div
-        className="pointer-events-none absolute left-1/2 top-20 h-80 w-80 -translate-x-1/2 rounded-full"
+        className="pointer-events-none absolute left-1/2 top-16 h-80 w-80 -translate-x-1/2 rounded-full"
         style={{
           background:
             "radial-gradient(circle, rgba(186,230,253,0.5) 0%, transparent 70%)",
@@ -21,99 +20,84 @@ export default function HeroSection({ config }: { config?: any }) {
       />
 
       <div className="relative z-10 mx-auto max-w-md">
-        {/* Badge */}
-        <span
-          className="inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
-          style={{
-            borderColor: "rgba(255,255,255,0.3)",
-            backgroundColor: "rgba(255,255,255,0.1)",
-            color: cream,
-          }}
-        >
-          ✦ Personnalisation textile — Alger
-        </span>
+        {/* Logo blanc, directement sur le fond dégradé */}
+        <img
+          src={LOGO_URL}
+          alt="Caractère"
+          className="mx-auto h-16 w-auto object-contain"
+        />
 
-        {/* Titre */}
-        <h1 className="mt-6 text-4xl font-extrabold leading-tight" style={{ color: cream }}>
-          {config?.heroTitle || "Imprimez Votre"}
-          <br />
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage: "linear-gradient(90deg, #FFD27A, #FFB67A)",
-            }}
-          >
-            {config?.heroAccent || "Identité de Marque"}
-          </span>
-        </h1>
-
-        {/* Sous-titre */}
-        <p className="mx-auto mt-4 max-w-xs text-sm" style={{ color: muted }}>
-          {config?.heroSubtitle ||
-            "DTF, broderie et personnalisation textile premium pour entreprises et particuliers. Une impression qui dure."}
+        <p className="mt-4 text-sm font-medium" style={{ color: "rgba(255,255,255,0.9)" }}>
+          Personnalisation Textile — Alger
         </p>
 
-        {/* CTAs */}
+        <h1 className="mt-3 text-4xl font-extrabold leading-tight text-white">
+          Habillez votre
+          <br />
+          équipe.
+        </h1>
+
+        <p className="mx-auto mt-4 max-w-xs text-sm" style={{ color: "rgba(255,255,255,0.85)" }}>
+          Broderie, DTF, uniformes — de 1 à 10 000 pièces. Devis gratuit sous 24h.
+        </p>
+
+        {/* Boutons d'origine */}
         <div className="mt-7 flex flex-col gap-3">
           <a
             href="/configurateur"
-            className="rounded-full py-3 text-sm font-semibold transition"
-            style={{ backgroundColor: cream, color: darkText }}
+            className="rounded-full bg-white py-3 text-sm font-semibold transition"
+            style={{ color: "#0C4A6E" }}
           >
-            Devis gratuit ✦
+            Configurer ma commande
           </a>
           <a
             href="/designer"
-            className="rounded-full border-2 py-3 text-sm font-semibold backdrop-blur-sm transition"
+            className="rounded-full border-2 py-3 text-sm font-semibold text-white backdrop-blur-sm transition"
             style={{
-              borderColor: "rgba(255,255,255,0.5)",
+              borderColor: "rgba(255,255,255,0.6)",
               backgroundColor: "rgba(255,255,255,0.08)",
-              color: cream,
             }}
           >
-            Voir nos produits
+            Open Designer ✏️
+          </a>
+          <a
+            href="/realisations"
+            className="rounded-full border-2 py-3 text-sm font-semibold text-white backdrop-blur-sm transition"
+            style={{
+              borderColor: "rgba(255,255,255,0.35)",
+              backgroundColor: "transparent",
+            }}
+          >
+            Voir nos réalisations
           </a>
         </div>
 
-        {/* Réassurance */}
-        <div
-          className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs"
-          style={{ color: muted }}
-        >
-          <span className="flex items-center gap-1.5">
-            <span style={{ color: "#7CFFB2" }}>✓</span> Qualité Premium
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span style={{ color: "#7CFFB2" }}>✓</span> Livraison Rapide
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span style={{ color: "#7CFFB2" }}>✓</span> Prix Compétitifs
-          </span>
-        </div>
-
-        {/* Stats */}
-        <div className="mt-8 grid grid-cols-3 gap-3">
-          {[
-            { value: "292K+", label: "Followers" },
-            { value: "20+", label: "Employés" },
-            { value: "3-7j", label: "Délai livraison" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border py-4 backdrop-blur-sm"
-              style={{
-                borderColor: "rgba(255,255,255,0.25)",
-                backgroundColor: "rgba(255,255,255,0.1)",
-              }}
-            >
-              <p className="text-xl font-bold" style={{ color: cream }}>
-                {stat.value}
-              </p>
-              <p className="mt-0.5 text-[11px]" style={{ color: muted }}>
-                {stat.label}
-              </p>
-            </div>
-          ))}
+        {/* Stats — fidèles à l'original, 2x2, sans cartes */}
+        <div className="mt-10 grid grid-cols-2 gap-y-7">
+          <div>
+            <p className="text-3xl font-extrabold text-white">297K</p>
+            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Abonnés Instagram
+            </p>
+          </div>
+          <div>
+            <p className="text-3xl font-extrabold text-white">5+</p>
+            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Ans d'activité
+            </p>
+          </div>
+          <div>
+            <p className="text-3xl font-extrabold text-white">3-5j</p>
+            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Délai production
+            </p>
+          </div>
+          <div>
+            <p className="text-3xl font-extrabold text-white">1</p>
+            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Pièce minimum
+            </p>
+          </div>
         </div>
       </div>
     </section>
