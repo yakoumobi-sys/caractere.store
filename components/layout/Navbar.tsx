@@ -19,7 +19,7 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-11 h-14 bg-white/[0.88] backdrop-blur-xl border-b border-black/[0.08]">
         <Link href="/" className="flex items-center no-underline">
-          <Image src="/logo.jpg" alt="Caractere Store" width={120} height={40} style={{objectFit:'contain',height:'34px',width:'auto'}} priority />
+          src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-black-transparent.png"
         </Link>
         <ul className="hidden md:flex gap-7 list-none items-center">
           {links.map(l => (
@@ -39,7 +39,7 @@ export default function Navbar() {
       </nav>
       <div className={`mob-menu ${open ? 'open' : ''}`}>
         <button className="absolute top-4 right-5 bg-black/[0.06] border-none w-8 h-8 rounded-full text-base cursor-pointer flex items-center justify-center" onClick={() => setOpen(false)}>x</button>
-        <Image src="/logo.jpg" alt="Caractere Store" width={140} height={50} style={{objectFit:'contain'}} />
+        src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-black-transparent.png"
         {links.map(l => (
           <a key={l.href} href={l.href} className="text-[26px] font-bold text-brand-dark no-underline tracking-tight" onClick={() => setOpen(false)}>{l.label}</a>
         ))}
