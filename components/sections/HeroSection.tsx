@@ -24,7 +24,7 @@ export default function HeroSection({ config }: { config?: any }) {
         <img
           src={LOGO_URL}
           alt="Caractère"
-          className="mx-auto h-16 w-auto object-contain"
+          className="mx-auto h-24 w-auto object-contain"
         />
 
         <p className="mt-4 text-sm font-medium" style={{ color: "rgba(255,255,255,0.9)" }}>
