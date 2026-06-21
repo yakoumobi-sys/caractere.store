@@ -9,7 +9,7 @@ const SEGMENTS = [
   {
     id: "b2b",
     label: "Je veux des uniformes pour mon entreprise",
-    redirectUrl: "/collections/uniformes-entreprise",
+    redirectUrl: "/configurateur",
     promoCode: "PRO15",
     discount: "15%",
     resultTitle: "Parfait pour les commandes pro.",
