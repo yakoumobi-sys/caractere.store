@@ -67,7 +67,7 @@ export default function CaracterePopup() {
           aria-label="Fermer"
           className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-stone-700 hover:bg-black/10 transition"
         >
-          <X size={16} />
+          ✕
         </button>
 
         {/* Header band */}
@@ -110,7 +110,7 @@ export default function CaracterePopup() {
             </>
           ) : (
             <div className="flex flex-col items-center text-center">
-              <Sparkles className="mb-3 text-[#B8722E]" size={28} />
+              <span className="mb-3 text-2xl">✨</span>
               <h2 className="text-lg font-semibold text-stone-900">
                 {selected.resultTitle}
               </h2>
