@@ -61,14 +61,14 @@ export default function HeroSection({ config }: { config?: any }) {
             Open Designer ✏️
           </a>
           <a
-            href="/realisations"
+            href="/auth/login"
             className="rounded-full border-2 py-3 text-sm font-semibold text-white backdrop-blur-sm transition"
             style={{
               borderColor: "rgba(255,255,255,0.35)",
               backgroundColor: "transparent",
             }}
           >
-            Voir nos réalisations
+            Se connecter
           </a>
         </div>
 
