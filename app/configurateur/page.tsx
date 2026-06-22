@@ -278,7 +278,7 @@ export default function ConfigurateurPage() {
                       }
                       const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
                       return (
-                        <button key={p.id} onClick={() => up({produit:p})} className={`text-left rounded-2xl border-2 transition-all cursor-pointer bg-white overflow-hidden ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
+                        <button key={p.id} onClick={() => up({produit:p, step: 2})} className={`text-left rounded-2xl border-2 transition-all cursor-pointer bg-white overflow-hidden ${order.produit?.id===p.id?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
                           <div className="w-full aspect-square overflow-hidden bg-brand-light">
                             <img src={imgUrl} alt={p.nom} className="w-full h-full object-cover" />
                           </div>
