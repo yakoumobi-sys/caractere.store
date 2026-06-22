@@ -13,13 +13,23 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleLogin = async () => {
-    if (!email || !password) return setError('Email et mot de passe requis.')
-    setLoading(true)
-    setError(null)
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
-    if (authError) { setError('Email ou mot de passe incorrect.'); setLoading(false); return }
-    router.push('/dashboard')
+const handleLogin = async () => {
+  if (!email || !password) return setError('Email et mot de passe requis.')
+  setLoading(true)
+  setError(null)
+  const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+  if (authError) {
+    setError(authError.message)
+    setLoading(false)
+    return
+  }
+  if (!data.session) {
+    setError('Pas de session — compte non confirme ?')
+    setLoading(false)
+    return
+  }
+  router.push('/dashboard')
+}
   }
 
   return (
