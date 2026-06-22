@@ -16,14 +16,18 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false)
 
   const handleRegister = async () => {
-    if (!email || !password || !nom) return setError('Tous les champs sont requis.')
-    if (password.length < 6) return setError('Le mot de passe doit faire au moins 6 caractères.')
-    setLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: nom } },
+  if (!email || !password || !nom) return setError('Tous les champs sont requis.')
+  if (password.length < 6) return setError('Le mot de passe doit faire au moins 6 caractères.')
+  setLoading(true)
+  setError(null)
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: nom } },
+  })
+  if (error) { setError(error.message); setLoading(false); return }
+  router.push('/dashboard')
+}
     })
     if (error) { setError(error.message); setLoading(false); return }
     setSuccess(true)
