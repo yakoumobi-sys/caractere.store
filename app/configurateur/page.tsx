@@ -234,11 +234,17 @@ export default function ConfigurateurPage() {
             <p className="text-[16px] text-brand-gray mb-2">Votre reference commande</p>
             <div className="text-[22px] font-bold font-mono bg-brand-light rounded-2xl px-6 py-3 inline-block mb-6 tracking-widest">{refCode}</div>
             <p className="text-[14px] text-brand-gray leading-relaxed mb-6">Notre equipe vous contacte sous 24h par WhatsApp.</p>
-            <a href={`/suivi/${refCode}`} className="inline-block mb-6 text-[14px] font-semibold text-brand-dark underline">
-              Voir le suivi + infos paiement
-            </a>
-            <br />
-            <button onClick={() => { setOrder(DEFAULT); setRefCode('') }} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Nouvelle commande</button>
+<a href="/auth/login" className="inline-block mb-4 bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline">
+  Suivre ma commande
+</a>
+<br />
+<a href={`/suivi/${refCode}`} className="inline-block mb-6 text-[13px] text-brand-gray underline">
+  Acces direct sans compte
+</a>
+<br />
+<button onClick={() => { setOrder(DEFAULT); setRefCode('') }} className="text-[13px] text-brand-gray underline bg-transparent border-none cursor-pointer">
+  Nouvelle commande
+</button>
           </div>
         ) : (
           <div className="max-w-[900px] mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
