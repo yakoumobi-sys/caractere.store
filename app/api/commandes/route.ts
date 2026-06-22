@@ -71,7 +71,23 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const reference = req.nextUrl.searchParams.get('reference')
+
+  if (reference) {
+    const { data, error } = await supabaseAdmin
+      .from('commandes')
+      .select('*')
+      .eq('reference', reference)
+      .single()
+
+    if (error || !data) {
+      return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 })
+    }
+
+    return NextResponse.json(data)
+  }
+
   const { data } = await supabaseAdmin
     .from('commandes')
     .select('*')
