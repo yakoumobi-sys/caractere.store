@@ -15,6 +15,7 @@ export interface Couleur {
   hex: string
   actif: boolean
   ordre: number
+  produits?: string[]
 }
 
 export interface Taille {
