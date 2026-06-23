@@ -56,15 +56,21 @@ export default function ConfigurateurPage() {
       {id:'7',nom:'Tablier',emoji:'',description:'Cuisine ou commerce',prix_base:1500,actif:true,ordre:7},
     ]
     const fallbackCouleurs = [
-      {id:'1',nom:'Blanc',hex:'#FFFFFF',actif:true,ordre:1},
-      {id:'2',nom:'Noir',hex:'#1d1d1f',actif:true,ordre:2},
-      {id:'3',nom:'Marine',hex:'#1B2A4A',actif:true,ordre:3},
-      {id:'4',nom:'Gris',hex:'#9E9E9E',actif:true,ordre:4},
-      {id:'5',nom:'Bordeaux',hex:'#6D1A2A',actif:true,ordre:5},
-      {id:'6',nom:'Vert bouteille',hex:'#1B4D3E',actif:true,ordre:6},
-      {id:'7',nom:'Beige',hex:'#D4B896',actif:true,ordre:7},
-      {id:'8',nom:'Bleu ciel',hex:'#87CEEB',actif:true,ordre:8},
-      {id:'9',nom:'Rouge',hex:'#CC3300',actif:true,ordre:9},
+      {id:'1',  nom:'Noir',           hex:'#1A1A1A', actif:true, ordre:1,  produits:['T-shirt','Polo','Gilet de travail','Casquette','Totebag','Tablier']},
+      {id:'2',  nom:'Blanc',          hex:'#FFFFFF', actif:true, ordre:2,  produits:['T-shirt','Polo','Casquette','Totebag']},
+      {id:'3',  nom:'Rouge',          hex:'#CC1111', actif:true, ordre:3,  produits:['T-shirt','Polo','Gilet de travail','Casquette','Tablier']},
+      {id:'4',  nom:'Orange',         hex:'#E8621A', actif:true, ordre:4,  produits:['T-shirt','Casquette']},
+      {id:'5',  nom:'Bleu Nuit',      hex:'#1B2A4A', actif:true, ordre:5,  produits:['Polo','Gilet de travail','Casquette']},
+      {id:'6',  nom:'Bleu Roi',       hex:'#1A5DC8', actif:true, ordre:6,  produits:['T-shirt','Casquette']},
+      {id:'7',  nom:'Bleu Ciel',      hex:'#87CEEB', actif:true, ordre:7,  produits:['T-shirt']},
+      {id:'8',  nom:'Vert',           hex:'#1A9A3C', actif:true, ordre:8,  produits:['T-shirt','Casquette']},
+      {id:'9',  nom:'Bordeaux',       hex:'#6B1A2A', actif:true, ordre:9,  produits:['T-shirt']},
+      {id:'10', nom:'Jaune',          hex:'#F5C200', actif:true, ordre:10, produits:['T-shirt']},
+      {id:'11', nom:'Rose',           hex:'#F5A0B5', actif:true, ordre:11, produits:['T-shirt']},
+      {id:'12', nom:'Beige',          hex:'#E8D5B0', actif:true, ordre:12, produits:['T-shirt','Gilet de travail','Totebag']},
+      {id:'13', nom:'Gris',           hex:'#888888', actif:true, ordre:13, produits:['T-shirt']},
+      {id:'14', nom:'Gris Clair',     hex:'#C8C8C8', actif:true, ordre:14, produits:['T-shirt']},
+      {id:'15', nom:'Gris Fonce',     hex:'#3A3A3A', actif:true, ordre:15, produits:['T-shirt']},
     ]
     const fallbackTailles = [
       {id:'1',nom:'XS',actif:true,ordre:1},
@@ -287,7 +293,9 @@ export default function ConfigurateurPage() {
 
                   <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Couleur du textile</label>
                   <div className="flex flex-wrap gap-3 mb-3">
-                    {couleurs.map(c => (
+                    {couleurs
+                      .filter(c => !order.produit || !c.produits || c.produits.length === 0 || c.produits.includes(order.produit.nom))
+                      .map(c => (
                       <button key={c.id} onClick={() => up({couleur:c.nom, couleurHex:c.hex})} title={c.nom} className={`w-9 h-9 rounded-full border-2 transition-all ${order.couleur===c.nom?'border-brand-dark scale-110':'border-transparent hover:border-black/20'}`} style={{background:c.hex, boxShadow:c.hex==='#FFFFFF'?'inset 0 0 0 1px rgba(0,0,0,0.12)':'none'}} />
                     ))}
                   </div>
