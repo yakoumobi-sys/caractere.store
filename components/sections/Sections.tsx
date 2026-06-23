@@ -1,53 +1,23 @@
 import Link from 'next/link'
 import type { Produit } from '@/types'
 
-// ── HERO ──
-export function HeroSection({ config }: { config: Record<string, string> }) {
-  const titre = config['hero_titre'] ?? 'Habillez votre équipe. Faites-le bien.'
-  const sous = config['hero_sous_titre'] ?? "Vêtements personnalisés, DTF, broderie — de 1 à 10 000 pièces. Simulation et devis gratuits."
-  return (
-    <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 bg-white">
-      <div className="mb-11 mx-auto flex justify-center">
-        <img src="/logo.jpg" alt="Caractere Store" style={{height:'90px',width:'auto',objectFit:'contain'}} />
-      </div>
-      <span className="text-[13px] font-medium text-brand-gray mb-[18px] block">Personnalisation Textile — Alger</span>
-      <h1 className="text-[clamp(42px,7vw,86px)] font-bold leading-[1.04] tracking-tight text-brand-dark max-w-[760px] mx-auto mb-[22px]">{titre}</h1>
-      <p className="text-[19px] font-light text-brand-gray leading-relaxed max-w-[500px] mx-auto mb-11">{sous}</p>
-      <div className="flex flex-col gap-3.5 items-center">
-  <Link href="/configurateur" className="bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline">
-    Configurer ma commande
-  </Link>
-  <Link href="/designer" className="border-2 border-brand-dark text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-brand-dark hover:text-white transition-colors no-underline">
-    Open Designer ✏
-  </Link>
-  <a href="/#produits" className="bg-transparent border border-black/20 text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-brand-light transition-colors no-underline">
-    Voir nos réalisations
-  </a>
-</div>
-
-      <div className="flex gap-14 justify-center flex-wrap pt-9 border-t border-black/[0.08] w-full max-w-[600px] mx-auto">
-        {[{n:'297K',l:'Abonnés Instagram'},{n:'5+',l:"Ans d'activité"},{n:'3–5j',l:'Délai production'},{n:'1',l:'Pièce minimum'}].map(s => (
-          <div key={s.l} className="text-center">
-            <div className="text-[32px] font-bold tracking-tight leading-none">{s.n}</div>
-            <div className="text-[12px] text-brand-gray mt-1">{s.l}</div>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
+const BLUE_DARK = '#0C4A6E'
+const BLUE_MID = '#1E6FA8'
+const BLUE_LIGHT = '#38BDF8'
+const BLUE_PALE = '#EFF6FF'
+const BLUE_MUTED = '#BAE6FD'
 
 // ── MARQUEE ──
 export function MarqueeStrip() {
-  const items = ['BRODERIE PREMIUM','DTF 60CM','PERSONNALISATION TEXTILE','LIVRAISON NATIONALE','DEVIS GRATUIT','QUALITÉ GARANTIE','ALGER','1 PIÈCE MIN']
+  const items = ['BRODERIE PREMIUM','DTF 60CM','PERSONNALISATION TEXTILE','LIVRAISON NATIONALE','DEVIS GRATUIT','QUALITE GARANTIE','ALGER','1 PIECE MIN']
   const doubled = [...items, ...items]
   return (
-    <div className="bg-brand-light py-[11px] overflow-hidden whitespace-nowrap border-t border-b border-black/[0.06]">
+    <div className="overflow-hidden whitespace-nowrap py-3 border-t border-b" style={{ backgroundColor: BLUE_DARK, borderColor: 'rgba(255,255,255,0.1)' }}>
       <div className="inline-flex gap-9 animate-marquee">
         {doubled.map((item, i) => (
           <span key={i} className="flex items-center gap-9 flex-shrink-0">
-            <span className="text-[12px] font-medium text-brand-gray tracking-[0.02em]">{item}</span>
-            <span className="text-[#c8c8c8]">·</span>
+            <span className="text-[11px] font-semibold tracking-widest" style={{ color: BLUE_MUTED }}>{item}</span>
+            <span style={{ color: BLUE_LIGHT }}>✦</span>
           </span>
         ))}
       </div>
@@ -58,24 +28,35 @@ export function MarqueeStrip() {
 // ── SERVICES ──
 export function ServicesSection() {
   const services = [
-    {e:'🧵',n:'Broderie machine',d:"Logos nets, tenu dans le temps. Rendu 3D premium sur tous textiles."},
-    {e:'🖨',n:'Impression DTF',d:"Designs full color jusqu'à 60cm. Idéal pour motifs complexes."},
-    {e:'👔',n:'Uniformes complets',d:"De la conception à la livraison. Prise en charge totale de votre projet."},
-    {e:'🎨',n:'Personnalisation',d:"Adaptation de votre charte graphique. Vectorisation gratuite."},
-    {e:'📦',n:'Commandes B2B',d:"À partir de 1 pièce, jusqu'à 10 000. Tarifs dégressifs."},
-    {e:'🚚',n:'Livraison nationale',d:"Retrait atelier ou envoi partout en Algérie via partenaires."},
+    { icon: '🧵', name: 'Broderie machine', desc: "Logos nets, tenus dans le temps. Rendu 3D premium sur tous textiles.", accent: '#0C4A6E' },
+    { icon: '🖨️', name: 'Impression DTF', desc: "Designs full color jusqu'a 60cm. Ideal pour motifs complexes.", accent: '#1E6FA8' },
+    { icon: '👔', name: 'Uniformes complets', desc: "De la conception a la livraison. Prise en charge totale de votre projet.", accent: '#38BDF8' },
+    { icon: '🎨', name: 'Personnalisation', desc: "Adaptation de votre charte graphique. Vectorisation gratuite.", accent: '#0C4A6E' },
+    { icon: '📦', name: 'Commandes B2B', desc: "A partir de 1 piece, jusqu'a 10 000. Tarifs degressifs.", accent: '#1E6FA8' },
+    { icon: '🚚', name: 'Livraison nationale', desc: "Retrait atelier ou envoi partout en Algerie via partenaires.", accent: '#38BDF8' },
   ]
   return (
-    <section id="services" className="py-28 px-6">
+    <section id="services" className="py-20 px-6 bg-white">
       <div className="max-w-[980px] mx-auto">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Nos services</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Tout pour habiller<br />votre équipe.</h2>
-        <div className="apple-grid mt-14" style={{gridTemplateColumns:'repeat(3,1fr)'}}>
-          {services.map((s,i) => (
-            <div key={i} className="apple-grid-cell p-10">
-              <span className="text-[32px] mb-[18px] block">{s.e}</span>
-              <h3 className="text-[19px] font-semibold tracking-tight mb-2">{s.n}</h3>
-              <p className="text-[14px] text-brand-gray leading-relaxed">{s.d}</p>
+        <div className="mb-12">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+            style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+            Nos services
+          </span>
+          <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06]" style={{ color: BLUE_DARK }}>
+            Tout pour habiller<br />votre equipe.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {services.map((s, i) => (
+            <div key={i} className="rounded-2xl p-6 border transition-all hover:shadow-md"
+              style={{ borderColor: 'rgba(12,74,110,0.08)', backgroundColor: i % 3 === 1 ? BLUE_PALE : '#fff' }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4"
+                style={{ backgroundColor: i % 3 === 1 ? '#DBEAFE' : BLUE_PALE }}>
+                {s.icon}
+              </div>
+              <h3 className="text-[16px] font-bold mb-2" style={{ color: BLUE_DARK }}>{s.name}</h3>
+              <p className="text-[13px] leading-relaxed" style={{ color: '#6B7280' }}>{s.desc}</p>
             </div>
           ))}
         </div>
@@ -86,50 +67,65 @@ export function ServicesSection() {
 
 // ── PRODUITS ──
 export function ProduitsSection({ produits }: { produits: Produit[] }) {
+  const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
+  const imgs: Record<string, string> = {
+    'T-shirt': BASE + '/IMG_5850.jpeg',
+    'Polo': BASE + '/IMG_5851.jpeg',
+    'Casquette': BASE + '/IMG_5853.jpeg',
+    'Totebag': BASE + '/IMG_5854.jpeg',
+    'Gilet de travail': BASE + '/IMG_5852.jpeg',
+    'Gilet de securite': BASE + '/IMG_5852.jpeg',
+    'Tablier': BASE + '/IMG_5850.jpeg',
+  }
   return (
-    <section id="produits" className="py-28 px-6 bg-brand-light">
+    <section id="produits" className="py-20 px-6" style={{ backgroundColor: '#F0F9FF' }}>
       <div className="max-w-[980px] mx-auto">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Produits</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Les essentiels<br />de l uniforme.</h2>
-        <div className="flex bg-white rounded-xl overflow-hidden mb-10 mt-8 border border-black/[0.06]">
-          {['Livraison nationale','Devis gratuit','Qualite garantie'].map((item,i) => (
-            <div key={i} className="flex-1 px-5 py-4 text-[13px] font-medium text-brand-dark flex items-center gap-2 border-r border-black/[0.06] last:border-r-0">
-              <span className="bg-brand-dark text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">ok</span>
+        <div className="mb-10">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+            style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+            Produits
+          </span>
+          <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06]" style={{ color: BLUE_DARK }}>
+            Les essentiels<br />de l uniforme.
+          </h2>
+        </div>
+
+        {/* Badges */}
+        <div className="flex gap-3 flex-wrap mb-8">
+          {['Livraison nationale', 'Devis gratuit', 'Qualite garantie'].map((item) => (
+            <span key={item} className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold border"
+              style={{ backgroundColor: '#fff', borderColor: 'rgba(12,74,110,0.15)', color: BLUE_DARK }}>
+              <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                style={{ backgroundColor: BLUE_DARK }}>✓</span>
               {item}
-            </div>
+            </span>
           ))}
         </div>
-        <div className="apple-grid" style={{gridTemplateColumns:'repeat(3,1fr)'}}>
-          {produits.map(p => {
-              const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
-              const imgs: Record<string,string> = {
-  'T-shirt': BASE + '/IMG_5850.jpeg',
-  'Polo': BASE + '/IMG_5851.jpeg',
-  'Casquette': BASE + '/IMG_5853.jpeg',
-  'Totebag': BASE + '/IMG_5854.jpeg',
-  'Gilet de travail': BASE + '/IMG_5852.jpeg',
-  'Gilet de securite': BASE + '/IMG_5852.jpeg',
-  'Tablier': BASE + '/IMG_5850.jpeg',
-}
-              const imgUrl = imgs[p.nom] || BASE + '/IMG_5509.png'
-              return (
-            <div key={p.id} className="apple-grid-cell flex flex-col">
-              <div className="w-full aspect-square overflow-hidden bg-brand-light">
-                <img src={imgUrl} alt={p.nom} className="w-full h-full object-cover" />
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {produits.map(p => (
+            <div key={p.id} className="rounded-2xl overflow-hidden border bg-white transition-all hover:shadow-lg hover:-translate-y-0.5"
+              style={{ borderColor: 'rgba(12,74,110,0.08)' }}>
+              <div className="w-full aspect-square overflow-hidden" style={{ backgroundColor: '#F0F9FF' }}>
+                <img src={imgs[p.nom] || BASE + '/IMG_5509.png'} alt={p.nom} className="w-full h-full object-cover" />
               </div>
-              <div className="p-5 pb-6 flex-1 flex flex-col bg-white">
-                <div className="text-[16px] font-semibold tracking-tight mb-1">{p.nom}</div>
-                <p className="text-[13px] text-brand-gray mb-4 flex-1 leading-relaxed">{p.description}</p>
+              <div className="p-4">
+                <div className="text-[15px] font-bold mb-1" style={{ color: BLUE_DARK }}>{p.nom}</div>
+                <p className="text-[12px] mb-3 leading-relaxed" style={{ color: '#6B7280' }}>{p.description}</p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-[20px] font-bold tracking-tight">{p.prix_base.toLocaleString('fr-FR')} DA</div>
-                    <div className="text-[11px] text-brand-gray mt-0.5">/ piece</div>
+                    <span className="text-[18px] font-bold" style={{ color: BLUE_DARK }}>{p.prix_base.toLocaleString('fr-FR')} DA</span>
+                    <span className="text-[11px] ml-1" style={{ color: '#9CA3AF' }}>/piece</span>
                   </div>
-                  <Link href="/configurateur" className="text-[13px] font-medium text-blue-600 no-underline hover:gap-2 transition-all">Configurer</Link>
+                  <Link href="/configurateur"
+                    className="text-[12px] font-semibold px-3 py-1.5 rounded-full no-underline transition-all"
+                    style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+                    Configurer →
+                  </Link>
                 </div>
               </div>
             </div>
-          )})}
+          ))}
         </div>
       </div>
     </section>
@@ -139,23 +135,32 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
 // ── PROCESS ──
 export function ProcessSection() {
   const steps = [
-    {n:'1',t:'Devis gratuit',d:'Envoyez votre logo et quantites. Reponse sous 24h.'},
-    {n:'2',t:'Validation maquette',d:'On adapte votre design pour un rendu optimal.'},
-    {n:'3',t:'Production atelier',d:'Fabrication avec controle qualite a chaque etape.'},
-    {n:'4',t:'Livraison',d:"Expedition nationale ou retrait a l atelier Alger."},
+    { n: '1', t: 'Devis gratuit', d: 'Envoyez votre logo et quantites. Reponse sous 24h.' },
+    { n: '2', t: 'Validation maquette', d: 'On adapte votre design pour un rendu optimal.' },
+    { n: '3', t: 'Production atelier', d: 'Fabrication avec controle qualite a chaque etape.' },
+    { n: '4', t: 'Livraison', d: 'Expedition nationale ou retrait a l atelier Alger.' },
   ]
   return (
-    <section className="py-28 px-6">
+    <section className="py-20 px-6 bg-white">
       <div className="max-w-[980px] mx-auto text-center">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Comment ca marche</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">De la commande<br />a la livraison.</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mt-[72px] relative">
-          <div className="hidden md:block absolute top-5 left-[10%] right-[10%] h-px bg-black/10" />
-          {steps.map(s => (
-            <div key={s.n} className="text-center">
-              <div className="w-10 h-10 bg-brand-dark text-white rounded-full flex items-center justify-center text-[14px] font-bold mx-auto mb-[18px] relative z-10">{s.n}</div>
-              <h4 className="text-[15px] font-semibold tracking-tight mb-1.5">{s.t}</h4>
-              <p className="text-[13px] text-brand-gray leading-[1.55]">{s.d}</p>
+        <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+          style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+          Comment ca marche
+        </span>
+        <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06] mb-14" style={{ color: BLUE_DARK }}>
+          De la commande<br />a la livraison.
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative">
+          <div className="hidden md:block absolute top-6 left-[12%] right-[12%] h-px"
+            style={{ background: `linear-gradient(90deg, ${BLUE_DARK}, ${BLUE_LIGHT})` }} />
+          {steps.map((s, i) => (
+            <div key={s.n} className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-[15px] font-bold text-white mb-4 relative z-10 shadow-lg"
+                style={{ background: `linear-gradient(135deg, ${BLUE_DARK}, ${BLUE_LIGHT})` }}>
+                {s.n}
+              </div>
+              <h4 className="text-[14px] font-bold mb-2" style={{ color: BLUE_DARK }}>{s.t}</h4>
+              <p className="text-[12px] leading-relaxed" style={{ color: '#6B7280' }}>{s.d}</p>
             </div>
           ))}
         </div>
@@ -167,40 +172,66 @@ export function ProcessSection() {
 // ── WHY ──
 export function WhySection() {
   const items = [
-    {n:'01',t:'Atelier propre a Alger',d:'3 machines a broder, 2 imprimantes DTF. Aucun intermediaire.'},
-    {n:'02',t:'Resultat garanti',d:'Toute commande non-conforme est reprise sans frais.'},
-    {n:'03',t:'A partir de 1 piece',d:"Petites commandes ou grandes entreprises — on s adapte."},
-    {n:'04',t:'Suivi WhatsApp en temps reel',d:'Pas de silence, pas de surprise.'},
+    { n: '01', t: 'Atelier propre a Alger', d: '3 machines a broder, 2 imprimantes DTF. Aucun intermediaire.' },
+    { n: '02', t: 'Resultat garanti', d: 'Toute commande non-conforme est reprise sans frais.' },
+    { n: '03', t: 'A partir de 1 piece', d: "Petites commandes ou grandes entreprises — on s adapte." },
+    { n: '04', t: 'Suivi WhatsApp en temps reel', d: 'Pas de silence, pas de surprise.' },
+  ]
+  const stats = [
+    { n: '297K', l: 'Abonnes Instagram' },
+    { n: '5+', l: "Ans d activite" },
+    { n: '20+', l: 'Employes' },
+    { n: '3-5j', l: 'Delai production' },
   ]
   return (
-    <section className="py-28 px-6 bg-brand-light">
+    <section className="py-20 px-6" style={{ backgroundColor: '#F0F9FF' }}>
       <div className="max-w-[980px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[72px] items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
           <div>
-            <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Pourquoi Caractere</span>
-            <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">La difference<br />qui compte.</h2>
-            <div className="flex flex-col mt-9">
-              {items.map(item => (
-                <div key={item.n} className="flex gap-[18px] py-6 border-b border-black/[0.07] first:border-t first:border-black/[0.07] items-start">
-                  <span className="text-[12px] font-bold text-brand-gray min-w-[22px] mt-0.5">{item.n}</span>
-                  <div><h4 className="text-[15px] font-semibold tracking-tight mb-0.5">{item.t}</h4><p className="text-[13px] text-brand-gray leading-relaxed">{item.d}</p></div>
+            <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+              style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+              Pourquoi Caractere
+            </span>
+            <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06] mb-8" style={{ color: BLUE_DARK }}>
+              La difference<br />qui compte.
+            </h2>
+            <div className="flex flex-col gap-0">
+              {items.map((item, i) => (
+                <div key={item.n} className="flex gap-4 py-5 border-b"
+                  style={{ borderColor: 'rgba(12,74,110,0.08)' }}>
+                  <span className="text-[11px] font-bold mt-0.5 w-6 flex-shrink-0"
+                    style={{ color: BLUE_LIGHT }}>{item.n}</span>
+                  <div>
+                    <h4 className="text-[15px] font-bold mb-1" style={{ color: BLUE_DARK }}>{item.t}</h4>
+                    <p className="text-[13px] leading-relaxed" style={{ color: '#6B7280' }}>{item.d}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="bg-white rounded-[20px] p-11 border border-black/[0.06]">
-            <div className="grid grid-cols-2 gap-[18px]">
-              {[{n:'297K',l:'Abonnes Instagram'},{n:'5+',l:"Ans d activite"},{n:'40+',l:'Employes'},{n:'3-5j',l:'Delai production'}].map(s => (
-                <div key={s.l} className="bg-brand-light rounded-[14px] p-6">
-                  <div className="text-[36px] font-bold tracking-tight leading-none">{s.n}</div>
-                  <div className="text-[12px] text-brand-gray mt-1.5">{s.l}</div>
-                </div>
-              ))}
+
+          <div className="rounded-2xl overflow-hidden border" style={{ borderColor: 'rgba(12,74,110,0.1)' }}>
+            <div className="p-6 text-white" style={{ background: `linear-gradient(165deg, ${BLUE_DARK}, ${BLUE_LIGHT})` }}>
+              <p className="text-[12px] font-semibold uppercase tracking-widest mb-4" style={{ color: BLUE_MUTED }}>En chiffres</p>
+              <div className="grid grid-cols-2 gap-4">
+                {stats.map(s => (
+                  <div key={s.l} className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    <div className="text-[30px] font-bold leading-none text-white">{s.n}</div>
+                    <div className="text-[11px] mt-1" style={{ color: BLUE_MUTED }}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 mt-[18px]">
-              {['Brother Pro','DTF 60cm i3200','DTF 42cm XP600','Encres premium'].map(c => (
-                <span key={c} className="bg-brand-light rounded-full px-3.5 py-1.5 text-[12px] font-medium text-brand-dark border border-black/10">{c}</span>
-              ))}
+            <div className="p-5 bg-white">
+              <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>Notre equipement</p>
+              <div className="flex flex-wrap gap-2">
+                {['Brother Pro', 'DTF 60cm i3200', 'DTF 42cm XP600', 'Encres premium'].map(c => (
+                  <span key={c} className="px-3 py-1.5 rounded-full text-[12px] font-medium border"
+                    style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK, borderColor: 'rgba(12,74,110,0.15)' }}>
+                    {c}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -212,26 +243,37 @@ export function WhySection() {
 // ── SECTEURS ──
 export function SecteursSection() {
   const s = [
-    {e:'🍽️',n:'Restauration & Hotellerie',d:'Tabliers, polos et uniformes de service.'},
-    {e:'🏥',n:'Sante & Cliniques',d:'Blouses et tenues medicales brodees.'},
-    {e:'🏗️',n:'BTP & Construction',d:'Gilets, t-shirts et vestes de chantier.'},
-    {e:'🏪',n:'Commerce & Retail',d:"Uniformes vendeurs et tenues d equipe."},
-    {e:'🎓',n:'Education',d:'Tenues scolaires, clubs et associations.'},
-    {e:'⚽',n:'Sport & Evenements',d:'Maillots et kits complets pour equipes.'},
-    {e:'🏭',n:'Industrie',d:'Vetements de travail avec signaletique.'},
-    {e:'💼',n:'Corporate',d:'Polos premium pour equipes commerciales.'},
+    { e: '🍽️', n: 'Restauration & Hotellerie', d: 'Tabliers, polos et uniformes de service.' },
+    { e: '🏥', n: 'Sante & Cliniques', d: 'Blouses et tenues medicales brodees.' },
+    { e: '🏗️', n: 'BTP & Construction', d: 'Gilets, t-shirts et vestes de chantier.' },
+    { e: '🏪', n: 'Commerce & Retail', d: "Uniformes vendeurs et tenues d equipe." },
+    { e: '🎓', n: 'Education', d: 'Tenues scolaires, clubs et associations.' },
+    { e: '⚽', n: 'Sport & Evenements', d: 'Maillots et kits complets pour equipes.' },
+    { e: '🏭', n: 'Industrie', d: 'Vetements de travail avec signaletique.' },
+    { e: '💼', n: 'Corporate', d: 'Polos premium pour equipes commerciales.' },
   ]
   return (
-    <section id="secteurs" className="py-28 px-6">
+    <section id="secteurs" className="py-20 px-6 bg-white">
       <div className="max-w-[980px] mx-auto">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">B2B</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Nous equipons<br />votre secteur.</h2>
-        <div className="apple-grid mt-[52px]" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
-          {s.map((sec,i) => (
-            <div key={i} className="apple-grid-cell p-7">
-              <span className="text-[22px] mb-3 block">{sec.e}</span>
-              <h4 className="text-[14px] font-semibold tracking-tight mb-1.5">{sec.n}</h4>
-              <p className="text-[12px] text-brand-gray leading-relaxed">{sec.d}</p>
+        <div className="mb-12">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+            style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+            B2B
+          </span>
+          <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06]" style={{ color: BLUE_DARK }}>
+            Nous equipons<br />votre secteur.
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {s.map((sec, i) => (
+            <div key={i} className="rounded-2xl p-5 border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-default"
+              style={{
+                borderColor: 'rgba(12,74,110,0.08)',
+                backgroundColor: i % 4 === 0 ? BLUE_PALE : '#fff'
+              }}>
+              <span className="text-2xl mb-3 block">{sec.e}</span>
+              <h4 className="text-[13px] font-bold mb-1.5" style={{ color: BLUE_DARK }}>{sec.n}</h4>
+              <p className="text-[12px] leading-relaxed" style={{ color: '#6B7280' }}>{sec.d}</p>
             </div>
           ))}
         </div>
@@ -243,23 +285,41 @@ export function SecteursSection() {
 // ── TESTIMONIALS ──
 export function TestimonialsSection() {
   const t = [
-    {i:'K',n:'Karim B.',r:'Gerant',c:'Restaurant El Kef',txt:'80 polos brodes pour notre equipe de salle. Rendu impeccable, delai respecte, suivi WhatsApp rassurant. On recommande sans hesiter.'},
-    {i:'S',n:'Samira M.',r:'Directrice',c:'Clinique Al Chifa',txt:"Blouses brodees pour toute notre equipe medicale. La qualite du tissu et la precision sur le logo sont vraiment au-dessus de nos attentes."},
-    {i:'Y',n:'Yacine O.',r:'Directeur',c:'BTP Construct',txt:'120 gilets de chantier en 5 jours. Troisieme commande chez Caractere — la regularite et le serieux sont la a chaque fois.'},
+    { i: 'K', n: 'Karim B.', r: 'Gerant', c: 'Restaurant El Kef', txt: '80 polos brodes pour notre equipe de salle. Rendu impeccable, delai respecte, suivi WhatsApp rassurant. On recommande sans hesiter.' },
+    { i: 'S', n: 'Samira M.', r: 'Directrice', c: 'Clinique Al Chifa', txt: "Blouses brodees pour toute notre equipe medicale. La qualite du tissu et la precision sur le logo sont vraiment au-dessus de nos attentes." },
+    { i: 'Y', n: 'Yacine O.', r: 'Directeur', c: 'BTP Construct', txt: '120 gilets de chantier en 5 jours. Troisieme commande chez Caractere — la regularite et le serieux sont la a chaque fois.' },
   ]
   return (
-    <section id="avis" className="py-28 px-6 bg-brand-light">
+    <section id="avis" className="py-20 px-6" style={{ backgroundColor: '#F0F9FF' }}>
       <div className="max-w-[980px] mx-auto">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-3.5">Temoignages</span>
-        <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-brand-dark">Ils nous font<br />confiance.</h2>
-        <div className="apple-grid mt-[52px]" style={{gridTemplateColumns:'repeat(3,1fr)'}}>
-          {t.map((tm,i) => (
-            <div key={i} className="apple-grid-cell p-9">
-              <div className="text-[12px] text-brand-dark tracking-[2px] mb-4">★★★★★</div>
-              <p className="text-[14px] text-brand-dark leading-[1.7] mb-6 font-light">{tm.txt}</p>
-              <div className="flex items-center gap-3">
-                <div className="w-[34px] h-[34px] bg-brand-dark rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0">{tm.i}</div>
-                <div><div className="text-[14px] font-semibold tracking-tight">{tm.n}</div><div className="text-[12px] text-brand-gray">{tm.r} — {tm.c}</div></div>
+        <div className="mb-12">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+            style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+            Temoignages
+          </span>
+          <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06]" style={{ color: BLUE_DARK }}>
+            Ils nous font<br />confiance.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {t.map((tm, i) => (
+            <div key={i} className="rounded-2xl p-6 border bg-white transition-all hover:shadow-md"
+              style={{ borderColor: 'rgba(12,74,110,0.08)' }}>
+              <div className="flex gap-0.5 mb-4">
+                {[...Array(5)].map((_, j) => (
+                  <span key={j} className="text-sm" style={{ color: BLUE_LIGHT }}>★</span>
+                ))}
+              </div>
+              <p className="text-[13px] leading-relaxed mb-5 flex-1" style={{ color: '#374151' }}>{tm.txt}</p>
+              <div className="flex items-center gap-3 pt-4 border-t" style={{ borderColor: 'rgba(12,74,110,0.06)' }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${BLUE_DARK}, ${BLUE_LIGHT})` }}>
+                  {tm.i}
+                </div>
+                <div>
+                  <div className="text-[13px] font-bold" style={{ color: BLUE_DARK }}>{tm.n}</div>
+                  <div className="text-[11px]" style={{ color: '#9CA3AF' }}>{tm.r} — {tm.c}</div>
+                </div>
               </div>
             </div>
           ))}
@@ -272,14 +332,103 @@ export function TestimonialsSection() {
 // ── CTA DARK ──
 export function CtaDarkSection() {
   return (
-    <div className="bg-brand-dark py-28 px-6 text-center">
-      <span className="text-[11px] font-bold tracking-widest uppercase text-white/45 block mb-3.5">Pret a demarrer ?</span>
-      <h2 className="text-[clamp(30px,4.5vw,50px)] font-bold tracking-tight leading-[1.06] text-white max-w-[580px] mx-auto">Habillons vos<br />equipes ensemble.</h2>
-      <p className="text-[17px] font-light text-white/45 mt-[18px] mb-10 mx-auto max-w-[400px] leading-relaxed">Simulation et devis gratuits. Sans engagement.</p>
-      <div className="flex gap-3.5 justify-center flex-wrap">
-        <Link href="/configurateur" className="bg-white text-brand-dark px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-100 transition-colors no-underline">Configurer ma commande</Link>
-        <a href="https://wa.me/213557440522" className="bg-transparent text-white/70 px-7 py-3.5 rounded-full text-[15px] font-medium border border-white/20 hover:border-white/50 hover:text-white transition-colors no-underline" target="_blank" rel="noopener noreferrer">WhatsApp direct</a>
+    <section className="py-20 px-6 text-center text-white"
+      style={{ background: `linear-gradient(165deg, ${BLUE_DARK} 0%, ${BLUE_MID} 100%)` }}>
+      <div className="max-w-[600px] mx-auto">
+        <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-5"
+          style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: BLUE_MUTED }}>
+          Pret a demarrer ?
+        </span>
+        <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06] text-white mb-4">
+          Habillons vos<br />equipes ensemble.
+        </h2>
+        <p className="text-[16px] mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          Simulation et devis gratuits. Sans engagement.
+        </p>
+        <div className="flex gap-3 justify-center flex-wrap">
+          <Link href="/configurateur"
+            className="rounded-full px-7 py-3.5 text-[15px] font-semibold no-underline transition-all hover:opacity-90"
+            style={{ backgroundColor: '#fff', color: BLUE_DARK }}>
+            Configurer ma commande
+          </Link>
+          <a href="https://wa.me/213557440522"
+            className="rounded-full px-7 py-3.5 text-[15px] font-semibold no-underline border-2 transition-all"
+            style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' }}
+            target="_blank" rel="noopener noreferrer">
+            WhatsApp direct
+          </a>
+        </div>
       </div>
-    </div>
+    </section>
+  )
+}
+
+// ── CONTACT ──
+export function ContactSection() {
+  return (
+    <section id="contact" className="py-20 px-6 bg-white">
+      <div className="max-w-[980px] mx-auto">
+        <div className="mb-10">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+            style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+            Contact
+          </span>
+          <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06]" style={{ color: BLUE_DARK }}>
+            Parlons de<br />votre projet.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { icon: '📱', title: 'WhatsApp', desc: 'Reponse sous 2h', link: 'https://wa.me/213557440522', cta: '0557 44 05 22' },
+            { icon: '📍', title: 'Atelier', desc: 'Alger, Algerie', link: '#', cta: 'Voir sur la carte' },
+            { icon: '📸', title: 'Instagram', desc: '297K abonnes', link: 'https://instagram.com/caractere.store', cta: '@caractere.store' },
+          ].map((c, i) => (
+            <a key={i} href={c.link} target="_blank" rel="noopener noreferrer"
+              className="rounded-2xl p-6 border no-underline transition-all hover:shadow-md hover:-translate-y-0.5 block"
+              style={{ borderColor: 'rgba(12,74,110,0.08)', backgroundColor: i === 0 ? BLUE_PALE : '#fff' }}>
+              <div className="text-3xl mb-3">{c.icon}</div>
+              <h3 className="text-[15px] font-bold mb-1" style={{ color: BLUE_DARK }}>{c.title}</h3>
+              <p className="text-[12px] mb-2" style={{ color: '#9CA3AF' }}>{c.desc}</p>
+              <p className="text-[13px] font-semibold" style={{ color: BLUE_MID }}>{c.cta}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── FAQ ──
+export function FaqSection() {
+  const faqs = [
+    { q: 'Quel est le minimum de commande ?', r: 'A partir de 1 piece. Les tarifs sont degressifs a partir de 10, 50 et 100 pieces.' },
+    { q: 'Quels formats de logo acceptez-vous ?', r: 'AI, EPS, SVG, PDF vectoriel. On vectorise gratuitement si vous n avez que du JPG/PNG.' },
+    { q: 'Quel est le delai de production ?', r: '3 a 5 jours ouvres en standard. Commande urgente disponible sur demande.' },
+    { q: 'Livrez-vous en dehors d Alger ?', r: 'Oui, livraison nationale via nos partenaires logistiques.' },
+    { q: 'Peut-on voir un echantillon avant ?', r: 'Oui, nous pouvons produire 1 piece test avant validation de la commande entiere.' },
+  ]
+  return (
+    <section className="py-20 px-6" style={{ backgroundColor: '#F0F9FF' }}>
+      <div className="max-w-[700px] mx-auto">
+        <div className="mb-10">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-4"
+            style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
+            FAQ
+          </span>
+          <h2 className="text-[clamp(28px,4vw,46px)] font-bold tracking-tight leading-[1.06]" style={{ color: BLUE_DARK }}>
+            Questions<br />frequentes.
+          </h2>
+        </div>
+        <div className="flex flex-col gap-3">
+          {faqs.map((f, i) => (
+            <div key={i} className="rounded-2xl p-5 border bg-white"
+              style={{ borderColor: 'rgba(12,74,110,0.08)' }}>
+              <h4 className="text-[14px] font-bold mb-2" style={{ color: BLUE_DARK }}>{f.q}</h4>
+              <p className="text-[13px] leading-relaxed" style={{ color: '#6B7280' }}>{f.r}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
