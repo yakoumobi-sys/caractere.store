@@ -32,13 +32,7 @@ const DEFAULT: OrderState = {
   urgent: false, nom: '', entreprise: '', telephone: '', email: '', notes: ''
 }
 
-const POSITIONS = [
-  {id:'coeur',name:'Logo petit — côté coeur',desc:'Broderie discrète avant gauche',badge:'Standard'},
-  {id:'coeur-dos',name:'Petit coeur + grand dos',desc:'Discret devant, impact dans le dos',badge:'Standard'},
-  {id:'poitrine',name:'Logo grand — poitrine',desc:'Impression pleine poitrine centrée',badge:'Standard'},
-  {id:'poitrine-dos',name:'Grand poitrine + grand dos',desc:'Impact maximum avant et arrière',badge:'Standard'},
-]
-const TECHNIQUES = ['Broderie','DTF','Conseil équipe']
+const TECHNIQUES = ['Broderie','DTF','Conseil equipe']
 
 export default function ConfigurateurPage() {
   const [order, setOrder] = useState<OrderState>(DEFAULT)
@@ -200,7 +194,7 @@ export default function ConfigurateurPage() {
   }
 
   const {unit, total, remise} = calcPrice()
-  const stepLabels = ['Produit','Couleurs','Logo','Position','Contact']
+  const stepLabels = ['Produit','Couleurs','Logo','Contact']
 
   return (
     <>
@@ -234,17 +228,11 @@ export default function ConfigurateurPage() {
             <p className="text-[16px] text-brand-gray mb-2">Votre reference commande</p>
             <div className="text-[22px] font-bold font-mono bg-brand-light rounded-2xl px-6 py-3 inline-block mb-6 tracking-widest">{refCode}</div>
             <p className="text-[14px] text-brand-gray leading-relaxed mb-6">Notre equipe vous contacte sous 24h par WhatsApp.</p>
-<a href="/auth/login" className="inline-block mb-4 bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline">
-  Suivre ma commande
-</a>
-<br />
-<a href={`/suivi/${refCode}`} className="inline-block mb-6 text-[13px] text-brand-gray underline">
-  Acces direct sans compte
-</a>
-<br />
-<button onClick={() => { setOrder(DEFAULT); setRefCode('') }} className="text-[13px] text-brand-gray underline bg-transparent border-none cursor-pointer">
-  Nouvelle commande
-</button>
+            <a href={`/suivi/${refCode}`} className="inline-block mb-6 text-[14px] font-semibold text-brand-dark underline">
+              Voir le suivi + infos paiement
+            </a>
+            <br />
+            <button onClick={() => { setOrder(DEFAULT); setRefCode('') }} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Nouvelle commande</button>
           </div>
         ) : (
           <div className="max-w-[900px] mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -350,42 +338,7 @@ export default function ConfigurateurPage() {
                   <p className="text-[13px] text-brand-gray mb-8">Pas de logo ? Notre equipe vectorise gratuitement.</p>
                   <div className="flex gap-3">
                     <button onClick={prev} className="px-6 py-3 rounded-full border border-black/20 text-[14px] font-medium">Retour</button>
-                    <button onClick={next} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Continuer</button>
-                  </div>
-                </div>
-              )}
-
-              {order.step === 4 && (
-                <div>
-                  {order.step === 4 && (
-  <div>
-    <div className="text-[22px] font-bold tracking-tight mb-1">Emplacement & Technique</div>
-    <div className="text-[14px] text-brand-gray mb-6">Ou et comment apposer votre logo</div>
-    <div className="flex gap-3 mb-8">
-      <button onClick={prev} className="px-6 py-3 rounded-full border border-black/20 text-[14px] font-medium">Retour</button>
-      <button onClick={next} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Continuer</button>
-    </div>
-    <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Emplacement du logo</label>
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    {POSITIONS.map(p => (
-                      <button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
-                        <div className="w-full aspect-square bg-brand-light rounded-xl flex items-center justify-center mb-3 overflow-hidden">
-                          <img src={`https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/${p.id}.jpg`} alt={p.name} className="w-full h-full object-cover rounded-xl" />
-                        </div>
-                        <div className="text-[13px] font-semibold tracking-tight">{p.name}</div>
-                        <div className="text-[11px] text-brand-gray mt-0.5">{p.desc}</div>
-                      </button>
-                    ))}
-                  </div>
-                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Technique</label>
-                  <div className="flex flex-wrap gap-2 mb-8">
-                    {TECHNIQUES.map(t => (
-                      <button key={t} onClick={() => up({technique:t})} className={`px-5 py-2.5 rounded-full text-[13px] font-medium border transition-all ${order.technique===t?'bg-brand-dark text-white border-brand-dark':'bg-white text-brand-dark border-black/15 hover:border-black/30'}`}>{t}</button>
-                    ))}
-                  </div>
-                  <div className="flex gap-3">
-                    <button onClick={prev} className="px-6 py-3 rounded-full border border-black/20 text-[14px] font-medium">Retour</button>
-                    <button onClick={next} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Continuer</button>
+                    <button onClick={() => { up({step: 5}); window.scrollTo({top:0,behavior:'smooth'}) }} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Continuer</button>
                   </div>
                 </div>
               )}
@@ -412,7 +365,7 @@ export default function ConfigurateurPage() {
                     <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Notes</label><textarea value={order.notes} onChange={e=>up({notes:e.target.value})} rows={3} placeholder="Informations utiles..." className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] focus:outline-none resize-none" /></div>
                   </div>
                   <div className="flex gap-3 mt-6">
-                    <button onClick={prev} className="px-6 py-3 rounded-full border border-black/20 text-[14px] font-medium">Retour</button>
+                    <button onClick={() => { up({step: 3}); window.scrollTo({top:0,behavior:'smooth'}) }} className="px-6 py-3 rounded-full border border-black/20 text-[14px] font-medium">Retour</button>
                     <button onClick={handleSubmit} disabled={loading} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors disabled:opacity-60">
                       {loading ? 'Envoi...' : 'Envoyer ma demande'}
                     </button>
@@ -432,8 +385,6 @@ export default function ConfigurateurPage() {
                     {l:'Couleur',v:order.couleur},
                     {l:'Tailles',v:order.tailles.length ? order.tailles.join(', ') : '-'},
                     {l:'Logo',v:order.logoFile ? order.logoFile.name : 'Non uploade',e:!order.logoFile},
-                    {l:'Emplacement',v:order.position},
-                    {l:'Technique',v:order.technique},
                   ].map(r => (
                     <div key={r.l} className="flex justify-between py-2.5 border-b border-black/[0.06] last:border-b-0">
                       <span className="text-[12px] text-brand-gray">{r.l}</span>
