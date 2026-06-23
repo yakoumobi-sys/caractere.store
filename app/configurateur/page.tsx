@@ -357,9 +357,15 @@ export default function ConfigurateurPage() {
 
               {order.step === 4 && (
                 <div>
-                  <div className="text-[22px] font-bold tracking-tight mb-1">Emplacement & Technique</div>
-                  <div className="text-[14px] text-brand-gray mb-8">Ou et comment apposer votre logo</div>
-                  <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Emplacement du logo</label>
+                  {order.step === 4 && (
+  <div>
+    <div className="text-[22px] font-bold tracking-tight mb-1">Emplacement & Technique</div>
+    <div className="text-[14px] text-brand-gray mb-6">Ou et comment apposer votre logo</div>
+    <div className="flex gap-3 mb-8">
+      <button onClick={prev} className="px-6 py-3 rounded-full border border-black/20 text-[14px] font-medium">Retour</button>
+      <button onClick={next} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Continuer</button>
+    </div>
+    <label className="text-[12px] font-bold tracking-widest uppercase text-brand-gray block mb-4">Emplacement du logo</label>
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {POSITIONS.map(p => (
                       <button key={p.id} onClick={() => up({position:p.name})} className={`text-left p-4 rounded-2xl border-2 transition-all bg-white ${order.position===p.name?'border-brand-dark':'border-black/10 hover:border-black/25'}`}>
