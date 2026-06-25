@@ -56,21 +56,21 @@ export default function ConfigurateurPage() {
       {id:'7',nom:'Tablier',emoji:'',description:'Cuisine ou commerce',prix_base:1500,actif:true,ordre:7},
     ]
     const fallbackCouleurs = [
-      {id:'1',  nom:'Noir',           hex:'#1A1A1A', actif:true, ordre:1,  produits:['T-shirt','Polo','Gilet de travail','Casquette','Totebag','Tablier']},
-      {id:'2',  nom:'Blanc',          hex:'#FFFFFF', actif:true, ordre:2,  produits:['T-shirt','Polo','Casquette','Totebag']},
-      {id:'3',  nom:'Rouge',          hex:'#CC1111', actif:true, ordre:3,  produits:['T-shirt','Polo','Gilet de travail','Casquette','Tablier']},
-      {id:'4',  nom:'Orange',         hex:'#E8621A', actif:true, ordre:4,  produits:['T-shirt','Casquette']},
+      {id:'1',  nom:'Noir',           hex:'#1A1A1A', actif:true, ordre:1,  produits:['T-shirt','T-shirt Oversized 250GSM','Polo','Gilet de travail','Casquette','Totebag','Tablier']},
+      {id:'2',  nom:'Blanc',          hex:'#FFFFFF', actif:true, ordre:2,  produits:['T-shirt','T-shirt Oversized 250GSM','Polo','Casquette','Totebag']},
+      {id:'3',  nom:'Rouge',          hex:'#CC1111', actif:true, ordre:3,  produits:['T-shirt','T-shirt Oversized 250GSM','Polo','Gilet de travail','Casquette','Tablier']},
+      {id:'4',  nom:'Orange',         hex:'#E8621A', actif:true, ordre:4,  produits:['T-shirt','T-shirt Oversized 250GSM','Casquette']},
       {id:'5',  nom:'Bleu Nuit',      hex:'#1B2A4A', actif:true, ordre:5,  produits:['Polo','Gilet de travail','Casquette']},
-      {id:'6',  nom:'Bleu Roi',       hex:'#1A5DC8', actif:true, ordre:6,  produits:['T-shirt','Casquette']},
-      {id:'7',  nom:'Bleu Ciel',      hex:'#87CEEB', actif:true, ordre:7,  produits:['T-shirt']},
-      {id:'8',  nom:'Vert',           hex:'#1A9A3C', actif:true, ordre:8,  produits:['T-shirt','Casquette']},
-      {id:'9',  nom:'Bordeaux',       hex:'#6B1A2A', actif:true, ordre:9,  produits:['T-shirt']},
-      {id:'10', nom:'Jaune',          hex:'#F5C200', actif:true, ordre:10, produits:['T-shirt']},
-      {id:'11', nom:'Rose',           hex:'#F5A0B5', actif:true, ordre:11, produits:['T-shirt']},
-      {id:'12', nom:'Beige',          hex:'#E8D5B0', actif:true, ordre:12, produits:['T-shirt','Gilet de travail','Totebag']},
-      {id:'13', nom:'Gris',           hex:'#888888', actif:true, ordre:13, produits:['T-shirt']},
-      {id:'14', nom:'Gris Clair',     hex:'#C8C8C8', actif:true, ordre:14, produits:['T-shirt']},
-      {id:'15', nom:'Gris Fonce',     hex:'#3A3A3A', actif:true, ordre:15, produits:['T-shirt']},
+      {id:'6',  nom:'Bleu Roi',       hex:'#1A5DC8', actif:true, ordre:6,  produits:['T-shirt','T-shirt Oversized 250GSM','Casquette']},
+      {id:'7',  nom:'Bleu Ciel',      hex:'#87CEEB', actif:true, ordre:7,  produits:['T-shirt','T-shirt Oversized 250GSM']},
+      {id:'8',  nom:'Vert',           hex:'#1A9A3C', actif:true, ordre:8,  produits:['T-shirt','T-shirt Oversized 250GSM','Casquette']},
+      {id:'9',  nom:'Bordeaux',       hex:'#6B1A2A', actif:true, ordre:9,  produits:['T-shirt','T-shirt Oversized 250GSM']},
+      {id:'10', nom:'Jaune',          hex:'#F5C200', actif:true, ordre:10, produits:['T-shirt','T-shirt Oversized 250GSM']},
+      {id:'11', nom:'Rose',           hex:'#F5A0B5', actif:true, ordre:11, produits:['T-shirt','T-shirt Oversized 250GSM']},
+      {id:'12', nom:'Beige',          hex:'#E8D5B0', actif:true, ordre:12, produits:['T-shirt','T-shirt Oversized 250GSM','Gilet de travail','Totebag']},
+      {id:'13', nom:'Gris',           hex:'#888888', actif:true, ordre:13, produits:['T-shirt','T-shirt Oversized 250GSM']},
+      {id:'14', nom:'Gris Clair',     hex:'#C8C8C8', actif:true, ordre:14, produits:['T-shirt','T-shirt Oversized 250GSM']},
+      {id:'15', nom:'Gris Fonce',     hex:'#3A3A3A', actif:true, ordre:15, produits:['T-shirt','T-shirt Oversized 250GSM']},
     ]
     const fallbackTailles = [
       {id:'1',nom:'XS',actif:true,ordre:1},
@@ -261,6 +261,7 @@ export default function ConfigurateurPage() {
                       const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
                       const imgs: Record<string,string> = {
                         'T-shirt': BASE + '/IMG_5850.jpeg',
+                        'T-shirt Oversized 250GSM': BASE + '/tshirt-oversized.jpeg',
                         'Polo': BASE + '/IMG_5851.jpeg',
                         'Casquette': BASE + '/IMG_5853.jpeg',
                         'Totebag': BASE + '/IMG_5854.jpeg',
