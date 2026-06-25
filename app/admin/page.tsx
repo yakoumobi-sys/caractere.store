@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import Link from 'next/link'
 
 export const revalidate = 0
 
@@ -21,74 +22,113 @@ async function getStats() {
   }
 }
 
-const STATUT_COLORS: Record<string, string> = {
-  nouveau:  'bg-blue-50 text-blue-700',
-  en_cours: 'bg-orange-50 text-orange-700',
-  termine:  'bg-green-50 text-green-700',
-  annule:   'bg-red-50 text-red-700',
+const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  nouveau:  { label: 'Nouveau',  color: '#3B82F6', bg: '#EFF6FF' },
+  en_cours: { label: 'En cours', color: '#F97316', bg: '#FFF7ED' },
+  termine:  { label: 'Terminé',  color: '#10B981', bg: '#ECFDF5' },
+  annule:   { label: 'Annulé',   color: '#EF4444', bg: '#FEF2F2' },
 }
 
 export default async function AdminDashboard() {
   const stats = await getStats()
 
   return (
-    <div className="p-8">
-      <h1 className="text-[24px] font-bold tracking-tight mb-2">Dashboard</h1>
-      <p className="text-[14px] text-brand-gray mb-8">Vue d'ensemble de Caractère Store</p>
+    <div style={{ minHeight: '100vh', background: '#F1F5F9', fontFamily: "'Inter', system-ui, sans-serif" }}>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        {[
-          { label: 'Commandes totales', value: stats.total_commandes, icon: '📦', color: 'text-brand-dark' },
-          { label: 'Nouvelles',         value: stats.nouvelles,       icon: '🆕', color: 'text-blue-600'  },
-          { label: 'En cours',          value: stats.en_cours,        icon: '⚙️', color: 'text-orange-600'},
-          { label: 'CA total (DA)',     value: stats.total_ca.toLocaleString('fr-FR'), icon: '💰', color: 'text-green-600' },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-[20px] p-6 border border-black/[0.06]">
-            <div className="text-[28px] mb-1">{s.icon}</div>
-            <div className={`text-[28px] font-bold tracking-tight ${s.color}`}>{s.value}</div>
-            <div className="text-[12px] text-brand-gray mt-1">{s.label}</div>
-          </div>
-        ))}
+      {/* Header */}
+      <div style={{ background: '#1E293B', padding: '18px 20px 14px', color: '#fff' }}>
+        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.3 }}>Caractère Store</div>
+        <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>Admin Dashboard</div>
       </div>
 
-      {/* Recent orders */}
-      <div className="bg-white rounded-[20px] border border-black/[0.06] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-black/[0.06]">
-          <h2 className="text-[16px] font-semibold tracking-tight">Dernières commandes</h2>
-          <a href="/admin/commandes" className="text-[13px] text-blue-600 no-underline hover:underline">Voir tout →</a>
+      <div style={{ padding: '16px 14px' }}>
+
+        {/* Bouton Résumé Commandes */}
+        <Link href="/admin/resume" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          width: '100%', padding: '13px', borderRadius: 12, border: 'none',
+          background: '#1E293B', color: '#fff',
+          fontSize: 14, fontWeight: 700, textDecoration: 'none',
+          marginBottom: 14, boxSizing: 'border-box',
+        }}>
+          📋 Résumé commandes — copie rapide
+        </Link>
+
+        {/* Stats cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+          {[
+            { label: 'Total commandes', value: stats.total_commandes, icon: '📦', color: '#1E293B' },
+            { label: 'Nouvelles',       value: stats.nouvelles,       icon: '🆕', color: '#3B82F6' },
+            { label: 'En cours',        value: stats.en_cours,        icon: '⚙️', color: '#F97316' },
+            { label: 'CA total (DA)',   value: stats.total_ca.toLocaleString('fr-FR'), icon: '💰', color: '#10B981' },
+          ].map(s => (
+            <div key={s.label} style={{
+              background: '#fff', borderRadius: 14, padding: '14px 16px',
+              boxShadow: '0 1px 4px rgba(0,0,0,.07)',
+            }}>
+              <div style={{ fontSize: 22, marginBottom: 4 }}>{s.icon}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: s.color, letterSpacing: -0.5 }}>{s.value}</div>
+              <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{s.label}</div>
+            </div>
+          ))}
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-black/[0.06]">
-                {['Référence','Client','Produit','Qté','Total','Statut','Date'].map(h => (
-                  <th key={h} className="text-left text-[11px] font-bold tracking-widest uppercase text-brand-gray px-6 py-3">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {stats.dernieres.map((c: any) => (
-                <tr key={c.id} className="border-b border-black/[0.04] hover:bg-brand-light/50">
-                  <td className="px-6 py-4 text-[13px] font-mono font-medium">{c.reference}</td>
-                  <td className="px-6 py-4 text-[13px]">{c.nom_client}</td>
-                  <td className="px-6 py-4 text-[13px]">{c.produit}</td>
-                  <td className="px-6 py-4 text-[13px]">{c.quantite}</td>
-                  <td className="px-6 py-4 text-[13px] font-medium">{(c.prix_total||0).toLocaleString('fr-FR')} DA</td>
-                  <td className="px-6 py-4">
-                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${STATUT_COLORS[c.statut] ?? 'bg-gray-50 text-gray-600'}`}>
-                      {c.statut}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-[12px] text-brand-gray">{new Date(c.created_at).toLocaleDateString('fr-FR')}</td>
-                </tr>
-              ))}
-              {stats.dernieres.length === 0 && (
-                <tr><td colSpan={7} className="px-6 py-12 text-center text-brand-gray text-[14px]">Aucune commande pour l'instant</td></tr>
-              )}
-            </tbody>
-          </table>
+
+        {/* Dernières commandes */}
+        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,.07)', overflow: 'hidden' }}>
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: '14px 16px', borderBottom: '1px solid #F1F5F9',
+          }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#1E293B' }}>Dernières commandes</span>
+            <Link href="/admin/commandes" style={{ fontSize: 12, color: '#3B82F6', textDecoration: 'none', fontWeight: 600 }}>
+              Voir tout →
+            </Link>
+          </div>
+
+          {stats.dernieres.length === 0 ? (
+            <div style={{ padding: 40, textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+              Aucune commande pour l'instant
+            </div>
+          ) : (
+            stats.dernieres.map((c: any) => {
+              const s = STATUT_CONFIG[c.statut] ?? { label: c.statut, color: '#6B7280', bg: '#F9FAFB' }
+              return (
+                <div key={c.id} style={{
+                  padding: '12px 16px',
+                  borderBottom: '1px solid #F8FAFC',
+                  borderLeft: `3px solid ${s.color}`,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1E293B', fontFamily: 'monospace' }}>{c.reference}</div>
+                    <div style={{ fontSize: 13, color: '#374151', marginTop: 1 }}>{c.nom_client}</div>
+                    <div style={{ fontSize: 11, color: '#94A3B8' }}>{c.produit} · x{c.quantite}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1E293B' }}>{(c.prix_total || 0).toLocaleString('fr-FR')} DA</div>
+                    <span style={{
+                      display: 'inline-block', marginTop: 4,
+                      background: s.bg, color: s.color,
+                      padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700,
+                    }}>{s.label}</span>
+                  </div>
+                </div>
+              )
+            })
+          )}
         </div>
+
+        {/* Lien commandes */}
+        <Link href="/admin/commandes" style={{
+          display: 'block', textAlign: 'center',
+          marginTop: 12, padding: '11px',
+          borderRadius: 12, border: '1.5px solid #E2E8F0',
+          background: '#fff', color: '#475569',
+          fontSize: 13, fontWeight: 600, textDecoration: 'none',
+        }}>
+          Gérer toutes les commandes →
+        </Link>
+
       </div>
     </div>
   )
