@@ -1,60 +1,45 @@
+"use client";
 import { useState, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = "https://your-project.supabase.co"; // à remplacer
-const SUPABASE_ANON_KEY = "your-anon-key"; // à remplacer
-
-// ── Mock data (remplace par ton vrai fetch Supabase) ──────────────────────────
-const MOCK_ORDERS = [
-  {
-    id: "CAR-MQT002XA",
-    status: "en_cours",
-    created_at: "2026-06-25T16:36:27",
-    customer_name: "Anwar Selmi",
-    customer_phone: "0555 123 456",
-    items: [{ article: "T-shirt Oversized 250GSM", taille: "L", qty: 1 }],
-  },
-  {
-    id: "CAR-MQTNP8XC",
-    status: "nouveau",
-    created_at: "2026-06-25T16:28:01",
-    customer_name: "Anwar Selmi",
-    customer_phone: "0555 123 456",
-    items: [{ article: "T-shirt Oversized 250GSM", taille: "XL", qty: 1 }],
-  },
-  {
-    id: "CAR-MQTITELL",
-    status: "nouveau",
-    created_at: "2026-06-25T14:11:15",
-    customer_name: "Iouai",
-    customer_phone: "0661 789 012",
-    items: [{ article: "T-shirt", taille: "M", qty: 1 }],
-  },
-];
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 const STATUS_CONFIG = {
-  nouveau:   { label: "Nouveau",    color: "#3B82F6", bg: "#EFF6FF" },
-  en_cours:  { label: "En cours",   color: "#F97316", bg: "#FFF7ED" },
-  termine:   { label: "Terminé",    color: "#10B981", bg: "#ECFDF5" },
-  annule:    { label: "Annulé",     color: "#EF4444", bg: "#FEF2F2" },
+  nouveau:  { label: "Nouveau",  color: "#3B82F6", bg: "#EFF6FF" },
+  en_cours: { label: "En cours", color: "#F97316", bg: "#FFF7ED" },
+  termine:  { label: "Terminé",  color: "#10B981", bg: "#ECFDF5" },
+  annule:   { label: "Annulé",   color: "#EF4444", bg: "#FEF2F2" },
 };
 
 function formatDate(iso) {
+  if (!iso) return "—";
   return new Date(iso).toLocaleString("fr-DZ", {
     day: "2-digit", month: "2-digit", year: "numeric",
     hour: "2-digit", minute: "2-digit",
   });
 }
 
-function buildText(order) {
+function buildText(o) {
+  const tailles = Array.isArray(o.tailles) && o.tailles.length > 0
+    ? o.tailles.join(", ")
+    : (o.tailles || "—");
+
   const lines = [
-    `📦 ${order.id}`,
-    `👤 ${order.customer_name}`,
-    `📞 ${order.customer_phone || "—"}`,
-    ...order.items.map((it, i) =>
-      `🛍️ Article ${order.items.length > 1 ? i + 1 + " : " : ": "}${it.article}  |  Taille : ${it.taille}  |  Qté : ${it.qty}`
-    ),
-    `📅 ${formatDate(order.created_at)}`,
+    `📦 ${o.reference || o.id}`,
+    `👤 ${o.nom_client || "—"}`,
+    `📞 ${o.telephone || "—"}`,
+    `🛍️ ${o.produit || "—"}`,
+    `📐 Taille : ${tailles}`,
+    `🔢 Quantité : ${o.quantite || 1}`,
+    `🎨 Couleur : ${o.couleur || "—"}`,
   ];
+  if (o.technique) lines.push(`⚙️ Technique : ${o.technique}`);
+  if (o.position)  lines.push(`📍 Position : ${o.position}`);
+  if (o.notes && o.notes !== "EMPTY") lines.push(`📝 Notes : ${o.notes}`);
+  lines.push(`📅 ${formatDate(o.created_at)}`);
   return lines.join("\n");
 }
 
@@ -67,64 +52,51 @@ function CopyBtn({ text }) {
     });
   };
   return (
-    <button
-      onClick={copy}
-      style={{
-        padding: "6px 14px",
-        borderRadius: 8,
-        border: "none",
-        background: done ? "#10B981" : "#1E293B",
-        color: "#fff",
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: "pointer",
-        transition: "background .2s",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {done ? "✓ Copié" : "📋 Copier"}
+    <button onClick={copy} style={{
+      padding: "6px 14px", borderRadius: 8, border: "none",
+      background: done ? "#10B981" : "#1E293B",
+      color: "#fff", fontSize: 12, fontWeight: 600,
+      cursor: "pointer", transition: "background .2s", whiteSpace: "nowrap",
+    }}>
+      {done ? "✓ Copié !" : "📋 Copier"}
     </button>
   );
 }
 
-function OrderCard({ order }) {
-  const s = STATUS_CONFIG[order.status] || STATUS_CONFIG.nouveau;
-  const text = buildText(order);
+function OrderCard({ o }) {
+  const s = STATUS_CONFIG[o.statut] || STATUS_CONFIG.nouveau;
+  const text = buildText(o);
+  const tailles = Array.isArray(o.tailles) && o.tailles.length > 0
+    ? o.tailles.join(", ")
+    : (o.tailles || "—");
 
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 14,
-        padding: "14px 16px",
-        marginBottom: 10,
-        borderLeft: `4px solid ${s.color}`,
-        boxShadow: "0 1px 4px rgba(0,0,0,.07)",
-      }}
-    >
-      {/* Header */}
+    <div style={{
+      background: "#fff", borderRadius: 14, padding: "14px 16px",
+      marginBottom: 10, borderLeft: `4px solid ${s.color}`,
+      boxShadow: "0 1px 4px rgba(0,0,0,.07)",
+    }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: "#1E293B" }}>{order.id}</span>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#1E293B" }}>
+          {o.reference || o.id?.slice(0, 8)}
+          {o.urgent && <span style={{ marginLeft: 6, color: "#EF4444" }}>⚡ URGENT</span>}
+        </span>
         <span style={{
           background: s.bg, color: s.color,
-          padding: "2px 10px", borderRadius: 20,
-          fontSize: 11, fontWeight: 700,
+          padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
         }}>{s.label}</span>
       </div>
 
-      {/* Infos */}
-      <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.7 }}>
-        <div>👤 <b>{order.customer_name}</b></div>
-        <div>📞 {order.customer_phone || <span style={{ color: "#9CA3AF" }}>Non renseigné</span>}</div>
-        {order.items.map((it, i) => (
-          <div key={i}>
-            🛍️ {it.article} &nbsp;|&nbsp; <b>{it.taille}</b> &nbsp;|&nbsp; x{it.qty}
-          </div>
-        ))}
-        <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>📅 {formatDate(order.created_at)}</div>
+      <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.8 }}>
+        <div>👤 <b>{o.nom_client || "—"}</b></div>
+        <div>📞 {o.telephone || "—"}</div>
+        <div>🛍️ {o.produit || "—"}</div>
+        <div>📐 <b>{tailles}</b> &nbsp;|&nbsp; x{o.quantite || 1} &nbsp;|&nbsp; {o.couleur || "—"}</div>
+        {o.technique && <div>⚙️ {o.technique}</div>}
+        {o.notes && o.notes !== "EMPTY" && <div>📝 {o.notes}</div>}
+        <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>📅 {formatDate(o.created_at)}</div>
       </div>
 
-      {/* Texte brut + bouton */}
       <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 10 }}>
         <pre style={{
           flex: 1, background: "#F8FAFC", borderRadius: 8,
@@ -138,19 +110,32 @@ function OrderCard({ order }) {
   );
 }
 
-export default function App() {
-  const [orders, setOrders] = useState(MOCK_ORDERS);
+export default function ResumeCommandes() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("tous");
   const [search, setSearch] = useState("");
   const [copyAll, setCopyAll] = useState(false);
 
+  useEffect(() => {
+    supabase
+      .from("commandes")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (!error) setOrders(data || []);
+        setLoading(false);
+      });
+  }, []);
+
   const filtered = orders.filter(o => {
-    const matchStatus = filter === "tous" || o.status === filter;
+    const matchStatus = filter === "tous" || o.statut === filter;
     const q = search.toLowerCase();
     const matchSearch = !q ||
-      o.id.toLowerCase().includes(q) ||
-      o.customer_name.toLowerCase().includes(q) ||
-      (o.customer_phone || "").includes(q);
+      (o.reference || "").toLowerCase().includes(q) ||
+      (o.nom_client || "").toLowerCase().includes(q) ||
+      (o.telephone || "").includes(q) ||
+      (o.produit || "").toLowerCase().includes(q);
     return matchStatus && matchSearch;
   });
 
@@ -164,39 +149,39 @@ export default function App() {
     { key: "annule",   label: "Annulés" },
   ];
 
-  const count = (k) => k === "tous" ? orders.length : orders.filter(o => o.status === k).length;
+  const count = (k) => k === "tous"
+    ? orders.length
+    : orders.filter(o => o.statut === k).length;
 
   const doCopyAll = () => {
     navigator.clipboard.writeText(allText).then(() => {
       setCopyAll(true);
-      setTimeout(() => setCopyAll(false), 2000);
+      setTimeout(() => setCopyAll(false), 2500);
     });
   };
 
   return (
     <div style={{ minHeight: "100vh", background: "#F1F5F9", fontFamily: "'Inter', system-ui, sans-serif" }}>
-      {/* Header */}
       <div style={{ background: "#1E293B", padding: "18px 16px 14px", color: "#fff" }}>
         <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: -.3 }}>📋 Résumé Commandes</div>
-        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>Caractère Store · copie rapide</div>
+        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>
+          Caractère Store · {orders.length} commandes
+        </div>
       </div>
 
       <div style={{ padding: "14px 12px" }}>
-        {/* Search */}
         <input
-          placeholder="🔍 Nom, référence, téléphone..."
+          placeholder="🔍 Nom, référence, téléphone, article..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
             width: "100%", boxSizing: "border-box",
             padding: "10px 14px", borderRadius: 12,
             border: "1px solid #E2E8F0", fontSize: 13,
-            outline: "none", background: "#fff",
-            marginBottom: 10,
+            outline: "none", background: "#fff", marginBottom: 10,
           }}
         />
 
-        {/* Tabs */}
         <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4, marginBottom: 12 }}>
           {TABS.map(t => (
             <button key={t.key} onClick={() => setFilter(t.key)} style={{
@@ -211,28 +196,27 @@ export default function App() {
           ))}
         </div>
 
-        {/* Copy all */}
         {filtered.length > 0 && (
           <button onClick={doCopyAll} style={{
-            width: "100%", padding: "11px",
-            borderRadius: 12, border: "none",
+            width: "100%", padding: "11px", borderRadius: 12, border: "none",
             background: copyAll ? "#10B981" : "#3B82F6",
             color: "#fff", fontSize: 13, fontWeight: 700,
-            cursor: "pointer", marginBottom: 12,
-            transition: "background .2s",
+            cursor: "pointer", marginBottom: 12, transition: "background .2s",
           }}>
-            {copyAll ? `✓ ${filtered.length} commandes copiées !` : `📋 Tout copier (${filtered.length} commandes)`}
+            {copyAll
+              ? `✓ ${filtered.length} commandes copiées !`
+              : `📋 Tout copier (${filtered.length} commandes)`}
           </button>
         )}
 
-        {/* Orders */}
-        {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", color: "#9CA3AF", padding: 40, fontSize: 14 }}>
-            Aucune commande trouvée
-          </div>
-        ) : (
-          filtered.map(o => <OrderCard key={o.id} order={o} />)
+        {loading && (
+          <div style={{ textAlign: "center", color: "#9CA3AF", padding: 40 }}>Chargement...</div>
         )}
+        {!loading && filtered.length === 0 && (
+          <div style={{ textAlign: "center", color: "#9CA3AF", padding: 40 }}>Aucune commande trouvée</div>
+        )}
+
+        {filtered.map(o => <OrderCard key={o.id} o={o} />)}
       </div>
     </div>
   );
