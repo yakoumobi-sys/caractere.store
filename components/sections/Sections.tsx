@@ -70,6 +70,7 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
   const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
   const imgs: Record<string, string> = {
     'T-shirt': BASE + '/IMG_5850.jpeg',
+    'T-shirt Oversized 250GSM': BASE + '/tshirt-oversized.jpeg',
     'Polo': BASE + '/IMG_5851.jpeg',
     'Casquette': BASE + '/IMG_5853.jpeg',
     'Totebag': BASE + '/IMG_5854.jpeg',
