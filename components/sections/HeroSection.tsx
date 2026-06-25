@@ -66,6 +66,8 @@ export default function HeroSection({ config }: { config?: any }) {
             }}
           >
             Open Designer ✏️
+          </a>
+
           <a
             href="/catalogue"
             target="_blank"
@@ -77,8 +79,6 @@ export default function HeroSection({ config }: { config?: any }) {
             }}
           >
             📘 Catalogue 2025–2026
-          </a>
-
           </a>
 
           <a
