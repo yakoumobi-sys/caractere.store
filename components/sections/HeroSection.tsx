@@ -66,6 +66,19 @@ export default function HeroSection({ config }: { config?: any }) {
             }}
           >
             Open Designer ✏️
+<a
+  href="/catalogue"
+  target="_blank"
+  className="rounded-full border-2 py-3 text-sm font-semibold no-underline backdrop-blur-sm transition"
+  style={{
+    borderColor: "rgba(255,255,255,0.4)",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    color: "#fff",
+  }}
+>
+  📘 Catalogue 2025–2026
+</a>
+
           </a>
 
           <a
