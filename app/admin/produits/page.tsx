@@ -6,7 +6,7 @@ import Image from "next/image";
 const EMOJIS = ['👕','👔','🧥','🧢','🩲','👗','🧣','🧤']
 
 export default function ProduitsAdmin() {
-  const [produits, setProduits] = useState<Produit[]>([])
+import type { Produit } from '@/types'
   const [form, setForm] = useState({ nom:'', emoji:'👕', description:'', prix_base:0, actif:true })
   const [editing, setEditing] = useState<string|null>(null)
   const [showForm, setShowForm] = useState(false)
