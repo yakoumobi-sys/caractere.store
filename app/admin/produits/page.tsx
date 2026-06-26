@@ -1,7 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
-import type { Produit } from '@/types'
 
+import { useState } from "react";
+import Image from "next/image";
+...
 const EMOJIS = ['👕','👔','🧥','🧢','🩲','👗','🧣','🧤']
 
 export default function ProduitsAdmin() {
