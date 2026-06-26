@@ -46,18 +46,6 @@ export default function HeroSection({ config }: { config?: any }) {
           </a>
 
           <a
-            href="/entreprises"
-            className="rounded-full py-3 text-sm font-semibold no-underline border-2 backdrop-blur-sm transition"
-            style={{
-              borderColor: "rgba(255,255,255,0.6)",
-              backgroundColor: "rgba(255,255,255,0.15)",
-              color: "#fff",
-            }}
-          >
-            Packs entreprise ✦
-          </a>
-
-          <a
             href="/designer"
             className="rounded-full border-2 py-3 text-sm font-semibold text-white no-underline backdrop-blur-sm transition"
             style={{
@@ -66,6 +54,30 @@ export default function HeroSection({ config }: { config?: any }) {
             }}
           >
             Open Designer ✏️
+          </a>
+
+          <a
+            href="/produits"
+            className="rounded-full py-3 text-sm font-semibold no-underline border-2 backdrop-blur-sm transition"
+            style={{
+              borderColor: "rgba(255,255,255,0.6)",
+              backgroundColor: "rgba(255,255,255,0.15)",
+              color: "#fff",
+            }}
+          >
+            Nos Produits 🛍️
+          </a>
+
+          <a
+            href="/entreprises"
+            className="rounded-full border-2 py-3 text-sm font-semibold no-underline backdrop-blur-sm transition"
+            style={{
+              borderColor: "rgba(255,255,255,0.4)",
+              backgroundColor: "rgba(255,255,255,0.05)",
+              color: "#fff",
+            }}
+          >
+            Packs entreprise ✦
           </a>
 
           <a
