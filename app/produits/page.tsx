@@ -1,463 +1,496 @@
 'use client'
+import { useState, useRef, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import Navbar from '@/components/layout/Navbar'
+import {
+  TshirtMockup, PoloMockup, GiletMockup, CasquetteMockup,
+  TotebagMockup, SweatMockup, TablierMockup, GiletSecuriteMockup,
+  MOCKUP_MAP,
+} from '@/components/designer/ProductMockups'
 
-import { useState } from "react"
+interface LogoLayer {
+  id: string
+  src: string
+  x: number
+  y: number
+  scale: number
+  rotation: number
+}
 
-const PRODUITS = [
-  // ── CHROME ONE EN PREMIER ──
-  {
-    id: "chrome-one",
-    nom: "CHROME ONE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/1621F031-176E-4755-B2A4-A7585A2F9031.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Tissu bouclette (serbita). Pièce signature.",
-    badge: "Exclusif",
-  },
-  // ── STREETWEAR ──
-  {
-    id: "black-regular-tee",
-    nom: "BLACK REGULAR TEE 210GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/CFE2A2DA-BA00-4B18-B6F9-9975D4FBC581.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt coton premium 210gsm. Coupe Regular.",
-  },
-  {
-    id: "white-regular-tee",
-    nom: "WHITE REGULAR TEE 250GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/4FC9A90A-56B6-4321-861C-8A25489163D6.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt coton premium 250gsm. Coupe Regular.",
-  },
-  {
-    id: "white-oversized-tee",
-    nom: "WHITE OVERSIZED TEE 250GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/76CA8FA6-887F-4184-A691-1A188FF315A9.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt oversized coton épais 250gsm.",
-  },
-  {
-    id: "black-oversized-tee",
-    nom: "BLACK OVERSIZED TEE 250GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/3D8BCF35-BF82-47A6-9A20-1E64D94EABEE.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt oversized coton épais 250gsm.",
-  },
-  {
-    id: "short-caractere",
-    nom: "SHORT CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-8887.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Short premium. Coupe moderne, tissu respirant.",
-  },
-  {
-    id: "baggy-jogger",
-    nom: "BAGGY JOGGER",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/D0319F16-6189-4EC1-8F32-A0C9EF3BA832.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Jogger baggy confort ultime. Coupe ample.",
-  },
-  {
-    id: "oversized-jogger",
-    nom: "OVERSIZED JOGGER",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/7027F65B-78FA-4D0E-8B0D-0C50240AACA0.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Jogger surdimensionné tissu doux et extensible.",
-  },
-  {
-    id: "premium-baggy-joggers",
-    nom: "PREMIUM BAGGY JOGGERS",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/B08118E1-A004-4F3A-B2E3-676CE6E75870.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Baggy jogger premium.",
-  },
-  {
-    id: "hoodie-medium",
-    nom: "HOODIE MEDIUM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/7668ABF0-890B-48D4-A05D-22D3E8090A7A.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Hoodie polyvalent et confortable.",
-  },
-  {
-    id: "premium-hoodie",
-    nom: "PREMIUM HOODIE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/0D2EF14B-6EF7-4CCF-AFAF-0A7B02A3B304.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Sweat-shirt premium confort incomparable.",
-  },
-  {
-    id: "hoodie-premium-500gsm",
-    nom: "HOODIE PREMIUM 500GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/058ECD43-1772-45BA-AE92-6DAF6F6CCCB2.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Le hoodie ultime 500gsm. Tissu lourd, coupe parfaite.",
-    badge: "Premium",
-  },
-  {
-    id: "zipper-hoodie",
-    nom: "ZIPPER HOODIE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/610D63C2-C065-4AEE-9444-6E9929D307D1.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Sweat à capuche zippé. Design pratique et élégant.",
-  },
-  {
-    id: "pull-caractere",
-    nom: "PULL CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-1210.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Pull incontournable. Tissu doux, idéal saison froide.",
-  },
-  {
-    id: "veste-ninja",
-    nom: "VESTE NINJA CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-1535.webp",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Veste technique au style unique. Coupe ninja ajustée.",
-    badge: "Nouveau",
-  },
-  // ── ENSEMBLES ──
-  {
-    id: "ensemble-blanc",
-    nom: "ENSEMBLE BLANC (HOODIE + JOGGER)",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/8FA331B2-CB03-421D-B7A6-C71A77EB48A3.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble hoodie + jogger assorti.",
-  },
-  {
-    id: "ensemble-noir",
-    nom: "ENSEMBLE HOODIE + JOGGER – NOIR",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/DC846844-3B4B-4123-BF75-707B645CCF84.png",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble hoodie + jogger noir.",
-  },
-  {
-    id: "ensemble-gris",
-    nom: "ENSEMBLE HOODIE + JOGGER – GRIS",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/A221C04C-1598-4ACD-BD22-51B4D9351944.png",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble hoodie + jogger gris.",
-  },
-  {
-    id: "ensemble-zipper-baggy",
-    nom: "ENSEMBLE ZIPPER + BAGGY",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/1C56C89E-1127-4FA1-8A27-7AF7C757619C.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble veste zippée + pantalon ample.",
-  },
-  {
-    id: "ensemble-veste-baggy",
-    nom: "VESTE + BAGGY ELASTIQUE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/38B475A2-3673-4DFD-9980-EBF27E2FE871.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL"],
-    description: "Ensemble veste + baggy élastique.",
-  },
-  {
-    id: "ensemble-3-pieces",
-    nom: "ENSEMBLE 3 PIÈCES",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/BF32F9EB-46BA-42AD-AC98-D86BA988FB4A.png",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL"],
-    description: "Ensemble 3 pièces complet.",
-    badge: "Premium",
-  },
-  // ── B2B ──
-  {
-    id: "polo-personnalise",
-    nom: "POLO PERSONNALISÉ",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/506E8F49-8A75-4785-AA5C-B15E9BDD4667.webp",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Polo personnalisé DTF ou broderie pour entreprises.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "polo-pro",
-    nom: "POLO CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/30D38768-C5B4-475D-8387-B77C07BE3EC6.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Polo demi-manche professionnel. Confort et élégance.",
-  },
-  {
-    id: "tshirt-personnalise",
-    nom: "T-SHIRTS PERSONNALISÉS",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/3D3096AD-C813-4B16-B8C8-AFE451835942.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirts personnalisés +15 couleurs. DTF ou broderie.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "gilet-travail",
-    nom: "GILET DE TRAVAIL",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/F096140F-DEDA-4418-81D7-B3C688C02B4F.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Gilet de travail sans manches. Liberté de mouvement.",
-  },
-  {
-    id: "gilet-col-haut",
-    nom: "GILET COL HAUT + POCHE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/5717612A-4250-4225-B79E-72B0941C4DCA.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Gilet col haut multipoches. Fonctionnel et confortable.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "gilet-personnalise",
-    nom: "GILET PERSONNALISÉ COL ROND",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/2ABA5114-8B2D-481B-800C-B24FA51CD855.webp",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Gilet col rond personnalisé. Simulation gratuite.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "tote-bag",
-    nom: "TOTE BAG PERSONNALISÉ",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-3828.webp",
-    categorie: "B2B",
-    tailles: ["Unique"],
-    description: "Tote bag coton naturel + impression DTF.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "tablier",
-    nom: "TABLIER DE CUISINE PERSONNALISÉ",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-3999.jpg",
-    categorie: "B2B",
-    tailles: ["Unique"],
-    description: "Tablier personnalisé durable. Idéal restauration.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "casquette",
-    nom: "CASQUETTE PERSONNALISÉE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/FFFDE421-D0F4-4B34-9096-BF52C840793D.webp",
-    categorie: "B2B",
-    tailles: ["Unique"],
-    description: "Casquette personnalisée broderie ou DTF.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "pack-tshirt-b2b",
-    nom: "T-SHIRT ENTREPRISE – PACK B2B",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/3D3096AD-C813-4B16-B8C8-AFE451835942.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Pack 10 t-shirts entreprise personnalisés DTF.",
-    badge: "Pack B2B",
-  },
-  {
-    id: "pack-polo-b2b",
-    nom: "POLO PROFESSIONNEL BRODÉ – PACK B2B",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/506E8F49-8A75-4785-AA5C-B15E9BDD4667.webp",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Pack polo professionnel brodé pour entreprises.",
-    badge: "Pack B2B",
-  },
-  {
-    id: "pack-veste-b2b",
-    nom: "VESTE DE TRAVAIL – PACK B2B",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/F096140F-DEDA-4418-81D7-B3C688C02B4F.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Pack veste de travail personnalisée BTP/logistique.",
-    badge: "Pack B2B",
-  },
-  {
-    id: "pack-uniforme-complet",
-    nom: "PACK UNIFORME COMPLET – CLÉ EN MAIN",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/30D38768-C5B4-475D-8387-B77C07BE3EC6.jpg",
-    categorie: "B2B",
-    tailles: ["Sur mesure"],
-    description: "Solution clé en main. Polo, T-shirt, Veste ou formule sur mesure.",
-    badge: "Clé en main",
-  },
+/* ─── PALETTE COULEURS ──────────────────────────────────────────────────── */
+const COLOR_PALETTE = [
+  { name: 'Blanc',        hex: '#FFFFFF' },
+  { name: 'Noir',         hex: '#1A1A1A' },
+  { name: 'Gris',         hex: '#9CA3AF' },
+  { name: 'Marine',       hex: '#1E3A5F' },
+  { name: 'Royal',        hex: '#2563EB' },
+  { name: 'Ciel',         hex: '#7DD3FC' },
+  { name: 'Rouge',        hex: '#DC2626' },
+  { name: 'Bordeaux',     hex: '#7F1D1D' },
+  { name: 'Vert foncé',   hex: '#14532D' },
+  { name: 'Vert bouteille', hex: '#166534' },
+  { name: 'Kaki',         hex: '#78716C' },
+  { name: 'Beige',        hex: '#D6B99A' },
+  { name: 'Jaune',        hex: '#FCD34D' },
+  { name: 'Orange',       hex: '#EA580C' },
+  { name: 'Violet',       hex: '#7C3AED' },
+  { name: 'Rose',         hex: '#EC4899' },
 ]
 
-const CATEGORIES = ["Tous", "Streetwear", "Ensembles", "B2B"]
+/* ─── PRODUITS ──────────────────────────────────────────────────────────── */
+const PRODUCTS = [
+  { id: 'tshirt',         name: 'T-shirt',         emoji: '👕', prix_base: 1800,
+    printZone: { left: 30, top: 28, width: 40, height: 35 } },
+  { id: 'polo',           name: 'Polo',            emoji: '👔', prix_base: 2200,
+    printZone: { left: 30, top: 30, width: 40, height: 32 } },
+  { id: 'gilet',          name: 'Gilet travail',   emoji: '🦺', prix_base: 2500,
+    printZone: { left: 32, top: 28, width: 36, height: 30 } },
+  { id: 'gilet_securite', name: 'Gilet sécu.',     emoji: '🟡', prix_base: 1500,
+    printZone: { left: 33, top: 30, width: 34, height: 25 } },
+  { id: 'casquette',      name: 'Casquette',       emoji: '🧢', prix_base: 1500,
+    printZone: { left: 32, top: 22, width: 36, height: 32 } },
+  { id: 'totebag',        name: 'Totebag',         emoji: '👜', prix_base: 1200,
+    printZone: { left: 28, top: 32, width: 44, height: 42 } },
+  { id: 'sweat',          name: 'Sweat',           emoji: '🧥', prix_base: 3200,
+    printZone: { left: 30, top: 28, width: 40, height: 35 } },
+  { id: 'tablier',        name: 'Tablier',         emoji: '🍽️', prix_base: 1500,
+    printZone: { left: 36, top: 34, width: 28, height: 30 } },
+]
 
-const BADGE_COLORS: Record<string, string> = {
-  "Premium": "bg-yellow-400 text-black",
-  "Nouveau": "bg-blue-500 text-white",
-  "Exclusif": "bg-purple-600 text-white",
-  "Devis gratuit": "bg-green-600 text-white",
-  "Pack B2B": "bg-sky-600 text-white",
-  "Clé en main": "bg-orange-500 text-white",
+function calcPrice(prixBase: number, qty: number) {
+  const remise = qty >= 100 ? 0.10 : qty >= 50 ? 0.05 : 0
+  const unit = Math.round(prixBase * (1 - remise))
+  return { unit, total: unit * qty, remise }
 }
 
-function CarteProduct({ p }: { p: typeof PRODUITS[0] }) {
-  const waMsg = encodeURIComponent(
-    `Bonjour Caractère Store 👋\n\nJe suis intéressé(e) par une commande en gros :\n\n🛍️ Produit : ${p.nom}\n📦 Quantité : (à préciser)\n📏 Tailles : (à préciser)\n\nPouvez-vous me faire un devis ?`
-  )
+/* ─── COMPOSANT INNER (uses useSearchParams) ────────────────────────────── */
+function DesignerInner() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
-  return (
-    <div className="group rounded-2xl overflow-hidden border border-[#e5e5ea] bg-white flex flex-col">
-      {/* IMAGE */}
-      <div className="relative aspect-square overflow-hidden bg-[#f2f2f7]">
-        <img
-          src={p.image}
-          alt={p.nom}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          loading="lazy"
-        />
-        {p.badge && (
-          <span className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${BADGE_COLORS[p.badge] ?? "bg-black text-white"}`}>
-            {p.badge}
-          </span>
-        )}
-      </div>
+  const initialProductId = searchParams.get('product') || 'tshirt'
+  const initialProduct = PRODUCTS.find(p => p.id === initialProductId) || PRODUCTS[0]
 
-      {/* INFOS */}
-      <div className="p-3 flex flex-col flex-1">
-        <h3 className="text-xs font-bold text-[#0a0a0a] leading-tight mb-1 line-clamp-2">
-          {p.nom}
-        </h3>
-        <p className="text-xs text-[#636366] mb-2 line-clamp-2">{p.description}</p>
+  const [product, setProduct] = useState(initialProduct)
+  const [color, setColor] = useState('#FFFFFF')
+  const [layers, setLayers] = useState<LogoLayer[]>([])
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const action = useRef<{ type: 'move'|'resize'|'rotate'|null, id: string, startX: number, startY: number, layer: LogoLayer } | null>(null)
 
-        {/* TAILLES */}
-        {p.tailles.length > 0 && p.tailles[0] !== "Disponible" && p.tailles[0] !== "Sur mesure" && p.tailles[0] !== "Unique" && (
-          <div className="flex gap-1 flex-wrap mb-3">
-            {p.tailles.map((t) => (
-              <span key={t} className="text-xs border border-[#e5e5ea] rounded px-1.5 py-0.5 text-[#636366]">
-                {t}
-              </span>
-            ))}
+  const [checkout, setCheckout] = useState(false)
+  const [qty, setQty] = useState(10)
+  const [nom, setNom] = useState('')
+  const [tel, setTel] = useState('')
+  const [entreprise, setEntreprise] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [refCode, setRefCode] = useState<string | null>(null)
+  const [colorLabel, setColorLabel] = useState('Blanc')
+
+  const { unit, total, remise } = calcPrice(product.prix_base, qty)
+  const MockupComponent = MOCKUP_MAP[product.id] || TshirtMockup
+  const pz = product.printZone
+
+  // Update URL when product changes
+  const handleProductChange = (p: typeof PRODUCTS[0]) => {
+    setProduct(p)
+    setLayers([])
+    setActiveId(null)
+    router.replace(`/designer?product=${p.id}`, { scroll: false })
+  }
+
+  const addLogo = (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const id = Date.now().toString(36)
+      const layer: LogoLayer = {
+        id, src: e.target?.result as string,
+        x: pz.left + pz.width / 2,
+        y: pz.top + pz.height / 2,
+        scale: 1, rotation: 0,
+      }
+      setLayers(prev => [...prev, layer])
+      setActiveId(id)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const updateLayer = (id: string, patch: Partial<LogoLayer>) =>
+    setLayers(prev => prev.map(l => l.id === id ? { ...l, ...patch } : l))
+
+  const removeLayer = (id: string) => {
+    setLayers(prev => prev.filter(l => l.id !== id))
+    if (activeId === id) setActiveId(null)
+  }
+
+  const duplicateLayer = (id: string) => {
+    const l = layers.find(x => x.id === id)
+    if (!l) return
+    const newId = Date.now().toString(36)
+    setLayers(prev => [...prev, { ...l, id: newId, x: Math.min(90, l.x + 4), y: Math.min(90, l.y + 4) }])
+    setActiveId(newId)
+  }
+
+  const startAction = (type: 'move'|'resize'|'rotate', id: string, e: React.PointerEvent) => {
+    e.stopPropagation()
+    const l = layers.find(x => x.id === id)
+    if (!l) return
+    setActiveId(id)
+    action.current = { type, id, startX: e.clientX, startY: e.clientY, layer: { ...l } }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    const a = action.current
+    if (!a || !stageRef.current) return
+    const rect = stageRef.current.getBoundingClientRect()
+    const dx = e.clientX - a.startX
+    const dy = e.clientY - a.startY
+    const BASE_W = 110
+    if (a.type === 'move') {
+      updateLayer(a.id, {
+        x: Math.min(92, Math.max(8, a.layer.x + (dx / rect.width) * 100)),
+        y: Math.min(92, Math.max(8, a.layer.y + (dy / rect.height) * 100)),
+      })
+    } else if (a.type === 'resize') {
+      updateLayer(a.id, { scale: Math.min(3, Math.max(0.2, a.layer.scale + (dx + dy) / 2 / 100)) })
+    } else if (a.type === 'rotate') {
+      const cx = rect.left + (a.layer.x / 100) * rect.width
+      const cy = rect.top + (a.layer.y / 100) * rect.height
+      const deltaDeg = (Math.atan2(e.clientY - cy, e.clientX - cx) - Math.atan2(a.startY - cy, a.startX - cx)) * (180 / Math.PI)
+      updateLayer(a.id, { rotation: Math.round(a.layer.rotation + deltaDeg) })
+    }
+  }
+
+  const handleOrder = async () => {
+    if (!nom || !tel) return alert('Nom et téléphone requis.')
+    setLoading(true)
+    const ref = 'POD-' + Date.now().toString(36).toUpperCase()
+    await fetch('/api/commandes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reference: ref,
+        produit: product.name,
+        quantite: qty,
+        couleur: colorLabel,
+        tailles: [],
+        position: 'Centre poitrine',
+        technique: 'DTF',
+        urgent: false,
+        nom_client: nom,
+        entreprise,
+        telephone: tel,
+        email: '',
+        notes: 'Commande via Designer',
+        logo_url: layers[0]?.src || null,
+        prix_unitaire: unit,
+        prix_total: total,
+      }),
+    })
+    setRefCode(ref)
+    setLoading(false)
+  }
+
+  const BASE_W = 110
+
+  /* ─── Confirmation ─────────────────────────────────────────────────────── */
+  if (refCode) {
+    return (
+      <main className="pt-14 min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center py-20 max-w-[500px] mx-auto px-6">
+          <div className="text-[64px] mb-6">✅</div>
+          <h2 className="text-[28px] font-bold tracking-tight mb-3">Commande envoyée !</h2>
+          <p className="text-[16px] text-brand-gray mb-2">Votre référence</p>
+          <div className="text-[22px] font-bold font-mono bg-brand-light rounded-2xl px-6 py-3 inline-block mb-4 tracking-widest">
+            {refCode}
           </div>
-        )}
-
-        {/* BOUTONS */}
-        <div className="flex flex-col gap-2 mt-auto">
-          <a
-            href={`/configurateur?produit=${encodeURIComponent(p.nom)}`}
-            className="w-full text-center bg-[#0a0a0a] text-white text-xs font-semibold py-2 rounded-full no-underline hover:bg-[#333] transition-colors"
-          >
-            Configurer ma commande
-          </a>
-          <a
-            href={`https://wa.me/213557440522?text=${waMsg}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full text-center bg-[#25D366] text-white text-xs font-semibold py-2 rounded-full no-underline hover:bg-[#1ebe5d] transition-colors"
-          >
-            Commander en gros
+          <p className="text-[14px] text-brand-gray leading-relaxed mb-6">
+            Notre équipe vous contacte sous 24h par WhatsApp.
+          </p>
+          <a href={`/suivi/${refCode}`}
+            className="inline-block mb-6 bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors no-underline">
+            Voir le suivi + infos paiement →
           </a>
         </div>
-      </div>
-    </div>
-  )
-}
+      </main>
+    )
+  }
 
-export default function ProduitsPage() {
-  const [categorie, setCategorie] = useState("Tous")
-  const [recherche, setRecherche] = useState("")
-
-  const filtres = PRODUITS.filter((p) => {
-    const matchCat = categorie === "Tous" || p.categorie === categorie
-    const matchSearch =
-      recherche === "" ||
-      p.nom.toLowerCase().includes(recherche.toLowerCase()) ||
-      p.description.toLowerCase().includes(recherche.toLowerCase())
-    return matchCat && matchSearch
-  })
-
+  /* ─── Main ─────────────────────────────────────────────────────────────── */
   return (
-    <main className="min-h-screen bg-white">
-      {/* HEADER */}
-      <div
-        className="relative px-6 py-16 text-center text-white"
-        style={{ background: "linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)" }}
-      >
-        <h1 className="text-4xl font-extrabold mb-3 tracking-tight">Nos Produits</h1>
-        <p className="text-sm opacity-75 max-w-md mx-auto">
-          {PRODUITS.length} produits — T-shirts, ensembles, uniformes B2B
-        </p>
-        <div className="mt-6 max-w-md mx-auto">
-          <input
-            type="text"
-            placeholder="Rechercher un produit..."
-            value={recherche}
-            onChange={(e) => setRecherche(e.target.value)}
-            className="w-full px-5 py-3 rounded-full text-sm text-[#0a0a0a] outline-none shadow-lg"
-          />
-        </div>
-      </div>
+    <main
+      className="pt-14 min-h-screen bg-white"
+      onPointerMove={onPointerMove}
+      onPointerUp={() => { action.current = null }}
+    >
+      <div className="max-w-[1120px] mx-auto px-4 md:px-6 py-8 md:py-10">
 
-      {/* FILTRES */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#e5e5ea] px-4 py-3">
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {CATEGORIES.map((cat) => (
+        <div className="mb-6">
+          <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-1">Designer</span>
+          <h1 className="text-[26px] md:text-[32px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
+          <p className="text-[13px] text-brand-gray mt-1">Choisissez un produit, une couleur, uploadez votre logo.</p>
+        </div>
+
+        {/* ── Product selector ── */}
+        <div className="flex gap-2 mb-5 flex-wrap">
+          {PRODUCTS.map(p => (
             <button
-              key={cat}
-              onClick={() => setCategorie(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                categorie === cat
-                  ? "bg-[#0a0a0a] text-white"
-                  : "bg-[#f2f2f7] text-[#636366] hover:bg-[#e5e5ea]"
+              key={p.id}
+              onClick={() => handleProductChange(p)}
+              className={`px-4 py-2 rounded-full text-[13px] font-medium border transition-all ${
+                product.id === p.id
+                  ? 'bg-brand-dark text-white border-brand-dark'
+                  : 'bg-white text-brand-dark border-black/15 hover:border-black/30'
               }`}
             >
-              {cat}
-              {cat !== "Tous" && (
-                <span className="ml-1 text-xs opacity-60">
-                  ({PRODUITS.filter((p) => p.categorie === cat).length})
-                </span>
-              )}
+              {p.emoji} {p.name}
             </button>
           ))}
         </div>
-      </div>
 
-      {/* GRILLE */}
-      <div className="px-4 py-6">
-        {filtres.length === 0 ? (
-          <div className="text-center py-20 text-[#636366]">
-            <p>Aucun produit trouvé</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filtres.map((p) => (
-              <CarteProduct key={p.id} p={p} />
-            ))}
-          </div>
-        )}
-      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
 
-      {/* CTA B2B */}
-      <div className="bg-[#0a0a0a] text-white text-center py-14 px-6">
-        <h2 className="text-2xl font-bold mb-3">Commande personnalisée ?</h2>
-        <p className="text-sm opacity-60 mb-6 max-w-sm mx-auto">
-          Broderie, DTF, uniformes B2B. Devis gratuit en moins de 2h.
-        </p>
-        <a
-          href="https://wa.me/213557440522"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-[#25D366] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#1ebe5d] transition-colors no-underline"
-        >
-          Contacter sur WhatsApp →
-        </a>
+          {/* ── CANVAS ── */}
+          <div>
+            {/* Color picker */}
+            <div className="mb-4">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-gray mb-2">
+                Couleur du produit
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_PALETTE.map(c => (
+                  <button
+                    key={c.hex}
+                    title={c.name}
+                    onClick={() => { setColor(c.hex); setColorLabel(c.name) }}
+                    className={`w-8 h-8 rounded-full transition-all border-2 ${
+                      color === c.hex ? 'border-brand-dark scale-110 shadow-md' : 'border-black/15 hover:scale-105'
+                    }`}
+                    style={{
+                      backgroundColor: c.hex,
+                      boxShadow: c.hex === '#FFFFFF' ? 'inset 0 0 0 1px #ddd' : undefined,
+                    }}
+                  />
+                ))}
+              </div>
+              <p className="text-[12px] text-brand-gray mt-1.5">{colorLabel}</p>
+            </div>
+
+            {/* Mockup stage */}
+            <div
+              ref={stageRef}
+              onClick={() => setActiveId(null)}
+              className="relative w-full aspect-square bg-[#f8f8f8] rounded-[24px] overflow-hidden select-none border border-black/[0.06] flex items-center justify-center"
+            >
+              {/* SVG Mockup */}
+              <MockupComponent color={color} className="absolute inset-0 w-full h-full p-4 pointer-events-none" />
+
+              {/* Print zone guide */}
+              {layers.length === 0 && (
+                <div
+                  className="absolute border-2 border-dashed border-black/20 rounded-lg flex items-center justify-center pointer-events-none"
+                  style={{
+                    left: `${pz.left}%`, top: `${pz.top}%`,
+                    width: `${pz.width}%`, height: `${pz.height}%`,
+                  }}
+                >
+                  <span className="text-[10px] font-semibold text-black/40 bg-white/80 px-2 py-0.5 rounded tracking-wide">
+                    Zone d'impression
+                  </span>
+                </div>
+              )}
+
+              {/* Logo layers */}
+              {layers.map(layer => {
+                const isActive = layer.id === activeId
+                const w = BASE_W * layer.scale
+                return (
+                  <div
+                    key={layer.id}
+                    onClick={e => e.stopPropagation()}
+                    onPointerDown={e => startAction('move', layer.id, e)}
+                    className="absolute cursor-move touch-none"
+                    style={{
+                      left: `${layer.x}%`, top: `${layer.y}%`,
+                      width: w, height: w,
+                      transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
+                    }}
+                  >
+                    <img
+                      src={layer.src} alt="logo"
+                      className="w-full h-full object-contain pointer-events-none drop-shadow-lg"
+                      draggable={false}
+                    />
+                    {isActive && (
+                      <>
+                        <div className="absolute inset-0 border-2 border-brand-dark rounded pointer-events-none" />
+                        <button
+                          onPointerDown={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); removeLayer(layer.id) }}
+                          className="absolute -top-3 -left-3 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-[13px] font-bold shadow-md hover:bg-red-600"
+                        >×</button>
+                        <button
+                          onPointerDown={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); duplicateLayer(layer.id) }}
+                          className="absolute -top-3 -right-3 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[12px] shadow-md hover:bg-brand-light"
+                          title="Dupliquer"
+                        >⧉</button>
+                        <div
+                          onPointerDown={e => startAction('rotate', layer.id, e)}
+                          className="absolute -bottom-3 -left-3 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[13px] shadow-md cursor-grab active:cursor-grabbing"
+                          title="Rotation"
+                        >↻</div>
+                        <div
+                          onPointerDown={e => startAction('resize', layer.id, e)}
+                          className="absolute -bottom-3 -right-3 w-7 h-7 bg-brand-dark rounded-full flex items-center justify-center text-white text-[12px] shadow-md cursor-nwse-resize"
+                          title="Redimensionner"
+                        >⤡</div>
+                      </>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Upload button */}
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="mt-3 w-full border-2 border-dashed border-black/20 rounded-2xl p-5 text-center cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50"
+            >
+              <div className="text-[24px] mb-0.5">📁</div>
+              <div className="text-[13px] font-medium">Ajouter un logo</div>
+              <div className="text-[11px] text-brand-gray mt-0.5">PNG, SVG, JPG • fond transparent recommandé</div>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) addLogo(f) }} />
+            </button>
+          </div>
+
+          {/* ── SIDEBAR ── */}
+          <div className="flex flex-col gap-5">
+
+            <div className="bg-brand-light rounded-2xl p-4 text-[13px] space-y-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-gray mb-2">Instructions</p>
+              <p className="text-brand-dark/70 leading-relaxed">
+                Glissez votre logo pour le positionner. Utilisez les poignées aux coins pour
+                <span className="font-medium"> supprimer ×</span>,
+                <span className="font-medium"> dupliquer ⧉</span>,
+                <span className="font-medium"> tourner ↻</span> ou
+                <span className="font-medium"> redimensionner ⤡</span>.
+              </p>
+            </div>
+
+            {/* Estimation */}
+            <div className="bg-brand-light rounded-2xl p-4 space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-gray">Estimation</p>
+
+              <div className="flex justify-between text-[13px]">
+                <span className="text-brand-gray">Produit</span>
+                <span className="font-medium">{product.emoji} {product.name}</span>
+              </div>
+
+              <div className="flex justify-between text-[13px]">
+                <span className="text-brand-gray">Couleur</span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="w-4 h-4 rounded-full border border-black/15 inline-block"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="font-medium">{colorLabel}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between text-[13px] items-center">
+                <span className="text-brand-gray">Quantité</span>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setQty(q => Math.max(1, q - 1))}
+                    className="w-6 h-6 rounded-full bg-white border border-black/15 text-[14px] flex items-center justify-center">−</button>
+                  <span className="font-medium w-8 text-center">{qty}</span>
+                  <button onClick={() => setQty(q => q + 1)}
+                    className="w-6 h-6 rounded-full bg-white border border-black/15 text-[14px] flex items-center justify-center">+</button>
+                </div>
+              </div>
+
+              {remise > 0 && (
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-green-600">Remise</span>
+                  <span className="text-green-600 font-medium">−{remise * 100}%</span>
+                </div>
+              )}
+
+              <div className="h-px bg-black/10" />
+
+              <div className="flex justify-between text-[15px]">
+                <span className="font-semibold">Total estimé</span>
+                <span className="font-bold">{total.toLocaleString('fr-FR')} DA</span>
+              </div>
+              <p className="text-[11px] text-brand-gray">{unit.toLocaleString('fr-FR')} DA / pièce</p>
+            </div>
+
+            {/* CTA */}
+            {!checkout ? (
+              <div className="space-y-2">
+                <button
+                  onClick={() => setCheckout(true)}
+                  disabled={layers.length === 0}
+                  className={`w-full bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors ${layers.length === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
+                >
+                  Commander →
+                </button>
+                {layers.length === 0 && (
+                  <p className="text-[12px] text-brand-gray text-center">Ajoutez un logo pour commander</p>
+                )}
+                <a
+                  href={`https://wa.me/213557440522?text=Bonjour, je veux personnaliser un ${product.name} couleur ${colorLabel}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 border border-black/15 text-brand-dark px-7 py-3 rounded-full text-[14px] font-medium hover:border-black/30 transition-colors no-underline"
+                >
+                  💬 Demander un devis WhatsApp
+                </a>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-[14px] font-semibold text-brand-dark">Vos informations</p>
+                <input placeholder="Nom complet *" value={nom} onChange={e => setNom(e.target.value)}
+                  className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-brand-dark" />
+                <input placeholder="Téléphone *" value={tel} onChange={e => setTel(e.target.value)}
+                  className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-brand-dark" />
+                <input placeholder="Entreprise (optionnel)" value={entreprise} onChange={e => setEntreprise(e.target.value)}
+                  className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-brand-dark" />
+
+                <div className="bg-brand-light rounded-xl px-4 py-3 text-[13px] flex justify-between">
+                  <span>{product.name} × {qty} ({colorLabel})</span>
+                  <span className="font-bold">{total.toLocaleString('fr-FR')} DA</span>
+                </div>
+
+                <button onClick={handleOrder} disabled={loading}
+                  className="w-full bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors disabled:opacity-50">
+                  {loading ? 'Envoi...' : 'Confirmer la commande →'}
+                </button>
+                <button onClick={() => setCheckout(false)}
+                  className="w-full text-[13px] text-brand-gray text-center underline">
+                  Retour au design
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
     </main>
+  )
+}
+
+/* ─── PAGE EXPORT (Suspense requis pour useSearchParams) ────────────────── */
+export default function DesignerPage() {
+  return (
+    <>
+      <Navbar />
+      <Suspense fallback={<div className="pt-14 min-h-screen bg-white flex items-center justify-center"><p className="text-brand-gray">Chargement du designer...</p></div>}>
+        <DesignerInner />
+      </Suspense>
+    </>
   )
 }
