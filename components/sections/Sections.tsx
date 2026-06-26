@@ -66,6 +66,19 @@ export function ServicesSection() {
 }
 
 // ── PRODUITS ──
+
+// Map nom produit → id designer
+const DESIGNER_IDS: Record<string, string> = {
+  'T-shirt':               'tshirt',
+  'T-shirt Oversized 250GSM': 'tshirt',
+  'Polo':                  'polo',
+  'Gilet de travail':      'gilet',
+  'Gilet de securite':     'gilet_securite',
+  'Casquette':             'casquette',
+  'Totebag':               'totebag',
+  'Tablier':               'tablier',
+}
+
 export function ProduitsSection({ produits }: { produits: Produit[] }) {
   const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
   const imgs: Record<string, string> = {
@@ -78,6 +91,7 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
     'Gilet de securite': BASE + '/IMG_5852.jpeg',
     'Tablier': BASE + '/IMG_5850.jpeg',
   }
+
   return (
     <section id="produits" className="py-20 px-6" style={{ backgroundColor: '#F0F9FF' }}>
       <div className="max-w-[980px] mx-auto">
@@ -104,29 +118,50 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {produits.map(p => (
-            <div key={p.id} className="rounded-2xl overflow-hidden border bg-white transition-all hover:shadow-lg hover:-translate-y-0.5"
-              style={{ borderColor: 'rgba(12,74,110,0.08)' }}>
-              <div className="w-full aspect-square overflow-hidden" style={{ backgroundColor: '#F0F9FF' }}>
-                <img src={imgs[p.nom] || BASE + '/IMG_5509.png'} alt={p.nom} className="w-full h-full object-cover" />
-              </div>
-              <div className="p-4">
-                <div className="text-[15px] font-bold mb-1" style={{ color: BLUE_DARK }}>{p.nom}</div>
-                <p className="text-[12px] mb-3 leading-relaxed" style={{ color: '#6B7280' }}>{p.description}</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[18px] font-bold" style={{ color: BLUE_DARK }}>{p.prix_base.toLocaleString('fr-FR')} DA</span>
-                    <span className="text-[11px] ml-1" style={{ color: '#9CA3AF' }}>/piece</span>
-                  </div>
-                  <Link href="/configurateur"
-                    className="text-[12px] font-semibold px-3 py-1.5 rounded-full no-underline transition-all"
-                    style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}>
-                    Configurer →
-                  </Link>
+          {produits.map(p => {
+            const designerId = DESIGNER_IDS[p.nom]
+            return (
+              <div key={p.id} className="rounded-2xl overflow-hidden border bg-white transition-all hover:shadow-lg hover:-translate-y-0.5"
+                style={{ borderColor: 'rgba(12,74,110,0.08)' }}>
+
+                {/* Image */}
+                <div className="w-full aspect-square overflow-hidden" style={{ backgroundColor: '#F0F9FF' }}>
+                  <img src={imgs[p.nom] || BASE + '/IMG_5509.png'} alt={p.nom} className="w-full h-full object-cover" />
                 </div>
+
+                <div className="p-4">
+                  <div className="text-[15px] font-bold mb-1" style={{ color: BLUE_DARK }}>{p.nom}</div>
+                  <p className="text-[12px] mb-3 leading-relaxed" style={{ color: '#6B7280' }}>{p.description}</p>
+
+                  <div className="text-[18px] font-bold mb-3" style={{ color: BLUE_DARK }}>
+                    {p.prix_base.toLocaleString('fr-FR')} DA
+                    <span className="text-[11px] font-normal ml-1" style={{ color: '#9CA3AF' }}>/piece</span>
+                  </div>
+
+                  {/* Boutons */}
+                  <div className="flex gap-2">
+                    <Link
+                      href="/configurateur"
+                      className="flex-1 text-center text-[12px] font-semibold px-3 py-2 rounded-full no-underline transition-all"
+                      style={{ backgroundColor: BLUE_PALE, color: BLUE_DARK }}
+                    >
+                      Configurer →
+                    </Link>
+                    {designerId && (
+                      <Link
+                        href={`/designer?product=${designerId}`}
+                        className="flex-1 text-center text-[12px] font-semibold px-3 py-2 rounded-full no-underline transition-all text-white"
+                        style={{ backgroundColor: BLUE_DARK }}
+                      >
+                        ✏️ Designer
+                      </Link>
+                    )}
+                  </div>
+                </div>
+
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>
