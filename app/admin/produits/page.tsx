@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react"
+import type { Produit } from '@/types'
 
 const EMOJIS = ['👕','👔','🧥','🧢','🩲','👗','🧣','🧤']
 
 export default function ProduitsAdmin() {
-import type { Produit } from '@/types'
+  const [produits, setProduits] = useState<Produit[]>([])
   const [form, setForm] = useState({ nom:'', emoji:'👕', description:'', prix_base:0, actif:true })
   const [editing, setEditing] = useState<string|null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -53,7 +53,6 @@ import type { Produit } from '@/types'
         </button>
       </div>
 
-      {/* Form */}
       {showForm && (
         <div className="bg-white rounded-[20px] border border-black/[0.08] p-6 mb-8">
           <h2 className="text-[16px] font-semibold mb-5">{editing ? 'Modifier le produit' : 'Nouveau produit'}</h2>
@@ -88,7 +87,6 @@ import type { Produit } from '@/types'
         </div>
       )}
 
-      {/* List */}
       <div className="bg-white rounded-[20px] border border-black/[0.06] overflow-hidden">
         <table className="w-full">
           <thead>
