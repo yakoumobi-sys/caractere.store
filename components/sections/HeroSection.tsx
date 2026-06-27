@@ -4,8 +4,11 @@ export default function HeroSection({ config }: { config?: any }) {
 
   return (
     <section
-      className="relative overflow-hidden px-6 pb-16 pt-14 text-center"
-      style={{ background: "linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)" }}
+      className="relative overflow-hidden px-6 pb-16 text-center"
+      style={{
+        background: "linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)",
+        paddingTop: "56px", // hauteur exacte de la navbar fixe
+      }}
     >
       <div
         className="pointer-events-none absolute left-1/2 top-16 h-80 w-80 -translate-x-1/2 rounded-full"
@@ -15,7 +18,7 @@ export default function HeroSection({ config }: { config?: any }) {
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-md">
+      <div className="relative z-10 mx-auto max-w-md pt-6">
         <img
           src={LOGO_URL}
           alt="Caractere"
@@ -39,7 +42,7 @@ export default function HeroSection({ config }: { config?: any }) {
         <div className="flex flex-col gap-3">
           <a
             href="/configurateur"
-            className="rounded-full bg-white py-3 text-sm font-semibold no-underline transition"
+            className="rounded-full bg-white py-3.5 text-[19px] font-semibold no-underline transition"
             style={{ color: "#0C4A6E" }}
           >
             Configurer ma commande
@@ -47,7 +50,7 @@ export default function HeroSection({ config }: { config?: any }) {
 
           <a
             href="/designer"
-            className="rounded-full border-2 py-3 text-sm font-semibold text-white no-underline backdrop-blur-sm transition"
+            className="rounded-full border-2 py-3.5 text-[19px] font-semibold text-white no-underline backdrop-blur-sm transition"
             style={{
               borderColor: "rgba(255,255,255,0.4)",
               backgroundColor: "rgba(255,255,255,0.05)",
@@ -58,7 +61,7 @@ export default function HeroSection({ config }: { config?: any }) {
 
           <a
             href="/produits"
-            className="rounded-full py-3 text-sm font-semibold no-underline border-2 backdrop-blur-sm transition"
+            className="rounded-full py-3.5 text-[19px] font-semibold no-underline border-2 backdrop-blur-sm transition"
             style={{
               borderColor: "rgba(255,255,255,0.6)",
               backgroundColor: "rgba(255,255,255,0.15)",
@@ -69,33 +72,33 @@ export default function HeroSection({ config }: { config?: any }) {
           </a>
 
           <a
-            href="/entreprises"
-            className="rounded-full border-2 py-3 text-sm font-semibold no-underline backdrop-blur-sm transition"
+            href="/collection"
+            className="rounded-full border-2 py-3.5 text-[19px] font-semibold no-underline backdrop-blur-sm transition"
             style={{
               borderColor: "rgba(255,255,255,0.4)",
               backgroundColor: "rgba(255,255,255,0.05)",
               color: "#fff",
             }}
           >
-            Packs entreprise ✦
+            Collection ✦
           </a>
 
           <a
             href="/catalogue"
             target="_blank"
-            className="rounded-full border-2 py-3 text-sm font-semibold no-underline backdrop-blur-sm transition"
+            className="rounded-full border-2 py-3.5 text-[19px] font-semibold no-underline backdrop-blur-sm transition"
             style={{
               borderColor: "rgba(255,255,255,0.4)",
               backgroundColor: "rgba(255,255,255,0.05)",
               color: "#fff",
             }}
           >
-            📘 Catalogue 2025–2026
+            📘 Catalogue
           </a>
 
           <a
             href="/auth/login"
-            className="rounded-full border-2 py-3 text-sm font-semibold no-underline"
+            className="rounded-full border-2 py-3.5 text-[19px] font-semibold no-underline"
             style={{
               borderColor: "rgba(255,255,255,0.25)",
               backgroundColor: "transparent",
@@ -109,9 +112,9 @@ export default function HeroSection({ config }: { config?: any }) {
         <div className="mt-10 grid grid-cols-2 gap-7">
           {[
             { value: "297K", label: "Abonnés Instagram" },
-            { value: "5+", label: "Ans d'activité" },
-            { value: "3-5j", label: "Délai production" },
-            { value: "1", label: "Pièce minimum" },
+            { value: "5+",   label: "Ans d'activité"   },
+            { value: "3-5j", label: "Délai production"  },
+            { value: "1",    label: "Pièce minimum"     },
           ].map((stat) => (
             <div key={stat.label}>
               <p className="text-3xl font-extrabold text-white">{stat.value}</p>
