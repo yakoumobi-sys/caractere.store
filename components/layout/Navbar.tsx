@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 const links = [
-  { href: '/#services', label: 'Services' },
-{ href: '/produits', label: 'Produits' },
-  { href: '/#secteurs', label: 'Secteurs' },
-  { href: '/#avis',     label: 'Avis'     },
-  { href: '/#contact',  label: 'Contact'  },
-  { href: '/designer',  label: 'Designer' },
+  { href: '/#services',  label: 'Services'  },
+  { href: '/produits',   label: 'Produits'  },
+  { href: '/#secteurs',  label: 'Secteurs'  },
+  { href: '/#avis',      label: 'Avis'      },
+  { href: '/#contact',   label: 'Contact'   },
+  { href: '/designer',   label: 'Designer'  },
+  { href: '/collection', label: 'Collection'},
+  { href: '/catalogue',  label: 'Catalogue' },
 ]
 
 export default function Navbar() {
