@@ -4,9 +4,10 @@ import Link from 'next/link'
 export const revalidate = 0
 
 async function getStats() {
-  const [commandesRes, produitsRes] = await Promise.all([
+  const [commandesRes, produitsRes, leadsRes] = await Promise.all([
     supabaseAdmin.from('commandes').select('*').order('created_at', { ascending: false }),
     supabaseAdmin.from('produits').select('*').eq('actif', true),
+    supabaseAdmin.from('leads').select('id', { count: 'exact', head: true }),
   ])
   const commandes = commandesRes.data ?? []
   const total_ca = commandes.reduce((sum, c) => sum + (c.prix_total || 0), 0)
@@ -18,6 +19,7 @@ async function getStats() {
     en_cours,
     total_ca,
     total_produits: produitsRes.data?.length ?? 0,
+    total_leads: leadsRes.count ?? 0,
     dernieres: commandes.slice(0, 8),
   }
 }
@@ -46,9 +48,27 @@ export default async function AdminDashboard() {
         width: '100%', padding: '13px', borderRadius: 12,
         background: '#1E293B', color: '#fff',
         fontSize: 14, fontWeight: 700, textDecoration: 'none',
-        marginBottom: 16, boxSizing: 'border-box',
+        marginBottom: 10, boxSizing: 'border-box',
       }}>
         📋 Résumé commandes — copie rapide
+      </Link>
+
+      {/* ── BOUTON MARKETING ── */}
+      <Link href="/admin/marketing" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        width: '100%', padding: '13px 16px', borderRadius: 12,
+        background: 'linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%)',
+        color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+        marginBottom: 16, boxSizing: 'border-box',
+        boxShadow: '0 4px 14px rgba(124,58,237,0.35)',
+      }}>
+        <span>📣 Marketing — Contacts & Campagnes</span>
+        <span style={{
+          background: 'rgba(255,255,255,0.25)', borderRadius: 20,
+          padding: '2px 10px', fontSize: 12, fontWeight: 800,
+        }}>
+          {stats.total_leads} leads
+        </span>
       </Link>
 
       {/* Stats cards */}
@@ -115,7 +135,6 @@ export default async function AdminDashboard() {
         )}
       </div>
 
-      {/* Lien commandes */}
       <Link href="/admin/commandes" style={{
         display: 'block', textAlign: 'center',
         marginTop: 12, padding: '11px',
