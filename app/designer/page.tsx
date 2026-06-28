@@ -22,15 +22,15 @@ const ALL_COLORS = {
 type ColorKey = keyof typeof ALL_COLORS
 
 const PRODUCTS = [
-  { id: 'tshirt',          name: 'T-shirt',        emoji: '👕', prix_base: 1800, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
-  { id: 'tshirt_oversized',name: 'Oversized 250G', emoji: '👕', prix_base: 3200, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
-  { id: 'polo',            name: 'Polo',           emoji: '👔', prix_base: 2200, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
-  { id: 'gilet',           name: 'Gilet travail',  emoji: '🦺', prix_base: 2500, colors: ['noir','rouge','beige','royal'] as ColorKey[] },
-  { id: 'gilet_securite',  name: 'Gilet sécu.',    emoji: '🟡', prix_base: 1500, colors: ['blanc'] as ColorKey[] },
-  { id: 'casquette',       name: 'Casquette',      emoji: '🧢', prix_base: 1500, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
-  { id: 'totebag',         name: 'Totebag',        emoji: '👜', prix_base: 1200, colors: ['beige','noir'] as ColorKey[] },
-  { id: 'hoodie',          name: 'Hoodie',         emoji: '🧥', prix_base: 3800, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
-  { id: 'tablier',         name: 'Tablier',        emoji: '🍽️', prix_base: 1500, colors: ['noir','rouge','bordeaux'] as ColorKey[] },
+  { id: 'tshirt',           name: 'T-shirt',       emoji: '👕', prix_base: 1800, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
+  { id: 'tshirt_oversized', name: 'Oversized',     emoji: '👕', prix_base: 3200, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
+  { id: 'polo',             name: 'Polo',          emoji: '👔', prix_base: 2200, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
+  { id: 'gilet',            name: 'Gilet',         emoji: '🦺', prix_base: 2500, colors: ['noir','rouge','beige','royal'] as ColorKey[] },
+  { id: 'gilet_securite',   name: 'Gilet sécu.',   emoji: '🟡', prix_base: 1500, colors: ['blanc'] as ColorKey[] },
+  { id: 'casquette',        name: 'Casquette',     emoji: '🧢', prix_base: 1500, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
+  { id: 'totebag',          name: 'Totebag',       emoji: '👜', prix_base: 1200, colors: ['beige','noir'] as ColorKey[] },
+  { id: 'hoodie',           name: 'Hoodie',        emoji: '🧥', prix_base: 3800, colors: ['blanc','noir','marine','royal','rouge','vert','gris','beige','bordeaux'] as ColorKey[] },
+  { id: 'tablier',          name: 'Tablier',       emoji: '🍽️', prix_base: 1500, colors: ['noir','rouge','bordeaux'] as ColorKey[] },
 ]
 
 function getMockup(productId: string): string {
@@ -43,27 +43,47 @@ function calcPrice(prixBase: number, qty: number) {
   return { unit, total: unit * qty, remise }
 }
 
+// ─── Icones ──────────────────────────────────────────────────────────────────
+const IconUpload = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+)
+const IconTrash = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /><path d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+  </svg>
+)
+const IconWhatsApp = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+  </svg>
+)
+
+// ─── Designer principal ───────────────────────────────────────────────────────
 function DesignerInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialId = searchParams.get('product') || 'tshirt'
   const initialProduct = PRODUCTS.find(p => p.id === initialId) || PRODUCTS[0]
 
-  const [product, setProduct] = useState(initialProduct)
-  const [colorKey, setColorKey] = useState<ColorKey>(initialProduct.colors[0])
-  const [layers, setLayers] = useState<LogoLayer[]>([])
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const [qty, setQty] = useState(1)
-  const [note, setNote] = useState('')
+  const [product, setProduct]     = useState(initialProduct)
+  const [colorKey, setColorKey]   = useState<ColorKey>(initialProduct.colors[0])
+  const [layers, setLayers]       = useState<LogoLayer[]>([])
+  const [activeId, setActiveId]   = useState<string | null>(null)
+  const [qty, setQty]             = useState(1)
+  const [note, setNote]           = useState('')
+  const [showHelp, setShowHelp]   = useState(false)
 
-  const fileRef = useRef<HTMLInputElement>(null)
+  const fileRef  = useRef<HTMLInputElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const action = useRef<{ type: 'move'|'resize'|'rotate'; id: string; startX: number; startY: number; layer: LogoLayer } | null>(null)
+  const action   = useRef<{ type: 'move'|'resize'|'rotate'; id: string; startX: number; startY: number; layer: LogoLayer } | null>(null)
 
   const { unit, total, remise } = calcPrice(product.prix_base, qty)
-  const currentColor = ALL_COLORS[colorKey]
+  const currentColor    = ALL_COLORS[colorKey]
   const availableColors = product.colors.map(k => ({ key: k, ...ALL_COLORS[k] }))
-  const mockupSrc = getMockup(product.id)
+  const mockupSrc       = getMockup(product.id)
+  const activeLayer     = layers.find(l => l.id === activeId)
 
   const handleProductChange = (p: typeof PRODUCTS[0]) => {
     setProduct(p)
@@ -76,10 +96,11 @@ function DesignerInner() {
   const addLogo = (file: File) => {
     if (!file.type.startsWith('image/')) return
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = e => {
       const id = Date.now().toString(36)
       setLayers(prev => [...prev, { id, src: e.target?.result as string, x: 50, y: 42, scale: 1, rotation: 0 }])
       setActiveId(id)
+      setShowHelp(false)
     }
     reader.readAsDataURL(file)
   }
@@ -131,9 +152,9 @@ function DesignerInner() {
   }
 
   const handleWhatsApp = () => {
-    const logoInfo = layers.length > 0 ? '✅ Logo uploadé' : '❌ Pas de logo'
-    const noteInfo = note.trim() ? `\n💬 Note : ${note.trim()}` : ''
-    const remiseInfo = remise > 0 ? `\n🎁 Remise : -${remise * 100}%` : ''
+    const logoInfo  = layers.length > 0 ? '✅ Logo uploadé' : '❌ Pas de logo'
+    const noteInfo  = note.trim() ? `\n💬 Note : ${note.trim()}` : ''
+    const remiseInfo = remise > 0 ? `\n🎁 Remise : −${remise * 100}%` : ''
     const msg = encodeURIComponent(
       `Bonjour Caractère Store 👋\n\nCommande via Designer :\n\n` +
       `👕 *Produit* : ${product.name}\n` +
@@ -148,36 +169,61 @@ function DesignerInner() {
   const BASE_W = 110
 
   return (
-    <main className="pt-14 min-h-screen bg-white" onPointerMove={onPointerMove} onPointerUp={() => { action.current = null }}>
-      <div className="max-w-[1120px] mx-auto px-4 md:px-6 py-8 md:py-10">
+    <main
+      className="pt-14 min-h-screen bg-white"
+      onPointerMove={onPointerMove}
+      onPointerUp={() => { action.current = null }}
+    >
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8">
 
-        <div className="mb-6">
-          <span className="text-[11px] font-bold tracking-widest uppercase text-brand-gray block mb-1">Designer</span>
-          <h1 className="text-[26px] md:text-[32px] font-bold tracking-tight text-brand-dark">Créez votre design.</h1>
-          <p className="text-[13px] text-brand-gray mt-1">Choisissez un produit, une couleur, uploadez votre logo.</p>
+        {/* ── Header ── */}
+        <div className="mb-8">
+          <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-1">Designer</p>
+          <h1 className="text-[28px] md:text-[36px] font-bold tracking-tight text-brand-dark leading-tight">
+            Créez votre design.
+          </h1>
+          <p className="text-[14px] text-brand-gray mt-1.5">
+            Choisissez un produit · une couleur · uploadez votre logo.
+          </p>
         </div>
 
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {PRODUCTS.map(p => (
-            <button key={p.id} onClick={() => handleProductChange(p)}
-              className={`px-4 py-2 rounded-full text-[13px] font-medium border transition-all ${
-                product.id === p.id ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-brand-dark border-black/15 hover:border-black/30'
-              }`}>
-              {p.emoji} {p.name}
-            </button>
-          ))}
+        {/* ── Sélecteur produit ── */}
+        <div className="mb-8 overflow-x-auto pb-1">
+          <div className="flex gap-2 min-w-max">
+            {PRODUCTS.map(p => (
+              <button
+                key={p.id}
+                onClick={() => handleProductChange(p)}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[13px] font-medium border-2 transition-all whitespace-nowrap
+                  ${product.id === p.id
+                    ? 'bg-brand-dark text-white border-brand-dark shadow-md'
+                    : 'bg-white text-brand-dark border-black/12 hover:border-black/30'
+                  }`}
+              >
+                <span>{p.emoji}</span>
+                <span>{p.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_310px] gap-8">
+        {/* ── Layout 2 colonnes ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+
+          {/* ── Canvas zone ── */}
           <div>
-            {/* Color picker */}
-            <div className="mb-4">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-gray mb-2">
+
+            {/* Couleurs */}
+            <div className="mb-5">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-gray mb-3">
                 Couleur — <span className="text-brand-dark normal-case font-semibold">{currentColor.name}</span>
               </p>
               <div className="flex flex-wrap gap-2.5">
                 {availableColors.map(c => (
-                  <button key={c.key} title={c.name} onClick={() => setColorKey(c.key)}
+                  <button
+                    key={c.key}
+                    title={c.name}
+                    onClick={() => setColorKey(c.key)}
                     className={`w-9 h-9 rounded-full transition-all border-2 ${colorKey === c.key ? 'border-brand-dark scale-110 shadow-md' : 'border-black/15 hover:scale-105'}`}
                     style={{ backgroundColor: c.hex, boxShadow: c.hex === '#FFFFFF' ? 'inset 0 0 0 1px #ddd' : undefined }}
                   />
@@ -186,30 +232,78 @@ function DesignerInner() {
             </div>
 
             {/* Canvas */}
-            <div ref={stageRef} onClick={() => setActiveId(null)}
-              className="relative w-full aspect-square bg-[#f8f9fa] rounded-[24px] overflow-hidden select-none border border-black/[0.06]">
-              <img src={mockupSrc} alt={product.name}
-                className="absolute inset-0 w-full h-full object-contain p-6 pointer-events-none" />
+            <div
+              ref={stageRef}
+              onClick={() => setActiveId(null)}
+              className="relative w-full aspect-square bg-[#F4F4F2] rounded-[28px] overflow-hidden select-none border border-black/[0.05] shadow-inner"
+              style={{ cursor: layers.length > 0 ? 'default' : 'crosshair' }}
+            >
+              {/* Mockup */}
+              <img
+                src={mockupSrc}
+                alt={product.name}
+                className="absolute inset-0 w-full h-full object-contain p-8 pointer-events-none"
+              />
+
+              {/* État vide */}
+              {layers.length === 0 && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 text-center shadow-sm border border-black/[0.06]">
+                    <p className="text-[13px] font-medium text-brand-dark mb-0.5">Uploadez votre logo</p>
+                    <p className="text-[11px] text-brand-gray">Il apparaîtra ici en temps réel</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Layers */}
               {layers.map(layer => {
                 const isActive = layer.id === activeId
                 const w = BASE_W * layer.scale
                 return (
-                  <div key={layer.id} onClick={e => e.stopPropagation()}
+                  <div
+                    key={layer.id}
+                    onClick={e => e.stopPropagation()}
                     onPointerDown={e => startAction('move', layer.id, e)}
                     className="absolute cursor-move touch-none"
-                    style={{ left: `${layer.x}%`, top: `${layer.y}%`, width: w, height: w, transform: `translate(-50%,-50%) rotate(${layer.rotation}deg)` }}>
-                    <img src={layer.src} alt="logo" className="w-full h-full object-contain pointer-events-none drop-shadow-lg" draggable={false} />
+                    style={{
+                      left: `${layer.x}%`, top: `${layer.y}%`,
+                      width: w, height: w,
+                      transform: `translate(-50%,-50%) rotate(${layer.rotation}deg)`,
+                    }}
+                  >
+                    <img
+                      src={layer.src} alt="logo"
+                      className="w-full h-full object-contain pointer-events-none drop-shadow-lg"
+                      draggable={false}
+                    />
                     {isActive && (
                       <>
+                        {/* Bordure sélection */}
                         <div className="absolute inset-0 border-2 border-brand-dark rounded pointer-events-none" />
-                        <button onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); removeLayer(layer.id) }}
-                          className="absolute -top-3 -left-3 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-[13px] font-bold shadow-md">×</button>
-                        <button onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); duplicateLayer(layer.id) }}
-                          className="absolute -top-3 -right-3 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[12px] shadow-md">⧉</button>
-                        <div onPointerDown={e => startAction('rotate', layer.id, e)}
-                          className="absolute -bottom-3 -left-3 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[13px] shadow-md cursor-grab">↻</div>
-                        <div onPointerDown={e => startAction('resize', layer.id, e)}
-                          className="absolute -bottom-3 -right-3 w-7 h-7 bg-brand-dark rounded-full flex items-center justify-center text-white text-[12px] shadow-md cursor-nwse-resize">⤡</div>
+                        {/* Supprimer */}
+                        <button
+                          onPointerDown={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); removeLayer(layer.id) }}
+                          className="absolute -top-3.5 -left-3.5 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-md transition-colors"
+                        >
+                          <IconTrash />
+                        </button>
+                        {/* Dupliquer */}
+                        <button
+                          onPointerDown={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); duplicateLayer(layer.id) }}
+                          className="absolute -top-3.5 -right-3.5 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[12px] shadow-md hover:bg-brand-light transition-colors"
+                        >⧉</button>
+                        {/* Rotation */}
+                        <div
+                          onPointerDown={e => startAction('rotate', layer.id, e)}
+                          className="absolute -bottom-3.5 -left-3.5 w-7 h-7 bg-white border border-black/20 rounded-full flex items-center justify-center text-[14px] shadow-md cursor-grab"
+                        >↻</div>
+                        {/* Resize */}
+                        <div
+                          onPointerDown={e => startAction('resize', layer.id, e)}
+                          className="absolute -bottom-3.5 -right-3.5 w-7 h-7 bg-brand-dark rounded-full flex items-center justify-center text-white text-[12px] shadow-md cursor-nwse-resize"
+                        >⤡</div>
                       </>
                     )}
                   </div>
@@ -217,82 +311,201 @@ function DesignerInner() {
               })}
             </div>
 
-            <button onClick={() => fileRef.current?.click()}
-              className="mt-3 w-full border-2 border-dashed border-black/20 rounded-2xl p-5 text-center cursor-pointer hover:border-black/40 transition-colors bg-brand-light/50">
-              <div className="text-[24px] mb-0.5">📁</div>
-              <div className="text-[13px] font-medium">Ajouter un logo / design</div>
-              <div className="text-[11px] text-brand-gray mt-0.5">PNG, SVG, JPG · fond transparent recommandé</div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) addLogo(f) }} />
-            </button>
-            <p className="text-[11px] text-brand-gray text-center mt-2">
-              Glissez · <span className="font-medium">×</span> supprimer · <span className="font-medium">⧉</span> dupliquer · <span className="font-medium">↻</span> tourner · <span className="font-medium">⤡</span> redimensionner
-            </p>
+            {/* Contrôles sous canvas */}
+            <div className="mt-4 flex items-center gap-3">
+              {/* Bouton upload principal */}
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="flex-1 flex items-center justify-center gap-2.5 border-2 border-dashed border-black/20 hover:border-brand-dark hover:bg-brand-light/40 rounded-2xl py-4 transition-all group"
+              >
+                <span className="text-brand-gray group-hover:text-brand-dark transition-colors"><IconUpload /></span>
+                <div className="text-left">
+                  <p className="text-[13px] font-semibold text-brand-dark leading-tight">Ajouter un logo / design</p>
+                  <p className="text-[11px] text-brand-gray">PNG · SVG · JPG — fond transparent recommandé</p>
+                </div>
+              </button>
+
+              {/* Aide */}
+              <button
+                onClick={() => setShowHelp(!showHelp)}
+                className="w-10 h-10 rounded-full border border-black/15 flex items-center justify-center text-[14px] text-brand-gray hover:bg-brand-light transition-colors flex-shrink-0"
+                title="Comment utiliser"
+              >?</button>
+            </div>
+
+            {/* Panneau d'aide */}
+            {showHelp && (
+              <div className="mt-3 bg-brand-light rounded-2xl p-4 grid grid-cols-2 gap-2">
+                {[
+                  { icon: '✋', label: 'Déplacer', sub: 'Clic + glisser' },
+                  { icon: '⤡', label: 'Redimensionner', sub: 'Coin bas-droite' },
+                  { icon: '↻', label: 'Tourner', sub: 'Coin bas-gauche' },
+                  { icon: '⧉', label: 'Dupliquer', sub: 'Coin haut-droite' },
+                ].map(h => (
+                  <div key={h.label} className="flex items-center gap-2.5 bg-white rounded-xl p-2.5">
+                    <span className="text-[18px]">{h.icon}</span>
+                    <div>
+                      <p className="text-[12px] font-semibold text-brand-dark">{h.label}</p>
+                      <p className="text-[11px] text-brand-gray">{h.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <input
+              ref={fileRef} type="file" accept="image/*" className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) addLogo(f) }}
+            />
+
+            {/* Info layer actif */}
+            {activeLayer && (
+              <div className="mt-3 flex items-center gap-3 bg-brand-light rounded-xl px-4 py-2.5">
+                <p className="text-[12px] text-brand-gray flex-1">
+                  Rotation <strong className="text-brand-dark">{activeLayer.rotation}°</strong>
+                  {' · '}
+                  Taille <strong className="text-brand-dark">{Math.round(activeLayer.scale * 100)}%</strong>
+                </p>
+                <button
+                  onClick={() => updateLayer(activeLayer.id, { rotation: 0, scale: 1, x: 50, y: 42 })}
+                  className="text-[11px] text-brand-gray underline"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Sidebar */}
+          {/* ── Sidebar ── */}
           <div className="flex flex-col gap-4">
-            <div className="bg-brand-light rounded-2xl p-4 space-y-2.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-gray">Récapitulatif</p>
-              <div className="flex justify-between text-[13px]">
+
+            {/* Récap prix */}
+            <div className="bg-brand-light rounded-2xl p-5">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-brand-gray mb-4">Votre commande</p>
+
+              {/* Produit */}
+              <div className="flex justify-between text-[13px] py-2 border-b border-black/[0.06]">
                 <span className="text-brand-gray">Produit</span>
-                <span className="font-medium">{product.emoji} {product.name}</span>
+                <span className="font-semibold">{product.emoji} {product.name}</span>
               </div>
-              <div className="flex justify-between text-[13px]">
+
+              {/* Couleur */}
+              <div className="flex justify-between items-center text-[13px] py-2 border-b border-black/[0.06]">
                 <span className="text-brand-gray">Couleur</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded-full border border-black/15 flex-shrink-0"
-                    style={{ backgroundColor: currentColor.hex, boxShadow: currentColor.hex === '#FFFFFF' ? 'inset 0 0 0 1px #ddd' : undefined }} />
-                  <span className="font-medium">{currentColor.name}</span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-4 h-4 rounded-full border border-black/15 flex-shrink-0"
+                    style={{ backgroundColor: currentColor.hex, boxShadow: currentColor.hex === '#FFFFFF' ? 'inset 0 0 0 1px #ddd' : undefined }}
+                  />
+                  <span className="font-semibold">{currentColor.name}</span>
                 </div>
               </div>
-              <div className="flex justify-between text-[13px] items-center">
+
+              {/* Quantité */}
+              <div className="flex justify-between items-center text-[13px] py-2.5 border-b border-black/[0.06]">
                 <span className="text-brand-gray">Quantité</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setQty(q => Math.max(1, q - 1))}
-                    className="w-7 h-7 rounded-full bg-white border border-black/15 text-[16px] flex items-center justify-center">−</button>
+                  <button
+                    onClick={() => setQty(q => Math.max(1, q - 1))}
+                    className="w-7 h-7 rounded-full bg-white border border-black/15 text-[16px] flex items-center justify-center hover:bg-black/5 transition-colors"
+                  >−</button>
                   <span className="font-bold w-8 text-center text-[15px]">{qty}</span>
-                  <button onClick={() => setQty(q => q + 1)}
-                    className="w-7 h-7 rounded-full bg-white border border-black/15 text-[16px] flex items-center justify-center">+</button>
+                  <button
+                    onClick={() => setQty(q => q + 1)}
+                    className="w-7 h-7 rounded-full bg-white border border-black/15 text-[16px] flex items-center justify-center hover:bg-black/5 transition-colors"
+                  >+</button>
                 </div>
               </div>
+
+              {/* Remise */}
               {remise > 0 && (
-                <div className="flex justify-between text-[13px]">
-                  <span className="text-green-600">Remise</span>
-                  <span className="text-green-600 font-medium">−{remise * 100}%</span>
+                <div className="flex justify-between text-[13px] py-2 border-b border-black/[0.06]">
+                  <span className="text-green-600 font-medium">Remise volume</span>
+                  <span className="text-green-600 font-bold">−{remise * 100}%</span>
                 </div>
               )}
-              <div className="h-px bg-black/10" />
-              <div className="flex justify-between">
-                <span className="text-[15px] font-semibold">Total estimé</span>
-                <span className="text-[17px] font-bold">{total.toLocaleString('fr-FR')} DA</span>
+
+              {/* Logo */}
+              <div className="flex justify-between text-[13px] py-2 border-b border-black/[0.06]">
+                <span className="text-brand-gray">Logo</span>
+                <span className={layers.length > 0 ? 'text-green-600 font-medium' : 'text-brand-gray/60'}>
+                  {layers.length > 0 ? `✓ ${layers.length} élément${layers.length > 1 ? 's' : ''}` : 'Non uploadé'}
+                </span>
               </div>
-              <p className="text-[11px] text-brand-gray">{unit.toLocaleString('fr-FR')} DA / pièce</p>
+
+              {/* Total */}
+              <div className="pt-3 mt-1">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[13px] text-brand-gray">Total estimé</span>
+                  <span className="text-[22px] font-bold text-brand-dark tracking-tight">{total.toLocaleString('fr-FR')} DA</span>
+                </div>
+                <p className="text-[11px] text-brand-gray text-right">{unit.toLocaleString('fr-FR')} DA / pièce</p>
+              </div>
+
+              {/* Paliers */}
+              <div className="mt-3 flex gap-1.5">
+                {[
+                  { range: '1–49', pct: '', active: qty < 50 },
+                  { range: '50+', pct: '−5%', active: qty >= 50 && qty < 100 },
+                  { range: '100+', pct: '−10%', active: qty >= 100 },
+                ].map(t => (
+                  <div key={t.range} className={`flex-1 text-center py-1.5 rounded-lg text-[10px] font-medium border transition-all
+                    ${t.active ? 'border-green-300 bg-green-50 text-green-700' : 'border-black/10 text-brand-gray/60'}`}>
+                    {t.range} {t.pct && <span className="font-bold">{t.pct}</span>}
+                  </div>
+                ))}
+              </div>
             </div>
 
+            {/* Note / commentaire */}
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-wide text-brand-gray block mb-2">Précision / commentaire</label>
-              <textarea value={note} onChange={e => setNote(e.target.value)}
-                placeholder="Ex : broderie au lieu de DTF, position dos, taille logo 10cm..."
+              <label className="text-[11px] font-bold uppercase tracking-widest text-brand-gray block mb-2">
+                Précisions
+              </label>
+              <textarea
+                value={note}
+                onChange={e => setNote(e.target.value)}
+                placeholder="Ex : broderie au lieu de DTF, position dos, taille logo 10 cm, couleur fil…"
                 rows={3}
-                className="w-full border border-black/15 rounded-xl px-4 py-3 text-[13px] outline-none focus:border-brand-dark resize-none leading-relaxed placeholder:text-gray-400" />
+                className="w-full border-2 border-black/12 focus:border-brand-dark rounded-xl px-4 py-3 text-[13px] outline-none resize-none leading-relaxed placeholder:text-gray-400 transition-colors"
+              />
             </div>
 
-            <button onClick={handleWhatsApp}
-              className="w-full flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl text-[15px] font-bold hover:bg-[#20BD5A] shadow-lg hover:-translate-y-0.5 transition-all">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-              </svg>
-              Confirmer la commande sur WhatsApp
+            {/* CTA WhatsApp */}
+            <button
+              onClick={handleWhatsApp}
+              className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white py-4 rounded-2xl text-[15px] font-bold transition-all shadow-lg shadow-green-200/50 hover:-translate-y-0.5"
+            >
+              <IconWhatsApp />
+              Confirmer sur WhatsApp
             </button>
 
-            <p className="text-[11px] text-brand-gray text-center leading-relaxed">
-              Un message pré-rempli s'ouvrira dans WhatsApp.<br/>Notre équipe vous répond sous 2h.
+            <p className="text-[11px] text-brand-gray text-center leading-relaxed -mt-1">
+              Un message pré-rempli s'ouvre dans WhatsApp.<br />Notre équipe répond sous 2h.
             </p>
 
-            <div className="bg-[#F0F7F0] rounded-xl px-4 py-3">
-              <p className="text-[11px] font-bold text-[#166534] uppercase tracking-wide mb-1">Livraison & Paiement</p>
-              <p className="text-[12px] text-[#1A3D2B] leading-relaxed">Paiement à la livraison · BaridiMob · CCP<br/>Livraison nationale 3–5 jours</p>
+            {/* Infos livraison */}
+            <div className="rounded-2xl border border-black/[0.07] p-4 space-y-3">
+              {[
+                { icon: '💳', text: 'Paiement à la livraison · BaridiMob · CCP' },
+                { icon: '🚚', text: 'Livraison nationale 3–5 jours' },
+                { icon: '🎨', text: 'Vectorisation logo offerte' },
+              ].map(item => (
+                <div key={item.text} className="flex items-center gap-2.5">
+                  <span className="text-[16px]">{item.icon}</span>
+                  <p className="text-[12px] text-brand-gray">{item.text}</p>
+                </div>
+              ))}
             </div>
+
+            {/* Lien configurateur */}
+            <a
+              href={`/configurateur?produit=${product.name}&couleur=${currentColor.name}`}
+              className="block text-center text-[12px] text-brand-dark font-semibold underline underline-offset-2 hover:text-brand-gray transition-colors"
+            >
+              Aller au configurateur complet →
+            </a>
+
           </div>
         </div>
       </div>
@@ -304,7 +517,14 @@ export default function DesignerPage() {
   return (
     <>
       <Navbar />
-      <Suspense fallback={<div className="pt-14 min-h-screen bg-white flex items-center justify-center"><p className="text-brand-gray">Chargement...</p></div>}>
+      <Suspense fallback={
+        <div className="pt-14 min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-brand-dark/20 border-t-brand-dark rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-[13px] text-brand-gray">Chargement du Designer…</p>
+          </div>
+        </div>
+      }>
         <DesignerInner />
       </Suspense>
     </>
