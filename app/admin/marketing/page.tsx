@@ -280,7 +280,7 @@ const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean)))
                 style={{ ...ST.input, resize: 'none', lineHeight: 1.6 }}
               />
               <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 6 }}>
-                {message.length} caractères · {{NOM}} sera remplacé par le prénom
+                {message.length} caractères · {'{NOM}'} sera remplacé par le prénom
               </div>
             </div>
 
