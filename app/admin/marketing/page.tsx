@@ -45,15 +45,15 @@ export default function MarketingPage() {
 
   /* Filtres */
   const filtered = contacts.filter(c => {
-    const q = search.toLowerCase()
-    const matchSearch = !q || c.nom.toLowerCase().includes(q) || c.telephone.includes(q) || (c.entreprise || '').toLowerCase().includes(q)
-    const wilayas = Array.from(new Set(contacts.map(c => c.wilaya).filter(Boolean))) as string[]
-const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean))) as string[]
-    return matchSearch && matchWilaya && matchSource
-  })
+  const q = search.toLowerCase()
+  const matchSearch = !q || c.nom.toLowerCase().includes(q) || c.telephone.includes(q) || (c.entreprise || '').toLowerCase().includes(q)
+  const matchWilaya = !filterWilaya || c.wilaya === filterWilaya
+  const matchSource = !filterSource || c.source === filterSource
+  return matchSearch && matchWilaya && matchSource
+})
 
-  const wilayas = [...new Set(contacts.map(c => c.wilaya).filter(Boolean))] as string[]
-  const sources = [...new Set(contacts.map(c => c.source).filter(Boolean))] as string[]
+const wilayas = Array.from(new Set(contacts.map(c => c.wilaya).filter(Boolean))) as string[]
+const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean))) as string[]
 
   /* Sélection */
   const toggleAll = () => {
