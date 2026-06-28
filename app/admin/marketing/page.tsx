@@ -270,7 +270,7 @@ const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean)))
             {/* Éditeur message */}
             <div style={{ ...ST.card, padding: '14px' }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Message ({{NOM}} = prénom auto)
+                {'Message ({NOM} = prénom auto)'}
               </div>
               <textarea
                 value={message}
