@@ -83,7 +83,7 @@ function Hero() {
       style={{
         background: 'linear-gradient(150deg, #0C4A6E 0%, #0E5E8A 50%, #38BDF8 100%)',
         minHeight: '100vh',
-        paddingTop: '72px',
+        paddingTop: '56px',
       }}
     >
       {/* Grille de fond */}
@@ -94,7 +94,7 @@ function Hero() {
       {/* Halo */}
       <div className="absolute pointer-events-none" style={{ top: -200, right: -200, width: 700, height: 700, background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, transparent 70%)' }} />
 
-      <div className="relative max-w-[1200px] mx-auto px-6 lg:px-10 py-8 lg:py-24">
+      <div className="relative max-w-[1200px] mx-auto px-6 lg:px-10 pt-4 pb-8 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
           {/* ── Colonne texte ── */}
@@ -118,19 +118,19 @@ function Hero() {
                 style={{ background: '#FFFFFF', color: C.blue, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}>
                 Configurer ma commande →
               </Link>
-              <Link href="/produits"
+              <Link href="/auth/register"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all border-2 hover:-translate-y-0.5"
                 style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.08)' }}>
-                Découvrir nos services
+                Commencer à vendre
               </Link>
             </div>
 
             {/* 3 cards service */}
             <div className="flex flex-col gap-2">
               {[
-                { emoji: '🚀', title: 'Print on Demand', desc: 'Sans abonnement. Sans stock.', href: '/designer' },
-                { emoji: '🏢', title: 'Entreprises', desc: 'Uniformes & vêtements personnalisés.', href: '/configurateur' },
-                { emoji: '👕', title: 'Particuliers', desc: 'Créez votre vêtement unique.', href: '/configurateur' },
+                { emoji: '🚀', title: 'Print on Demand', desc: 'Sans abonnement. Sans stock.', href: '/designer', sub: true },
+                { emoji: '🏢', title: 'Entreprises', desc: 'Uniformes & vêtements personnalisés.', href: '/configurateur', sub: true },
+                { emoji: '👕', title: 'Créez votre vêtement unique.', desc: '', href: '/produits', sub: false },
               ].map(card => (
                 <Link key={card.title} href={card.href}
                   className="group flex items-center justify-between px-4 py-3 rounded-2xl border no-underline hover:shadow-md hover:-translate-y-0.5 transition-all"
@@ -139,7 +139,7 @@ function Hero() {
                     <span className="text-[18px]">{card.emoji}</span>
                     <div>
                       <p className="text-[13px] font-bold text-white leading-tight">{card.title}</p>
-                      <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{card.desc}</p>
+                      {card.sub && <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{card.desc}</p>}
                     </div>
                   </div>
                   <span className="text-[12px] font-bold flex-shrink-0 ml-3" style={{ color: '#BAE6FD' }}>→</span>
