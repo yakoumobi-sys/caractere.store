@@ -251,6 +251,26 @@ function Hero() {
 /* ══════════════════════════════════════════════════════════════════════════════
    COMMENT ÇA MARCHE — 4 étapes à la Tapstitch
 ══════════════════════════════════════════════════════════════════════════════ */
+function StepCard({ step, delay, isLast }: { step: { n: string; emoji: string; title: string; desc: string }; delay: number; isLast: boolean }) {
+  const ref = useFadeIn(delay)
+  return (
+    <div ref={ref} className="relative group">
+      {!isLast && (
+        <div className="hidden lg:block absolute top-8 left-[calc(100%-8px)] w-full h-px z-0" style={{ background: `linear-gradient(90deg, ${C.gray2}, transparent)` }} />
+      )}
+      <div className="relative z-10 p-6 rounded-[24px] border hover:shadow-lg hover:-translate-y-1 transition-all" style={{ background: C.gray1, borderColor: C.gray2 }}>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[22px]" style={{ background: C.white, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+            {step.emoji}
+          </div>
+          <span className="text-[32px] font-black tracking-tighter" style={{ color: C.gray2, lineHeight: 1 }}>{step.n}</span>
+        </div>
+        <h3 className="font-bold text-[16px] mb-2 leading-tight" style={{ color: C.black }}>{step.title}</h3>
+        <p className="text-[13px] leading-relaxed" style={{ color: C.gray4 }}>{step.desc}</p>
+      </div>
+    </div>
+  )
+}
 function HowItWorks() {
   const ref = useFadeIn()
   const steps = [
@@ -270,28 +290,9 @@ function HowItWorks() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {steps.map((step, i) => {
-            const stepRef = useFadeIn(i * 80)
-            return (
-              <div key={step.n} ref={stepRef} className="relative group">
-                {/* Connecteur */}
-                {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-[calc(100%-8px)] w-full h-px z-0" style={{ background: `linear-gradient(90deg, ${C.gray2}, transparent)` }} />
-                )}
-                <div className="relative z-10 p-6 rounded-[24px] border hover:shadow-lg hover:-translate-y-1 transition-all" style={{ background: C.gray1, borderColor: C.gray2 }}>
-                  {/* Numéro + emoji */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[22px]" style={{ background: C.white, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-                      {step.emoji}
-                    </div>
-                    <span className="text-[32px] font-black tracking-tighter" style={{ color: C.gray2, lineHeight: 1 }}>{step.n}</span>
-                  </div>
-                  <h3 className="font-bold text-[16px] mb-2 leading-tight" style={{ color: C.black }}>{step.title}</h3>
-                  <p className="text-[13px] leading-relaxed" style={{ color: C.gray4 }}>{step.desc}</p>
-                </div>
-              </div>
-            )
-          })}
+          {steps.map((step, i) => (
+            <StepCard key={step.n} step={step} delay={i * 80} isLast={i === steps.length - 1} />
+          ))}
         </div>
 
         {/* CTA sous les étapes */}
@@ -428,6 +429,39 @@ function ProduitsSection({ produits }: { produits: any[] }) {
 /* ══════════════════════════════════════════════════════════════════════════════
    TECHNIQUES — DTF vs Broderie
 ══════════════════════════════════════════════════════════════════════════════ */
+type TechItem = { id: string; label: string; emoji: string; title: string; subtitle: string; desc: string; specs: string[]; bg: string; accent: string; cta: string; href: string }
+
+function TechCard({ tech, delay }: { tech: TechItem; delay: number }) {
+  const ref = useFadeIn(delay)
+  return (
+    <div ref={ref} className="rounded-[28px] p-8 border hover:shadow-lg transition-all"
+      style={{ background: tech.bg, borderColor: 'rgba(0,0,0,0.06)' }}>
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[22px] shadow-sm">
+          {tech.emoji}
+        </div>
+        <div>
+          <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: tech.accent }}>{tech.label}</span>
+          <p className="text-[12px]" style={{ color: C.gray4 }}>{tech.subtitle}</p>
+        </div>
+      </div>
+      <h3 className="font-black text-[22px] mb-3" style={{ color: C.black }}>{tech.title}</h3>
+      <p className="text-[14px] leading-relaxed mb-6" style={{ color: C.gray4 }}>{tech.desc}</p>
+      <div className="grid grid-cols-2 gap-2 mb-6">
+        {tech.specs.map(s => (
+          <div key={s} className="flex items-center gap-2 text-[13px] font-medium" style={{ color: C.black }}>
+            <span style={{ color: tech.accent }}>✓</span> {s}
+          </div>
+        ))}
+      </div>
+      <Link href={tech.href}
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold no-underline transition-all hover:-translate-y-0.5"
+        style={{ background: tech.accent, color: C.white }}>
+        {tech.cta} →
+      </Link>
+    </div>
+  )
+}
 function TechniquesSection() {
   const ref = useFadeIn()
   return (
@@ -469,37 +503,9 @@ function TechniquesSection() {
               cta: 'Commander en broderie',
               href: '/configurateur',
             },
-          ].map((tech, i) => {
-            const cardRef = useFadeIn(i * 100)
-            return (
-              <div key={tech.id} ref={cardRef} className="rounded-[28px] p-8 border hover:shadow-lg transition-all"
-                style={{ background: tech.bg, borderColor: 'rgba(0,0,0,0.06)' }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[22px] shadow-sm">
-                    {tech.emoji}
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: tech.accent }}>{tech.label}</span>
-                    <p className="text-[12px]" style={{ color: C.gray4 }}>{tech.subtitle}</p>
-                  </div>
-                </div>
-                <h3 className="font-black text-[22px] mb-3" style={{ color: C.black }}>{tech.title}</h3>
-                <p className="text-[14px] leading-relaxed mb-6" style={{ color: C.gray4 }}>{tech.desc}</p>
-                <div className="grid grid-cols-2 gap-2 mb-6">
-                  {tech.specs.map(s => (
-                    <div key={s} className="flex items-center gap-2 text-[13px] font-medium" style={{ color: C.black }}>
-                      <span style={{ color: tech.accent }}>✓</span> {s}
-                    </div>
-                  ))}
-                </div>
-                <Link href={tech.href}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold no-underline transition-all hover:-translate-y-0.5"
-                  style={{ background: tech.accent, color: C.white }}>
-                  {tech.cta} →
-                </Link>
-              </div>
-            )
-          })}
+          ].map((tech, i) => (
+            <TechCard key={tech.id} tech={tech} delay={i * 100} />
+          ))}
         </div>
       </div>
     </section>
@@ -535,6 +541,20 @@ function StatsSection() {
 /* ══════════════════════════════════════════════════════════════════════════════
    ENGAGEMENTS — Dark grid
 ══════════════════════════════════════════════════════════════════════════════ */
+function EngagementCard({ item, delay }: { item: { emoji: string; title: string; desc: string }; delay: number }) {
+  const ref = useFadeIn(delay)
+  return (
+    <div ref={ref} className="rounded-[20px] p-6 hover:bg-white/[0.07] transition-all"
+      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[20px] mb-4"
+        style={{ background: 'rgba(56,189,248,0.15)' }}>
+        {item.emoji}
+      </div>
+      <h3 className="font-bold text-[15px] text-white mb-2">{item.title}</h3>
+      <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
+    </div>
+  )
+}
 function EngagementsSection() {
   const ref = useFadeIn()
   const items = [
@@ -555,20 +575,9 @@ function EngagementsSection() {
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item, i) => {
-            const cardRef = useFadeIn(i * 60)
-            return (
-              <div key={item.title} ref={cardRef} className="rounded-[20px] p-6 hover:bg-white/[0.07] transition-all"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[20px] mb-4"
-                  style={{ background: 'rgba(56,189,248,0.15)' }}>
-                  {item.emoji}
-                </div>
-                <h3 className="font-bold text-[15px] text-white mb-2">{item.title}</h3>
-                <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
-              </div>
-            )
-          })}
+          {items.map((item, i) => (
+            <EngagementCard key={item.title} item={item} delay={i * 60} />
+          ))}
         </div>
       </div>
     </section>
@@ -578,6 +587,30 @@ function EngagementsSection() {
 /* ══════════════════════════════════════════════════════════════════════════════
    TÉMOIGNAGES
 ══════════════════════════════════════════════════════════════════════════════ */
+type Temoignage = { init: string; nom: string; role: string; co: string; note: number; texte: string }
+
+function TemoignageCard({ t, delay }: { t: Temoignage; delay: number }) {
+  const ref = useFadeIn(delay)
+  return (
+    <div ref={ref} className="rounded-[24px] p-7 border hover:shadow-md transition-all"
+      style={{ background: C.white, borderColor: C.gray2 }}>
+      <div className="flex gap-0.5 mb-4">
+        {[...Array(t.note)].map((_, j) => <span key={j} style={{ color: '#F59E0B' }}>★</span>)}
+      </div>
+      <p className="text-[15px] leading-relaxed mb-6" style={{ color: '#374151' }}>"{t.texte}"</p>
+      <div className="flex items-center gap-3 pt-5" style={{ borderTop: `1px solid ${C.gray2}` }}>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-black text-white flex-shrink-0"
+          style={{ background: `linear-gradient(135deg, ${C.blue}, #7C3AED)` }}>
+          {t.init}
+        </div>
+        <div>
+          <p className="font-bold text-[13px]" style={{ color: C.black }}>{t.nom}</p>
+          <p className="text-[12px]" style={{ color: C.gray3 }}>{t.role} · {t.co}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 const TEMOIGNAGES = [
   { init: 'K', nom: 'Karim B.', role: 'Gérant', co: 'Restaurant El Kef',    note: 5, texte: '80 polos brodés pour notre équipe. Rendu impeccable, délai respecté, suivi WhatsApp rassurant. On recommande sans hésiter.' },
   { init: 'S', nom: 'Samira M.', role: 'Directrice', co: 'Clinique Al Chifa', note: 5, texte: 'Blouses brodées pour toute notre équipe médicale. La qualité du tissu et la précision sur le logo sont vraiment au-dessus de nos attentes.' },
@@ -597,28 +630,9 @@ function TestimonialsSection() {
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {TEMOIGNAGES.map((t, i) => {
-            const cardRef = useFadeIn(i * 70)
-            return (
-              <div key={t.nom} ref={cardRef} className="rounded-[24px] p-7 border hover:shadow-md transition-all"
-                style={{ background: C.white, borderColor: C.gray2 }}>
-                <div className="flex gap-0.5 mb-4">
-                  {[...Array(t.note)].map((_, j) => <span key={j} style={{ color: '#F59E0B' }}>★</span>)}
-                </div>
-                <p className="text-[15px] leading-relaxed mb-6" style={{ color: '#374151' }}>"{t.texte}"</p>
-                <div className="flex items-center gap-3 pt-5" style={{ borderTop: `1px solid ${C.gray2}` }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-black text-white flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${C.blue}, #7C3AED)` }}>
-                    {t.init}
-                  </div>
-                  <div>
-                    <p className="font-bold text-[13px]" style={{ color: C.black }}>{t.nom}</p>
-                    <p className="text-[12px]" style={{ color: C.gray3 }}>{t.role} · {t.co}</p>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+          {TEMOIGNAGES.map((t, i) => (
+            <TemoignageCard key={t.nom} t={t} delay={i * 70} />
+          ))}
         </div>
       </div>
     </section>
