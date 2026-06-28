@@ -99,44 +99,38 @@ function Hero() {
 
           {/* ── Colonne texte ── */}
           <div ref={leftRef}>
-            <img src={LOGO} alt="Caractère" className="h-20 w-auto object-contain mb-5 mx-auto block lg:mx-0" />
+            <img src={LOGO} alt="Caractère" className="h-28 w-auto object-contain mb-5 mx-auto block lg:mx-0" />
 
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold border mb-4"
-              style={{ background: 'rgba(255,255,255,0.12)', color: '#BAE6FD', borderColor: 'rgba(255,255,255,0.25)' }}>
-              ✦ Impression textile premium · Alger
-            </span>
-
-            <h1 className="font-black leading-[1.05] tracking-tight mb-3"
-              style={{ fontSize: 'clamp(36px,5vw,60px)', color: '#FFFFFF', letterSpacing: '-0.025em' }}>
-              Votre logo.<br />
-              <span style={{ color: '#BAE6FD' }}>Nos machines.</span><br />
-              Votre marque.
+            <h1 className="font-black leading-[1.08] tracking-tight mb-3"
+              style={{ fontSize: 'clamp(30px,5vw,56px)', color: '#FFFFFF', letterSpacing: '-0.025em' }}>
+              Personnalisez vos vêtements.<br />
+              <span style={{ color: '#BAE6FD' }}>Développez votre marque.</span>
             </h1>
 
-            <p className="mb-5 max-w-md leading-relaxed" style={{ fontSize: '16px', color: 'rgba(255,255,255,0.75)' }}>
-              Broderie, DTF, uniformes B2B — dès 1 pièce. Devis gratuit sous 2h, production en 48h.
+            <p className="mb-5 max-w-md leading-relaxed" style={{ fontSize: '15px', color: 'rgba(255,255,255,0.72)' }}>
+              Print on Demand sans abonnement, vêtements personnalisés pour entreprises et particuliers. Production rapide à partir d'une seule pièce.
             </p>
 
             {/* CTAs principaux */}
-            <div className="flex flex-wrap gap-2.5 mb-5">
+            <div className="flex flex-col sm:flex-row gap-2.5 mb-5">
               <Link href="/configurateur"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all hover:-translate-y-0.5"
                 style={{ background: '#FFFFFF', color: C.blue, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}>
                 Configurer ma commande →
               </Link>
-              <Link href="/designer"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all border-2 hover:-translate-y-0.5"
+              <Link href="/produits"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all border-2 hover:-translate-y-0.5"
                 style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.08)' }}>
-                Open Designer ✏️
+                Découvrir nos services
               </Link>
             </div>
 
-            {/* 3 cards service — style Tapstitch */}
+            {/* 3 cards service */}
             <div className="flex flex-col gap-2">
               {[
-                { emoji: '🖨️', title: 'Print on Demand', desc: 'Lancez votre marque sans stock.', href: '/designer' },
-                { emoji: '🏢', title: 'Entreprises & B2B', desc: 'Uniformes sur-mesure pour votre équipe.', href: '/configurateur' },
-                { emoji: '👕', title: 'Collection Caractère', desc: 'Pièces premium prêtes à porter.', href: '/collection' },
+                { emoji: '🚀', title: 'Print on Demand', desc: 'Sans abonnement. Sans stock.', href: '/designer' },
+                { emoji: '🏢', title: 'Entreprises', desc: 'Uniformes & vêtements personnalisés.', href: '/configurateur' },
+                { emoji: '👕', title: 'Particuliers', desc: 'Créez votre vêtement unique.', href: '/configurateur' },
               ].map(card => (
                 <Link key={card.title} href={card.href}
                   className="group flex items-center justify-between px-4 py-3 rounded-2xl border no-underline hover:shadow-md hover:-translate-y-0.5 transition-all"
@@ -230,16 +224,15 @@ function Hero() {
         </div>
 
         {/* Stats rapides */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-[800px]">
+        <div className="mt-10 grid grid-cols-3 gap-6 max-w-[680px]">
           {[
-            { v: '50 000+', l: 'Pièces produites' },
-            { v: '1 pièce', l: 'Minimum de commande' },
-            { v: '48h', l: 'Délai de production' },
-            { v: '297K', l: 'Abonnés Instagram' },
+            { v: '50 000+', l: 'Articles personnalisés' },
+            { v: '1 pièce', l: 'Commande minimum' },
+            { v: 'Production\nrapide', l: 'Partout en Algérie' },
           ].map(s => (
             <div key={s.l}>
-              <p className="text-[28px] font-black text-white tracking-tight leading-none">{s.v}</p>
-              <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.l}</p>
+              <p className="text-[22px] font-black text-white tracking-tight leading-tight whitespace-pre-line">{s.v}</p>
+              <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.l}</p>
             </div>
           ))}
         </div>
