@@ -94,31 +94,31 @@ function Hero() {
       {/* Halo */}
       <div className="absolute pointer-events-none" style={{ top: -200, right: -200, width: 700, height: 700, background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, transparent 70%)' }} />
 
-      <div className="relative max-w-[1200px] mx-auto px-6 lg:px-10 py-16 lg:py-24">
+      <div className="relative max-w-[1200px] mx-auto px-6 lg:px-10 py-8 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
           {/* ── Colonne texte ── */}
           <div ref={leftRef}>
-            <img src={LOGO} alt="Caractère" className="h-14 w-auto object-contain mb-8" />
+            <img src={LOGO} alt="Caractère" className="h-20 w-auto object-contain mb-5 mx-auto block lg:mx-0" />
 
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold border mb-6"
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold border mb-4"
               style={{ background: 'rgba(255,255,255,0.12)', color: '#BAE6FD', borderColor: 'rgba(255,255,255,0.25)' }}>
               ✦ Impression textile premium · Alger
             </span>
 
-            <h1 className="font-black leading-[1.05] tracking-tight mb-5"
+            <h1 className="font-black leading-[1.05] tracking-tight mb-3"
               style={{ fontSize: 'clamp(36px,5vw,60px)', color: '#FFFFFF', letterSpacing: '-0.025em' }}>
               Votre logo.<br />
               <span style={{ color: '#BAE6FD' }}>Nos machines.</span><br />
               Votre marque.
             </h1>
 
-            <p className="mb-8 max-w-md leading-relaxed" style={{ fontSize: '17px', color: 'rgba(255,255,255,0.75)' }}>
+            <p className="mb-5 max-w-md leading-relaxed" style={{ fontSize: '16px', color: 'rgba(255,255,255,0.75)' }}>
               Broderie, DTF, uniformes B2B — dès 1 pièce. Devis gratuit sous 2h, production en 48h.
             </p>
 
             {/* CTAs principaux */}
-            <div className="flex flex-wrap gap-3 mb-10">
+            <div className="flex flex-wrap gap-2.5 mb-5">
               <Link href="/configurateur"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all hover:-translate-y-0.5"
                 style={{ background: '#FFFFFF', color: C.blue, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}>
@@ -139,13 +139,13 @@ function Hero() {
                 { emoji: '👕', title: 'Collection Caractère', desc: 'Pièces premium prêtes à porter.', href: '/collection' },
               ].map(card => (
                 <Link key={card.title} href={card.href}
-                  className="group flex items-center justify-between px-5 py-3.5 rounded-2xl border no-underline hover:shadow-md hover:-translate-y-0.5 transition-all"
+                  className="group flex items-center justify-between px-4 py-3 rounded-2xl border no-underline hover:shadow-md hover:-translate-y-0.5 transition-all"
                   style={{ background: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)' }}>
                   <div className="flex items-center gap-3">
-                    <span className="text-[20px]">{card.emoji}</span>
+                    <span className="text-[18px]">{card.emoji}</span>
                     <div>
                       <p className="text-[13px] font-bold text-white leading-tight">{card.title}</p>
-                      <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{card.desc}</p>
+                      <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{card.desc}</p>
                     </div>
                   </div>
                   <span className="text-[12px] font-bold flex-shrink-0 ml-3" style={{ color: '#BAE6FD' }}>→</span>
