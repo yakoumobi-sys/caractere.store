@@ -3,12 +3,14 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
 const C = {
-  blue:    '#2563EB',
-  black:   '#0A0A0A',
-  gray1:   '#F7F7F7',
-  gray2:   '#E5E5E5',
-  gray3:   '#9CA3AF',
-  gray4:   '#6B7280',
+  blue:    '#0C4A6E',   // bleu foncé principal
+  blueMid: '#1E6FA8',   // bleu milieu
+  blueAcc: '#38BDF8',   // bleu accent clair
+  black:   '#0C1A26',   // quasi-noir bleuté
+  gray1:   '#F0F7FF',   // fond très léger bleuté
+  gray2:   '#BAE6FD',   // bordure légère
+  gray3:   '#7DD3FC',   // texte léger
+  gray4:   '#1E3A5F',   // texte secondaire foncé
   white:   '#FFFFFF',
   green:   '#16A34A',
   greenLt: '#DCFCE7',
@@ -34,7 +36,7 @@ function useFadeIn(delay = 0) {
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-[12px] font-bold tracking-[0.15em] uppercase mb-4" style={{ color: C.blue }}>{children}</p>
+  return <p className="text-[12px] font-bold tracking-[0.15em] uppercase mb-4" style={{ color: '#1E6FA8' }}>{children}</p>
 }
 
 function FloatingCard({ children, className = '', style = {} }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
@@ -65,12 +67,12 @@ function Hero() {
   const LOGO = "https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png"
 
   return (
-    <section className="relative overflow-hidden" style={{ background: C.white, minHeight: '100vh', paddingTop: '80px' }}>
+    <section className="relative overflow-hidden" style={{ background: 'linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)', minHeight: '100vh', paddingTop: '80px' }}>
       <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: `linear-gradient(${C.gray2} 1px, transparent 1px), linear-gradient(90deg, ${C.gray2} 1px, transparent 1px)`,
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)`,
         backgroundSize: '60px 60px', opacity: 0.28,
       }} />
-      <div className="absolute pointer-events-none" style={{ top: '-200px', right: '-200px', width: '700px', height: '700px', background: `radial-gradient(circle, ${C.blue}12 0%, transparent 70%)` }} />
+      <div className="absolute pointer-events-none" style={{ top: '-200px', right: '-200px', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(56,189,248,0.3) 0%, transparent 70%)' }} />
 
       <div className="relative max-w-[1200px] mx-auto px-6 lg:px-10 py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -78,11 +80,11 @@ function Hero() {
             {/* Logo */}
             <img src={LOGO} alt="Caractère" className="h-16 w-auto object-contain mb-8" />
 
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-semibold border mb-8" style={{ background: C.blueLt, color: C.blue, borderColor: `${C.blue}30` }}>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-semibold border mb-8" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)' }}>
               Fabrication textile premium en Algérie
             </span>
 
-            <h1 className="font-black leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(38px,5vw,64px)', color: C.black, letterSpacing: '-0.02em' }}>
+            <h1 className="font-black leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(38px,5vw,64px)', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
               Le textile premium<br /><span style={{ color: C.blue }}>pour votre marque.</span>
             </h1>
             <p className="mt-6 leading-relaxed max-w-lg" style={{ fontSize: '18px', color: C.gray4 }}>
@@ -91,12 +93,12 @@ function Hero() {
             <div className="mt-10 flex flex-wrap gap-3">
               <Link href="/configurateur"
                 className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-[16px] font-bold text-white no-underline hover:opacity-90 hover:-translate-y-0.5 transition-all"
-                style={{ background: C.blue, boxShadow: `0 8px 24px ${C.blue}40` }}>
+                style={{ background: '#FFFFFF', color: '#0C4A6E', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
                 Configurer ma commande →
               </Link>
               <Link href="/designer"
                 className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-[16px] font-bold no-underline hover:-translate-y-0.5 transition-all border-2"
-                style={{ color: C.black, borderColor: C.gray2, background: C.white }}>
+                style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.1)' }}>
                 Lancer ma marque
               </Link>
             </div>
@@ -108,12 +110,12 @@ function Hero() {
               ].map(card => (
                 <Link key={card.title} href={card.href}
                   className="group flex flex-col justify-between p-4 rounded-2xl border no-underline hover:shadow-lg hover:-translate-y-1 transition-all"
-                  style={{ background: C.white, borderColor: C.gray2 }}>
+                  style={{ background: 'rgba(255,255,255,0.12)', borderColor: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(12px)' }}>
                   <div>
-                    <p className="text-[13px] font-bold leading-tight mb-1" style={{ color: C.black }}>{card.title}</p>
-                    <p className="text-[11px] leading-relaxed" style={{ color: C.gray4 }}>{card.desc}</p>
+                    <p className="text-[13px] font-bold leading-tight mb-1" style={{ color: '#FFFFFF' }}>{card.title}</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{card.desc}</p>
                   </div>
-                  <span className="mt-3 text-[12px] font-bold" style={{ color: C.blue }}>{card.cta} →</span>
+                  <span className="mt-3 text-[12px] font-bold" style={{ color: '#BAE6FD' }}>{card.cta} →</span>
                 </Link>
               ))}
             </div>
@@ -232,18 +234,18 @@ function WhyCard({ badge, title, desc, href, cta, accent, bg, delay }: {
 function WhySection() {
   const ref = useFadeIn()
   return (
-    <section style={{ background: C.white, padding: '100px 0' }}>
+    <section style={{ background: '#F0F7FF', padding: '80px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref}>
           <SectionLabel>Pourquoi Caractère ?</SectionLabel>
-          <h2 className="font-black tracking-tight mb-14" style={{ fontSize: 'clamp(30px,4vw,48px)', color: C.black, letterSpacing: '-0.02em', maxWidth: '600px' }}>
+          <h2 className="font-black tracking-tight mb-14" style={{ fontSize: 'clamp(28px,4vw,44px)', color: '#0C4A6E', letterSpacing: '-0.02em', maxWidth: '600px' }}>
             Tout ce dont vous avez besoin,<br />au même endroit.
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <WhyCard badge="Print on Demand" title={"Vous vendez.\nNous fabriquons."} desc="Créez votre boutique, uploadez vos designs. Zéro stock, zéro risque." href="/designer" cta="Lancer ma marque" accent={C.blue} bg={C.blueLt} delay={0} />
-          <WhyCard badge="Entreprise" title={"Configurez en\nquelques minutes."} desc="Uniformes, tenues d'équipe, goodies corporate. Devis instantané." href="/configurateur" cta="Configurer ma commande" accent={C.black} bg={C.gray1} delay={80} />
-          <WhyCard badge="Collection" title={"Des pièces premium\nprêtes à porter."} desc="T-shirts 250GSM, hoodies, casquettes. Éditions limitées fabriquées en Algérie." href="/collection" cta="Voir la collection" accent={C.blue} bg="#F0F4FF" delay={160} />
+          <WhyCard badge="Print on Demand" title={"Vous vendez.\nNous fabriquons."} desc="Créez votre boutique, uploadez vos designs. Zéro stock, zéro risque." href="/designer" cta="Lancer ma marque" accent='#0C4A6E' bg='#EFF6FF' delay={0} />
+          <WhyCard badge="Entreprise" title={"Configurez en\nquelques minutes."} desc="Uniformes, tenues d'équipe, goodies corporate. Devis instantané." href="/configurateur" cta="Configurer ma commande" accent='#0C4A6E' bg='#F0F7FF' delay={80} />
+          <WhyCard badge="Collection" title={"Des pièces premium\nprêtes à porter."} desc="T-shirts 250GSM, hoodies, casquettes. Éditions limitées fabriquées en Algérie." href="/collection" cta="Voir la collection" accent='#1E6FA8' bg='#E0F2FE' delay={160} />
         </div>
       </div>
     </section>
@@ -269,7 +271,7 @@ function HowStep({ n, label, title, desc, delay, isMiddle }: { n: number; label:
 function HowItWorksSection() {
   const ref = useFadeIn()
   return (
-    <section style={{ background: C.gray1, padding: '100px 0' }}>
+    <section style={{ background: '#FFFFFF', padding: '80px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="text-center mb-16">
           <SectionLabel>Comment ça fonctionne</SectionLabel>
@@ -322,7 +324,7 @@ function ProduitCard({ id, nom, badge, prix, tag, img, delay }: {
             <p className="text-[11px]" style={{ color: C.gray3 }}>DA / pièce</p>
           </div>
         </div>
-        <Link href={`/designer?product=${id}`} className="mt-4 w-full flex items-center justify-center py-2.5 rounded-xl text-[13px] font-bold no-underline transition-all" style={{ background: C.gray1, color: C.black }}>
+        <Link href={`/designer?product=${id}`} className="mt-4 w-full flex items-center justify-center py-2.5 rounded-xl text-[13px] font-bold no-underline transition-all" style={{ background: '#EFF6FF', color: '#0C4A6E' }}>
           Personnaliser →
         </Link>
       </div>
@@ -333,7 +335,7 @@ function ProduitCard({ id, nom, badge, prix, tag, img, delay }: {
 function ProduitsSection() {
   const ref = useFadeIn()
   return (
-    <section style={{ background: C.white, padding: '100px 0' }}>
+    <section style={{ background: '#F0F7FF', padding: '80px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="flex items-end justify-between mb-12 flex-wrap gap-4">
           <div>
@@ -374,7 +376,7 @@ function FeaturesSection() {
     { label: 'Qualité', title: 'Contrôle qualité', desc: 'Chaque pièce vérifiée. Non-conforme = reprise gratuite.' },
   ]
   return (
-    <section style={{ background: C.black, padding: '100px 0' }}>
+    <section style={{ background: '#0C1A26', padding: '80px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="text-center mb-16">
           <SectionLabel>Nos engagements</SectionLabel>
@@ -401,7 +403,7 @@ function StatsSection() {
             { value: '4.9★', label: 'Avis clients' },
           ].map(s => (
             <div key={s.label}>
-              <p className="font-black tracking-tight" style={{ fontSize: 'clamp(36px,5vw,56px)', color: C.blue, letterSpacing: '-0.03em' }}>{s.value}</p>
+              <p className="font-black tracking-tight" style={{ fontSize: 'clamp(36px,5vw,56px)', color: '#0C4A6E', letterSpacing: '-0.03em' }}>{s.value}</p>
               <p className="mt-2 text-[14px]" style={{ color: C.gray4 }}>{s.label}</p>
             </div>
           ))}
@@ -431,7 +433,7 @@ function TestimonialCard({ init, name, role, company, text, delay }: { init: str
 function TestimonialsSection() {
   const ref = useFadeIn()
   return (
-    <section style={{ background: C.gray1, padding: '100px 0' }}>
+    <section style={{ background: '#FFFFFF', padding: '80px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="text-center mb-14">
           <SectionLabel>Témoignages</SectionLabel>
@@ -451,7 +453,7 @@ function TestimonialsSection() {
 function CtaSection() {
   const ref = useFadeIn()
   return (
-    <section style={{ background: C.white, padding: '100px 0' }}>
+    <section style={{ background: '#F0F7FF', padding: '80px 0' }}>
       <div className="max-w-[900px] mx-auto px-6 lg:px-10 text-center">
         <div ref={ref} className="rounded-[32px] p-12 md:p-16" style={{ background: `linear-gradient(135deg, ${C.black} 0%, #1a1a2e 100%)` }}>
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-semibold border mb-6" style={{ background: '#EFF6FF20', color: '#93C5FD', borderColor: '#93C5FD30' }}>Démarrez aujourd'hui</span>
@@ -460,7 +462,7 @@ function CtaSection() {
           </h2>
           <p className="mt-4 text-[16px] mb-10" style={{ color: 'rgba(255,255,255,0.6)' }}>Devis gratuit · Réponse en 2h · Livraison nationale</p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/configurateur" className="px-8 py-4 rounded-full text-[16px] font-bold text-white no-underline hover:-translate-y-0.5 transition-all" style={{ background: C.blue, boxShadow: `0 8px 24px ${C.blue}50` }}>
+            <Link href="/configurateur" className="px-8 py-4 rounded-full text-[16px] font-bold text-white no-underline hover:-translate-y-0.5 transition-all" style={{ background: '#0C4A6E', boxShadow: '0 8px 24px rgba(12,74,110,0.5)' }}>
               Configurer ma commande →
             </Link>
             <a href="https://wa.me/213557440522" target="_blank" rel="noopener noreferrer" className="px-8 py-4 rounded-full text-[16px] font-bold no-underline border-2" style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'white', background: 'rgba(255,255,255,0.08)' }}>
@@ -475,7 +477,7 @@ function CtaSection() {
 
 function Footer() {
   return (
-    <footer style={{ background: C.black, padding: '60px 0 40px' }}>
+    <footer style={{ background: '#0C1A26', padding: '60px 0 40px' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
