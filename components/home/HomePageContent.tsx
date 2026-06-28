@@ -78,14 +78,14 @@ function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div ref={heroRef}>
             {/* Logo */}
-            <img src={LOGO} alt="Caractère" className="h-16 w-auto object-contain mb-8" />
+            <img src={LOGO} alt="Caractère" className="h-28 w-auto object-contain mb-8 mx-auto block" />
 
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-semibold border mb-8" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)' }}>
               Fabrication textile premium en Algérie
             </span>
 
-            <h1 className="font-black leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(38px,5vw,64px)', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-              Le textile premium<br /><span style={{ color: C.blue }}>pour votre marque.</span>
+            <h1 className="font-black leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(38px,5vw,64px)', color: '#FFFFFF', letterSpacing: '-0.02em', textShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+              Le textile premium<br /><span style={{ color: '#BAE6FD' }}>pour votre marque.</span>
             </h1>
             <p className="mt-6 leading-relaxed max-w-lg" style={{ fontSize: '18px', color: C.gray4 }}>
               Une seule plateforme pour lancer votre marque en Print on Demand, commander des vêtements personnalisés ou acheter la collection Caractère.
@@ -102,20 +102,20 @@ function Hero() {
                 Lancer ma marque
               </Link>
             </div>
-            <div className="mt-10 grid grid-cols-3 gap-3">
+            <div className="mt-10 flex flex-col gap-3">
               {[
-                { title: 'Print on Demand', desc: 'Sans stock.', href: '/designer', cta: 'Commencer' },
-                { title: 'Entreprises', desc: 'Uniformes équipe.', href: '/configurateur', cta: 'Configurer' },
-                { title: 'Collection', desc: 'Pièces premium.', href: '/collection', cta: 'Voir' },
+                { title: '🚀 Print on Demand', desc: 'Lancez votre marque sans stock. Vendez, nous produisons.', href: '/designer', cta: 'Commencer' },
+                { title: '🏢 Entreprises', desc: 'Uniformes et vêtements personnalisés pour votre équipe.', href: '/configurateur', cta: 'Configurer ma commande' },
+                { title: '👕 Collection', desc: 'Découvrez notre collection premium prête à porter.', href: '/collection', cta: 'Voir la collection' },
               ].map(card => (
                 <Link key={card.title} href={card.href}
-                  className="group flex flex-col justify-between p-4 rounded-2xl border no-underline hover:shadow-lg hover:-translate-y-1 transition-all"
-                  style={{ background: 'rgba(255,255,255,0.12)', borderColor: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(12px)' }}>
-                  <div>
-                    <p className="text-[13px] font-bold leading-tight mb-1" style={{ color: '#FFFFFF' }}>{card.title}</p>
-                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{card.desc}</p>
+                  className="group flex items-center justify-between p-5 rounded-2xl border no-underline hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                  style={{ background: 'rgba(255,255,255,0.12)', borderColor: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(16px)' }}>
+                  <div className="flex-1">
+                    <p className="text-[15px] font-bold mb-1" style={{ color: '#FFFFFF' }}>{card.title}</p>
+                    <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.80)' }}>{card.desc}</p>
                   </div>
-                  <span className="mt-3 text-[12px] font-bold" style={{ color: '#BAE6FD' }}>{card.cta} →</span>
+                  <span className="ml-4 text-[13px] font-bold flex-shrink-0" style={{ color: '#BAE6FD' }}>{card.cta} →</span>
                 </Link>
               ))}
             </div>
