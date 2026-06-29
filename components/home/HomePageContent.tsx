@@ -146,6 +146,13 @@ function Hero() {
                 </Link>
               ))}
             </div>
+
+            {/* Bouton Comment ca marche */}
+            <Link href="/comment-ca-marche"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[13px] font-bold no-underline transition-all mt-1 border"
+              style={{ color: '#BAE6FD', borderColor: 'rgba(186,230,253,0.3)', background: 'rgba(186,230,253,0.08)' }}>
+              <span>🚀</span> Comment ça marche ? <span style={{ color: '#BAE6FD' }}>→</span>
+            </Link>
           </div>
 
           {/* ── Colonne visuelle ── */}
