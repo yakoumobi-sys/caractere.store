@@ -6,14 +6,15 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 const links = [
-  { href: '/#services',  label: 'Services'  },
-  { href: '/produits',   label: 'Produits'  },
-  { href: '/#secteurs',  label: 'Secteurs'  },
-  { href: '/#avis',      label: 'Avis'      },
-  { href: '/#contact',   label: 'Contact'   },
-  { href: '/designer',   label: 'Designer'  },
-  { href: '/collection', label: 'Collection'},
-  { href: '/catalogue',  label: 'Catalogue' },
+  { href: '/comment-ca-marche', label: 'Comment ça marche 🚀' },
+  { href: '/#services',         label: 'Services'              },
+  { href: '/produits',          label: 'Produits'              },
+  { href: '/#secteurs',         label: 'Secteurs'              },
+  { href: '/#avis',             label: 'Avis'                  },
+  { href: '/#contact',          label: 'Contact'               },
+  { href: '/designer',          label: 'Designer'              },
+  { href: '/collection',        label: 'Collection'            },
+  { href: '/catalogue',         label: 'Catalogue'             },
 ]
 
 export default function Navbar() {
@@ -78,7 +79,7 @@ export default function Navbar() {
               Mon compte
             </Link>
             <button onClick={() => { handleLogout(); setOpen(false) }} className="text-[16px] text-brand-gray underline bg-transparent border-none cursor-pointer">
-              Deconnexion
+              Déconnexion
             </button>
           </>
         ) : (
@@ -87,7 +88,15 @@ export default function Navbar() {
           </Link>
         )}
 
-        <Link href="/configurateur" className="bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium no-underline" onClick={() => setOpen(false)}>
+        <Link
+          href="/comment-ca-marche"
+          className="bg-[#0C4A6E] text-white px-7 py-3.5 rounded-full text-[15px] font-bold no-underline text-center"
+          onClick={() => setOpen(false)}
+        >
+          Comment ça marche 🚀
+        </Link>
+
+        <Link href="/configurateur" className="bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium no-underline text-center" onClick={() => setOpen(false)}>
           Configurer ma commande
         </Link>
       </div>
