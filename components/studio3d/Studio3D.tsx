@@ -24,7 +24,8 @@ import * as THREE from "three";
 // Config
 // ─────────────────────────────────────────────
 
-const MODEL_PATH = "/models/shirt_baked.glb";
+const MODEL_CLASSIC = "/models/shirt_baked.glb";
+const MODEL_WALK = "/models/shirt_walk.glb";
 const WHATSAPP = "213557440522";
 const MAX_RECORD_SECONDS = 30;
 
@@ -65,20 +66,29 @@ const BG_PRESETS: BgPreset[] = [
   },
 ];
 
-type AnimationMode = "aucune" | "rotation" | "flottement" | "formation";
+type ModelId = "classique" | "mouvement";
+type AnimationMode =
+  | "aucune"
+  | "rotation"
+  | "flottement"
+  | "marche"
+  | "formation";
 
 const ANIMATIONS: { id: AnimationMode; label: string }[] = [
   { id: "aucune", label: "Aucune" },
   { id: "rotation", label: "Rotation 360°" },
   { id: "flottement", label: "Flottement" },
+  { id: "marche", label: "Marche" },
   { id: "formation", label: "Formation fil par fil" },
 ];
 
-// Limites verticales du t-shirt (une fois centré) pour l'effet formation
-const SHIRT_MIN_Y = -0.42;
-const SHIRT_MAX_Y = 0.46;
-const FORMATION_DURATION = 4.5; // secondes pour se tisser
-const FORMATION_HOLD = 2.0; // secondes t-shirt complet avant de reboucler
+// Limites verticales par modèle (pour l'effet formation)
+const CLIP_BOUNDS: Record<ModelId, [number, number]> = {
+  classique: [-0.42, 0.46],
+  mouvement: [-0.45, 0.45],
+};
+const FORMATION_DURATION = 4.5;
+const FORMATION_HOLD = 2.0;
 
 // ─────────────────────────────────────────────
 // Utilitaires texture
@@ -120,27 +130,32 @@ function SceneBackground({ bg }: { bg: BgState }) {
 }
 
 // ─────────────────────────────────────────────
-// 3D — T-shirt avec logo (Decal) + clipping
+// 3D — T-shirts
 // ─────────────────────────────────────────────
 
-type ShirtProps = {
+type ShirtInput = {
   color: string;
   logoTexture: THREE.Texture | null;
   logoScale: number;
   logoY: number;
+  logoBack: boolean;
+};
+
+type ShirtProps = ShirtInput & {
   clipPlane: THREE.Plane;
   clipActive: boolean;
 };
 
-function Shirt({
+function ShirtClassic({
   color,
   logoTexture,
   logoScale,
   logoY,
+  logoBack,
   clipPlane,
   clipActive,
 }: ShirtProps) {
-  const { nodes, materials } = useGLTF(MODEL_PATH) as any;
+  const { nodes, materials } = useGLTF(MODEL_CLASSIC) as any;
   const targetColor = useRef(new THREE.Color(color));
 
   useEffect(() => {
@@ -155,17 +170,80 @@ function Shirt({
   });
 
   return (
-    <mesh
-      castShadow
-      geometry={nodes.T_Shirt_male.geometry}
-      material={materials.lambert1}
-      material-roughness={1}
-      dispose={null}
-    >
+    <Center>
+      <mesh
+        castShadow
+        geometry={nodes.T_Shirt_male.geometry}
+        material={materials.lambert1}
+        material-roughness={1}
+        dispose={null}
+      >
+        {logoTexture && (
+          <Decal
+            position={[0, logoY, logoBack ? -0.15 : 0.15]}
+            rotation={[0, logoBack ? Math.PI : 0, 0]}
+            scale={logoScale}
+          >
+            <meshStandardMaterial
+              map={logoTexture}
+              transparent
+              polygonOffset
+              polygonOffsetFactor={-10}
+              clippingPlanes={clipActive ? [clipPlane] : null}
+            />
+          </Decal>
+        )}
+      </mesh>
+    </Center>
+  );
+}
+
+function ShirtWalk({
+  color,
+  logoTexture,
+  logoScale,
+  logoY,
+  logoBack,
+  clipPlane,
+  clipActive,
+}: ShirtProps) {
+  const { nodes, materials } = useGLTF(MODEL_WALK) as any;
+  const targetColor = useRef(new THREE.Color(color));
+
+  const geometry = useMemo(() => {
+    const candidates = ["Object_4", "Object_0"];
+    for (const n of candidates) {
+      if (nodes[n]?.geometry) return nodes[n].geometry;
+    }
+    for (const key of Object.keys(nodes)) {
+      if (nodes[key]?.geometry) return nodes[key].geometry;
+    }
+    return null;
+  }, [nodes]);
+
+  const material: any = materials.Fabirc ?? Object.values(materials)[0];
+
+  useEffect(() => {
+    if (!material) return;
+    material.clippingPlanes = clipActive ? [clipPlane] : null;
+    material.clipShadows = true;
+    material.needsUpdate = true;
+  }, [clipActive, clipPlane, material]);
+
+  useFrame(() => {
+    if (!material) return;
+    targetColor.current.set(color);
+    material.color.lerp(targetColor.current, 0.25);
+  });
+
+  if (!geometry || !material) return null;
+
+  return (
+    <mesh castShadow geometry={geometry} material={material} dispose={null}>
       {logoTexture && (
         <Decal
-          position={[0, logoY, 0.15]}
-          rotation={[0, 0, 0]}
+          position={[0, logoY, logoBack ? -0.17 : 0.17]}
+          rotation={[0, logoBack ? Math.PI : 0, 0]}
           scale={logoScale}
         >
           <meshStandardMaterial
@@ -181,27 +259,26 @@ function Shirt({
   );
 }
 
-useGLTF.preload(MODEL_PATH);
+useGLTF.preload(MODEL_CLASSIC);
+useGLTF.preload(MODEL_WALK);
 
 // ─────────────────────────────────────────────
 // 3D — Scène animée
 // ─────────────────────────────────────────────
 
-type SceneProps = {
-  color: string;
-  logoTexture: THREE.Texture | null;
-  logoScale: number;
-  logoY: number;
+type SceneProps = ShirtInput & {
   bg: BgState;
   animation: AnimationMode;
+  model: ModelId;
 };
 
-function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: SceneProps) {
+function Scene({ bg, animation, model, ...shirtInput }: SceneProps) {
   const group = useRef<THREE.Group>(null);
   const threadLine = useRef<THREE.Mesh>(null);
+  const [minY, maxY] = CLIP_BOUNDS[model];
   const clipPlane = useMemo(
-    () => new THREE.Plane(new THREE.Vector3(0, -1, 0), SHIRT_MAX_Y + 0.1),
-    []
+    () => new THREE.Plane(new THREE.Vector3(0, -1, 0), maxY + 0.1),
+    [maxY]
   );
   const formation = animation === "formation";
 
@@ -210,11 +287,13 @@ function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: ScenePro
     const g = group.current;
     if (!g) return;
 
-    // Reset doux
-    if (animation !== "rotation") g.rotation.y *= 0.95;
-    if (animation !== "flottement") {
+    // Retour doux à la position neutre
+    if (animation !== "rotation" && animation !== "formation")
+      g.rotation.y *= 0.95;
+    if (animation !== "flottement" && animation !== "marche") {
       g.position.y *= 0.9;
       g.rotation.z *= 0.9;
+      g.rotation.x *= 0.9;
     }
 
     if (animation === "rotation") {
@@ -227,17 +306,23 @@ function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: ScenePro
       g.rotation.y = Math.sin(t * 0.6) * 0.25;
     }
 
+    if (animation === "marche") {
+      // Cadence de marche : rebond à chaque pas + balancement des épaules
+      const step = t * 3.4;
+      g.position.y = Math.abs(Math.sin(step)) * 0.032;
+      g.rotation.z = Math.sin(step) * 0.05;
+      g.rotation.x = 0.03 + Math.sin(step * 2) * 0.012;
+      g.rotation.y = Math.sin(t * 0.8) * 0.18;
+    }
+
     if (formation) {
       const cycle = FORMATION_DURATION + FORMATION_HOLD;
       const local = t % cycle;
       const progress = Math.min(local / FORMATION_DURATION, 1);
-      // easing douce
       const eased = 1 - Math.pow(1 - progress, 2.2);
-      const y = SHIRT_MIN_Y + eased * (SHIRT_MAX_Y - SHIRT_MIN_Y);
+      const y = minY + eased * (maxY - minY);
       clipPlane.constant = y;
-      // rotation lente pendant le tissage
       g.rotation.y += 0.006;
-      // ligne dorée de "tissage"
       if (threadLine.current) {
         threadLine.current.visible = progress < 1;
         threadLine.current.position.y = y;
@@ -245,7 +330,7 @@ function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: ScenePro
         mat.opacity = progress < 1 ? 0.9 : 0;
       }
     } else {
-      clipPlane.constant = SHIRT_MAX_Y + 0.1;
+      clipPlane.constant = maxY + 0.1;
       if (threadLine.current) threadLine.current.visible = false;
     }
   });
@@ -256,19 +341,21 @@ function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: ScenePro
       <ambientLight intensity={0.4} />
       <Environment preset="city" />
       <group ref={group}>
-        <Center>
-          <Shirt
-            color={color}
-            logoTexture={logoTexture}
-            logoScale={logoScale}
-            logoY={logoY}
+        {model === "classique" ? (
+          <ShirtClassic
+            {...shirtInput}
             clipPlane={clipPlane}
             clipActive={formation}
           />
-        </Center>
-        {/* Ligne dorée de tissage (formation fil par fil) */}
+        ) : (
+          <ShirtWalk
+            {...shirtInput}
+            clipPlane={clipPlane}
+            clipActive={formation}
+          />
+        )}
         <mesh ref={threadLine} visible={false}>
-          <boxGeometry args={[0.95, 0.006, 0.4]} />
+          <boxGeometry args={[0.95, 0.006, 0.5]} />
           <meshBasicMaterial
             color="#d4a94e"
             transparent
@@ -278,7 +365,7 @@ function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: ScenePro
         </mesh>
       </group>
       <ContactShadows
-        position={[0, -0.5, 0]}
+        position={[0, -0.52, 0]}
         opacity={0.55}
         scale={2.5}
         blur={2.2}
@@ -300,11 +387,13 @@ function Scene({ color, logoTexture, logoScale, logoY, bg, animation }: ScenePro
 // ─────────────────────────────────────────────
 
 export default function Studio3D() {
+  const [model, setModel] = useState<ModelId>("classique");
   const [color, setColor] = useState(COLORS[1].hex);
   const [logoTexture, setLogoTexture] = useState<THREE.Texture | null>(null);
   const [logoName, setLogoName] = useState<string | null>(null);
   const [logoScale, setLogoScale] = useState(0.14);
   const [logoY, setLogoY] = useState(0.04);
+  const [logoBack, setLogoBack] = useState(false);
   const [bg, setBg] = useState<BgState>({ type: "color", value: "#0b0b0d" });
   const [bgSelected, setBgSelected] = useState("Studio sombre");
   const [animation, setAnimation] = useState<AnimationMode>("rotation");
@@ -317,6 +406,12 @@ export default function Studio3D() {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Sélection d'animation (Marche bascule sur le modèle en mouvement)
+  const selectAnimation = useCallback((a: AnimationMode) => {
+    setAnimation(a);
+    if (a === "marche") setModel("mouvement");
+  }, []);
 
   // ── Upload logo
   const handleLogoUpload = useCallback(
@@ -391,8 +486,9 @@ export default function Studio3D() {
       "video/webm;codecs=vp9",
       "video/webm",
     ];
-    const mimeType = candidates.find((m) =>
-      typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m)
+    const mimeType = candidates.find(
+      (m) =>
+        typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m)
     );
     if (!mimeType) {
       alert("L'enregistrement vidéo n'est pas supporté par ce navigateur.");
@@ -483,17 +579,18 @@ export default function Studio3D() {
           >
             <Suspense fallback={null}>
               <Scene
+                model={model}
                 color={color}
                 logoTexture={logoTexture}
                 logoScale={logoScale}
                 logoY={logoY}
+                logoBack={logoBack}
                 bg={bg}
                 animation={animation}
               />
             </Suspense>
           </Canvas>
 
-          {/* Badge enregistrement */}
           {recording && (
             <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-black/70 px-3 py-1.5 backdrop-blur">
               <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" />
@@ -515,8 +612,37 @@ export default function Studio3D() {
 
         {/* Panneau de contrôle */}
         <aside className="w-full border-t border-[#1e1e22] bg-[#101013] p-5 lg:w-[340px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:[height:calc(100vh-73px)]">
-          {/* Couleur */}
+          {/* Modèle */}
           <section>
+            <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
+              Modèle
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setModel("classique")}
+                className={`rounded-lg border px-3 py-2 text-xs transition ${
+                  model === "classique"
+                    ? "border-[#d4a94e] bg-[#d4a94e]/10 text-[#d4a94e]"
+                    : "border-[#26262b] bg-[#141417] text-[#c9c9cf] hover:border-[#4a4a52]"
+                }`}
+              >
+                T-shirt classique
+              </button>
+              <button
+                onClick={() => setModel("mouvement")}
+                className={`rounded-lg border px-3 py-2 text-xs transition ${
+                  model === "mouvement"
+                    ? "border-[#d4a94e] bg-[#d4a94e]/10 text-[#d4a94e]"
+                    : "border-[#26262b] bg-[#141417] text-[#c9c9cf] hover:border-[#4a4a52]"
+                }`}
+              >
+                En mouvement
+              </button>
+            </div>
+          </section>
+
+          {/* Couleur */}
+          <section className="mt-6">
             <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
               Couleur du vêtement
             </p>
@@ -602,7 +728,9 @@ export default function Studio3D() {
               onClick={() => logoInputRef.current?.click()}
               className="w-full rounded-lg border border-dashed border-[#33333a] bg-[#141417] px-4 py-3 text-sm text-[#c9c9cf] transition hover:border-[#d4a94e]/50"
             >
-              {logoName ? `✓ ${logoName} — changer` : "Importer un logo (PNG conseillé)"}
+              {logoName
+                ? `✓ ${logoName} — changer`
+                : "Importer un logo (PNG conseillé)"}
             </button>
 
             {logoTexture && (
@@ -620,17 +748,35 @@ export default function Studio3D() {
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs text-[#8b8b93]">Position (haut / bas)</span>
+                  <span className="text-xs text-[#8b8b93]">
+                    Position (haut / bas)
+                  </span>
                   <input
                     type="range"
-                    min={-0.12}
-                    max={0.18}
+                    min={-0.15}
+                    max={0.22}
                     step={0.005}
                     value={logoY}
                     onChange={(e) => setLogoY(parseFloat(e.target.value))}
                     className="mt-1 w-full accent-[#d4a94e]"
                   />
                 </label>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#8b8b93]">Logo dans le dos</span>
+                  <button
+                    onClick={() => setLogoBack((v) => !v)}
+                    className={`relative h-6 w-11 rounded-full transition ${
+                      logoBack ? "bg-[#d4a94e]" : "bg-[#26262b]"
+                    }`}
+                    aria-pressed={logoBack}
+                  >
+                    <span
+                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${
+                        logoBack ? "left-[22px]" : "left-0.5"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
             )}
           </section>
@@ -644,7 +790,7 @@ export default function Studio3D() {
               {ANIMATIONS.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => setAnimation(a.id)}
+                  onClick={() => selectAnimation(a.id)}
                   className={`rounded-lg border px-3 py-2 text-xs transition ${
                     animation === a.id
                       ? "border-[#d4a94e] bg-[#d4a94e]/10 text-[#d4a94e]"
@@ -655,6 +801,11 @@ export default function Studio3D() {
                 </button>
               ))}
             </div>
+            {animation === "marche" && (
+              <p className="mt-2 text-[11px] text-[#5f5f66]">
+                La marche utilise le modèle « En mouvement ».
+              </p>
+            )}
           </section>
 
           {/* Vidéo */}
@@ -701,6 +852,8 @@ export default function Studio3D() {
             </a>
             <p className="text-center text-[11px] text-[#5f5f66]">
               Production DTF & broderie — Caractère Store, Alger
+              <br />
+              Modèle « en mouvement » : Zakaria Essekkouri (CC-BY)
             </p>
           </section>
         </aside>
