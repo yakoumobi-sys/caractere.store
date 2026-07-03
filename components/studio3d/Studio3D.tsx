@@ -20,12 +20,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
-// ─────────────────────────────────────────────
-// Config
-// ─────────────────────────────────────────────
-
-const MODEL_CLASSIC = "/models/shirt_baked.glb";
-const MODEL_WALK = "/models/shirt_walk.glb";
+const MODEL_PATH = "/models/shirt_baked.glb";
 const WHATSAPP = "213557440522";
 const MAX_RECORD_SECONDS = 30;
 
@@ -66,7 +61,6 @@ const BG_PRESETS: BgPreset[] = [
   },
 ];
 
-type ModelId = "classique" | "mouvement";
 type AnimationMode =
   | "aucune"
   | "rotation"
@@ -82,17 +76,9 @@ const ANIMATIONS: { id: AnimationMode; label: string }[] = [
   { id: "formation", label: "Formation fil par fil" },
 ];
 
-// Limites verticales par modèle (pour l'effet formation)
-const CLIP_BOUNDS: Record<ModelId, [number, number]> = {
-  classique: [-0.42, 0.46],
-  mouvement: [-0.45, 0.45],
-};
+const CLIP_BOUNDS: [number, number] = [-0.42, 0.46];
 const FORMATION_DURATION = 4.5;
 const FORMATION_HOLD = 2.0;
-
-// ─────────────────────────────────────────────
-// Utilitaires texture
-// ─────────────────────────────────────────────
 
 function makeGradientTexture(stops: [string, string]): THREE.CanvasTexture {
   const c = document.createElement("canvas");
@@ -108,10 +94,6 @@ function makeGradientTexture(stops: [string, string]): THREE.CanvasTexture {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
-
-// ─────────────────────────────────────────────
-// 3D — Arrière-plan de la scène
-// ─────────────────────────────────────────────
 
 type BgState =
   | { type: "color"; value: string }
@@ -129,24 +111,17 @@ function SceneBackground({ bg }: { bg: BgState }) {
   return null;
 }
 
-// ─────────────────────────────────────────────
-// 3D — T-shirts
-// ─────────────────────────────────────────────
-
-type ShirtInput = {
+type ShirtProps = {
   color: string;
   logoTexture: THREE.Texture | null;
   logoScale: number;
   logoY: number;
   logoBack: boolean;
-};
-
-type ShirtProps = ShirtInput & {
   clipPlane: THREE.Plane;
   clipActive: boolean;
 };
 
-function ShirtClassic({
+function Shirt({
   color,
   logoTexture,
   logoScale,
@@ -155,7 +130,7 @@ function ShirtClassic({
   clipPlane,
   clipActive,
 }: ShirtProps) {
-  const { nodes, materials } = useGLTF(MODEL_CLASSIC) as any;
+  const { nodes, materials } = useGLTF(MODEL_PATH) as any;
   const targetColor = useRef(new THREE.Color(color));
 
   useEffect(() => {
@@ -198,84 +173,25 @@ function ShirtClassic({
   );
 }
 
-function ShirtWalk({
+useGLTF.preload(MODEL_PATH);
+
+type SceneProps = ShirtProps & {
+  bg: BgState;
+  animation: AnimationMode;
+};
+
+function Scene({
+  bg,
+  animation,
   color,
   logoTexture,
   logoScale,
   logoY,
   logoBack,
-  clipPlane,
-  clipActive,
-}: ShirtProps) {
-  const { nodes, materials } = useGLTF(MODEL_WALK) as any;
-  const targetColor = useRef(new THREE.Color(color));
-
-  const geometry = useMemo(() => {
-    const candidates = ["Object_4", "Object_0"];
-    for (const n of candidates) {
-      if (nodes[n]?.geometry) return nodes[n].geometry;
-    }
-    for (const key of Object.keys(nodes)) {
-      if (nodes[key]?.geometry) return nodes[key].geometry;
-    }
-    return null;
-  }, [nodes]);
-
-  const material: any = materials.Fabirc ?? Object.values(materials)[0];
-
-  useEffect(() => {
-    if (!material) return;
-    material.clippingPlanes = clipActive ? [clipPlane] : null;
-    material.clipShadows = true;
-    material.needsUpdate = true;
-  }, [clipActive, clipPlane, material]);
-
-  useFrame(() => {
-    if (!material) return;
-    targetColor.current.set(color);
-    material.color.lerp(targetColor.current, 0.25);
-  });
-
-  if (!geometry || !material) return null;
-
-  return (
-    <mesh castShadow geometry={geometry} material={material} dispose={null}>
-      {logoTexture && (
-        <Decal
-          position={[0, logoY, logoBack ? -0.17 : 0.17]}
-          rotation={[0, logoBack ? Math.PI : 0, 0]}
-          scale={logoScale}
-        >
-          <meshStandardMaterial
-            map={logoTexture}
-            transparent
-            polygonOffset
-            polygonOffsetFactor={-10}
-            clippingPlanes={clipActive ? [clipPlane] : null}
-          />
-        </Decal>
-      )}
-    </mesh>
-  );
-}
-
-useGLTF.preload(MODEL_CLASSIC);
-useGLTF.preload(MODEL_WALK);
-
-// ─────────────────────────────────────────────
-// 3D — Scène animée
-// ─────────────────────────────────────────────
-
-type SceneProps = ShirtInput & {
-  bg: BgState;
-  animation: AnimationMode;
-  model: ModelId;
-};
-
-function Scene({ bg, animation, model, ...shirtInput }: SceneProps) {
+}: SceneProps) {
   const group = useRef<THREE.Group>(null);
   const threadLine = useRef<THREE.Mesh>(null);
-  const [minY, maxY] = CLIP_BOUNDS[model];
+  const [minY, maxY] = CLIP_BOUNDS;
   const clipPlane = useMemo(
     () => new THREE.Plane(new THREE.Vector3(0, -1, 0), maxY + 0.1),
     [maxY]
@@ -287,7 +203,6 @@ function Scene({ bg, animation, model, ...shirtInput }: SceneProps) {
     const g = group.current;
     if (!g) return;
 
-    // Retour doux à la position neutre
     if (animation !== "rotation" && animation !== "formation")
       g.rotation.y *= 0.95;
     if (animation !== "flottement" && animation !== "marche") {
@@ -307,7 +222,6 @@ function Scene({ bg, animation, model, ...shirtInput }: SceneProps) {
     }
 
     if (animation === "marche") {
-      // Cadence de marche : rebond à chaque pas + balancement des épaules
       const step = t * 3.4;
       g.position.y = Math.abs(Math.sin(step)) * 0.032;
       g.rotation.z = Math.sin(step) * 0.05;
@@ -341,19 +255,15 @@ function Scene({ bg, animation, model, ...shirtInput }: SceneProps) {
       <ambientLight intensity={0.4} />
       <Environment preset="city" />
       <group ref={group}>
-        {model === "classique" ? (
-          <ShirtClassic
-            {...shirtInput}
-            clipPlane={clipPlane}
-            clipActive={formation}
-          />
-        ) : (
-          <ShirtWalk
-            {...shirtInput}
-            clipPlane={clipPlane}
-            clipActive={formation}
-          />
-        )}
+        <Shirt
+          color={color}
+          logoTexture={logoTexture}
+          logoScale={logoScale}
+          logoY={logoY}
+          logoBack={logoBack}
+          clipPlane={clipPlane}
+          clipActive={formation}
+        />
         <mesh ref={threadLine} visible={false}>
           <boxGeometry args={[0.95, 0.006, 0.5]} />
           <meshBasicMaterial
@@ -382,12 +292,7 @@ function Scene({ bg, animation, model, ...shirtInput }: SceneProps) {
   );
 }
 
-// ─────────────────────────────────────────────
-// Studio
-// ─────────────────────────────────────────────
-
 export default function Studio3D() {
-  const [model, setModel] = useState<ModelId>("classique");
   const [color, setColor] = useState(COLORS[1].hex);
   const [logoTexture, setLogoTexture] = useState<THREE.Texture | null>(null);
   const [logoName, setLogoName] = useState<string | null>(null);
@@ -407,13 +312,6 @@ export default function Studio3D() {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Sélection d'animation (Marche bascule sur le modèle en mouvement)
-  const selectAnimation = useCallback((a: AnimationMode) => {
-    setAnimation(a);
-    if (a === "marche") setModel("mouvement");
-  }, []);
-
-  // ── Upload logo
   const handleLogoUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -432,7 +330,6 @@ export default function Studio3D() {
     []
   );
 
-  // ── Background
   const selectBgPreset = useCallback((p: BgPreset) => {
     setBgSelected(p.name);
     if (p.kind === "color") {
@@ -459,7 +356,6 @@ export default function Studio3D() {
     []
   );
 
-  // ── Export PNG
   const downloadPNG = useCallback(() => {
     const gl = glRef.current;
     if (!gl) return;
@@ -470,7 +366,6 @@ export default function Studio3D() {
     a.click();
   }, []);
 
-  // ── Enregistrement vidéo
   const stopRecording = useCallback(() => {
     recorderRef.current?.stop();
   }, []);
@@ -547,7 +442,6 @@ export default function Studio3D() {
 
   return (
     <div className="min-h-screen bg-[#0b0b0d] text-[#f2f2f2]">
-      {/* Header */}
       <header className="flex items-center justify-between border-b border-[#1e1e22] px-5 py-4">
         <div>
           <h1 className="text-base font-semibold tracking-tight">
@@ -566,7 +460,6 @@ export default function Studio3D() {
       </header>
 
       <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
-        {/* Viewport 3D */}
         <div className="relative h-[55vh] min-h-[380px] flex-1 lg:h-[calc(100vh-73px)]">
           <Canvas
             shadows
@@ -579,7 +472,6 @@ export default function Studio3D() {
           >
             <Suspense fallback={null}>
               <Scene
-                model={model}
                 color={color}
                 logoTexture={logoTexture}
                 logoScale={logoScale}
@@ -587,6 +479,8 @@ export default function Studio3D() {
                 logoBack={logoBack}
                 bg={bg}
                 animation={animation}
+                clipPlane={null as any}
+                clipActive={false}
               />
             </Suspense>
           </Canvas>
@@ -610,39 +504,8 @@ export default function Studio3D() {
           )}
         </div>
 
-        {/* Panneau de contrôle */}
         <aside className="w-full border-t border-[#1e1e22] bg-[#101013] p-5 lg:w-[340px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:[height:calc(100vh-73px)]">
-          {/* Modèle */}
           <section>
-            <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
-              Modèle
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setModel("classique")}
-                className={`rounded-lg border px-3 py-2 text-xs transition ${
-                  model === "classique"
-                    ? "border-[#d4a94e] bg-[#d4a94e]/10 text-[#d4a94e]"
-                    : "border-[#26262b] bg-[#141417] text-[#c9c9cf] hover:border-[#4a4a52]"
-                }`}
-              >
-                T-shirt classique
-              </button>
-              <button
-                onClick={() => setModel("mouvement")}
-                className={`rounded-lg border px-3 py-2 text-xs transition ${
-                  model === "mouvement"
-                    ? "border-[#d4a94e] bg-[#d4a94e]/10 text-[#d4a94e]"
-                    : "border-[#26262b] bg-[#141417] text-[#c9c9cf] hover:border-[#4a4a52]"
-                }`}
-              >
-                En mouvement
-              </button>
-            </div>
-          </section>
-
-          {/* Couleur */}
-          <section className="mt-6">
             <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
               Couleur du vêtement
             </p>
@@ -665,7 +528,6 @@ export default function Studio3D() {
             <p className="mt-2 text-xs text-[#8b8b93]">{colorName}</p>
           </section>
 
-          {/* Arrière-plan */}
           <section className="mt-6">
             <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
               Arrière-plan
@@ -712,7 +574,6 @@ export default function Studio3D() {
             <p className="mt-2 text-xs text-[#8b8b93]">{bgSelected}</p>
           </section>
 
-          {/* Logo */}
           <section className="mt-6">
             <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
               Votre design
@@ -781,7 +642,6 @@ export default function Studio3D() {
             )}
           </section>
 
-          {/* Animation */}
           <section className="mt-6">
             <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
               Animation
@@ -790,7 +650,7 @@ export default function Studio3D() {
               {ANIMATIONS.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => selectAnimation(a.id)}
+                  onClick={() => setAnimation(a.id)}
                   className={`rounded-lg border px-3 py-2 text-xs transition ${
                     animation === a.id
                       ? "border-[#d4a94e] bg-[#d4a94e]/10 text-[#d4a94e]"
@@ -801,14 +661,8 @@ export default function Studio3D() {
                 </button>
               ))}
             </div>
-            {animation === "marche" && (
-              <p className="mt-2 text-[11px] text-[#5f5f66]">
-                La marche utilise le modèle « En mouvement ».
-              </p>
-            )}
           </section>
 
-          {/* Vidéo */}
           <section className="mt-6">
             <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8b93]">
               Vidéo
@@ -830,11 +684,9 @@ export default function Studio3D() {
             )}
             <p className="mt-2 text-[11px] text-[#5f5f66]">
               Lancez une animation puis enregistrez (max {MAX_RECORD_SECONDS}s).
-              Export MP4 sur iPhone/Safari, WebM sur Chrome.
             </p>
           </section>
 
-          {/* Actions */}
           <section className="mt-8 space-y-3">
             <button
               onClick={downloadPNG}
@@ -852,8 +704,6 @@ export default function Studio3D() {
             </a>
             <p className="text-center text-[11px] text-[#5f5f66]">
               Production DTF & broderie — Caractère Store, Alger
-              <br />
-              Modèle « en mouvement » : Zakaria Essekkouri (CC-BY)
             </p>
           </section>
         </aside>
