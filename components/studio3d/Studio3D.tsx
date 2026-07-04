@@ -1,20 +1,21 @@
 "use client";
 
 import {
-  useRef, useState, useEffect, useCallback,
-  Component, ErrorInfo, ReactNode,
+  Suspense, useRef, useState, useEffect, useCallback, useMemo,
+  Component, ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
+import { OrbitControls, Decal, useGLTF, ContactShadows, Center } from "@react-three/drei";
 import * as THREE from "three";
 
+// ── Error Boundary
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
   constructor(props: { children: ReactNode }) { super(props); this.state = { error: null }; }
   componentDidCatch(error: Error) { this.setState({ error: error.message }); }
   render() {
     if (this.state.error) return (
       <div className="flex min-h-screen items-center justify-center bg-white p-6 text-[#0a1f2e]">
-        <div className="max-w-sm rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
+        <div className="max-w-sm rounded-2xl border border-red-300 bg-red-50 p-6 text-center">
           <p className="mb-2 text-sm font-semibold text-red-600">Erreur</p>
           <p className="text-xs text-red-700">{this.state.error}</p>
         </div>
@@ -24,13 +25,17 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
   }
 }
 
+// ── Config — IDENTIQUE à la version qui marchait
+const MODEL_PATH = "/models/shirt_baked.glb";
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
+const CLIP_MIN = -0.42;
+const CLIP_MAX = 0.46;
 
 const COLORS = [
   { name: "Blanc", hex: "#f2f0eb" }, { name: "Noir", hex: "#1c1c1e" },
   { name: "Beige", hex: "#d6c6a8" }, { name: "Marine", hex: "#1f2a44" },
-  { name: "Bordeaux", hex: "#6e1423" }, { name: "Vert", hex: "#2d4a3a" },
+  { name: "Bordeaux", hex: "#6e1423" }, { name: "Vert forêt", hex: "#2d4a3a" },
   { name: "Gris", hex: "#9a9a9a" }, { name: "Caramel", hex: "#b0713a" },
 ];
 
@@ -52,77 +57,147 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
   {id:"formation",label:"Tissage",icon:"🧵"},
 ];
 
+// ── Scene background
 function SceneBg({ color }: { color: string }) {
   const { scene } = useThree();
   useEffect(() => { scene.background = new THREE.Color(color); }, [color, scene]);
   return null;
 }
 
-function Shirt({ color }: { color: string }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
+// ── T-shirt (structure de la version qui marchait + features)
+type SP = {
+  color: string;
+  logoTexture: THREE.Texture | null;
+  logoScale: number;
+  logoY: number;
+  logoBack: boolean;
+  clipPlane: THREE.Plane;
+  clipActive: boolean;
+};
+
+function Shirt({ color, logoTexture, logoScale, logoY, logoBack, clipPlane, clipActive }: SP) {
+  const gltf = useGLTF(MODEL_PATH) as any;
+  const mat = gltf.materials?.lambert1 as any;
+  const tc = useRef(new THREE.Color(color));
+
+  useEffect(() => {
+    if (!mat) return;
+    mat.clippingPlanes = clipActive ? [clipPlane] : null;
+    mat.needsUpdate = true;
+  }, [clipActive, clipPlane, mat]);
+
   useFrame(() => {
-    if (meshRef.current) {
-      (meshRef.current.material as THREE.MeshStandardMaterial).color.setHex(parseInt(color.replace("#", ""), 16));
-      meshRef.current.rotation.y += 0.004;
+    if (mat?.color) {
+      tc.current.set(color);
+      mat.color.lerp(tc.current, 0.15);
     }
   });
 
+  if (!gltf.nodes?.T_Shirt_male?.geometry) return null;
+
   return (
-    <mesh ref={meshRef} position={[0, 0, 0]}>
-      <boxGeometry args={[0.2, 0.3, 0.15]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
+    <Center>
+      <mesh geometry={gltf.nodes.T_Shirt_male.geometry} material={mat} dispose={null}>
+        {logoTexture && (
+          <Decal
+            position={[0, logoY, logoBack ? -0.15 : 0.15]}
+            rotation={[0, logoBack ? Math.PI : 0, 0]}
+            scale={logoScale}
+          >
+            <meshStandardMaterial
+              map={logoTexture}
+              transparent
+              polygonOffset
+              polygonOffsetFactor={-10}
+              clippingPlanes={clipActive ? [clipPlane] : null}
+            />
+          </Decal>
+        )}
+      </mesh>
+    </Center>
   );
 }
 
-function Scene({ bgColor, color, anim }: { bgColor: string; color: string; anim: Anim }) {
+useGLTF.preload(MODEL_PATH);
+
+// ── Scene avec animations
+type ScP = SP & { bgColor: string; anim: Anim };
+
+function Scene({ bgColor, anim, ...sp }: ScP) {
   const g = useRef<THREE.Group>(null);
-  
+  const tl = useRef<THREE.Mesh>(null);
+  const cp = useMemo(() => new THREE.Plane(new THREE.Vector3(0,-1,0), CLIP_MAX+0.1), []);
+  const isF = anim === "formation";
+
   useFrame(state => {
     const t = state.clock.getElapsedTime();
     const gr = g.current; if (!gr) return;
-    
+
+    if (anim !== "rotation" && anim !== "formation") gr.rotation.y *= 0.95;
+    if (anim !== "flottement" && anim !== "marche") {
+      gr.position.y *= 0.9; gr.rotation.z *= 0.9; gr.rotation.x *= 0.9;
+    }
+
     if (anim === "rotation") gr.rotation.y += 0.012;
-    else if (anim === "flottement") {
+    if (anim === "flottement") {
       gr.position.y = Math.sin(t*1.4)*0.035;
       gr.rotation.z = Math.sin(t*0.9)*0.04;
       gr.rotation.y = Math.sin(t*0.6)*0.25;
     }
-    else if (anim === "marche") {
-      const s=t*3.4;
-      gr.position.y=Math.abs(Math.sin(s))*0.032;
-      gr.rotation.z=Math.sin(s)*0.05;
-      gr.rotation.x=0.03+Math.sin(s*2)*0.012;
-      gr.rotation.y=Math.sin(t*0.8)*0.18;
+    if (anim === "marche") {
+      const s = t*3.4;
+      gr.position.y = Math.abs(Math.sin(s))*0.032;
+      gr.rotation.z = Math.sin(s)*0.05;
+      gr.rotation.x = 0.03 + Math.sin(s*2)*0.012;
+      gr.rotation.y = Math.sin(t*0.8)*0.18;
     }
-    else {
-      gr.rotation.y *= 0.95;
-      gr.position.y *= 0.9;
-      gr.rotation.z *= 0.9;
-      gr.rotation.x *= 0.9;
+    if (isF) {
+      const cycle = 4.5 + 2.0;
+      const local = t % cycle;
+      const prog = Math.min(local/4.5, 1);
+      const eased = 1 - Math.pow(1-prog, 2.2);
+      cp.constant = CLIP_MIN + eased*(CLIP_MAX-CLIP_MIN);
+      gr.rotation.y += 0.006;
+      if (tl.current) {
+        tl.current.visible = prog < 1;
+        tl.current.position.y = cp.constant;
+        (tl.current.material as THREE.MeshBasicMaterial).opacity = prog < 1 ? 0.9 : 0;
+      }
+    } else {
+      cp.constant = CLIP_MAX + 0.1;
+      if (tl.current) tl.current.visible = false;
     }
   });
 
   return (
     <>
       <SceneBg color={bgColor} />
+      {/* Éclairage manuel — PAS de Environment (CDN externe = spinner infini) */}
       <ambientLight intensity={0.7} />
-      <directionalLight position={[5,5,5]} intensity={0.8} />
-      <Environment preset="city" />
+      <directionalLight position={[3, 4, 5]} intensity={1.2} />
+      <directionalLight position={[-4, 2, -3]} intensity={0.5} />
       <group ref={g}>
-        <Shirt color={color} />
+        <Shirt {...sp} clipPlane={cp} clipActive={isF} />
+        <mesh ref={tl} visible={false}>
+          <boxGeometry args={[0.95, 0.006, 0.5]} />
+          <meshBasicMaterial color="#c9a84c" transparent opacity={0.9} toneMapped={false} />
+        </mesh>
       </group>
-      <ContactShadows position={[0,-0.52,0]} opacity={0.4} scale={2.5} blur={2.2} far={1.2}/>
-      <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4} minPolarAngle={Math.PI/4} maxPolarAngle={3*Math.PI/4}/>
+      <ContactShadows position={[0,-0.52,0]} opacity={0.35} scale={2.5} blur={2.2} far={1.2} />
+      <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4}
+        minPolarAngle={Math.PI/4} maxPolarAngle={3*Math.PI/4} />
     </>
   );
 }
 
+// ── Studio principal
 export default function Studio3D() {
   const [color,setColor]=useState(COLORS[1].hex);
   const [logoTex,setLogoTex]=useState<THREE.Texture|null>(null);
   const [logoName,setLogoName]=useState<string|null>(null);
+  const [logoScale,setLogoScale]=useState(0.14);
+  const [logoY,setLogoY]=useState(0.04);
+  const [logoBack,setLogoBack]=useState(false);
   const [bgColor,setBgColor]=useState("#0d2d45");
   const [bgName,setBgName]=useState("Caractère Blue");
   const [anim,setAnim]=useState<Anim>("rotation");
@@ -146,7 +221,8 @@ export default function Studio3D() {
 
   const dlPNG=useCallback(()=>{
     const gl=glRef.current; if(!gl) return;
-    const a=document.createElement("a"); a.href=gl.domElement.toDataURL("image/png");
+    const a=document.createElement("a");
+    a.href=gl.domElement.toDataURL("image/png");
     a.download="caractere-3d.png"; a.click();
   },[]);
 
@@ -155,7 +231,7 @@ export default function Studio3D() {
     const gl=glRef.current; if(!gl||rec) return;
     const stream=gl.domElement.captureStream(30);
     const mt=["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9","video/webm"].find(m=>typeof MediaRecorder!=="undefined"&&MediaRecorder.isTypeSupported(m));
-    if(!mt){alert("Non supporté."); return;}
+    if(!mt){alert("Enregistrement non supporté sur ce navigateur."); return;}
     const recorder=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:8_000_000});
     chunks.current=[];
     recorder.ondataavailable=e=>{if(e.data.size>0)chunks.current.push(e.data);};
@@ -195,16 +271,30 @@ export default function Studio3D() {
         </header>
 
         <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
-          <div className="relative h-[56vh] min-h-[340px] flex-1 bg-gradient-to-br from-blue-50 to-blue-100 lg:h-[calc(100vh-57px)]">
-            <Canvas shadows camera={{position:[0,0,2.5],fov:25}} gl={{preserveDrawingBuffer:true,antialias:false,powerPreference:"low-power"}}
-              onCreated={({gl})=>{gl.setPixelRatio(Math.min(window.devicePixelRatio,2));glRef.current=gl;}}>
-              <Scene bgColor={bgColor} color={color} anim={anim} />
+          <div className="relative h-[56vh] min-h-[340px] flex-1 lg:h-[calc(100vh-57px)]">
+            <Canvas
+              camera={{ position: [0, 0, 2.2], fov: 25 }}
+              gl={{ preserveDrawingBuffer: true }}
+              onCreated={({ gl }) => {
+                gl.localClippingEnabled = true;
+                gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                glRef.current = gl;
+              }}
+            >
+              <Suspense fallback={null}>
+                <Scene bgColor={bgColor} anim={anim} color={color} logoTexture={logoTex}
+                  logoScale={logoScale} logoY={logoY} logoBack={logoBack}
+                  clipPlane={null as any} clipActive={false} />
+              </Suspense>
             </Canvas>
+
             {rec&&<div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-red-500"/><span className="text-xs font-semibold tabular-nums text-white">{recSec}s/{MAX_REC}s</span>
+              <span className="h-2 w-2 animate-pulse rounded-full bg-red-500"/>
+              <span className="text-xs font-semibold tabular-nums text-white">{recSec}s/{MAX_REC}s</span>
             </div>}
+
             {!logoTex&&<button onClick={()=>logoRef.current?.click()}
-              className="absolute bottom-5 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[#0a1f2e]/20 bg-white/80 px-5 py-2 text-xs font-medium text-[#0a1f2e] backdrop-blur hover:bg-white">
+              className="absolute bottom-5 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/30 bg-black/40 px-5 py-2 text-xs font-medium text-white backdrop-blur hover:bg-black/60">
               + Ajouter votre logo
             </button>}
           </div>
@@ -235,9 +325,28 @@ export default function Studio3D() {
               <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Design</p>
               <input ref={logoRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadLogo} className="hidden"/>
               <button onClick={()=>logoRef.current?.click()}
-                className="w-full rounded-xl border border-gray-200 bg-white py-3 text-sm text-[#0a1f2e]/50 transition hover:border-[#1a5f8a]/40 hover:text-[#0a1f2e]">
+                className="w-full rounded-xl border border-dashed border-gray-300 bg-white py-3 text-sm text-[#0a1f2e]/50 transition hover:border-[#1a5f8a]/40 hover:text-[#0a1f2e]">
                 {logoName?`✓ ${logoName}`:"Importer un logo (PNG)"}
               </button>
+              {logoTex&&<div className="mt-4 space-y-3">
+                <label className="block">
+                  <span className="text-xs text-[#0a1f2e]/40">Taille</span>
+                  <input type="range" min={0.05} max={0.35} step={0.005} value={logoScale}
+                    onChange={e=>setLogoScale(parseFloat(e.target.value))} className="mt-1 w-full accent-[#1a5f8a]"/>
+                </label>
+                <label className="block">
+                  <span className="text-xs text-[#0a1f2e]/40">Position verticale</span>
+                  <input type="range" min={-0.15} max={0.22} step={0.005} value={logoY}
+                    onChange={e=>setLogoY(parseFloat(e.target.value))} className="mt-1 w-full accent-[#1a5f8a]"/>
+                </label>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#0a1f2e]/40">Logo dans le dos</span>
+                  <button onClick={()=>setLogoBack(v=>!v)}
+                    className={`relative h-6 w-11 rounded-full transition-colors ${logoBack?"bg-[#1a5f8a]":"bg-gray-300"}`}>
+                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${logoBack?"left-[22px]":"left-0.5"}`}/>
+                  </button>
+                </div>
+              </div>}
             </section>
 
             <section className="mt-5">
@@ -271,7 +380,7 @@ export default function Studio3D() {
                 className="block w-full rounded-xl bg-[#1a5f8a] py-3.5 text-center text-sm font-bold text-white transition hover:bg-[#0f3d5c]">
                 Commander ce design →
               </a>
-              <p className="text-center text-[10px] text-[#0a1f2e]/20">DTF & broderie · Caractère Store · Alger</p>
+              <p className="text-center text-[10px] text-[#0a1f2e]/30">DTF & broderie · Caractère Store · Alger</p>
             </section>
           </aside>
         </div>
