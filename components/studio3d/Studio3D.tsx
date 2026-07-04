@@ -7,6 +7,7 @@ import {
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Decal, useGLTF, Environment, ContactShadows, Center } from "@react-three/drei";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
   constructor(props: { children: ReactNode }) { super(props); this.state = { error: null }; }
@@ -67,19 +68,19 @@ type SP = {
 };
 
 function Shirt({ color, logoTexture, logoScale, logoY, logoBack, clipPlane, clipActive }: SP) {
-  const { scene } = useThree();
   const [loaded, setLoaded] = useState(false);
   const [gltf, setGltf] = useState<any>(null);
   
   useEffect(() => {
-    new THREE.GLTFLoader().load(
+    const loader = new GLTFLoader();
+    loader.load(
       MODEL_PATH,
       (data) => {
         setGltf(data);
         setLoaded(true);
       },
-      (prog) => console.log("Loading model:", (prog.loaded / prog.total * 100).toFixed(0) + "%"),
-      (err) => console.error("Failed to load model:", err)
+      (prog) => console.log("Model loading:", (prog.loaded / prog.total * 100).toFixed(0) + "%"),
+      (err) => console.error("Model load error:", err)
     );
   }, []);
 
