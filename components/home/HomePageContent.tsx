@@ -111,48 +111,34 @@ function Hero() {
               Print on Demand sans abonnement, vêtements personnalisés pour entreprises et particuliers. Production rapide à partir d'une seule pièce.
             </p>
 
-            {/* CTAs principaux */}
-            <div className="flex flex-col sm:flex-row gap-2.5 mb-5">
-              <Link href="/configurateur"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all hover:-translate-y-0.5"
-                style={{ background: '#FFFFFF', color: C.blue, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}>
-                Configurer ma commande →
-              </Link>
+            {/* 2 boutons principaux */}
+            <div className="flex flex-col gap-3 mt-2">
               <Link href="/auth/register"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-bold no-underline transition-all border-2 hover:-translate-y-0.5"
-                style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.08)' }}>
-                Commencer à vendre
+                className="flex items-center justify-between px-7 py-5 rounded-2xl no-underline transition-all hover:-translate-y-0.5 hover:shadow-xl group"
+                style={{ background: '#FFFFFF', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                <div>
+                  <p className="text-[18px] font-black leading-tight" style={{ color: C.blue }}>Lancez votre marque.</p>
+                  <p className="text-[12px] mt-0.5" style={{ color: C.blueMid }}>Print on Demand · Sans stock · Sans abonnement</p>
+                </div>
+                <span className="text-[22px] ml-4 group-hover:translate-x-1 transition-transform" style={{ color: C.blue }}>→</span>
+              </Link>
+
+              <Link href="/configurateur"
+                className="flex items-center justify-between px-7 py-5 rounded-2xl no-underline transition-all hover:-translate-y-0.5 border-2 group"
+                style={{ background: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.35)', backdropFilter: 'blur(12px)' }}>
+                <div>
+                  <p className="text-[18px] font-black text-white leading-tight">Habillez votre entreprise.</p>
+                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>Uniformes · Broderie · DTF · Dès 1 pièce</p>
+                </div>
+                <span className="text-[22px] ml-4 text-white group-hover:translate-x-1 transition-transform">→</span>
+              </Link>
+
+              <Link href="/comment-ca-marche"
+                className="text-center py-2.5 text-[13px] font-medium no-underline transition-all"
+                style={{ color: 'rgba(255,255,255,0.5)' }}>
+                Comment ça marche ? →
               </Link>
             </div>
-
-            {/* 3 cards service */}
-            <div className="flex flex-col gap-2">
-              {[
-                { emoji: '🚀', title: 'Print on Demand', desc: 'Sans abonnement. Sans stock.', href: '/designer', sub: true },
-                { emoji: '🏢', title: 'Entreprises', desc: 'Uniformes & vêtements personnalisés.', href: '/configurateur', sub: true },
-                { emoji: '👕', title: 'Créez votre vêtement unique.', desc: '', href: '/produits', sub: false },
-              ].map(card => (
-                <Link key={card.title} href={card.href}
-                  className="group flex items-center justify-between px-4 py-3 rounded-2xl border no-underline hover:shadow-md hover:-translate-y-0.5 transition-all"
-                  style={{ background: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)' }}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[18px]">{card.emoji}</span>
-                    <div>
-                      <p className="text-[13px] font-bold text-white leading-tight">{card.title}</p>
-                      {card.sub && <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{card.desc}</p>}
-                    </div>
-                  </div>
-                  <span className="text-[12px] font-bold flex-shrink-0 ml-3" style={{ color: '#BAE6FD' }}>→</span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Bouton Comment ca marche */}
-            <Link href="/comment-ca-marche"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[13px] font-bold no-underline transition-all mt-1 border"
-              style={{ color: '#BAE6FD', borderColor: 'rgba(186,230,253,0.3)', background: 'rgba(186,230,253,0.08)' }}>
-              <span>🚀</span> Comment ça marche ? <span style={{ color: '#BAE6FD' }}>→</span>
-            </Link>
           </div>
 
           {/* ── Colonne visuelle ── */}
