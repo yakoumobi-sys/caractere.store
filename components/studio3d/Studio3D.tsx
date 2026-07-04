@@ -1,4 +1,3 @@
-// components/studio3d/Studio3D.tsx
 "use client";
 
 import {
@@ -68,16 +67,45 @@ type SP = {
 };
 
 function Shirt({ color, logoTexture, logoScale, logoY, logoBack, clipPlane, clipActive }: SP) {
-  const gltf = useGLTF(MODEL_PATH) as any;
-  const mat = gltf.materials?.lambert1 as THREE.MeshStandardMaterial | undefined;
-  const tc = useRef(new THREE.Color(color));
+  const { scene } = useThree();
+  const [loaded, setLoaded] = useState(false);
+  const [gltf, setGltf] = useState<any>(null);
+  
   useEffect(() => {
+    new THREE.GLTFLoader().load(
+      MODEL_PATH,
+      (data) => {
+        setGltf(data);
+        setLoaded(true);
+      },
+      (prog) => console.log("Loading model:", (prog.loaded / prog.total * 100).toFixed(0) + "%"),
+      (err) => console.error("Failed to load model:", err)
+    );
+  }, []);
+
+  const tc = useRef(new THREE.Color(color));
+  
+  useEffect(() => {
+    if (!gltf || !loaded) return;
+    const mat = gltf.materials?.lambert1 as THREE.MeshStandardMaterial | undefined;
     if (!mat) return;
     mat.clippingPlanes = clipActive ? [clipPlane] : null;
     mat.needsUpdate = true;
-  }, [clipActive, clipPlane, mat]);
-  useFrame(() => { if (mat) { tc.current.set(color); mat.color.lerp(tc.current, 0.25); } });
-  if (!gltf.nodes?.T_Shirt_male?.geometry) return null;
+  }, [clipActive, clipPlane, gltf, loaded]);
+
+  useFrame(() => {
+    if (!gltf || !loaded) return;
+    const mat = gltf.materials?.lambert1 as THREE.MeshStandardMaterial | undefined;
+    if (mat) {
+      tc.current.set(color);
+      mat.color.lerp(tc.current, 0.15);
+    }
+  });
+
+  if (!loaded || !gltf?.nodes?.T_Shirt_male?.geometry) return null;
+
+  const mat = gltf.materials?.lambert1;
+
   return (
     <Center>
       <mesh castShadow geometry={gltf.nodes.T_Shirt_male.geometry} material={mat} dispose={null}>
@@ -124,7 +152,8 @@ function Scene({ bgColor, anim, ...sp }: ScP) {
   return (
     <>
       <SceneBg color={bgColor} />
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[5,5,5]} intensity={0.6} />
       <Environment preset="city" />
       <group ref={g}>
         <Shirt {...sp} clipPlane={cp} clipActive={isF} />
@@ -244,7 +273,7 @@ export default function Studio3D() {
               <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Couleur</p>
               <div className="flex flex-wrap gap-2">
                 {COLORS.map(c=><button key={c.hex} title={c.name} onClick={()=>setColor(c.hex)}
-                  className={`h-8 w-8 rounded-full border-2 transition ${color===c.hex?"border-[#1a5f8a] scale-110 shadow-lg":"border-gray-300 hover:border-[#1a5f8a]/40"}`}
+                  className={`h-8 w-8 rounded-full border-2 transition ${color===c.hex?"border-[#1a5f8a] scale-110 shadow-lg ring-2 ring-[#1a5f8a]/30":"border-gray-300 hover:border-[#1a5f8a]/40"}`}
                   style={{backgroundColor:c.hex}}/>)}
               </div>
               <p className="mt-1.5 text-xs text-[#0a1f2e]/50">{colorName}</p>
@@ -254,7 +283,7 @@ export default function Studio3D() {
               <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Arrière-plan</p>
               <div className="flex flex-wrap gap-2">
                 {BGS.map(b=><button key={b.name} title={b.name} onClick={()=>{setBgColor(b.color);setBgName(b.name);}}
-                  className={`h-8 w-8 rounded-lg border-2 transition ${bgName===b.name?"border-[#1a5f8a] scale-110":"border-gray-300 hover:border-[#1a5f8a]/40"}`}
+                  className={`h-8 w-8 rounded-lg border-2 transition ${bgName===b.name?"border-[#1a5f8a] scale-110 ring-2 ring-[#1a5f8a]/30":"border-gray-300 hover:border-[#1a5f8a]/40"}`}
                   style={{backgroundColor:b.color}}/>)}
                 <input ref={bgRef} type="file" accept="image/*" onChange={()=>{}} className="hidden"/>
               </div>
