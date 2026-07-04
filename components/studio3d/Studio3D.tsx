@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  useRef, useState, useEffect, useCallback, useMemo,
+  useRef, useState, useEffect, useCallback,
   Component, ErrorInfo, ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows, Center } from "@react-three/drei";
+import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
@@ -60,22 +60,19 @@ function SceneBg({ color }: { color: string }) {
 
 function Shirt({ color }: { color: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const tc = useRef(new THREE.Color(color));
   
   useFrame(() => {
-    if (meshRef.current && meshRef.current.material) {
-      tc.current.set(color);
-      (meshRef.current.material as THREE.MeshStandardMaterial).color.lerp(tc.current, 0.1);
+    if (meshRef.current) {
+      (meshRef.current.material as THREE.MeshStandardMaterial).color.setHex(parseInt(color.replace("#", ""), 16));
+      meshRef.current.rotation.y += 0.004;
     }
   });
 
   return (
-    <Center>
-      <mesh ref={meshRef} castShadow>
-        <capsuleGeometry args={[0.15, 0.4, 8, 16]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-    </Center>
+    <mesh ref={meshRef} position={[0, 0, 0]}>
+      <boxGeometry args={[0.2, 0.3, 0.15]} />
+      <meshStandardMaterial color={color} />
+    </mesh>
   );
 }
 
