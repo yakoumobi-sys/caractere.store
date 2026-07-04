@@ -1,13 +1,7 @@
-// app/studio-3d/page.tsx
-import type { Metadata } from "next";
-import Studio3DClient from "@/components/studio3d/Studio3DClient";
+import Studio3D from "@/components/studio3d/Studio3D";
 
-export const metadata: Metadata = {
-  title: "Studio 3D — Caractère Store",
-  description:
-    "Visualisez votre logo sur un t-shirt en 3D temps réel. Changez la couleur, positionnez votre design et commandez directement.",
-};
+export const metadata = { title: "Studio 3D — Caractère" };
 
-export default function Studio3DPage() {
-  return <Studio3DClient />;
+export default function Page() {
+  return <Studio3D />;
 }
