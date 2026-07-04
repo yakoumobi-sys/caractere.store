@@ -25,7 +25,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
   }
 }
 
-const MODEL_PATH = "https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/models/shirt_baked.glb";
+const MODEL_PATH = "/models/shirt_baked.glb";
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
 const CLIP_MIN = -0.42;
