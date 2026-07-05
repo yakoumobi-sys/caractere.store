@@ -1,11 +1,12 @@
 "use client";
 
 import {
-  Suspense, useRef, useState, useEffect, useCallback, useMemo,
+  Suspense, useRef, useState, useEffect, useCallback,
   Component, ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Decal, useGLTF, ContactShadows, Center } from "@react-three/drei";
+import { OrbitControls, ContactShadows } from "@react-three/drei";
+import { useSearchParams } from "next/navigation";
 import * as THREE from "three";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
@@ -24,41 +25,74 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
   }
 }
 
-const MODEL_PATH = "/models/shirt_baked.glb";
+const SUPABASE_URL = "https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public";
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
-const CLIP_MIN = -0.42;
-const CLIP_MAX = 0.46;
 
-// 5 couleurs vives
-const COLORS = [
-  { name: "Noir", hex: "#1a1a1a" },
-  { name: "Blanc", hex: "#ffffff" },
-  { name: "Rouge", hex: "#d41717" },
-  { name: "Vert bouteille", hex: "#1b4332" },
-  { name: "Beige", hex: "#d4a574" },
-];
+const ALL_COLORS: Record<string, string> = {
+  "Blanc": "#FFFFFF",
+  "Noir": "#1A1A1A",
+  "Marine": "#1E3A5F",
+  "Bleu roi": "#2563EB",
+  "Rouge": "#DC2626",
+  "Vert": "#166534",
+  "Gris": "#6B7280",
+  "Beige": "#D6B99A",
+  "Bordeaux": "#7F1D1D",
+};
 
-// Backgrounds stylés
 const BGS = [
   { name: "Dégradé bleu", color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
   { name: "Dégradé rose", color: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" },
   { name: "Dégradé vert", color: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" },
-  { name: "Dégradé orange", color: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)" },
   { name: "Noir mat", color: "#0a0a0a" },
   { name: "Blanc pur", color: "#f5f5f5" },
 ];
 
-type Anim = "aucune"|"rotation"|"flottement"|"marche"|"formation";
+type Anim = "aucune"|"rotation"|"flottement"|"marche";
 const ANIMS: {id:Anim;label:string;icon:string}[] = [
   {id:"aucune",label:"Aucune",icon:"⏹"},
   {id:"rotation",label:"Rotation",icon:"🔄"},
   {id:"flottement",label:"Flottement",icon:"🌊"},
   {id:"marche",label:"Marche",icon:"🚶"},
-  {id:"formation",label:"Tissage",icon:"🧵"},
 ];
 
-type LogoPos = "poitrine" | "coeur-dos" | "poitrine-dos";
+// ── Générer un t-shirt 3D en géométrie
+function createTShirtGeometry() {
+  const group = new THREE.Group();
+
+  // Corps (boîte main)
+  const bodyGeom = new THREE.BoxGeometry(0.6, 0.8, 0.2);
+  const body = new THREE.Mesh(bodyGeom);
+  body.position.z = 0;
+  body.position.y = 0.1;
+  group.add(body);
+
+  // Manche gauche
+  const leftSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
+  const leftSleeve = new THREE.Mesh(leftSleeveGeom);
+  leftSleeve.position.x = -0.5;
+  leftSleeve.position.y = 0.2;
+  leftSleeve.rotation.z = 0.3;
+  group.add(leftSleeve);
+
+  // Manche droite
+  const rightSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
+  const rightSleeve = new THREE.Mesh(rightSleeveGeom);
+  rightSleeve.position.x = 0.5;
+  rightSleeve.position.y = 0.2;
+  rightSleeve.rotation.z = -0.3;
+  group.add(rightSleeve);
+
+  // Col (petit cylindre)
+  const collarGeom = new THREE.CylinderGeometry(0.15, 0.15, 0.08, 32);
+  const collar = new THREE.Mesh(collarGeom);
+  collar.position.y = 0.55;
+  collar.position.z = 0.08;
+  group.add(collar);
+
+  return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
+}
 
 function SceneBg({ bgColor }: { bgColor: string }) {
   const { scene } = useThree();
@@ -72,91 +106,70 @@ function SceneBg({ bgColor }: { bgColor: string }) {
   return null;
 }
 
-type SP = {
-  color: string;
-  logoTexture: THREE.Texture | null;
-  logoTextureBack: THREE.Texture | null;
-  logoPos: LogoPos;
-  clipPlane: THREE.Plane;
-  clipActive: boolean;
-};
-
-function Shirt({ color, logoTexture, logoTextureBack, logoPos, clipPlane, clipActive }: SP) {
-  const gltf = useGLTF(MODEL_PATH) as any;
-  const mat = gltf.materials?.lambert1 as any;
-  const tc = useRef(new THREE.Color(color));
+function TShirt3D({ color, logoTexture }: { color: string; logoTexture: THREE.Texture | null }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const meshesRef = useRef<THREE.Mesh[]>([]);
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   useEffect(() => {
-    if (!mat) return;
-    mat.clippingPlanes = clipActive ? [clipPlane] : null;
-    mat.needsUpdate = true;
-  }, [clipActive, clipPlane, mat]);
+    if (!groupRef.current) {
+      const { group, meshes } = createTShirtGeometry();
+      groupRef.current = group;
+      meshesRef.current = meshes;
 
-  useFrame(() => {
-    if (mat?.color) {
-      tc.current.set(color);
-      mat.color.lerp(tc.current, 0.15);
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(color),
+        metalness: 0.1,
+        roughness: 0.8,
+      });
+      materialRef.current = material;
+
+      meshes.forEach(mesh => {
+        mesh.material = material;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      });
     }
-  });
+  }, []);
 
-  if (!gltf.nodes?.T_Shirt_male?.geometry) return null;
-
-  const getLogoPositions = () => {
-    switch(logoPos) {
-      case "poitrine":
-        return [{ pos: [0, 0.05, 0.15], rot: [0, 0, 0], scale: 0.15, tex: logoTexture }];
-      case "coeur-dos":
-        return [
-          { pos: [0, 0.08, 0.15], rot: [0, 0, 0], scale: 0.12, tex: logoTexture },
-          { pos: [0, 0.08, -0.15], rot: [0, Math.PI, 0], scale: 0.12, tex: logoTextureBack }
-        ];
-      case "poitrine-dos":
-        return [
-          { pos: [0, 0.05, 0.15], rot: [0, 0, 0], scale: 0.14, tex: logoTexture },
-          { pos: [0, 0.05, -0.15], rot: [0, Math.PI, 0], scale: 0.14, tex: logoTextureBack }
-        ];
+  useEffect(() => {
+    if (materialRef.current) {
+      materialRef.current.color.set(color);
     }
-  };
+  }, [color]);
 
-  return (
-    <Center>
-      <mesh geometry={gltf.nodes.T_Shirt_male.geometry} material={mat} dispose={null}>
-        {getLogoPositions().map((logo, i) => logo.tex && (
-          <Decal
-            key={i}
-            position={logo.pos as [number, number, number]}
-            rotation={logo.rot as [number, number, number]}
-            scale={logo.scale}
-          >
-            <meshStandardMaterial
-              map={logo.tex}
-              transparent
-              polygonOffset
-              polygonOffsetFactor={-10}
-              clippingPlanes={clipActive ? [clipPlane] : null}
-            />
-          </Decal>
-        ))}
-      </mesh>
-    </Center>
-  );
+  useEffect(() => {
+    if (logoTexture && meshesRef.current[0]) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.fillStyle = color;
+          ctx.fillRect(0, 0, 512, 512);
+          ctx.drawImage(img, 150, 150, 200, 200);
+          const texture = new THREE.CanvasTexture(canvas);
+          const mat = new THREE.MeshStandardMaterial({ map: texture, metalness: 0.1, roughness: 0.8 });
+          meshesRef.current[0].material = mat;
+        };
+        img.src = logoTexture.source.data instanceof HTMLCanvasElement ? logoTexture.source.data.toDataURL() : "";
+      }
+    }
+  }, [logoTexture, color]);
+
+  return <primitive object={groupRef.current} />;
 }
 
-useGLTF.preload(MODEL_PATH);
-
-type ScP = SP & { bgColor: string; anim: Anim };
-
-function Scene({ bgColor, anim, ...sp }: ScP) {
+function Scene({ bgColor, anim, color, logoTexture }: { bgColor: string; anim: Anim; color: string; logoTexture: THREE.Texture | null }) {
   const g = useRef<THREE.Group>(null);
-  const tl = useRef<THREE.Mesh>(null);
-  const cp = useMemo(() => new THREE.Plane(new THREE.Vector3(0,-1,0), CLIP_MAX+0.1), []);
-  const isF = anim === "formation";
 
   useFrame(state => {
     const t = state.clock.getElapsedTime();
     const gr = g.current; if (!gr) return;
 
-    if (anim !== "rotation" && anim !== "formation") gr.rotation.y *= 0.95;
+    if (anim !== "rotation") gr.rotation.y *= 0.95;
     if (anim !== "flottement" && anim !== "marche") {
       gr.position.y *= 0.9; gr.rotation.z *= 0.9; gr.rotation.x *= 0.9;
     }
@@ -167,32 +180,12 @@ function Scene({ bgColor, anim, ...sp }: ScP) {
       gr.rotation.z = Math.sin(t*0.9)*0.04;
       gr.rotation.y = Math.sin(t*0.6)*0.25;
     }
-    
-    // Animation marche réaliste avec bras
     if (anim === "marche") {
       const s = t*3.4;
       gr.position.y = Math.abs(Math.sin(s))*0.032;
       gr.rotation.z = Math.sin(s)*0.05;
       gr.rotation.x = 0.03 + Math.sin(s*2)*0.012;
       gr.rotation.y = Math.sin(t*0.8)*0.18;
-      // Les bras bougent naturellement via la rotation
-    }
-    
-    if (isF) {
-      const cycle = 4.5 + 2.0;
-      const local = t % cycle;
-      const prog = Math.min(local/4.5, 1);
-      const eased = 1 - Math.pow(1-prog, 2.2);
-      cp.constant = CLIP_MIN + eased*(CLIP_MAX-CLIP_MIN);
-      gr.rotation.y += 0.006;
-      if (tl.current) {
-        tl.current.visible = prog < 1;
-        tl.current.position.y = cp.constant;
-        (tl.current.material as THREE.MeshBasicMaterial).opacity = prog < 1 ? 0.9 : 0;
-      }
-    } else {
-      cp.constant = CLIP_MAX + 0.1;
-      if (tl.current) tl.current.visible = false;
     }
   });
 
@@ -200,16 +193,12 @@ function Scene({ bgColor, anim, ...sp }: ScP) {
     <>
       <SceneBg bgColor={bgColor} />
       <ambientLight intensity={0.8} />
-      <directionalLight position={[3, 4, 5]} intensity={1.3} />
+      <directionalLight position={[3, 4, 5]} intensity={1.3} castShadow />
       <directionalLight position={[-4, 2, -3]} intensity={0.6} />
       <group ref={g}>
-        <Shirt {...sp} clipPlane={cp} clipActive={isF} />
-        <mesh ref={tl} visible={false}>
-          <boxGeometry args={[0.95, 0.006, 0.5]} />
-          <meshBasicMaterial color="#c9a84c" transparent opacity={0.9} toneMapped={false} />
-        </mesh>
+        <TShirt3D color={color} logoTexture={logoTexture} />
       </group>
-      <ContactShadows position={[0,-0.52,0]} opacity={0.35} scale={2.5} blur={2.2} far={1.2} />
+      <ContactShadows position={[0,-0.8,0]} opacity={0.35} scale={3} blur={2.2} far={1.5} />
       <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4}
         minPolarAngle={Math.PI/4} maxPolarAngle={3*Math.PI/4} />
     </>
@@ -217,65 +206,66 @@ function Scene({ bgColor, anim, ...sp }: ScP) {
 }
 
 export default function Studio3D() {
-  const [color,setColor]=useState(COLORS[0].hex);
-  const [logoPos,setLogoPos]=useState<LogoPos>("poitrine");
-  const [logoTex,setLogoTex]=useState<THREE.Texture|null>(null);
-  const [logoTexBack,setLogoTexBack]=useState<THREE.Texture|null>(null);
-  const [logoName,setLogoName]=useState<string|null>(null);
-  const [bgColor,setBgColor]=useState("#0d2d45");
-  const [bgName,setBgName]=useState("Dégradé bleu");
-  const [anim,setAnim]=useState<Anim>("rotation");
-  const [rec,setRec]=useState(false);
-  const [recSec,setRecSec]=useState(0);
-  const glRef=useRef<THREE.WebGLRenderer|null>(null);
-  const logoRef=useRef<HTMLInputElement>(null);
-  const logoBackRef=useRef<HTMLInputElement>(null);
-  const recRef=useRef<MediaRecorder|null>(null);
-  const chunks=useRef<Blob[]>([]);
-  const timer=useRef<ReturnType<typeof setInterval>|null>(null);
+  const searchParams = useSearchParams();
+  const colorParam = searchParams.get("couleur") || "Noir";
+  const [color, setColor] = useState(ALL_COLORS[colorParam] || "#1A1A1A");
+  const [logoTex, setLogoTex] = useState<THREE.Texture | null>(null);
+  const [bgColor, setBgColor] = useState("#0d2d45");
+  const [bgName, setBgName] = useState("Dégradé bleu");
+  const [anim, setAnim] = useState<Anim>("rotation");
+  const [rec, setRec] = useState(false);
+  const [recSec, setRecSec] = useState(0);
+  const glRef = useRef<THREE.WebGLRenderer | null>(null);
+  const recRef = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const uploadLogo=useCallback((e:React.ChangeEvent<HTMLInputElement>, isBack=false)=>{
-    const f=e.target.files?.[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload=()=>new THREE.TextureLoader().load(r.result as string,tex=>{
-      tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=16;
-      if (isBack) setLogoTexBack(tex);
-      else { setLogoTex(tex); setLogoName(f.name); }
-    });
-    r.readAsDataURL(f);
-  },[]);
+  // Charger le logo depuis localStorage
+  useEffect(() => {
+    try {
+      const logoData = localStorage.getItem("designerLogo");
+      if (logoData) {
+        new THREE.TextureLoader().load(logoData, (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          setLogoTex(tex);
+        });
+      }
+    } catch (e) {
+      console.error("Erreur chargement logo", e);
+    }
+  }, []);
 
-  const dlPNG=useCallback(()=>{
-    const gl=glRef.current; if(!gl) return;
-    const a=document.createElement("a");
-    a.href=gl.domElement.toDataURL("image/png");
-    a.download="caracterstore-3d.png"; a.click();
-  },[]);
+  const dlPNG = useCallback(() => {
+    const gl = glRef.current; if (!gl) return;
+    const a = document.createElement("a");
+    a.href = gl.domElement.toDataURL("image/png");
+    a.download = "caracterstore-3d.png"; a.click();
+  }, []);
 
-  const stopRec=useCallback(()=>recRef.current?.stop(),[]);
-  const startRec=useCallback(()=>{
-    const gl=glRef.current; if(!gl||rec) return;
-    const stream=gl.domElement.captureStream(30);
-    const mt=["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9","video/webm"].find(m=>typeof MediaRecorder!=="undefined"&&MediaRecorder.isTypeSupported(m));
-    if(!mt){alert("Non supporté."); return;}
-    const recorder=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:8_000_000});
-    chunks.current=[];
-    recorder.ondataavailable=e=>{if(e.data.size>0)chunks.current.push(e.data);};
-    recorder.onstop=()=>{
-      const ext=mt.includes("mp4")?"mp4":"webm";
-      const blob=new Blob(chunks.current,{type:mt});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a"); a.href=url; a.download=`caracterstore-3d.${ext}`; a.click();
-      setTimeout(()=>URL.revokeObjectURL(url),5000);
-      setRec(false); setRecSec(0); if(timer.current)clearInterval(timer.current);
+  const stopRec = useCallback(() => recRef.current?.stop(), []);
+  const startRec = useCallback(() => {
+    const gl = glRef.current; if (!gl || rec) return;
+    const stream = gl.domElement.captureStream(30);
+    const mt = ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"].find(m => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m));
+    if (!mt) { alert("Non supporté."); return; }
+    const recorder = new MediaRecorder(stream, { mimeType: mt, videoBitsPerSecond: 8_000_000 });
+    chunks.current = [];
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.current.push(e.data); };
+    recorder.onstop = () => {
+      const ext = mt.includes("mp4") ? "mp4" : "webm";
+      const blob = new Blob(chunks.current, { type: mt });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = `caracterstore-3d.${ext}`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      setRec(false); setRecSec(0); if (timer.current) clearInterval(timer.current);
     };
-    recRef.current=recorder; recorder.start(); setRec(true); setRecSec(0);
-    timer.current=setInterval(()=>setRecSec(s=>{if(s+1>=MAX_REC){recorder.stop();return s+1;}return s+1;}),1000);
-  },[rec]);
+    recRef.current = recorder; recorder.start(); setRec(true); setRecSec(0);
+    timer.current = setInterval(() => setRecSec(s => { if (s + 1 >= MAX_REC) { recorder.stop(); return s + 1; } return s + 1; }), 1000);
+  }, [rec]);
 
-  useEffect(()=>()=>{if(timer.current)clearInterval(timer.current);},[]);
-  const colorName=COLORS.find(c=>c.hex===color)?.name??"";
-  const waUrl=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. T-shirt ${colorName}${logoName?` avec logo (${logoName})`:""}.`)}`;
+  useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
+
+  const waUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. T-shirt ${colorParam}.`)}`;
 
   return (
     <ErrorBoundary>
@@ -290,127 +280,63 @@ export default function Studio3D() {
               <p className="text-[10px] leading-tight text-[#0a1f2e]/50">Studio 3D</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="rounded-full border border-[#d41717]/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#d41717]">Bêta</span>
-            <a href="/" className="text-xs text-[#0a1f2e]/40 hover:text-[#0a1f2e]">← Retour</a>
-          </div>
+          <a href="/designer" className="text-xs text-[#0a1f2e]/40 hover:text-[#0a1f2e]">← Designer</a>
         </header>
 
         <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
-          <div className="relative h-[56vh] min-h-[340px] flex-1 lg:h-[calc(100vh-57px)]" style={{background: bgColor.startsWith("linear") ? bgColor : undefined, backgroundColor: bgColor.startsWith("linear") ? undefined : bgColor}}>
-            <Canvas
-              camera={{ position: [0, 0, 2.2], fov: 25 }}
-              gl={{ preserveDrawingBuffer: true }}
-              onCreated={({ gl }) => {
-                gl.localClippingEnabled = true;
-                gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                glRef.current = gl;
-              }}
-            >
+          <div className="relative h-[56vh] min-h-[340px] flex-1 lg:h-[calc(100vh-57px)]" style={{ background: bgColor.startsWith("linear") ? bgColor : undefined, backgroundColor: bgColor.startsWith("linear") ? undefined : bgColor }}>
+            <Canvas camera={{ position: [0, 0, 2.5], fov: 25 }} gl={{ preserveDrawingBuffer: true, antialias: true }}
+              onCreated={({ gl }) => { gl.setPixelRatio(Math.min(window.devicePixelRatio, 2)); glRef.current = gl; }} shadows>
               <Suspense fallback={null}>
-                <Scene bgColor={bgColor} anim={anim} color={color} logoTexture={logoTex}
-                  logoTextureBack={logoTexBack} logoPos={logoPos}
-                  clipPlane={null as any} clipActive={false} />
+                <Scene bgColor={bgColor} anim={anim} color={color} logoTexture={logoTex} />
               </Suspense>
             </Canvas>
 
-            {rec&&<div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-red-500"/>
-              <span className="text-xs font-semibold tabular-nums text-white">{recSec}s/{MAX_REC}s</span>
+            {rec && <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+              <span className="text-xs font-semibold text-white">{recSec}s/{MAX_REC}s</span>
             </div>}
-
-            {!logoTex&&<button onClick={()=>logoRef.current?.click()}
-              className="absolute bottom-5 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/30 bg-black/40 px-5 py-2 text-xs font-medium text-white backdrop-blur hover:bg-black/60">
-              + Ajouter votre logo
-            </button>}
           </div>
 
           <aside className="w-full border-t border-gray-100 bg-[#f8fafc] p-5 lg:w-[310px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:[height:calc(100vh-57px)]">
-
             <section>
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Couleur</p>
+              <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Couleur</p>
+              <p className="text-xs font-semibold text-[#0a1f2e]">{colorParam}</p>
+            </section>
+
+            <section className="mt-5">
+              <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Arrière-plan</p>
               <div className="flex flex-wrap gap-2">
-                {COLORS.map(c=><button key={c.hex} title={c.name} onClick={()=>setColor(c.hex)}
-                  className={`h-8 w-8 rounded-full border-2 transition ${color===c.hex?"border-[#d41717] scale-110 shadow-lg":"border-gray-300 hover:border-[#d41717]/40"}`}
-                  style={{backgroundColor:c.hex}}/>)}
-              </div>
-              <p className="mt-1.5 text-xs text-[#0a1f2e]/50">{colorName}</p>
-            </section>
-
-            <section className="mt-5">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Arrière-plan</p>
-              <div className="flex flex-wrap gap-2">
-                {BGS.map(b=><button key={b.name} title={b.name} onClick={()=>{setBgColor(b.color);setBgName(b.name);}}
-                  className={`h-8 w-8 rounded-lg border-2 transition ${bgName===b.name?"border-[#d41717] scale-110":"border-gray-300 hover:border-[#d41717]/40"}`}
-                  style={{background: b.color}}/>)}
-              </div>
-              <p className="mt-1.5 text-xs text-[#0a1f2e]/50">{bgName}</p>
-            </section>
-
-            <section className="mt-5">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Position du logo</p>
-              <div className="space-y-2">
-                {(["poitrine", "coeur-dos", "poitrine-dos"] as LogoPos[]).map(pos=>(
-                  <button key={pos} onClick={()=>setLogoPos(pos)}
-                    className={`w-full rounded-lg border px-3 py-2 text-xs transition ${logoPos===pos?"border-[#d41717] bg-red-50 text-[#d41717]":"border-gray-200 bg-white text-[#0a1f2e]/50 hover:border-[#d41717]/40"}`}>
-                    {pos === "poitrine" && "Poitrine"}
-                    {pos === "coeur-dos" && "Cœur + Dos"}
-                    {pos === "poitrine-dos" && "Poitrine + Dos"}
-                  </button>
-                ))}
+                {BGS.map(b => <button key={b.name} title={b.name} onClick={() => { setBgColor(b.color); setBgName(b.name); }}
+                  className={`h-8 w-8 rounded-lg border-2 transition ${bgName === b.name ? "border-[#d41717] scale-110" : "border-gray-300"}`}
+                  style={{ background: b.color }} />)}
               </div>
             </section>
 
             <section className="mt-5">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Logo</p>
-              <input ref={logoRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e)=>uploadLogo(e,false)} className="hidden"/>
-              <button onClick={()=>logoRef.current?.click()}
-                className="w-full rounded-xl border border-dashed border-gray-300 bg-white py-3 text-sm text-[#0a1f2e]/50 transition hover:border-[#d41717]/40 hover:text-[#0a1f2e]">
-                {logoName?`✓ ${logoName}`:"Importer logo avant"}
-              </button>
-              {(logoPos === "coeur-dos" || logoPos === "poitrine-dos") && (
-                <>
-                  <input ref={logoBackRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e)=>uploadLogo(e,true)} className="hidden"/>
-                  <button onClick={()=>logoBackRef.current?.click()}
-                    className="mt-2 w-full rounded-xl border border-dashed border-gray-300 bg-white py-3 text-sm text-[#0a1f2e]/50 transition hover:border-[#d41717]/40 hover:text-[#0a1f2e]">
-                    {logoTexBack?"✓ Logo arrière chargé":"Importer logo arrière"}
-                  </button>
-                </>
-              )}
-            </section>
-
-            <section className="mt-5">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Animation</p>
+              <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Animation</p>
               <div className="grid grid-cols-2 gap-2">
-                {ANIMS.map(a=><button key={a.id} onClick={()=>setAnim(a.id)}
-                  className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition ${anim===a.id?"border-[#d41717] bg-red-50 text-[#d41717]":"border-gray-200 bg-white text-[#0a1f2e]/50 hover:border-[#d41717]/40"}`}>
-                  <span>{a.icon}</span><span>{a.label}</span>
+                {ANIMS.map(a => <button key={a.id} onClick={() => setAnim(a.id)}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition ${anim === a.id ? "border-[#d41717] bg-red-50 text-[#d41717]" : "border-gray-200 bg-white"}`}>
+                  <span>{a.icon}</span><span className="text-[11px]">{a.label}</span>
                 </button>)}
               </div>
             </section>
 
             <section className="mt-5">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#0a1f2e]/40">Exporter</p>
+              <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Exporter</p>
               <div className="space-y-2">
-                <button onClick={dlPNG} className="w-full rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-medium text-[#0a1f2e]/60 transition hover:bg-gray-50">
-                  📷 Télécharger PNG
-                </button>
-                {!rec
-                  ?<button onClick={startRec} className="w-full rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-medium text-[#0a1f2e]/60 transition hover:border-red-400/40 hover:text-red-600">
-                    ● Enregistrer vidéo (max {MAX_REC}s)
-                  </button>
-                  :<button onClick={stopRec} className="w-full rounded-xl border border-red-300 bg-red-50 py-2.5 text-xs font-semibold text-red-600">
-                    ■ Arrêter — {recSec}s / {MAX_REC}s
-                  </button>}
+                <button onClick={dlPNG} className="w-full rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-medium text-[#0a1f2e]/60">📷 PNG</button>
+                {!rec ? <button onClick={startRec} className="w-full rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-medium text-[#0a1f2e]/60">● Vidéo</button>
+                  : <button onClick={stopRec} className="w-full rounded-xl border border-red-300 bg-red-50 py-2.5 text-xs font-semibold text-red-600">■ Arrêter</button>}
               </div>
             </section>
 
-            <section className="mt-6 space-y-2">
+            <section className="mt-6">
               <a href={waUrl} target="_blank" rel="noopener noreferrer"
-                className="block w-full rounded-xl bg-[#d41717] py-3.5 text-center text-sm font-bold text-white transition hover:bg-[#a80f0f]">
-                Commander ce design →
+                className="block w-full rounded-xl bg-[#d41717] py-3.5 text-center text-sm font-bold text-white">
+                Commander →
               </a>
-              <p className="text-center text-[10px] text-[#0a1f2e]/30">DTF & broderie · Caractère Store · Alger</p>
             </section>
           </aside>
         </div>
