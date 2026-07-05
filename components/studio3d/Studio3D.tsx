@@ -25,7 +25,6 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
   }
 }
 
-const SUPABASE_URL = "https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public";
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
 
@@ -57,18 +56,15 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
   {id:"marche",label:"Marche",icon:"🚶"},
 ];
 
-// ── Générer un t-shirt 3D en géométrie
 function createTShirtGeometry() {
   const group = new THREE.Group();
 
-  // Corps (boîte main)
   const bodyGeom = new THREE.BoxGeometry(0.6, 0.8, 0.2);
   const body = new THREE.Mesh(bodyGeom);
   body.position.z = 0;
   body.position.y = 0.1;
   group.add(body);
 
-  // Manche gauche
   const leftSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
   const leftSleeve = new THREE.Mesh(leftSleeveGeom);
   leftSleeve.position.x = -0.5;
@@ -76,7 +72,6 @@ function createTShirtGeometry() {
   leftSleeve.rotation.z = 0.3;
   group.add(leftSleeve);
 
-  // Manche droite
   const rightSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
   const rightSleeve = new THREE.Mesh(rightSleeveGeom);
   rightSleeve.position.x = 0.5;
@@ -84,7 +79,6 @@ function createTShirtGeometry() {
   rightSleeve.rotation.z = -0.3;
   group.add(rightSleeve);
 
-  // Col (petit cylindre)
   const collarGeom = new THREE.CylinderGeometry(0.15, 0.15, 0.08, 32);
   const collar = new THREE.Mesh(collarGeom);
   collar.position.y = 0.55;
@@ -107,7 +101,7 @@ function SceneBg({ bgColor }: { bgColor: string }) {
 }
 
 function TShirt3D({ color, logoTexture }: { color: string; logoTexture: THREE.Texture | null }) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group | null>(null);
   const meshesRef = useRef<THREE.Mesh[]>([]);
   const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
@@ -138,27 +132,8 @@ function TShirt3D({ color, logoTexture }: { color: string; logoTexture: THREE.Te
     }
   }, [color]);
 
-  useEffect(() => {
-    if (logoTexture && meshesRef.current[0]) {
-      const canvas = document.createElement("canvas");
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        const img = new Image();
-        img.onload = () => {
-          ctx.fillStyle = color;
-          ctx.fillRect(0, 0, 512, 512);
-          ctx.drawImage(img, 150, 150, 200, 200);
-          const texture = new THREE.CanvasTexture(canvas);
-          const mat = new THREE.MeshStandardMaterial({ map: texture, metalness: 0.1, roughness: 0.8 });
-          meshesRef.current[0].material = mat;
-        };
-        img.src = logoTexture.source.data instanceof HTMLCanvasElement ? logoTexture.source.data.toDataURL() : "";
-      }
-    }
-  }, [logoTexture, color]);
-
+  if (!groupRef.current) return null;
+  
   return <primitive object={groupRef.current} />;
 }
 
@@ -220,7 +195,6 @@ export default function Studio3D() {
   const chunks = useRef<Blob[]>([]);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Charger le logo depuis localStorage
   useEffect(() => {
     try {
       const logoData = localStorage.getItem("designerLogo");
