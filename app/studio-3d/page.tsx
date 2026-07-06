@@ -1,9 +1,9 @@
 'use client'
-export const dynamic = 'force-dynamic'
 import { useState, useRef, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import { MOCKUPS } from '@/components/designer/mockups-data'
+
 
 interface LogoLayer {
   id: string; src: string; x: number; y: number; scale: number; rotation: number
@@ -61,9 +61,9 @@ const IconWhatsApp = () => (
 )
 
 function DesignerInner() {
-  const searchParams = useSearchParams()
+
   const router = useRouter()
-  const initialId = searchParams.get('product') || 'tshirt'
+  const initialId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('product') || 'tshirt' : 'tshirt'
   const initialProduct = PRODUCTS.find(p => p.id === initialId) || PRODUCTS[0]
 
   const [product, setProduct]     = useState(initialProduct)
