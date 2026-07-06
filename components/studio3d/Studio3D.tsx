@@ -63,7 +63,6 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
   {id:"marche",label:"Marche",icon:"🚶"},
 ];
 
-// T-shirt classique (slim fit)
 function createTShirtGeometry() {
   const group = new THREE.Group();
   const bodyGeom = new THREE.BoxGeometry(0.6, 0.8, 0.2);
@@ -95,7 +94,6 @@ function createTShirtGeometry() {
   return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
 }
 
-// T-shirt Oversized Boxy (large et carré)
 function createOversizedBoxyGeometry() {
   const group = new THREE.Group();
   const bodyGeom = new THREE.BoxGeometry(0.85, 0.95, 0.25);
@@ -127,7 +125,6 @@ function createOversizedBoxyGeometry() {
   return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
 }
 
-// Polo (avec col)
 function createPoloGeometry() {
   const group = new THREE.Group();
   const bodyGeom = new THREE.BoxGeometry(0.6, 0.75, 0.2);
@@ -150,14 +147,12 @@ function createPoloGeometry() {
   rightSleeve.rotation.z = -0.25;
   group.add(rightSleeve);
 
-  // Col polo plus marqué
   const collarGeom = new THREE.BoxGeometry(0.35, 0.15, 0.12);
   const collar = new THREE.Mesh(collarGeom);
   collar.position.y = 0.52;
   collar.position.z = 0.1;
   group.add(collar);
 
-  // Petit bouton
   const buttonGeom = new THREE.SphereGeometry(0.05, 16, 16);
   const button = new THREE.Mesh(buttonGeom);
   button.position.y = 0.4;
@@ -167,7 +162,6 @@ function createPoloGeometry() {
   return { group, meshes: [body, leftSleeve, rightSleeve, collar, button] };
 }
 
-// Hoodie (avec capuche)
 function createHoodieGeometry() {
   const group = new THREE.Group();
   
@@ -191,7 +185,6 @@ function createHoodieGeometry() {
   rightSleeve.rotation.z = -0.2;
   group.add(rightSleeve);
 
-  // Capuche (dôme)
   const hoodGeom = new THREE.SphereGeometry(0.25, 32, 16);
   const hood = new THREE.Mesh(hoodGeom);
   hood.position.y = 0.62;
@@ -199,7 +192,6 @@ function createHoodieGeometry() {
   hood.scale.set(1, 0.8, 0.9);
   group.add(hood);
 
-  // Cordes de la capuche
   const cordGeom = new THREE.CylinderGeometry(0.03, 0.03, 0.25, 16);
   const leftCord = new THREE.Mesh(cordGeom);
   leftCord.position.set(-0.08, 0.35, 0.08);
@@ -229,18 +221,17 @@ function TShirt3D({ color, product }: { color: string; product: string }) {
 
   useEffect(() => {
     if (!groupRef.current) {
-      let { group, meshes };
+      let result = createTShirtGeometry();
       
       if (product === "tshirt_oversized") {
-        ({ group, meshes } = createOversizedBoxyGeometry());
+        result = createOversizedBoxyGeometry();
       } else if (product === "polo") {
-        ({ group, meshes } = createPoloGeometry());
+        result = createPoloGeometry();
       } else if (product === "hoodie") {
-        ({ group, meshes } = createHoodieGeometry());
-      } else {
-        ({ group, meshes } = createTShirtGeometry());
+        result = createHoodieGeometry();
       }
       
+      const { group, meshes } = result;
       groupRef.current = group;
       meshesRef.current = meshes;
 
@@ -319,7 +310,7 @@ export default function Studio3D() {
   
   const product = PRODUCTS[productParam] || PRODUCTS["tshirt"];
   const [selectedProduct, setSelectedProduct] = useState(product.id);
-  const [color, setColor] = useState(ALL_COLORS["blanc"]); // Blanc par défaut
+  const [color, setColor] = useState(ALL_COLORS["blanc"]);
   const [bgColor, setBgColor] = useState("#667eea");
   const [bgName, setBgName] = useState("Dégradé bleu");
   const [anim, setAnim] = useState<Anim>("rotation");
