@@ -28,31 +28,29 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
 
-const PRODUCTS: Record<string, { id: string; name: string; emoji: string; colors: string[] }> = {
-  "tshirt": { id: "tshirt", name: "T-shirt", emoji: "👕", colors: ["blanc", "noir", "marine", "royal", "rouge", "vert", "gris", "beige", "bordeaux"] },
-  "tshirt_oversized": { id: "tshirt_oversized", name: "Oversized Boxy", emoji: "👕", colors: ["blanc", "noir", "marine", "royal", "rouge", "vert", "gris", "beige", "bordeaux"] },
-  "polo": { id: "polo", name: "Polo", emoji: "🎾", colors: ["blanc", "noir", "marine", "royal", "rouge", "vert", "gris", "beige", "bordeaux"] },
-  "hoodie": { id: "hoodie", name: "Hoodie", emoji: "🧥", colors: ["blanc", "noir", "marine", "royal", "rouge", "vert", "gris", "beige", "bordeaux"] },
+const PRODUCTS: Record<string, { id: string; name: string; emoji: string }> = {
+  "tshirt": { id: "tshirt", name: "T-shirt", emoji: "👕" },
+  "tshirt_oversized": { id: "tshirt_oversized", name: "Oversized Boxy", emoji: "👕" },
 };
 
 const ALL_COLORS: Record<string, string> = {
-  "blanc": "#FFFFFF",
-  "noir": "#1A1A1A",
-  "marine": "#1E3A5F",
-  "royal": "#2563EB",
-  "rouge": "#DC2626",
-  "vert": "#166534",
-  "gris": "#6B7280",
-  "beige": "#D6B99A",
-  "bordeaux": "#7F1D1D",
+  "blanc": "#FFFFFF", "Blanc": "#FFFFFF",
+  "noir": "#1A1A1A", "Noir": "#1A1A1A",
+  "marine": "#1E3A5F", "Marine": "#1E3A5F",
+  "royal": "#2563EB", "Bleu roi": "#2563EB",
+  "rouge": "#DC2626", "Rouge": "#DC2626",
+  "vert": "#166534", "Vert": "#166534",
+  "gris": "#6B7280", "Gris": "#6B7280",
+  "beige": "#D6B99A", "Beige": "#D6B99A",
+  "bordeaux": "#7F1D1D", "Bordeaux": "#7F1D1D",
 };
 
 const BGS = [
-  { name: "Dégradé bleu", hex: "#667eea" },
-  { name: "Dégradé rose", hex: "#f093fb" },
-  { name: "Dégradé vert", hex: "#4facfe" },
-  { name: "Noir mat", hex: "#0a0a0a" },
-  { name: "Blanc pur", hex: "#f5f5f5" },
+  { name: "Bleu", hex: "#667eea" },
+  { name: "Rose", hex: "#f5576c" },
+  { name: "Cyan", hex: "#4facfe" },
+  { name: "Noir", hex: "#0a0a0a" },
+  { name: "Blanc", hex: "#f5f5f5" },
 ];
 
 type Anim = "aucune"|"rotation"|"flottement"|"marche";
@@ -66,215 +64,52 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
 function createTShirtGeometry() {
   const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
-  const bodyGeom = new THREE.BoxGeometry(0.6, 0.8, 0.2);
-  const body = new THREE.Mesh(bodyGeom);
-  body.position.z = 0;
-  body.position.y = 0.1;
-  group.add(body);
-  meshes.push(body);
-
-  const leftSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
-  const leftSleeve = new THREE.Mesh(leftSleeveGeom);
-  leftSleeve.position.x = -0.5;
-  leftSleeve.position.y = 0.2;
-  leftSleeve.rotation.z = 0.3;
-  group.add(leftSleeve);
-  meshes.push(leftSleeve);
-
-  const rightSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
-  const rightSleeve = new THREE.Mesh(rightSleeveGeom);
-  rightSleeve.position.x = 0.5;
-  rightSleeve.position.y = 0.2;
-  rightSleeve.rotation.z = -0.3;
-  group.add(rightSleeve);
-  meshes.push(rightSleeve);
-
-  const collarGeom = new THREE.BoxGeometry(0.3, 0.2, 0.1);
-  const collar = new THREE.Mesh(collarGeom);
-  collar.position.y = 0.55;
-  collar.position.z = 0.08;
-  group.add(collar);
-  meshes.push(collar);
-
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.8, 0.2));
+  body.position.y = 0.1; group.add(body); meshes.push(body);
+  const ls = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.4, 0.15));
+  ls.position.set(-0.5, 0.2, 0); ls.rotation.z = 0.3; group.add(ls); meshes.push(ls);
+  const rs = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.4, 0.15));
+  rs.position.set(0.5, 0.2, 0); rs.rotation.z = -0.3; group.add(rs); meshes.push(rs);
+  const c = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1));
+  c.position.set(0, 0.55, 0.08); group.add(c); meshes.push(c);
   return { group, meshes };
 }
 
-function createOversizedBoxyGeometry() {
+function createOversizedGeometry() {
   const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
-  const bodyGeom = new THREE.BoxGeometry(0.85, 0.95, 0.25);
-  const body = new THREE.Mesh(bodyGeom);
-  body.position.z = 0;
-  body.position.y = 0.05;
-  group.add(body);
-  meshes.push(body);
-
-  const leftSleeveGeom = new THREE.BoxGeometry(0.5, 0.5, 0.18);
-  const leftSleeve = new THREE.Mesh(leftSleeveGeom);
-  leftSleeve.position.x = -0.65;
-  leftSleeve.position.y = 0.15;
-  leftSleeve.rotation.z = 0.15;
-  group.add(leftSleeve);
-  meshes.push(leftSleeve);
-
-  const rightSleeveGeom = new THREE.BoxGeometry(0.5, 0.5, 0.18);
-  const rightSleeve = new THREE.Mesh(rightSleeveGeom);
-  rightSleeve.position.x = 0.65;
-  rightSleeve.position.y = 0.15;
-  rightSleeve.rotation.z = -0.15;
-  group.add(rightSleeve);
-  meshes.push(rightSleeve);
-
-  const collarGeom = new THREE.BoxGeometry(0.35, 0.2, 0.12);
-  const collar = new THREE.Mesh(collarGeom);
-  collar.position.y = 0.6;
-  collar.position.z = 0.1;
-  group.add(collar);
-  meshes.push(collar);
-
-  return { group, meshes };
-}
-
-function createPoloGeometry() {
-  const meshes: THREE.Mesh[] = [];
-  const group = new THREE.Group();
-  const bodyGeom = new THREE.BoxGeometry(0.6, 0.75, 0.2);
-  const body = new THREE.Mesh(bodyGeom);
-  body.position.z = 0;
-  body.position.y = 0.12;
-  group.add(body);
-  meshes.push(body);
-
-  const leftSleeveGeom = new THREE.BoxGeometry(0.3, 0.35, 0.15);
-  const leftSleeve = new THREE.Mesh(leftSleeveGeom);
-  leftSleeve.position.x = -0.45;
-  leftSleeve.position.y = 0.25;
-  leftSleeve.rotation.z = 0.25;
-  group.add(leftSleeve);
-  meshes.push(leftSleeve);
-
-  const rightSleeveGeom = new THREE.BoxGeometry(0.3, 0.35, 0.15);
-  const rightSleeve = new THREE.Mesh(rightSleeveGeom);
-  rightSleeve.position.x = 0.45;
-  rightSleeve.position.y = 0.25;
-  rightSleeve.rotation.z = -0.25;
-  group.add(rightSleeve);
-  meshes.push(rightSleeve);
-
-  const collarGeom = new THREE.BoxGeometry(0.35, 0.15, 0.12);
-  const collar = new THREE.Mesh(collarGeom);
-  collar.position.y = 0.52;
-  collar.position.z = 0.1;
-  group.add(collar);
-  meshes.push(collar);
-
-  const buttonGeom = new THREE.BoxGeometry(0.08, 0.08, 0.08);
-  const button = new THREE.Mesh(buttonGeom);
-  button.position.y = 0.4;
-  button.position.z = 0.12;
-  group.add(button);
-  meshes.push(button);
-
-  return { group, meshes };
-}
-
-function createHoodieGeometry() {
-  const meshes: THREE.Mesh[] = [];
-  const group = new THREE.Group();
-  const bodyGeom = new THREE.BoxGeometry(0.65, 0.85, 0.22);
-  const body = new THREE.Mesh(bodyGeom);
-  body.position.z = 0;
-  body.position.y = 0.08;
-  group.add(body);
-  meshes.push(body);
-
-  const leftSleeveGeom = new THREE.BoxGeometry(0.4, 0.45, 0.16);
-  const leftSleeve = new THREE.Mesh(leftSleeveGeom);
-  leftSleeve.position.x = -0.52;
-  leftSleeve.position.y = 0.18;
-  leftSleeve.rotation.z = 0.2;
-  group.add(leftSleeve);
-  meshes.push(leftSleeve);
-
-  const rightSleeveGeom = new THREE.BoxGeometry(0.4, 0.45, 0.16);
-  const rightSleeve = new THREE.Mesh(rightSleeveGeom);
-  rightSleeve.position.x = 0.52;
-  rightSleeve.position.y = 0.18;
-  rightSleeve.rotation.z = -0.2;
-  group.add(rightSleeve);
-  meshes.push(rightSleeve);
-
-  const hoodGeom = new THREE.BoxGeometry(0.4, 0.35, 0.2);
-  const hood = new THREE.Mesh(hoodGeom);
-  hood.position.y = 0.62;
-  hood.position.z = 0.05;
-  group.add(hood);
-  meshes.push(hood);
-
-  const leftCordGeom = new THREE.BoxGeometry(0.04, 0.25, 0.04);
-  const leftCord = new THREE.Mesh(leftCordGeom);
-  leftCord.position.set(-0.08, 0.35, 0.08);
-  group.add(leftCord);
-  meshes.push(leftCord);
-
-  const rightCordGeom = new THREE.BoxGeometry(0.04, 0.25, 0.04);
-  const rightCord = new THREE.Mesh(rightCordGeom);
-  rightCord.position.set(0.08, 0.35, 0.08);
-  group.add(rightCord);
-  meshes.push(rightCord);
-
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.95, 0.25));
+  body.position.y = 0.05; group.add(body); meshes.push(body);
+  const ls = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.18));
+  ls.position.set(-0.65, 0.15, 0); ls.rotation.z = 0.15; group.add(ls); meshes.push(ls);
+  const rs = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.18));
+  rs.position.set(0.65, 0.15, 0); rs.rotation.z = -0.15; group.add(rs); meshes.push(rs);
+  const c = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.22, 0.12));
+  c.position.set(0, 0.6, 0.1); group.add(c); meshes.push(c);
   return { group, meshes };
 }
 
 function SceneBg({ bgColor }: { bgColor: string }) {
   const { scene } = useThree();
-  useEffect(() => {
-    scene.background = new THREE.Color(bgColor);
-  }, [bgColor, scene]);
+  useEffect(() => { scene.background = new THREE.Color(bgColor); }, [bgColor, scene]);
   return null;
 }
 
-function TShirt3D({ color, product }: { color: string; product: string }) {
+function Product3D({ color, product }: { color: string; product: string }) {
   const groupRef = useRef<THREE.Group | null>(null);
-  const meshesRef = useRef<THREE.Mesh[]>([]);
   const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   useEffect(() => {
-    if (!groupRef.current) {
-      let result;
-      if (product === "tshirt_oversized") {
-        result = createOversizedBoxyGeometry();
-      } else if (product === "polo") {
-        result = createPoloGeometry();
-      } else if (product === "hoodie") {
-        result = createHoodieGeometry();
-      } else {
-        result = createTShirtGeometry();
-      }
-      const { group, meshes } = result;
-      groupRef.current = group;
-      meshesRef.current = meshes;
-
-      const material = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(color),
-        metalness: 0.1,
-        roughness: 0.8,
-      });
-      materialRef.current = material;
-
-      meshes.forEach(mesh => {
-        mesh.material = material;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-      });
-    }
+    const result = product === "tshirt_oversized" ? createOversizedGeometry() : createTShirtGeometry();
+    const { group, meshes } = result;
+    const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), metalness: 0.1, roughness: 0.8 });
+    materialRef.current = material;
+    meshes.forEach(m => { m.material = material; m.castShadow = true; m.receiveShadow = true; });
+    groupRef.current = group;
+    return () => { meshes.forEach(m => m.geometry.dispose()); material.dispose(); };
   }, [product]);
 
-  useEffect(() => {
-    if (materialRef.current) {
-      materialRef.current.color.set(color);
-    }
-  }, [color]);
+  useEffect(() => { if (materialRef.current) materialRef.current.color.set(color); }, [color]);
 
   if (!groupRef.current) return null;
   return <primitive object={groupRef.current} />;
@@ -282,43 +117,24 @@ function TShirt3D({ color, product }: { color: string; product: string }) {
 
 function Scene({ bgColor, anim, color, product }: { bgColor: string; anim: Anim; color: string; product: string }) {
   const g = useRef<THREE.Group>(null);
-
   useFrame(state => {
     const t = state.clock.getElapsedTime();
     const gr = g.current; if (!gr) return;
-
     if (anim !== "rotation") gr.rotation.y *= 0.95;
-    if (anim !== "flottement" && anim !== "marche") {
-      gr.position.y *= 0.9; gr.rotation.z *= 0.9; gr.rotation.x *= 0.9;
-    }
-
+    if (anim !== "flottement" && anim !== "marche") { gr.position.y *= 0.9; gr.rotation.z *= 0.9; gr.rotation.x *= 0.9; }
     if (anim === "rotation") gr.rotation.y += 0.012;
-    if (anim === "flottement") {
-      gr.position.y = Math.sin(t*1.4)*0.035;
-      gr.rotation.z = Math.sin(t*0.9)*0.04;
-      gr.rotation.y = Math.sin(t*0.6)*0.25;
-    }
-    if (anim === "marche") {
-      const s = t*3.4;
-      gr.position.y = Math.abs(Math.sin(s))*0.032;
-      gr.rotation.z = Math.sin(s)*0.05;
-      gr.rotation.x = 0.03 + Math.sin(s*2)*0.012;
-      gr.rotation.y = Math.sin(t*0.8)*0.18;
-    }
+    if (anim === "flottement") { gr.position.y = Math.sin(t*1.4)*0.035; gr.rotation.z = Math.sin(t*0.9)*0.04; gr.rotation.y = Math.sin(t*0.6)*0.25; }
+    if (anim === "marche") { const s = t*3.4; gr.position.y = Math.abs(Math.sin(s))*0.032; gr.rotation.z = Math.sin(s)*0.05; gr.rotation.x = 0.03 + Math.sin(s*2)*0.012; gr.rotation.y = Math.sin(t*0.8)*0.18; }
   });
-
   return (
     <>
       <SceneBg bgColor={bgColor} />
       <ambientLight intensity={0.8} />
       <directionalLight position={[3, 4, 5]} intensity={1.3} castShadow />
       <directionalLight position={[-4, 2, -3]} intensity={0.6} />
-      <group ref={g}>
-        <TShirt3D color={color} product={product} />
-      </group>
+      <group ref={g}><Product3D color={color} product={product} /></group>
       <ContactShadows position={[0,-0.8,0]} opacity={0.35} scale={3} blur={2.2} far={1.5} />
-      <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4}
-        minPolarAngle={Math.PI/4} maxPolarAngle={3*Math.PI/4} />
+      <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4} minPolarAngle={Math.PI/4} maxPolarAngle={3*Math.PI/4} />
     </>
   );
 }
@@ -326,12 +142,11 @@ function Scene({ bgColor, anim, color, product }: { bgColor: string; anim: Anim;
 export default function Studio3DContent() {
   const searchParams = useSearchParams();
   const productParam = searchParams.get("produit") || "tshirt";
-  const colorParam = searchParams.get("couleur") || "blanc";
-  const product = PRODUCTS[productParam] || PRODUCTS["tshirt"];
-  const [selectedProduct, setSelectedProduct] = useState(product.id);
-  const [color, setColor] = useState(ALL_COLORS["blanc"]);
+  const colorParam = searchParams.get("couleur") || "Blanc";
+  const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[productParam] ? productParam : "tshirt");
+  const [color, setColor] = useState("#FFFFFF");
   const [bgColor, setBgColor] = useState("#667eea");
-  const [bgName, setBgName] = useState("Dégradé bleu");
+  const [bgName, setBgName] = useState("Bleu");
   const [anim, setAnim] = useState<Anim>("rotation");
   const [rec, setRec] = useState(false);
   const [recSec, setRecSec] = useState(0);
@@ -339,6 +154,11 @@ export default function Studio3DContent() {
   const recRef = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const c = ALL_COLORS[colorParam];
+    if (c) setColor(c);
+  }, [colorParam]);
 
   const dlPNG = useCallback(() => {
     const gl = glRef.current; if (!gl) return;
@@ -370,16 +190,14 @@ export default function Studio3DContent() {
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
-  const waUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. ${PRODUCTS[selectedProduct]?.name || "Produit"} ${colorParam}.`)}`;
+  const waUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. ${PRODUCTS[selectedProduct]?.name} ${colorParam}.`)}`;
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white text-[#0a1f2e]">
         <header className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d41717]">
-              <span className="text-base font-black text-white">C</span>
-            </div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d41717]"><span className="text-base font-black text-white">C</span></div>
             <div>
               <p className="text-sm font-bold leading-tight">Caractère</p>
               <p className="text-[10px] leading-tight text-[#0a1f2e]/50">Studio 3D</p>
@@ -394,7 +212,6 @@ export default function Studio3DContent() {
               onCreated={({ gl }) => { gl.setPixelRatio(Math.min(window.devicePixelRatio, 2)); glRef.current = gl; }} shadows>
               <Scene bgColor={bgColor} anim={anim} color={color} product={selectedProduct} />
             </Canvas>
-
             {rec && <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur">
               <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
               <span className="text-xs font-semibold text-white">{recSec}s/{MAX_REC}s</span>
@@ -448,10 +265,7 @@ export default function Studio3DContent() {
             </section>
 
             <section className="mt-6">
-              <a href={waUrl} target="_blank" rel="noopener noreferrer"
-                className="block w-full rounded-xl bg-[#d41717] py-3.5 text-center text-sm font-bold text-white">
-                Commander →
-              </a>
+              <a href={waUrl} target="_blank" rel="noopener noreferrer" className="block w-full rounded-xl bg-[#d41717] py-3.5 text-center text-sm font-bold text-white">Commander →</a>
             </section>
           </aside>
         </div>
