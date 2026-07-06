@@ -64,12 +64,15 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
 ];
 
 function createTShirtGeometry() {
+  const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
+  
   const bodyGeom = new THREE.BoxGeometry(0.6, 0.8, 0.2);
   const body = new THREE.Mesh(bodyGeom);
   body.position.z = 0;
   body.position.y = 0.1;
   group.add(body);
+  meshes.push(body);
 
   const leftSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
   const leftSleeve = new THREE.Mesh(leftSleeveGeom);
@@ -77,6 +80,7 @@ function createTShirtGeometry() {
   leftSleeve.position.y = 0.2;
   leftSleeve.rotation.z = 0.3;
   group.add(leftSleeve);
+  meshes.push(leftSleeve);
 
   const rightSleeveGeom = new THREE.BoxGeometry(0.35, 0.4, 0.15);
   const rightSleeve = new THREE.Mesh(rightSleeveGeom);
@@ -84,23 +88,28 @@ function createTShirtGeometry() {
   rightSleeve.position.y = 0.2;
   rightSleeve.rotation.z = -0.3;
   group.add(rightSleeve);
+  meshes.push(rightSleeve);
 
   const collarGeom = new THREE.CylinderGeometry(0.15, 0.15, 0.08, 32);
   const collar = new THREE.Mesh(collarGeom);
   collar.position.y = 0.55;
   collar.position.z = 0.08;
   group.add(collar);
+  meshes.push(collar);
 
-  return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
+  return { group, meshes };
 }
 
 function createOversizedBoxyGeometry() {
+  const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
+  
   const bodyGeom = new THREE.BoxGeometry(0.85, 0.95, 0.25);
   const body = new THREE.Mesh(bodyGeom);
   body.position.z = 0;
   body.position.y = 0.05;
   group.add(body);
+  meshes.push(body);
 
   const leftSleeveGeom = new THREE.BoxGeometry(0.5, 0.5, 0.18);
   const leftSleeve = new THREE.Mesh(leftSleeveGeom);
@@ -108,6 +117,7 @@ function createOversizedBoxyGeometry() {
   leftSleeve.position.y = 0.15;
   leftSleeve.rotation.z = 0.15;
   group.add(leftSleeve);
+  meshes.push(leftSleeve);
 
   const rightSleeveGeom = new THREE.BoxGeometry(0.5, 0.5, 0.18);
   const rightSleeve = new THREE.Mesh(rightSleeveGeom);
@@ -115,23 +125,28 @@ function createOversizedBoxyGeometry() {
   rightSleeve.position.y = 0.15;
   rightSleeve.rotation.z = -0.15;
   group.add(rightSleeve);
+  meshes.push(rightSleeve);
 
   const collarGeom = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 32);
   const collar = new THREE.Mesh(collarGeom);
   collar.position.y = 0.6;
   collar.position.z = 0.1;
   group.add(collar);
+  meshes.push(collar);
 
-  return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
+  return { group, meshes };
 }
 
 function createPoloGeometry() {
+  const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
+  
   const bodyGeom = new THREE.BoxGeometry(0.6, 0.75, 0.2);
   const body = new THREE.Mesh(bodyGeom);
   body.position.z = 0;
   body.position.y = 0.12;
   group.add(body);
+  meshes.push(body);
 
   const leftSleeveGeom = new THREE.BoxGeometry(0.3, 0.35, 0.15);
   const leftSleeve = new THREE.Mesh(leftSleeveGeom);
@@ -139,6 +154,7 @@ function createPoloGeometry() {
   leftSleeve.position.y = 0.25;
   leftSleeve.rotation.z = 0.25;
   group.add(leftSleeve);
+  meshes.push(leftSleeve);
 
   const rightSleeveGeom = new THREE.BoxGeometry(0.3, 0.35, 0.15);
   const rightSleeve = new THREE.Mesh(rightSleeveGeom);
@@ -146,23 +162,27 @@ function createPoloGeometry() {
   rightSleeve.position.y = 0.25;
   rightSleeve.rotation.z = -0.25;
   group.add(rightSleeve);
+  meshes.push(rightSleeve);
 
   const collarGeom = new THREE.BoxGeometry(0.35, 0.15, 0.12);
   const collar = new THREE.Mesh(collarGeom);
   collar.position.y = 0.52;
   collar.position.z = 0.1;
   group.add(collar);
+  meshes.push(collar);
 
-  const buttonGeom = new THREE.SphereGeometry(0.05, 16, 16);
+  const buttonGeom = new THREE.BoxGeometry(0.08, 0.08, 0.08);
   const button = new THREE.Mesh(buttonGeom);
   button.position.y = 0.4;
   button.position.z = 0.12;
   group.add(button);
+  meshes.push(button);
 
-  return { group, meshes: [body, leftSleeve, rightSleeve, collar, button] };
+  return { group, meshes };
 }
 
 function createHoodieGeometry() {
+  const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
   
   const bodyGeom = new THREE.BoxGeometry(0.65, 0.85, 0.22);
@@ -170,6 +190,7 @@ function createHoodieGeometry() {
   body.position.z = 0;
   body.position.y = 0.08;
   group.add(body);
+  meshes.push(body);
 
   const leftSleeveGeom = new THREE.BoxGeometry(0.4, 0.45, 0.16);
   const leftSleeve = new THREE.Mesh(leftSleeveGeom);
@@ -177,6 +198,7 @@ function createHoodieGeometry() {
   leftSleeve.position.y = 0.18;
   leftSleeve.rotation.z = 0.2;
   group.add(leftSleeve);
+  meshes.push(leftSleeve);
 
   const rightSleeveGeom = new THREE.BoxGeometry(0.4, 0.45, 0.16);
   const rightSleeve = new THREE.Mesh(rightSleeveGeom);
@@ -184,26 +206,28 @@ function createHoodieGeometry() {
   rightSleeve.position.y = 0.18;
   rightSleeve.rotation.z = -0.2;
   group.add(rightSleeve);
+  meshes.push(rightSleeve);
 
-  const hoodGeom = new THREE.SphereGeometry(0.25, 32, 16);
+  const hoodGeom = new THREE.BoxGeometry(0.4, 0.35, 0.2);
   const hood = new THREE.Mesh(hoodGeom);
   hood.position.y = 0.62;
   hood.position.z = 0.05;
-  hood.scale.set(1, 0.8, 0.9);
   group.add(hood);
+  meshes.push(hood);
 
-  const cordGeom = new THREE.CylinderGeometry(0.03, 0.03, 0.25, 16);
-  const leftCord = new THREE.Mesh(cordGeom);
+  const leftCordGeom = new THREE.BoxGeometry(0.04, 0.25, 0.04);
+  const leftCord = new THREE.Mesh(leftCordGeom);
   leftCord.position.set(-0.08, 0.35, 0.08);
-  leftCord.rotation.z = 0.3;
   group.add(leftCord);
+  meshes.push(leftCord);
 
-  const rightCord = new THREE.Mesh(cordGeom);
+  const rightCordGeom = new THREE.BoxGeometry(0.04, 0.25, 0.04);
+  const rightCord = new THREE.Mesh(rightCordGeom);
   rightCord.position.set(0.08, 0.35, 0.08);
-  rightCord.rotation.z = -0.3;
   group.add(rightCord);
+  meshes.push(rightCord);
 
-  return { group, meshes: [body, leftSleeve, rightSleeve, hood, leftCord, rightCord] };
+  return { group, meshes };
 }
 
 function SceneBg({ bgColor }: { bgColor: string }) {
@@ -221,7 +245,7 @@ function TShirt3D({ color, product }: { color: string; product: string }) {
 
   useEffect(() => {
     if (!groupRef.current) {
-      let result = createTShirtGeometry();
+      let result;
       
       if (product === "tshirt_oversized") {
         result = createOversizedBoxyGeometry();
@@ -229,6 +253,8 @@ function TShirt3D({ color, product }: { color: string; product: string }) {
         result = createPoloGeometry();
       } else if (product === "hoodie") {
         result = createHoodieGeometry();
+      } else {
+        result = createTShirtGeometry();
       }
       
       const { group, meshes } = result;
