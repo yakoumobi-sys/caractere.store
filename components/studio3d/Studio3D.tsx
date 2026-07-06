@@ -28,16 +28,21 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
 
+const PRODUCTS: Record<string, { id: string; name: string; emoji: string; colors: string[] }> = {
+  "tshirt": { id: "tshirt", name: "T-shirt", emoji: "👕", colors: ["blanc", "noir", "marine", "royal", "rouge", "vert", "gris", "beige", "bordeaux"] },
+  "tshirt_oversized": { id: "tshirt_oversized", name: "Oversized Boxy", emoji: "👕", colors: ["blanc", "noir", "marine", "royal", "rouge", "vert", "gris", "beige", "bordeaux"] },
+};
+
 const ALL_COLORS: Record<string, string> = {
-  "Blanc": "#FFFFFF",
-  "Noir": "#1A1A1A",
-  "Marine": "#1E3A5F",
-  "Bleu roi": "#2563EB",
-  "Rouge": "#DC2626",
-  "Vert": "#166534",
-  "Gris": "#6B7280",
-  "Beige": "#D6B99A",
-  "Bordeaux": "#7F1D1D",
+  "blanc": "#FFFFFF",
+  "noir": "#1A1A1A",
+  "marine": "#1E3A5F",
+  "royal": "#2563EB",
+  "rouge": "#DC2626",
+  "vert": "#166534",
+  "gris": "#6B7280",
+  "beige": "#D6B99A",
+  "bordeaux": "#7F1D1D",
 };
 
 const BGS = [
@@ -56,9 +61,9 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
   {id:"marche",label:"Marche",icon:"🚶"},
 ];
 
+// T-shirt classique (slim fit)
 function createTShirtGeometry() {
   const group = new THREE.Group();
-
   const bodyGeom = new THREE.BoxGeometry(0.6, 0.8, 0.2);
   const body = new THREE.Mesh(bodyGeom);
   body.position.z = 0;
@@ -88,6 +93,42 @@ function createTShirtGeometry() {
   return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
 }
 
+// T-shirt Oversized Boxy (large et carré)
+function createOversizedBoxyGeometry() {
+  const group = new THREE.Group();
+  
+  // Corps beaucoup plus large et carré
+  const bodyGeom = new THREE.BoxGeometry(0.85, 0.95, 0.25);
+  const body = new THREE.Mesh(bodyGeom);
+  body.position.z = 0;
+  body.position.y = 0.05;
+  group.add(body);
+
+  // Manches plus larges et droites
+  const leftSleeveGeom = new THREE.BoxGeometry(0.5, 0.5, 0.18);
+  const leftSleeve = new THREE.Mesh(leftSleeveGeom);
+  leftSleeve.position.x = -0.65;
+  leftSleeve.position.y = 0.15;
+  leftSleeve.rotation.z = 0.15;
+  group.add(leftSleeve);
+
+  const rightSleeveGeom = new THREE.BoxGeometry(0.5, 0.5, 0.18);
+  const rightSleeve = new THREE.Mesh(rightSleeveGeom);
+  rightSleeve.position.x = 0.65;
+  rightSleeve.position.y = 0.15;
+  rightSleeve.rotation.z = -0.15;
+  group.add(rightSleeve);
+
+  // Col plus grand
+  const collarGeom = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 32);
+  const collar = new THREE.Mesh(collarGeom);
+  collar.position.y = 0.6;
+  collar.position.z = 0.1;
+  group.add(collar);
+
+  return { group, meshes: [body, leftSleeve, rightSleeve, collar] };
+}
+
 function SceneBg({ bgColor }: { bgColor: string }) {
   const { scene } = useThree();
   useEffect(() => {
@@ -100,14 +141,16 @@ function SceneBg({ bgColor }: { bgColor: string }) {
   return null;
 }
 
-function TShirt3D({ color, logoTexture }: { color: string; logoTexture: THREE.Texture | null }) {
+function TShirt3D({ color, product }: { color: string; product: string }) {
   const groupRef = useRef<THREE.Group | null>(null);
   const meshesRef = useRef<THREE.Mesh[]>([]);
   const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   useEffect(() => {
     if (!groupRef.current) {
-      const { group, meshes } = createTShirtGeometry();
+      const { group, meshes } = product === "tshirt_oversized" 
+        ? createOversizedBoxyGeometry() 
+        : createTShirtGeometry();
       groupRef.current = group;
       meshesRef.current = meshes;
 
@@ -124,7 +167,7 @@ function TShirt3D({ color, logoTexture }: { color: string; logoTexture: THREE.Te
         mesh.receiveShadow = true;
       });
     }
-  }, []);
+  }, [product]);
 
   useEffect(() => {
     if (materialRef.current) {
@@ -133,11 +176,10 @@ function TShirt3D({ color, logoTexture }: { color: string; logoTexture: THREE.Te
   }, [color]);
 
   if (!groupRef.current) return null;
-  
   return <primitive object={groupRef.current} />;
 }
 
-function Scene({ bgColor, anim, color, logoTexture }: { bgColor: string; anim: Anim; color: string; logoTexture: THREE.Texture | null }) {
+function Scene({ bgColor, anim, color, product }: { bgColor: string; anim: Anim; color: string; product: string }) {
   const g = useRef<THREE.Group>(null);
 
   useFrame(state => {
@@ -171,7 +213,7 @@ function Scene({ bgColor, anim, color, logoTexture }: { bgColor: string; anim: A
       <directionalLight position={[3, 4, 5]} intensity={1.3} castShadow />
       <directionalLight position={[-4, 2, -3]} intensity={0.6} />
       <group ref={g}>
-        <TShirt3D color={color} logoTexture={logoTexture} />
+        <TShirt3D color={color} product={product} />
       </group>
       <ContactShadows position={[0,-0.8,0]} opacity={0.35} scale={3} blur={2.2} far={1.5} />
       <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4}
@@ -182,9 +224,12 @@ function Scene({ bgColor, anim, color, logoTexture }: { bgColor: string; anim: A
 
 export default function Studio3D() {
   const searchParams = useSearchParams();
-  const colorParam = searchParams.get("couleur") || "Noir";
-  const [color, setColor] = useState(ALL_COLORS[colorParam] || "#1A1A1A");
-  const [logoTex, setLogoTex] = useState<THREE.Texture | null>(null);
+  const productParam = searchParams.get("produit") || "tshirt";
+  const colorParam = searchParams.get("couleur") || "blanc";
+  
+  const product = PRODUCTS[productParam] || PRODUCTS["tshirt"];
+  const [selectedProduct, setSelectedProduct] = useState(product.id);
+  const [color, setColor] = useState(ALL_COLORS[colorParam] || "#FFFFFF");
   const [bgColor, setBgColor] = useState("#0d2d45");
   const [bgName, setBgName] = useState("Dégradé bleu");
   const [anim, setAnim] = useState<Anim>("rotation");
@@ -199,13 +244,10 @@ export default function Studio3D() {
     try {
       const logoData = localStorage.getItem("designerLogo");
       if (logoData) {
-        new THREE.TextureLoader().load(logoData, (tex) => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          setLogoTex(tex);
-        });
+        // Logo support can be added here
       }
     } catch (e) {
-      console.error("Erreur chargement logo", e);
+      console.error("Erreur", e);
     }
   }, []);
 
@@ -239,7 +281,7 @@ export default function Studio3D() {
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
-  const waUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. T-shirt ${colorParam}.`)}`;
+  const waUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. ${PRODUCTS[selectedProduct]?.name || "Produit"} ${colorParam}.`)}`;
 
   return (
     <ErrorBoundary>
@@ -262,7 +304,7 @@ export default function Studio3D() {
             <Canvas camera={{ position: [0, 0, 2.5], fov: 25 }} gl={{ preserveDrawingBuffer: true, antialias: true }}
               onCreated={({ gl }) => { gl.setPixelRatio(Math.min(window.devicePixelRatio, 2)); glRef.current = gl; }} shadows>
               <Suspense fallback={null}>
-                <Scene bgColor={bgColor} anim={anim} color={color} logoTexture={logoTex} />
+                <Scene bgColor={bgColor} anim={anim} color={color} product={selectedProduct} />
               </Suspense>
             </Canvas>
 
@@ -274,6 +316,25 @@ export default function Studio3D() {
 
           <aside className="w-full border-t border-gray-100 bg-[#f8fafc] p-5 lg:w-[310px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:[height:calc(100vh-57px)]">
             <section>
+              <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Produit</p>
+              <div className="space-y-2">
+                {Object.entries(PRODUCTS).map(([key, prod]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedProduct(key)}
+                    className={`w-full rounded-lg border px-3 py-2 text-xs transition ${
+                      selectedProduct === key
+                        ? "border-[#d41717] bg-red-50 text-[#d41717]"
+                        : "border-gray-200 bg-white text-[#0a1f2e]/50"
+                    }`}
+                  >
+                    {prod.emoji} {prod.name}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-5">
               <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Couleur</p>
               <p className="text-xs font-semibold text-[#0a1f2e]">{colorParam}</p>
             </section>
