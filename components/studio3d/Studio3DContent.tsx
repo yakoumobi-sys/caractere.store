@@ -5,7 +5,7 @@ import {
   Component, ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, ContactShadows } from "@react-three/drei";
+import { OrbitControls, ContactShadows, useGLTF, Center } from "@react-three/drei";
 import { useSearchParams } from "next/navigation";
 import * as THREE from "three";
 
@@ -28,9 +28,16 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
 
-const PRODUCTS: Record<string, { id: string; name: string; emoji: string }> = {
-  "tshirt": { id: "tshirt", name: "T-shirt", emoji: "👕" },
-  "tshirt_oversized": { id: "tshirt_oversized", name: "Oversized Boxy", emoji: "👕" },
+const MODELS: Record<string, string> = {
+  "tshirt": "/models/shirt_tshirt.glb",
+  "tshirt_oversized": "/models/shirt_oversized.glb",
+  "polo": "/models/shirt_polo.glb",
+};
+
+const PRODUCTS: Record<string, { id: string; name: string; emoji: string; tint: boolean }> = {
+  "tshirt": { id: "tshirt", name: "T-shirt", emoji: "👕", tint: true },
+  "tshirt_oversized": { id: "tshirt_oversized", name: "Oversized Boxy", emoji: "👕", tint: false },
+  "polo": { id: "polo", name: "Polo", emoji: "🎾", tint: false },
 };
 
 const ALL_COLORS: Record<string, string> = {
@@ -61,59 +68,40 @@ const ANIMS: {id:Anim;label:string;icon:string}[] = [
   {id:"marche",label:"Marche",icon:"🚶"},
 ];
 
-function createTShirtGeometry() {
-  const meshes: THREE.Mesh[] = [];
-  const group = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.8, 0.2));
-  body.position.y = 0.1; group.add(body); meshes.push(body);
-  const ls = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.4, 0.15));
-  ls.position.set(-0.5, 0.2, 0); ls.rotation.z = 0.3; group.add(ls); meshes.push(ls);
-  const rs = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.4, 0.15));
-  rs.position.set(0.5, 0.2, 0); rs.rotation.z = -0.3; group.add(rs); meshes.push(rs);
-  const c = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1));
-  c.position.set(0, 0.55, 0.08); group.add(c); meshes.push(c);
-  return { group, meshes };
-}
-
-function createOversizedGeometry() {
-  const meshes: THREE.Mesh[] = [];
-  const group = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.95, 0.25));
-  body.position.y = 0.05; group.add(body); meshes.push(body);
-  const ls = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.18));
-  ls.position.set(-0.65, 0.15, 0); ls.rotation.z = 0.15; group.add(ls); meshes.push(ls);
-  const rs = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.18));
-  rs.position.set(0.65, 0.15, 0); rs.rotation.z = -0.15; group.add(rs); meshes.push(rs);
-  const c = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.22, 0.12));
-  c.position.set(0, 0.6, 0.1); group.add(c); meshes.push(c);
-  return { group, meshes };
-}
-
 function SceneBg({ bgColor }: { bgColor: string }) {
   const { scene } = useThree();
   useEffect(() => { scene.background = new THREE.Color(bgColor); }, [bgColor, scene]);
   return null;
 }
 
-function Product3D({ color, product }: { color: string; product: string }) {
-  const groupRef = useRef<THREE.Group | null>(null);
-  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+function Model({ product, color }: { product: string; color: string }) {
+  const path = MODELS[product] || MODELS["tshirt"];
+  const { scene } = useGLTF(path) as any;
+  const tint = PRODUCTS[product]?.tint;
+  const tc = useRef(new THREE.Color(color));
+
+  useFrame(() => {
+    if (!tint) return;
+    tc.current.set(color);
+    scene.traverse((o: any) => {
+      if (o.isMesh && o.material?.color) o.material.color.lerp(tc.current, 0.15);
+    });
+  });
 
   useEffect(() => {
-    const result = product === "tshirt_oversized" ? createOversizedGeometry() : createTShirtGeometry();
-    const { group, meshes } = result;
-    const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), metalness: 0.1, roughness: 0.8 });
-    materialRef.current = material;
-    meshes.forEach(m => { m.material = material; m.castShadow = true; m.receiveShadow = true; });
-    groupRef.current = group;
-    return () => { meshes.forEach(m => m.geometry.dispose()); material.dispose(); };
-  }, [product]);
+    scene.traverse((o: any) => {
+      if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+    });
+  }, [scene]);
 
-  useEffect(() => { if (materialRef.current) materialRef.current.color.set(color); }, [color]);
-
-  if (!groupRef.current) return null;
-  return <primitive object={groupRef.current} />;
+  return (
+    <Center>
+      <primitive object={scene} />
+    </Center>
+  );
 }
+
+Object.values(MODELS).forEach(m => useGLTF.preload(m));
 
 function Scene({ bgColor, anim, color, product }: { bgColor: string; anim: Anim; color: string; product: string }) {
   const g = useRef<THREE.Group>(null);
@@ -123,18 +111,18 @@ function Scene({ bgColor, anim, color, product }: { bgColor: string; anim: Anim;
     if (anim !== "rotation") gr.rotation.y *= 0.95;
     if (anim !== "flottement" && anim !== "marche") { gr.position.y *= 0.9; gr.rotation.z *= 0.9; gr.rotation.x *= 0.9; }
     if (anim === "rotation") gr.rotation.y += 0.012;
-    if (anim === "flottement") { gr.position.y = Math.sin(t*1.4)*0.035; gr.rotation.z = Math.sin(t*0.9)*0.04; gr.rotation.y = Math.sin(t*0.6)*0.25; }
-    if (anim === "marche") { const s = t*3.4; gr.position.y = Math.abs(Math.sin(s))*0.032; gr.rotation.z = Math.sin(s)*0.05; gr.rotation.x = 0.03 + Math.sin(s*2)*0.012; gr.rotation.y = Math.sin(t*0.8)*0.18; }
+    if (anim === "flottement") { gr.position.y = Math.sin(t*1.4)*0.05; gr.rotation.z = Math.sin(t*0.9)*0.04; gr.rotation.y = Math.sin(t*0.6)*0.25; }
+    if (anim === "marche") { const s = t*3.4; gr.position.y = Math.abs(Math.sin(s))*0.05; gr.rotation.z = Math.sin(s)*0.05; gr.rotation.x = 0.03 + Math.sin(s*2)*0.012; gr.rotation.y = Math.sin(t*0.8)*0.18; }
   });
   return (
     <>
       <SceneBg bgColor={bgColor} />
-      <ambientLight intensity={0.8} />
+      <ambientLight intensity={0.9} />
       <directionalLight position={[3, 4, 5]} intensity={1.3} castShadow />
-      <directionalLight position={[-4, 2, -3]} intensity={0.6} />
-      <group ref={g}><Product3D color={color} product={product} /></group>
-      <ContactShadows position={[0,-0.8,0]} opacity={0.35} scale={3} blur={2.2} far={1.5} />
-      <OrbitControls enablePan={false} minDistance={1.2} maxDistance={4} minPolarAngle={Math.PI/4} maxPolarAngle={3*Math.PI/4} />
+      <directionalLight position={[-4, 2, -3]} intensity={0.5} />
+      <group ref={g}><Model product={product} color={color} /></group>
+      <ContactShadows position={[0,-1,0]} opacity={0.35} scale={4} blur={2.4} far={2} />
+      <OrbitControls enablePan={false} minDistance={1.5} maxDistance={6} minPolarAngle={Math.PI/5} maxPolarAngle={3*Math.PI/4} />
     </>
   );
 }
@@ -155,10 +143,7 @@ export default function Studio3DContent() {
   const chunks = useRef<Blob[]>([]);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    const c = ALL_COLORS[colorParam];
-    if (c) setColor(c);
-  }, [colorParam]);
+  useEffect(() => { const c = ALL_COLORS[colorParam]; if (c) setColor(c); }, [colorParam]);
 
   const dlPNG = useCallback(() => {
     const gl = glRef.current; if (!gl) return;
@@ -191,6 +176,7 @@ export default function Studio3DContent() {
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
   const waUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Bonjour Caractère Store 👋\nJe viens du Studio 3D. ${PRODUCTS[selectedProduct]?.name} ${colorParam}.`)}`;
+  const canTint = PRODUCTS[selectedProduct]?.tint;
 
   return (
     <ErrorBoundary>
@@ -208,7 +194,7 @@ export default function Studio3DContent() {
 
         <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
           <div className="relative h-[56vh] min-h-[340px] flex-1 lg:h-[calc(100vh-57px)]" style={{ backgroundColor: bgColor }}>
-            <Canvas camera={{ position: [0, 0, 2.5], fov: 25 }} gl={{ preserveDrawingBuffer: true, antialias: true }}
+            <Canvas camera={{ position: [0, 0.5, 4], fov: 30 }} gl={{ preserveDrawingBuffer: true, antialias: true }}
               onCreated={({ gl }) => { gl.setPixelRatio(Math.min(window.devicePixelRatio, 2)); glRef.current = gl; }} shadows>
               <Scene bgColor={bgColor} anim={anim} color={color} product={selectedProduct} />
             </Canvas>
@@ -234,6 +220,7 @@ export default function Studio3DContent() {
             <section className="mt-5">
               <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Couleur</p>
               <p className="text-xs font-semibold text-[#0a1f2e]">{colorParam}</p>
+              {!canTint && <p className="mt-1 text-[10px] text-[#0a1f2e]/40">Ce modèle garde sa texture d'origine</p>}
             </section>
 
             <section className="mt-5">
