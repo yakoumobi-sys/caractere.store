@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 const navItems = [
   { href: '/admin',           icon: '📊', label: 'Dashboard'  },
@@ -14,6 +15,55 @@ const navItems = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+
+  // Vérifier l'authentification au chargement
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        router.push('/auth/login')
+        return
+      }
+
+      setUser(session.user)
+      setIsLoading(false)
+    }
+
+    checkAuth()
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        router.push('/auth/login')
+      } else {
+        setUser(session.user)
+      }
+    })
+
+    return () => {
+      subscription?.unsubscribe()
+    }
+  }, [router])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/auth/login')
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-brand-light flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-brand-dark"></div>
+          <p className="mt-4 text-brand-dark">Vérification de l'authentification...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-brand-light flex">
@@ -63,26 +113,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="mt-auto">
+        <div className="mt-auto space-y-3">
           <Link href="/" className="flex items-center gap-2 px-3 py-2 text-[12px] text-white/40 hover:text-white/60 no-underline transition-colors">
             Voir le site
           </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-white/40 hover:text-white/60 hover:bg-white/5 rounded-lg transition-colors text-left"
+          >
+            🚪 Déconnexion
+          </button>
+          <div className="text-[11px] text-white/30 px-3 py-2 break-words">
+            {user?.email}
+          </div>
         </div>
       </aside>
 
       {/* Main */}
       <main className="flex-1 overflow-auto min-w-0">
         {/* Topbar mobile */}
-        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-black/[0.06] sticky top-0 z-30">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-black/[0.06] sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setOpen(true)}
+              className="flex flex-col gap-[5px] p-1"
+            >
+              <span className="w-5 h-[2px] bg-brand-dark block" />
+              <span className="w-5 h-[2px] bg-brand-dark block" />
+              <span className="w-5 h-[2px] bg-brand-dark block" />
+            </button>
+            <span className="text-[14px] font-bold text-brand-dark">Admin</span>
+          </div>
           <button
-            onClick={() => setOpen(true)}
-            className="flex flex-col gap-[5px] p-1"
+            onClick={handleLogout}
+            className="text-[12px] text-brand-dark hover:opacity-60 transition-opacity"
           >
-            <span className="w-5 h-[2px] bg-brand-dark block" />
-            <span className="w-5 h-[2px] bg-brand-dark block" />
-            <span className="w-5 h-[2px] bg-brand-dark block" />
+            🚪
           </button>
-          <span className="text-[14px] font-bold text-brand-dark">Admin</span>
         </div>
 
         <div className="p-6 lg:p-8">
