@@ -750,6 +750,7 @@ export default function HomePageContent({ produits = [] }: { produits?: any[] })
       `}</style>
       <Hero />
       <HowItWorks />
+<Studio3DPreview />
       <ProduitsSection produits={produits} />
       <TechniquesSection />
       <StatsSection />
