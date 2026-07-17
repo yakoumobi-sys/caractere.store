@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Studio3DPreview from './Studio3DPreview'
 
 // ─── Palette ────────────────────────────────────────────────────────────────
 const C = {
