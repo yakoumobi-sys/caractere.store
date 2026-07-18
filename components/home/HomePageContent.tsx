@@ -48,17 +48,6 @@ function Label({ children }: { children: React.ReactNode }) {
 
 // ─── Images produits ────────────────────────────────────────────────────────
 const BASE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image'
-const PRODUCT_IMAGES: Record<string, string> = {
-  'T-shirt':               BASE + '/IMG_5850.jpeg',
-  'T-shirt Oversized 250GSM': BASE + '/tshirt-oversized.jpeg',
-  'Polo':                  BASE + '/IMG_5851.jpeg',
-  'Casquette':             BASE + '/IMG_5853.jpeg',
-  'Totebag':               BASE + '/IMG_5854.jpeg',
-  'Gilet de travail':      BASE + '/IMG_5852.jpeg',
-  'Gilet de securite':     BASE + '/images.jpg',
-  'Tablier':               BASE + '/png-clipart-apron-apron-thumbnail.png',
-  'Hoodie':                BASE + '/IMG_5850.jpeg',
-}
 
 // ─── CATALOGUE produits (fallback si Supabase vide) ──────────────────────────
 const PRODUITS_FALLBACK = [
@@ -71,10 +60,11 @@ const PRODUITS_FALLBACK = [
 ]
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   HERO — Layout 2 colonnes à la Tapstitch
+   HERO — OPTIMISÉ: Single CTA primaire + pricing transparent
 ══════════════════════════════════════════════════════════════════════════════ */
 function Hero() {
   const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png'
+  const [userType, setUserType] = useState<'b2c' | 'b2b'>('b2c')
   const leftRef  = useFadeIn(0)
   const rightRef = useFadeIn(150)
 
@@ -112,39 +102,76 @@ function Hero() {
               Print on Demand sans abonnement, vêtements personnalisés pour entreprises et particuliers. Production rapide à partir d'une seule pièce.
             </p>
 
-            {/* 2 boutons principaux */}
-            <div className="flex flex-col gap-3 mt-2">
-              <Link href="/auth/register"
-                className="flex items-center justify-between px-7 py-5 rounded-2xl no-underline transition-all hover:-translate-y-0.5 hover:shadow-xl group"
-                style={{ background: '#FFFFFF', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
-                <div>
-                  <p className="text-[18px] font-black leading-tight" style={{ color: C.blue }}>Lancez votre marque.</p>
-                  <p className="text-[12px] mt-0.5" style={{ color: C.blueMid }}>Print on Demand · Sans stock · Sans abonnement</p>
-                </div>
-                <span className="text-[22px] ml-4 group-hover:translate-x-1 transition-transform" style={{ color: C.blue }}>→</span>
-              </Link>
-
-              <Link href="/configurateur"
-                className="flex items-center justify-between px-7 py-5 rounded-2xl no-underline transition-all hover:-translate-y-0.5 border-2 group"
-                style={{ background: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.35)', backdropFilter: 'blur(12px)' }}>
-                <div>
-                  <p className="text-[18px] font-black text-white leading-tight">Habillez votre entreprise.</p>
-                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>Uniformes · Broderie · DTF · Dès 1 pièce</p>
-                </div>
-                <span className="text-[22px] ml-4 text-white group-hover:translate-x-1 transition-transform">→</span>
-              </Link>
-
-              <Link href="/comment-ca-marche"
-                className="text-center py-2.5 text-[13px] font-medium no-underline transition-all"
-                style={{ color: 'rgba(255,255,255,0.5)' }}>
-                Comment ça marche ? →
-              </Link>
+            {/* SEGMENTATION: Toggle B2C/B2B */}
+            <div className="flex gap-2 mb-6">
+              <button
+                onClick={() => setUserType('b2c')}
+                className="px-4 py-2 rounded-full text-[12px] font-bold transition-all"
+                style={{
+                  background: userType === 'b2c' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+                  color: userType === 'b2c' ? C.blue : 'rgba(255,255,255,0.7)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                }}>
+                👤 Particulier
+              </button>
+              <button
+                onClick={() => setUserType('b2b')}
+                className="px-4 py-2 rounded-full text-[12px] font-bold transition-all"
+                style={{
+                  background: userType === 'b2b' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+                  color: userType === 'b2b' ? C.blue : 'rgba(255,255,255,0.7)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                }}>
+                🏢 Entreprise
+              </button>
             </div>
+
+            {/* CTA PRIMAIRE + Pricing transparent */}
+            {userType === 'b2c' ? (
+              <div className="space-y-3">
+                <Link href="/designer"
+                  className="flex flex-col px-7 py-5 rounded-2xl no-underline transition-all hover:-translate-y-0.5 hover:shadow-xl group w-full"
+                  style={{ background: '#FFFFFF', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[18px] font-black leading-tight" style={{ color: C.blue }}>Lancez votre marque</p>
+                      <p className="text-[12px] mt-0.5" style={{ color: C.blueMid }}>À partir de 1 950 DA / pièce</p>
+                    </div>
+                    <span className="text-[22px] group-hover:translate-x-1 transition-transform" style={{ color: C.blue }}>→</span>
+                  </div>
+                </Link>
+                <p className="text-[12px] text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  ✓ Dès 1 pièce · Sans abonnement · Devis gratuit
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Link href="/configurateur"
+                  className="flex flex-col px-7 py-5 rounded-2xl no-underline transition-all hover:-translate-y-0.5 hover:shadow-xl group w-full"
+                  style={{ background: '#FFFFFF', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[18px] font-black leading-tight" style={{ color: C.blue }}>Habillez votre équipe</p>
+                      <p className="text-[12px] mt-0.5" style={{ color: C.blueMid }}>À partir de 1 200 DA / pièce</p>
+                    </div>
+                    <span className="text-[22px] group-hover:translate-x-1 transition-transform" style={{ color: C.blue }}>→</span>
+                  </div>
+                </Link>
+                <p className="text-[12px] text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  ✓ Remise dès 50 pièces · Devis en 2h · Livraison nationale
+                </p>
+              </div>
+            )}
+
+            <Link href="/comment-ca-marche"
+              className="text-center py-2.5 text-[13px] font-medium no-underline transition-all mt-3 block"
+              style={{ color: 'rgba(255,255,255,0.5)' }}>
+              Comment ça marche ? →
+            </Link>
           </div>
 
           {/* ── Colonne visuelle ── */}
           <div ref={rightRef} className="relative hidden lg:flex items-center justify-center" style={{ height: '580px' }}>
-
             {/* Carte produit centrale */}
             <div className="relative w-[300px] h-[360px] rounded-[28px] overflow-hidden flex flex-col items-center justify-center"
               style={{ background: 'linear-gradient(145deg, #F0F7FF 0%, #E0EEFF 100%)', boxShadow: '0 32px 80px rgba(12,74,110,0.25)' }}>
@@ -161,74 +188,10 @@ function Hero() {
                     <div key={hex} className="w-5 h-5 rounded-full border-2 border-white shadow-sm" style={{ background: hex }} />
                   ))}
                 </div>
-                <Link href="/designer?product=tshirt"
-                  className="block w-full py-2 rounded-xl text-[12px] font-bold text-white text-center no-underline"
-                  style={{ background: C.blue }}>
-                  Personnaliser →
-                </Link>
-              </div>
-            </div>
-
-            {/* Floating cards */}
-            {/* Commande en cours */}
-            <div className="absolute animate-float-slow" style={{ top: 30, left: -30, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: 16, border: `1px solid ${C.gray2}`, padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.10)', minWidth: 190 }}>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold" style={{ background: C.blueLt, color: C.blue }}>POD</div>
-                <div>
-                  <p className="text-[11px] font-bold" style={{ color: C.black }}>Commande #5841</p>
-                  <p className="text-[10px]" style={{ color: C.gray4 }}>En production · 48h</p>
-                </div>
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse ml-1" />
-              </div>
-            </div>
-
-            {/* Vente */}
-            <div className="absolute animate-float" style={{ top: 150, right: -35, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: 16, border: `1px solid ${C.gray2}`, padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.10)', minWidth: 170 }}>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold" style={{ background: C.greenLt, color: C.green }}>+1</div>
-                <div>
-                  <p className="text-[11px] font-bold" style={{ color: C.black }}>Nouvelle vente</p>
-                  <p className="text-[10px]" style={{ color: C.green }}>Hoodie · 3 800 DA</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Livraison */}
-            <div className="absolute" style={{ bottom: 120, left: -35, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: 16, border: `1px solid ${C.gray2}`, padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.10)', minWidth: 175 }}>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold" style={{ background: '#FFF7ED', color: '#EA580C' }}>🚚</div>
-                <div>
-                  <p className="text-[11px] font-bold" style={{ color: C.black }}>Expédié aujourd'hui</p>
-                  <p className="text-[10px]" style={{ color: C.gray4 }}>Constantine · #5832</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Note */}
-            <div className="absolute" style={{ bottom: 35, right: -20, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: 16, border: `1px solid ${C.gray2}`, padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.10)', minWidth: 145 }}>
-              <div className="flex items-center gap-2">
-                <span className="text-[18px]">⭐</span>
-                <div>
-                  <p className="text-[11px] font-bold" style={{ color: C.black }}>4.9 / 5</p>
-                  <p className="text-[10px]" style={{ color: C.gray4 }}>500+ avis clients</p>
-                </div>
+                <p className="text-[16px] font-black" style={{ color: C.blue }}>À partir de 1 950 DA</p>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Stats rapides */}
-        <div className="mt-10 grid grid-cols-3 gap-6 max-w-[680px]">
-          {[
-            { v: '50 000+', l: 'Articles personnalisés' },
-            { v: '1 pièce', l: 'Commande minimum' },
-            { v: 'Production\nrapide', l: 'Partout en Algérie' },
-          ].map(s => (
-            <div key={s.l}>
-              <p className="text-[22px] font-black text-white tracking-tight leading-tight whitespace-pre-line">{s.v}</p>
-              <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.l}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
@@ -236,59 +199,82 @@ function Hero() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   COMMENT ÇA MARCHE — 4 étapes à la Tapstitch
+   SOCIAL PROOF — DÉPLACÉ PLUS TÔT (juste après Hero)
 ══════════════════════════════════════════════════════════════════════════════ */
-function StepCard({ step, delay, isLast }: { step: { n: string; emoji: string; title: string; desc: string }; delay: number; isLast: boolean }) {
-  const ref = useFadeIn(delay)
+function TrustBadges() {
+  const ref = useFadeIn()
   return (
-    <div ref={ref} className="relative group">
-      {!isLast && (
-        <div className="hidden lg:block absolute top-8 left-[calc(100%-8px)] w-full h-px z-0" style={{ background: `linear-gradient(90deg, ${C.gray2}, transparent)` }} />
-      )}
-      <div className="relative z-10 p-6 rounded-[24px] border hover:shadow-lg hover:-translate-y-1 transition-all" style={{ background: C.gray1, borderColor: C.gray2 }}>
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[22px]" style={{ background: C.white, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-            {step.emoji}
+    <section style={{ background: C.white, padding: '64px 0' }}>
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+        <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div>
+            <p className="text-[28px] font-black" style={{ color: C.blue }}>50 000+</p>
+            <p className="text-[13px] mt-1" style={{ color: C.gray4 }}>Pièces fabriquées</p>
           </div>
-          <span className="text-[32px] font-black tracking-tighter" style={{ color: C.gray2, lineHeight: 1 }}>{step.n}</span>
+          <div>
+            <p className="text-[28px] font-black" style={{ color: C.blue }}>500+</p>
+            <p className="text-[13px] mt-1" style={{ color: C.gray4 }}>Marques & entreprises</p>
+          </div>
+          <div>
+            <p className="text-[28px] font-black" style={{ color: C.blue }}>4.9 ⭐</p>
+            <p className="text-[13px] mt-1" style={{ color: C.gray4 }}>Note moyenne clients</p>
+          </div>
+          <div>
+            <p className="text-[28px] font-black" style={{ color: C.blue }}>48h</p>
+            <p className="text-[13px] mt-1" style={{ color: C.gray4 }}>Délai de production</p>
+          </div>
         </div>
-        <h3 className="font-bold text-[16px] mb-2 leading-tight" style={{ color: C.black }}>{step.title}</h3>
-        <p className="text-[13px] leading-relaxed" style={{ color: C.gray4 }}>{step.desc}</p>
       </div>
-    </div>
+    </section>
   )
 }
-function HowItWorks() {
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   GARANTIES & OBJECTIONS — NOUVELLE SECTION CLÉE
+══════════════════════════════════════════════════════════════════════════════ */
+function GuaranteesSection() {
   const ref = useFadeIn()
-  const steps = [
-    { n: '01', emoji: '🛍️', title: 'Choisissez votre produit', desc: 'T-shirt, polo, gilet, casquette… catalogue textile premium avec images HD.' },
-    { n: '02', emoji: '🎨', title: 'Uploadez votre design', desc: 'Glissez votre logo dans le Designer ou passez par le Configurateur. Prévisualisation en temps réel.' },
-    { n: '03', emoji: '🖨️', title: 'On produit', desc: 'DTF ou broderie — production en 48h à Alger. Contrôle qualité sur chaque pièce.' },
-    { n: '04', emoji: '🚚', title: 'On livre', desc: 'Livraison nationale 3–5 jours. Retrait atelier disponible. Suivi de commande en temps réel.' },
+  const guarantees = [
+    {
+      icon: '✓',
+      title: 'Qualité garantie',
+      desc: 'Contrôle QC sur chaque pièce. Non-conforme = reprise gratuite.',
+    },
+    {
+      icon: '⚡',
+      title: 'Délai respecté',
+      desc: 'Production en 48h à Alger. Livraison 3-5 jours. Garantie délai.',
+    },
+    {
+      icon: '🎨',
+      title: 'Design adapté',
+      desc: 'Pas de fichier vectoriel? On vectorise gratuitement pour vous.',
+    },
+    {
+      icon: '💬',
+      title: 'Support WhatsApp',
+      desc: 'Suivi temps réel à chaque étape. On vous tient informé.',
+    },
   ]
+
   return (
-    <section style={{ background: C.white, padding: '96px 0' }}>
+    <section style={{ background: '#F8FAFB', padding: '80px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
-        <div ref={ref} className="text-center mb-16">
-          <Label>Comment ça fonctionne</Label>
-          <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,46px)', color: C.black, letterSpacing: '-0.025em' }}>
-            De l'idée à la livraison<br />en 4 étapes.
+        <div ref={ref} className="text-center mb-14">
+          <Label>Nos engagements</Label>
+          <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
+            Pourquoi nous choisir
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {steps.map((step, i) => (
-            <StepCard key={step.n} step={step} delay={i * 80} isLast={i === steps.length - 1} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {guarantees.map((g, i) => (
+            <div key={i} className="p-6 rounded-2xl" style={{ background: C.white, border: '1px solid #E5E7EB' }}>
+              <p className="text-[32px] mb-3">{g.icon}</p>
+              <p className="font-black text-[15px] mb-2" style={{ color: C.black }}>{g.title}</p>
+              <p className="text-[13px] leading-relaxed" style={{ color: C.gray4 }}>{g.desc}</p>
+            </div>
           ))}
-        </div>
-
-        {/* CTA sous les étapes */}
-        <div className="mt-12 text-center">
-          <Link href="/configurateur"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[15px] font-bold no-underline hover:-translate-y-0.5 transition-all"
-            style={{ background: C.blue, color: C.white, boxShadow: '0 8px 24px rgba(12,74,110,0.25)' }}>
-            Démarrer ma commande →
-          </Link>
         </div>
       </div>
     </section>
@@ -296,117 +282,43 @@ function HowItWorks() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   PRODUITS — Grille style Tapstitch
+   HOW IT WORKS
 ══════════════════════════════════════════════════════════════════════════════ */
-function ProduitCard({ produit, delay }: { produit: any; delay: number }) {
-  const ref    = useFadeIn(delay)
-  const imgUrl = PRODUCT_IMAGES[produit.nom] || (BASE + '/IMG_5509.png')
-  const fallback = PRODUITS_FALLBACK.find(p => p.id === produit.id || p.nom === produit.nom)
+function HowItWorks() {
+  const ref = useFadeIn()
+  const steps = [
+    { num: '01', title: 'Choisissez votre produit', desc: 'T-shirt, polo, gilet, casquette… catalogue textile premium avec images HD.' },
+    { num: '02', title: 'Uploadez votre design', desc: 'Glissez votre logo dans le Designer ou passez par le Configurateur. Prévisualisation en temps réel.' },
+    { num: '03', title: 'On produit', desc: 'DTF ou broderie — production en 48h à Alger. Contrôle qualité sur chaque pièce.' },
+    { num: '04', title: 'On livre', desc: 'Livraison nationale 3–5 jours. Retrait atelier disponible. Suivi de commande en temps réel.' },
+  ]
 
   return (
-    <div ref={ref} className="group rounded-[24px] border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all bg-white"
-      style={{ borderColor: C.gray2 }}>
-      {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden" style={{ background: C.gray1 }}>
-        {fallback?.tag && (
-          <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold text-white z-10" style={{ background: C.blue }}>
-            {fallback.tag}
-          </span>
-        )}
-        {fallback?.technique && (
-          <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold z-10"
-            style={{ background: 'rgba(12,74,110,0.1)', color: C.blue }}>
-            {fallback.technique}
-          </span>
-        )}
-        <img
-          src={imgUrl}
-          alt={produit.nom}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-      </div>
-
-      {/* Infos */}
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <div>
-            <p className="font-bold text-[15px] leading-tight" style={{ color: C.black }}>{produit.nom}</p>
-            <p className="text-[12px] mt-0.5" style={{ color: C.gray4 }}>{fallback?.badge || produit.description}</p>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p className="font-black text-[16px] leading-tight" style={{ color: C.black }}>
-              {(produit.prix_base || fallback?.prix || 0).toLocaleString('fr-FR')} DA
-            </p>
-            <p className="text-[11px]" style={{ color: C.gray3 }}>/ pièce</p>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Link
-            href={`/designer?product=${produit.id || fallback?.id}`}
-            className="flex-1 flex items-center justify-center py-2.5 rounded-xl text-[13px] font-bold no-underline transition-all"
-            style={{ background: C.blueLt, color: C.blue }}>
-            Designer ✏️
-          </Link>
-          <Link
-            href={`/configurateur?produit=${encodeURIComponent(produit.nom)}`}
-            className="flex-1 flex items-center justify-center py-2.5 rounded-xl text-[13px] font-bold no-underline transition-all"
-            style={{ background: C.gray1, color: C.black }}>
-            Commander →
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ProduitsSection({ produits }: { produits: any[] }) {
-  const ref  = useFadeIn()
-  const data = produits.length > 0 ? produits : PRODUITS_FALLBACK
-
-  return (
-    <section style={{ background: C.gray1, padding: '96px 0' }}>
+    <section style={{ background: 'rgba(12,74,110,0.03)', padding: '96px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
-        {/* Header */}
-        <div ref={ref} className="flex items-end justify-between mb-12 flex-wrap gap-4">
-          <div>
-            <Label>Catalogue</Label>
-            <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
-              Produits populaires.
-            </h2>
-            <p className="mt-2 text-[15px]" style={{ color: C.gray4 }}>
-              Broderie ou DTF — de 1 à 10 000 pièces, prix dégressif.
-            </p>
-          </div>
-          <Link href="/produits" className="text-[14px] font-bold no-underline flex items-center gap-1" style={{ color: C.blue }}>
-            Voir le catalogue complet →
-          </Link>
+        <div ref={ref} className="text-center mb-14">
+          <Label>Le processus</Label>
+          <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
+            De l'idée à la livraison en 4 étapes
+          </h2>
         </div>
 
-        {/* Grille */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
-          {data.slice(0, 6).map((p, i) => (
-            <ProduitCard key={p.id || p.nom} produit={p} delay={i * 60} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {steps.map((s, i) => (
+            <div key={i} className="text-center">
+              <p className="text-[42px] font-black mb-4" style={{ color: C.blueAcc }}>{s.num}</p>
+              <h3 className="font-black text-[16px] mb-2" style={{ color: C.black }}>{s.title}</h3>
+              <p className="text-[13px] leading-relaxed" style={{ color: C.gray4 }}>{s.desc}</p>
+            </div>
           ))}
         </div>
 
-        {/* Banner B2B */}
-        <div className="mt-8 rounded-[24px] p-8 flex flex-col md:flex-row items-center justify-between gap-6"
-          style={{ background: `linear-gradient(135deg, ${C.blue} 0%, ${C.blueMid} 100%)` }}>
-          <div>
-            <p className="text-[18px] font-black text-white mb-1">Commande entreprise ou volume ?</p>
-            <p className="text-[14px]" style={{ color: 'rgba(255,255,255,0.75)' }}>
-              Devis personnalisé · Remise dès 50 pièces · Livraison B2B
-            </p>
-          </div>
-          <a href="https://wa.me/213557440522" target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2.5 px-6 py-3.5 rounded-full text-[14px] font-bold no-underline flex-shrink-0 transition-all hover:-translate-y-0.5"
-            style={{ background: '#25D366', color: C.white, boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
-            Demander un devis
-          </a>
+        <div className="mt-12 text-center">
+          <Link href="/comment-ca-marche"
+            className="inline-block px-7 py-3 rounded-full font-bold text-[14px] no-underline transition-all hover:-translate-y-0.5"
+            style={{ background: C.blue, color: C.white, boxShadow: '0 4px 12px rgba(12,74,110,0.3)' }}>
+            Voir en détail →
+          </Link>
         </div>
       </div>
     </section>
@@ -414,109 +326,64 @@ function ProduitsSection({ produits }: { produits: any[] }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   TECHNIQUES — DTF vs Broderie
+   TECHNIQUES
 ══════════════════════════════════════════════════════════════════════════════ */
-type TechItem = { id: string; label: string; emoji: string; title: string; subtitle: string; desc: string; specs: string[]; bg: string; accent: string; cta: string; href: string }
-
-function TechCard({ tech, delay }: { tech: TechItem; delay: number }) {
-  const ref = useFadeIn(delay)
-  return (
-    <div ref={ref} className="rounded-[28px] p-8 border hover:shadow-lg transition-all"
-      style={{ background: tech.bg, borderColor: 'rgba(0,0,0,0.06)' }}>
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[22px] shadow-sm">
-          {tech.emoji}
-        </div>
-        <div>
-          <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: tech.accent }}>{tech.label}</span>
-          <p className="text-[12px]" style={{ color: C.gray4 }}>{tech.subtitle}</p>
-        </div>
-      </div>
-      <h3 className="font-black text-[22px] mb-3" style={{ color: C.black }}>{tech.title}</h3>
-      <p className="text-[14px] leading-relaxed mb-6" style={{ color: C.gray4 }}>{tech.desc}</p>
-      <div className="grid grid-cols-2 gap-2 mb-6">
-        {tech.specs.map(s => (
-          <div key={s} className="flex items-center gap-2 text-[13px] font-medium" style={{ color: C.black }}>
-            <span style={{ color: tech.accent }}>✓</span> {s}
-          </div>
-        ))}
-      </div>
-      <Link href={tech.href}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold no-underline transition-all hover:-translate-y-0.5"
-        style={{ background: tech.accent, color: C.white }}>
-        {tech.cta} →
-      </Link>
-    </div>
-  )
-}
 function TechniquesSection() {
   const ref = useFadeIn()
+
   return (
     <section style={{ background: C.white, padding: '96px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="text-center mb-14">
           <Label>Nos techniques</Label>
           <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
-            La meilleure technique<br />pour chaque projet.
+            La meilleure technique pour chaque projet
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* DTF */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {[
             {
-              id: 'dtf',
-              label: 'DTF — Direct to Film',
-              emoji: '🖨️',
-              title: 'Impression DTF',
+              icon: '🖨️',
+              title: 'DTF — Direct to Film',
               subtitle: 'Machines Epson I3200 · Format jusqu\'à 60cm',
-              desc: 'Couleurs illimitées, dégradés parfaits, fond transparent. Idéal pour les logos complexes et les designs multi-couleurs.',
-              specs: ['Rendu photographique', 'Résistant au lavage 40+', 'Tous types de tissus', 'Dès 1 pièce'],
-              bg: '#EFF6FF',
-              accent: C.blue,
-              cta: 'Commander en DTF',
-              href: '/configurateur',
+              points: [
+                'Rendu photographique',
+                'Résistant au lavage 40+',
+                'Tous types de tissus',
+                'Dès 1 pièce',
+              ],
+              link: { text: 'Commander en DTF →', href: '/configurateur' },
             },
             {
-              id: 'broderie',
-              label: 'Broderie',
-              emoji: '🪡',
+              icon: '🪡',
               title: 'Broderie machine',
               subtitle: '3 têtes de broderie · Finition relief',
-              desc: 'Finition haut de gamme, relief tactile, durabilité exceptionnelle. Le choix des marques premium et des uniformes professionnels.',
-              specs: ['Effet 3D et relief', 'Tenue à vie', 'Casquettes et polos', 'Logos structurés'],
-              bg: '#FFF7ED',
-              accent: '#EA580C',
-              cta: 'Commander en broderie',
-              href: '/configurateur',
+              points: [
+                'Effet 3D et relief',
+                'Tenue à vie',
+                'Casquettes et polos',
+                'Logos structurés',
+              ],
+              link: { text: 'Commander en broderie →', href: '/configurateur' },
             },
-          ].map((tech, i) => (
-            <TechCard key={tech.id} tech={tech} delay={i * 100} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   STATS
-══════════════════════════════════════════════════════════════════════════════ */
-function StatsSection() {
-  const ref = useFadeIn()
-  return (
-    <section style={{ background: C.black, padding: '80px 0' }}>
-      <div ref={ref} className="max-w-[1200px] mx-auto px-6 lg:px-10">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-          {[
-            { v: '50 000+', l: 'Pièces fabriquées' },
-            { v: '500+', l: 'Marques & entreprises' },
-            { v: '48h', l: 'Délai de production' },
-            { v: '4.9 ★', l: 'Note moyenne clients' },
-          ].map(s => (
-            <div key={s.l}>
-              <p className="font-black tracking-tight text-white" style={{ fontSize: 'clamp(32px,4vw,52px)', letterSpacing: '-0.03em' }}>{s.v}</p>
-              <p className="mt-2 text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.l}</p>
+          ].map((t, i) => (
+            <div key={i} className="p-8 rounded-2xl" style={{ background: C.gray1, border: `2px solid ${C.gray2}` }}>
+              <p className="text-[48px] mb-4">{t.icon}</p>
+              <h3 className="font-black text-[20px] mb-1" style={{ color: C.black }}>{t.title}</h3>
+              <p className="text-[13px] mb-6" style={{ color: C.gray4 }}>{t.subtitle}</p>
+              <ul className="space-y-2 mb-6">
+                {t.points.map((pt, j) => (
+                  <li key={j} className="flex items-center gap-2 text-[13px]" style={{ color: C.gray4 }}>
+                    <span style={{ color: C.green }}>✓</span> {pt}
+                  </li>
+                ))}
+              </ul>
+              <Link href={t.link.href}
+                className="inline-block text-[13px] font-bold no-underline transition-all hover:translate-x-1"
+                style={{ color: C.blue }}>
+                {t.link.text}
+              </Link>
             </div>
           ))}
         </div>
@@ -526,45 +393,55 @@ function StatsSection() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   ENGAGEMENTS — Dark grid
+   PRODUITS
 ══════════════════════════════════════════════════════════════════════════════ */
-function EngagementCard({ item, delay }: { item: { emoji: string; title: string; desc: string }; delay: number }) {
-  const ref = useFadeIn(delay)
-  return (
-    <div ref={ref} className="rounded-[20px] p-6 hover:bg-white/[0.07] transition-all"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-      <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[20px] mb-4"
-        style={{ background: 'rgba(56,189,248,0.15)' }}>
-        {item.emoji}
-      </div>
-      <h3 className="font-bold text-[15px] text-white mb-2">{item.title}</h3>
-      <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
-    </div>
-  )
-}
-function EngagementsSection() {
+function ProduitsSection({ produits = [] }: { produits?: any[] }) {
   const ref = useFadeIn()
-  const items = [
-    { emoji: '⚡', title: 'Production 48h', desc: 'Votre commande produite et prête à expédier en 48h ouvrables à Alger.' },
-    { emoji: '📦', title: 'Dès 1 pièce', desc: 'Pas de minimum. Commandez 1 pièce ou 10 000 — prix dégressif à partir de 50 pièces.' },
-    { emoji: '🎨', title: 'Vectorisation offerte', desc: 'Pas de fichier vectoriel ? Notre équipe adapte votre logo gratuitement.' },
-    { emoji: '✅', title: 'Contrôle qualité', desc: 'Chaque pièce vérifiée avant expédition. Non-conforme = reprise gratuite.' },
-    { emoji: '🚚', title: 'Livraison nationale', desc: 'Livraison dans toute l\'Algérie en 3–5 jours. Retrait atelier disponible.' },
-    { emoji: '💬', title: 'Suivi WhatsApp', desc: 'Un message avec votre référence de commande. On vous tient informé à chaque étape.' },
-  ]
+  const items = produits.length > 0 ? produits : PRODUITS_FALLBACK
+
   return (
-    <section style={{ background: '#0C1A26', padding: '96px 0' }}>
+    <section style={{ background: C.white, padding: '96px 0' }}>
       <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="text-center mb-14">
-          <Label>Nos engagements</Label>
-          <h2 className="font-black tracking-tight text-white" style={{ fontSize: 'clamp(28px,4vw,44px)', letterSpacing: '-0.025em' }}>
-            Pourquoi nous choisir.
+          <Label>Catalogue</Label>
+          <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
+            Produits populaires
           </h2>
+          <p className="text-[15px] mt-3" style={{ color: C.gray4 }}>
+            Broderie ou DTF — de 1 à 10 000 pièces, prix dégressif.
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item, i) => (
-            <EngagementCard key={item.title} item={item} delay={i * 60} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {items.slice(0, 6).map((p: any, i: number) => (
+            <div key={p.id || i} className="rounded-2xl overflow-hidden transition-transform hover:scale-105" style={{ background: C.gray1, border: '1px solid #E5E7EB' }}>
+              <div className="h-[200px] bg-gray-200 relative overflow-hidden">
+                {p.tag && (
+                  <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-bold" style={{ background: C.blueAcc, color: C.white }}>
+                    {p.tag}
+                  </span>
+                )}
+              </div>
+              <div className="p-5">
+                <p className="text-[14px] font-black mb-1" style={{ color: C.black }}>{p.nom || p.name}</p>
+                <p className="text-[11px] mb-3" style={{ color: C.gray4 }}>{p.badge || p.description}</p>
+                <p className="text-[14px] font-bold mb-4" style={{ color: C.blue }}>{p.prix || p.price} DA / pièce</p>
+                <Link href="/configurateur"
+                  className="inline-block px-4 py-2 rounded-lg text-[12px] font-bold no-underline transition-all hover:-translate-y-0.5 w-full text-center"
+                  style={{ background: C.blue, color: C.white }}>
+                  Commander →
+                </Link>
+              </div>
+            </div>
           ))}
+        </div>
+
+        <div className="text-center">
+          <Link href="/produits"
+            className="inline-block px-7 py-3 rounded-full font-bold text-[14px] no-underline transition-all hover:-translate-y-0.5"
+            style={{ background: C.blueLt, color: C.blue, border: `2px solid ${C.blueAcc}` }}>
+            Voir le catalogue complet →
+          </Link>
         </div>
       </div>
     </section>
@@ -572,38 +449,37 @@ function EngagementsSection() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   TÉMOIGNAGES
+   TESTIMONIALS — SIMPLIFIED
 ══════════════════════════════════════════════════════════════════════════════ */
-type Temoignage = { init: string; nom: string; role: string; co: string; note: number; texte: string }
+const TEMOIGNAGES = [
+  { init: 'K', nom: 'Karim B.', role: 'Gérant', co: 'Restaurant El Kef', note: 5, texte: '80 polos brodés pour notre équipe. Rendu impeccable, délai respecté, suivi WhatsApp rassurant. On recommande sans hésiter.' },
+  { init: 'S', nom: 'Samira M.', role: 'Directrice', co: 'Clinique Al Chifa', note: 5, texte: 'Blouses brodées pour toute notre équipe médicale. La qualité du tissu et la précision sur le logo sont vraiment au-dessus de nos attentes.' },
+  { init: 'Y', nom: 'Yacine O.', role: 'Directeur', co: 'BTP Construct', note: 5, texte: '120 gilets de chantier en 5 jours. Troisième commande chez Caractère — la régularité et le sérieux sont là à chaque fois.' },
+  { init: 'L', nom: 'Lina K.', role: 'Fondatrice', co: 'Brand Vert', note: 5, texte: "J'ai lancé ma marque de t-shirts sans stock grâce à Caractère. Le designer est simple, la qualité est premium. Mes clients adorent." },
+]
 
-function TemoignageCard({ t, delay }: { t: Temoignage; delay: number }) {
+function TemoignageCard({ t, delay }: { t: any; delay: number }) {
   const ref = useFadeIn(delay)
   return (
-    <div ref={ref} className="rounded-[24px] p-7 border hover:shadow-md transition-all"
-      style={{ background: C.white, borderColor: C.gray2 }}>
-      <div className="flex gap-0.5 mb-4">
-        {[...Array(t.note)].map((_, j) => <span key={j} style={{ color: '#F59E0B' }}>★</span>)}
+    <div ref={ref} className="p-6 rounded-2xl" style={{ background: C.gray1, border: '1px solid #E5E7EB' }}>
+      <div className="flex gap-3 mb-3">
+        {[...Array(t.note)].map((_, i) => (
+          <span key={i} style={{ color: '#FFB703' }}>⭐</span>
+        ))}
       </div>
-      <p className="text-[15px] leading-relaxed mb-6" style={{ color: '#374151' }}>"{t.texte}"</p>
-      <div className="flex items-center gap-3 pt-5" style={{ borderTop: `1px solid ${C.gray2}` }}>
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-black text-white flex-shrink-0"
-          style={{ background: `linear-gradient(135deg, ${C.blue}, #7C3AED)` }}>
+      <p className="text-[13px] leading-relaxed mb-4 italic" style={{ color: C.gray4 }}>"{t.texte}"</p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-white" style={{ background: C.blue }}>
           {t.init}
         </div>
         <div>
-          <p className="font-bold text-[13px]" style={{ color: C.black }}>{t.nom}</p>
-          <p className="text-[12px]" style={{ color: C.gray3 }}>{t.role} · {t.co}</p>
+          <p className="text-[13px] font-bold" style={{ color: C.black }}>{t.nom}</p>
+          <p className="text-[11px]" style={{ color: C.gray4 }}>{t.role} · {t.co}</p>
         </div>
       </div>
     </div>
   )
 }
-const TEMOIGNAGES = [
-  { init: 'K', nom: 'Karim B.', role: 'Gérant', co: 'Restaurant El Kef',    note: 5, texte: '80 polos brodés pour notre équipe. Rendu impeccable, délai respecté, suivi WhatsApp rassurant. On recommande sans hésiter.' },
-  { init: 'S', nom: 'Samira M.', role: 'Directrice', co: 'Clinique Al Chifa', note: 5, texte: 'Blouses brodées pour toute notre équipe médicale. La qualité du tissu et la précision sur le logo sont vraiment au-dessus de nos attentes.' },
-  { init: 'Y', nom: 'Yacine O.', role: 'Directeur', co: 'BTP Construct',       note: 5, texte: '120 gilets de chantier en 5 jours. Troisième commande chez Caractère — la régularité et le sérieux sont là à chaque fois.' },
-  { init: 'L', nom: 'Lina K.', role: 'Fondatrice', co: 'Brand Vert',           note: 5, texte: "J'ai lancé ma marque de t-shirts sans stock grâce à Caractère. Le designer est simple, la qualité est premium. Mes clients adorent." },
-]
 
 function TestimonialsSection() {
   const ref = useFadeIn()
@@ -613,7 +489,7 @@ function TestimonialsSection() {
         <div ref={ref} className="text-center mb-14">
           <Label>Témoignages</Label>
           <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
-            Ils nous font confiance.
+            Ils nous font confiance
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -636,12 +512,11 @@ function CtaSection() {
       <div className="max-w-[1000px] mx-auto px-6 lg:px-10">
         <div ref={ref} className="rounded-[32px] p-10 md:p-16 text-center overflow-hidden relative"
           style={{ background: `linear-gradient(135deg, ${C.black} 0%, #1a1a2e 100%)` }}>
-          {/* Halo décoratif */}
           <div className="absolute pointer-events-none" style={{ top: -100, right: -100, width: 400, height: 400, background: 'radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%)' }} />
 
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold border mb-6"
             style={{ background: 'rgba(56,189,248,0.1)', color: '#BAE6FD', borderColor: 'rgba(56,189,248,0.2)' }}>
-            Démarrez aujourd'hui
+            🚀 Démarrez aujourd'hui
           </span>
 
           <h2 className="font-black tracking-tight text-white mb-4" style={{ fontSize: 'clamp(26px,4vw,42px)', letterSpacing: '-0.025em' }}>
@@ -652,20 +527,20 @@ function CtaSection() {
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/configurateur"
+            <Link href="/designer"
               className="px-8 py-4 rounded-full text-[15px] font-bold text-white no-underline transition-all hover:-translate-y-0.5"
               style={{ background: C.blue, boxShadow: '0 8px 24px rgba(12,74,110,0.5)' }}>
-              Configurer ma commande →
+              Lancer ma marque →
             </Link>
-            <Link href="/designer"
+            <Link href="/configurateur"
               className="px-8 py-4 rounded-full text-[15px] font-bold no-underline transition-all border-2 hover:-translate-y-0.5"
               style={{ color: C.white, borderColor: 'rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.07)' }}>
-              Open Designer ✏️
+              Configurer ma commande
             </Link>
             <a href="https://wa.me/213557440522" target="_blank" rel="noopener noreferrer"
               className="px-8 py-4 rounded-full text-[15px] font-bold no-underline transition-all flex items-center gap-2 hover:-translate-y-0.5"
               style={{ background: '#25D366', color: C.white }}>
-              WhatsApp direct
+              💬 WhatsApp direct
             </a>
           </div>
         </div>
@@ -737,7 +612,7 @@ function Footer() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   EXPORT PRINCIPAL
+   EXPORT PRINCIPAL — OPTIMISÉ
 ══════════════════════════════════════════════════════════════════════════════ */
 export default function HomePageContent({ produits = [] }: { produits?: any[] }) {
   return (
@@ -749,12 +624,11 @@ export default function HomePageContent({ produits = [] }: { produits?: any[] })
         .animate-float-slow { animation: float-slow 4s ease-in-out infinite }
       `}</style>
       <Hero />
+      <TrustBadges />
+      <GuaranteesSection />
       <HowItWorks />
-<Studio3DPreview />
       <ProduitsSection produits={produits} />
       <TechniquesSection />
-      <StatsSection />
-      <EngagementsSection />
       <TestimonialsSection />
       <CtaSection />
       <Footer />
