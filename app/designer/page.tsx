@@ -213,7 +213,7 @@ function DesignerInner() {
   }, [activeId])
 
   return (
-    <div className="flex flex-col h-screen bg-[#F1F1F1] overflow-hidden" onPointerMove={onPointerMove} onPointerUp={() => { action.current = null }}>
+    <div className="flex flex-col bg-[#F1F1F1]" style={{ minHeight: "100dvh" }} onPointerMove={onPointerMove} onPointerUp={() => { action.current = null }}>
 
       {/* ── TOP BAR ── */}
       <div className="flex-shrink-0 bg-white border-b border-black/10 shadow-sm z-20">
@@ -324,10 +324,10 @@ function DesignerInner() {
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row">
 
         {/* ── CANVAS ── */}
-        <div className={`flex-1 flex items-center justify-center p-4 relative ${sidebarOpen ? 'hidden lg:flex' : 'flex'}`}>
+        <div className="flex items-center justify-center p-3">
 
           {/* Color strip */}
           <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
@@ -344,8 +344,8 @@ function DesignerInner() {
             onClick={() => setActiveId(null)}
             className="relative rounded-[20px] overflow-hidden shadow-2xl"
             style={{
-              width: 'min(calc(100vw - 80px), calc(100vh - 200px), 560px)',
-              height: 'min(calc(100vw - 80px), calc(100vh - 200px), 560px)',
+              width: 'min(calc(100vw - 72px), 560px)',
+              height: 'min(calc(100vw - 72px), 560px)',
               background: '#F9F9F7',
               cursor: tool === 'text' ? 'text' : 'default',
             }}
@@ -431,7 +431,7 @@ function DesignerInner() {
         </div>
 
         {/* ── RIGHT PANEL ── */}
-        <div className={`w-full lg:w-[300px] flex-shrink-0 bg-white border-l border-black/10 flex flex-col overflow-hidden ${sidebarOpen ? 'flex' : 'hidden lg:flex'}`}>
+        <div className="w-full lg:w-[300px] flex-shrink-0 bg-white border-t lg:border-t-0 lg:border-l border-black/10 flex flex-col">
 
           {/* Panel tabs */}
           <div className="flex border-b border-black/10 flex-shrink-0">
