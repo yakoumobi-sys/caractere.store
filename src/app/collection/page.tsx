@@ -51,7 +51,7 @@ _Message automatique depuis The Collection_
     `;
 
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/213XXX?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/213557440522?text=${encodedMessage}`, '_blank');
 
     // Reset form
     setName('');
