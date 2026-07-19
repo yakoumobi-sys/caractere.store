@@ -3,6 +3,7 @@ import { useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import { MOCKUPS } from '@/components/designer/mockups-data'
+import { TSHIRT_VIEWS } from '@/components/designer/tshirt-views'
 
 interface Layer {
   id: string
@@ -79,7 +80,15 @@ function DesignerInner() {
   const currentColor = ALL_COLORS[colorKey]
   const availableColors = product.colors.map(k => ({ key: k, ...ALL_COLORS[k] }))
   const { unit, total, remise } = calcPrice(product.prix, qty)
-  const mockupSrc = MOCKUPS[product.id] || MOCKUPS['tshirt']
+  const [viewIndex, setViewIndex] = useState(0)
+  const views = product.id === 'tshirt' ? TSHIRT_VIEWS : [MOCKUPS[product.id] || MOCKUPS['tshirt']]
+  const mockupSrc = views[viewIndex] || views[0]
+
+  // Reset view when product changes
+  const handleProductWithReset = (p: typeof PRODUCTS[0]) => {
+    setViewIndex(0)
+    handleProduct(p)
+  }
 
   const handleProduct = (p: typeof PRODUCTS[0]) => {
     setProduct(p)
@@ -181,6 +190,35 @@ function DesignerInner() {
 
             <img src={mockupSrc} alt={product.name}
               className="absolute inset-0 w-full h-full object-contain pointer-events-none p-3" />
+
+            {/* Navigation recto/verso */}
+            {views.length > 1 && (
+              <>
+                <button
+                  onClick={e => { e.stopPropagation(); setViewIndex(i => (i - 1 + views.length) % views.length) }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md border border-black/10 z-10 transition-all hover:scale-105"
+                  style={{ color: '#0C4A6E' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); setViewIndex(i => (i + 1) % views.length) }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md border border-black/10 z-10 transition-all hover:scale-105"
+                  style={{ color: '#0C4A6E' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+                {/* Dots indicator */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                  {views.map((_, i) => (
+                    <button key={i} onClick={e => { e.stopPropagation(); setViewIndex(i) }}
+                      className={`w-2 h-2 rounded-full transition-all ${viewIndex === i ? 'bg-[#0C4A6E] w-4' : 'bg-black/20'}`} />
+                  ))}
+                </div>
+                {/* Label */}
+                <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-bold text-[#0C4A6E] z-10">
+                  {viewIndex === 0 ? 'RECTO' : viewIndex === 1 ? 'VERSO' : 'CÔTÉ'}
+                </div>
+              </>
+            )}
 
             {layers.map(layer => {
               const isActive = layer.id === activeId
@@ -293,7 +331,7 @@ function DesignerInner() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Produit</p>
             <div className="grid grid-cols-3 gap-2">
               {PRODUCTS.map(p => (
-                <button key={p.id} onClick={() => handleProduct(p)}
+                <button key={p.id} onClick={() => handleProductWithReset(p)}
                   className={`py-2.5 px-2 rounded-xl text-[12px] font-semibold text-center transition-all border-2 ${
                     product.id === p.id ? 'bg-[#0C4A6E] text-white border-[#0C4A6E]' : 'bg-white text-gray-600 border-black/10 hover:border-black/25'
                   }`}>
