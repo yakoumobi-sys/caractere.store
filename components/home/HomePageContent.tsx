@@ -842,92 +842,224 @@ THE COLLECTION — NOUVELLE SECTION
 
 ══════════════════════════════════════════════════════════════════════════════ */
 
+/* ══════════════════════════════════════════════════════════════════════════════
+
+THE COLLECTION — REDESIGNED FOR CONVERSION
+
+══════════════════════════════════════════════════════════════════════════════ */
+
 function CollectionShowcase() {
+  const ref = useFadeIn()
 
-const ref = useFadeIn()
+  const themes = [
+    {
+      icon: '🏎️',
+      name: 'Automotive',
+      desc: 'Speed, precision, passion. Designs inspirés des légendes du motorsport.',
+      color: '#DC2626',
+      count: 6,
+    },
+    {
+      icon: '✨',
+      name: 'Minimalist',
+      desc: 'Less is more. Clean lines, bold statements, timeless aesthetics.',
+      color: '#2563EB',
+      count: 4,
+    },
+    {
+      icon: '🎨',
+      name: 'Graphic & Art',
+      desc: 'Urban creativity. Artistic expressions que font une déclaration.',
+      color: '#7C3AED',
+      count: 4,
+    },
+    {
+      icon: '⭐',
+      name: 'Limited Edition',
+      desc: 'Exclusif. Une fois disparu, disparu pour toujours.',
+      color: '#F59E0B',
+      count: 4,
+    },
+  ]
 
-const featured = [
+  const allProducts = [
+    { id: 1, name: 'BMW M Power', theme: 'Automotive', image: '/collection/IMG_7474.jpeg', badge: 'Trending', price: 3200 },
+    { id: 2, name: 'Ferrari Legends', theme: 'Automotive', image: '/collection/IMG_7473.jpeg', badge: null, price: 3200 },
+    { id: 3, name: 'Essential Basics', theme: 'Minimalist', image: '/collection/IMG_7468.jpeg', badge: 'Best Seller', price: 3200 },
+    { id: 4, name: 'Code Club', theme: 'Minimalist', image: '/collection/IMG_7465.jpeg', badge: null, price: 3200 },
+    { id: 5, name: 'Urban Canvas', theme: 'Graphic & Art', image: '/collection/IMG_7464.jpeg', badge: 'New', price: 3200 },
+    { id: 6, name: 'Street Philosophy', theme: 'Graphic & Art', image: '/collection/IMG_7463.jpeg', badge: null, price: 3200 },
+    { id: 7, name: 'Monaco Grand Prix', theme: 'Limited Edition', image: '/collection/IMG_7460.jpeg', badge: 'Limited', price: 3200 },
+    { id: 8, name: 'South Capital', theme: 'Limited Edition', image: '/collection/IMG_7459.jpeg', badge: 'Limited', price: 3200 },
+  ]
 
-{ id: 1, name: 'Automotive', theme: 'Speed & Passion', image: '/collection/IMG_7474.jpeg' },
+  return (
+    <>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* HERO — COLLECTION */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
 
-{ id: 2, name: 'Minimalist', theme: 'Clean & Bold', image: '/collection/IMG_7468.jpeg' },
+      <section
+        style={{
+          background: 'linear-gradient(135deg, #0C4A6E 0%, #1E6FA8 50%, #0E5E8A 100%)',
+          padding: '100px 0 60px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px',
+        }} />
 
-{ id: 3, name: 'Graphic & Art', theme: 'Urban Canvas', image: '/collection/IMG_7464.jpeg' },
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 relative z-10">
+          <div ref={ref} className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold border mb-6"
+              style={{ background: 'rgba(255,255,255,0.15)', color: '#BAE6FD', borderColor: 'rgba(255,255,255,0.25)' }}>
+              ⭐ 18 DESIGNS EXCLUSIFS
+            </span>
 
-]
+            <h2 className="font-black tracking-tight text-white mb-4" style={{ fontSize: 'clamp(32px,5vw,56px)', letterSpacing: '-0.025em' }}>
+              The Collection
+            </h2>
 
-return (
+            <p className="text-[16px] max-w-2xl mx-auto" style={{ color: 'rgba(255,255,255,0.8)' }}>
+              18 designs exclusifs organisés par thème. <br />
+              Qualité premium, prix fixe 3200 DA. Commandez directement, livraison en 3-5 jours.
+            </p>
 
-<section style={{ background: C.gray1, padding: '96px 0' }}>
+            <div className="mt-6 flex flex-wrap justify-center gap-4 text-[13px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              <span>✓ Dès 1 pièce</span>
+              <span>•</span>
+              <span>✓ Sans minimum</span>
+              <span>•</span>
+              <span>✓ Premium quality</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* THEMES GRID — AVEC CTA IMMÉDIAT */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
 
-<div ref={ref} className="text-center mb-14">
+      <section style={{ background: C.white, padding: '80px 0' }}>
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {themes.map((t, i) => (
+              <div key={i} className="p-6 rounded-2xl border-2 transition-all hover:scale-105 hover:shadow-lg cursor-pointer"
+                style={{ background: C.gray1, borderColor: t.color }}>
+                <p className="text-[40px] mb-3">{t.icon}</p>
+                <p className="font-black text-[18px] mb-1" style={{ color: C.black }}>{t.name}</p>
+                <p className="text-[12px] mb-4" style={{ color: C.gray4 }}>{t.desc}</p>
+                <p className="text-[13px] font-bold mb-4" style={{ color: t.color }}>
+                  {t.count} designs
+                </p>
+                <Link href="/collection"
+                  className="inline-block text-[12px] font-bold px-3 py-1.5 rounded-full no-underline transition-all w-full text-center"
+                  style={{ background: t.color, color: 'white' }}>
+                  Voir la thématique →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-<Label>Exclusif</Label>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* PRODUCTS SHOWCASE — 8 ITEMS */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
 
-<h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(28px,4vw,44px)', color: C.black, letterSpacing: '-0.025em' }}>
+      <section style={{ background: C.gray1, padding: '80px 0' }}>
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+          <div className="text-center mb-12">
+            <h3 className="font-black text-[28px] mb-2" style={{ color: C.black }}>
+              Découvrez les bestsellers
+            </h3>
+            <p className="text-[14px]" style={{ color: C.gray4 }}>
+              Designs sélectionnés par nos clients
+            </p>
+          </div>
 
-The Collection
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {allProducts.map((p) => (
+              <div key={p.id} className="rounded-xl overflow-hidden transition-all hover:scale-105 hover:shadow-lg"
+                style={{ background: C.white, border: '1px solid #E5E7EB' }}>
+                {/* Image + Badge */}
+                <div className="relative h-[220px] overflow-hidden bg-gray-200">
+                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
 
-</h2>
+                  {p.badge && (
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold text-white"
+                      style={{
+                        background: p.badge === 'Limited' ? '#EF4444' :
+                                   p.badge === 'Trending' ? '#8B5CF6' :
+                                   p.badge === 'Best Seller' ? '#10B981' :
+                                   '#3B82F6'
+                      }}>
+                      {p.badge}
+                    </span>
+                  )}
+                </div>
 
-<p className="text-[15px] mt-3" style={{ color: C.gray4 }}>
+                {/* Info */}
+                <div className="p-4">
+                  <p className="text-[13px] font-black mb-1" style={{ color: C.black }}>{p.name}</p>
+                  <p className="text-[11px] mb-3" style={{ color: C.gray4 }}>{p.theme}</p>
 
-Designs exclusifs par thème. Commandez directement depuis la collection.
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[14px] font-bold" style={{ color: C.blue }}>3200 DA</p>
+                    <p className="text-[11px]" style={{ color: C.gray4 }}>premium</p>
+                  </div>
 
-</p>
+                  <button
+                    className="w-full px-3 py-2 rounded-lg text-[12px] font-bold text-white no-underline transition-all hover:-translate-y-0.5"
+                    style={{ background: C.blue }}>
+                    Commander →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
 
-</div>
+          <div className="text-center mt-12">
+            <Link href="/collection"
+              className="inline-block px-8 py-4 rounded-full text-[15px] font-bold no-underline transition-all hover:-translate-y-0.5"
+              style={{ background: C.blue, color: C.white, boxShadow: '0 4px 12px rgba(12,74,110,0.3)' }}>
+              Voir les 18 designs → 
+            </Link>
+          </div>
+        </div>
+      </section>
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* SOCIAL PROOF — COLLECTION SPECIFIQUE */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
 
-{featured.map((item) => (
-
-<div key={item.id} className="rounded-2xl overflow-hidden group cursor-pointer transition-transform hover:scale-105" style={{ background: C.white, border: '1px solid #E5E7EB' }}>
-
-<div className="h-[280px] bg-gray-200 relative overflow-hidden">
-
-<img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-
-</div>
-
-<div className="p-5">
-
-<p className="text-[14px] font-black" style={{ color: C.black }}>{item.name}</p>
-
-<p className="text-[12px] mt-1" style={{ color: C.gray4 }}>{item.theme}</p>
-
-<p className="text-[13px] font-bold mt-3" style={{ color: C.blue }}>3200 DA / pièce</p>
-
-</div>
-
-</div>
-
-))}
-
-</div>
-
-<div className="text-center">
-
-<Link href="/collection"
-
-className="inline-block px-8 py-4 rounded-full font-bold text-[15px] no-underline transition-all hover:-translate-y-0.5"
-
-style={{ background: C.blue, color: C.white, boxShadow: '0 4px 12px rgba(12,74,110,0.3)' }}>
-
-Voir The Collection →
-
-</Link>
-
-</div>
-
-</div>
-
-</section>
-
-)
-
+      <section style={{ background: C.white, padding: '60px 0' }}>
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <p className="text-[32px] font-black" style={{ color: C.blue }}>18</p>
+              <p className="text-[12px] mt-1" style={{ color: C.gray4 }}>Designs exclusifs</p>
+            </div>
+            <div>
+              <p className="text-[32px] font-black" style={{ color: C.blue }}>3200 DA</p>
+              <p className="text-[12px] mt-1" style={{ color: C.gray4 }}>Prix fixe garanti</p>
+            </div>
+            <div>
+              <p className="text-[32px] font-black" style={{ color: C.blue }}>2 500+</p>
+              <p className="text-[12px] mt-1" style={{ color: C.gray4 }}>Pièces vendues</p>
+            </div>
+            <div>
+              <p className="text-[32px] font-black" style={{ color: C.blue }}>4.8 ⭐</p>
+              <p className="text-[12px] mt-1" style={{ color: C.gray4 }}>Note Collection</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  )
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
