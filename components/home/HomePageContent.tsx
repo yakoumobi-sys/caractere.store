@@ -574,7 +574,7 @@ function FinalCTA() {
 // MAIN EXPORT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export default function HomePageContentNew() {
+export default function HomePageContent({ produits = [] }: { produits?: any[] }) {
   return (
     <main style={{ background: PALETTE.white }}>
       <Hero />
