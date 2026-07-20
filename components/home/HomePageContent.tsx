@@ -203,11 +203,11 @@ function TrustSection() {
 function BestsellersSection() {
   const ref = useFadeIn()
   const products = [
-    { name: 'T-shirt Premium', desc: '100% coton', price: '1 950 DA', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5850.jpeg' },
-    { name: 'Polo', desc: 'Piqué premium', price: '2 300 DA', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5850.jpeg' },
-    { name: 'Gilet travail', desc: 'Multipoches', price: '2 500 DA', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5850.jpeg' },
-    { name: 'Casquette', desc: 'Structurée', price: '1 200 DA', img: 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5850.jpeg' },
-  ]
+  { name: 'BMW M Power', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7474.jpeg' },
+  { name: 'Ferrari Legends', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7473.jpeg' },
+  { name: 'Essential Basics', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7468.jpeg' },
+  { name: 'Code Club', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7465.jpeg' },
+]
 
   return (
     <section className="py-24 px-6" style={{ background: PALETTE.white }}>
