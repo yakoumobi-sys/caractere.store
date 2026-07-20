@@ -228,9 +228,9 @@ function BestsellersSection() {
               className="rounded-lg overflow-hidden border transition-all hover:shadow-lg"
               style={{ background: PALETTE.white, borderColor: PALETTE.grayMed }}
             >
-              <div className="h-48 bg-gray-300 relative overflow-hidden">
-                <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-              </div>
+              <div className="h-48 bg-gray-300 overflow-hidden">
+  <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+</div>
               <div className="p-5">
                 <p className="font-black text-black mb-1">{p.name}</p>
                 <p className="text-sm" style={{ color: PALETTE.grayDark }}>{p.desc}</p>
