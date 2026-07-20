@@ -7,14 +7,13 @@ import { supabase } from '@/lib/supabase'
 
 const links = [
   { href: '/comment-ca-marche', label: 'Comment ça marche 🚀' },
-  { href: '/#services',         label: 'Services'              },
-  { href: '/produits',          label: 'Produits'              },
-  { href: '/#secteurs',         label: 'Secteurs'              },
-  { href: '/#avis',             label: 'Avis'                  },
-  { href: '/#contact',          label: 'Contact'               },
-  { href: '/designer',          label: 'Designer'              },
-  { href: '/collection',        label: 'Collection'            },
-  { href: '/catalogue',         label: 'Catalogue'             },
+  { href: '/produits', label: '🛍️ Produits' },  // ← BOLD & ICON
+  { href: '/collection', label: '⭐ The Collection' },  // ← BOLD & ICON
+  { href: '/configurateur', label: 'Configurer' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#secteurs', label: 'Secteurs' },
+  { href: '/#avis', label: 'Avis' },
+  { href: '/#contact', label: 'Contact' },
 ]
 
 export default function Navbar() {
