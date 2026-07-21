@@ -74,7 +74,7 @@ function Hero() {
           <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6 max-w-4xl mx-auto">
             Personnalisez.
             <br />
-            <span style={{ color: PALETTE.blue }}>Développez.</span>
+<span style={{ color: PALETTE.grayDark }}>Développez.</span>
             <br />
             Livrez.
           </h1>
@@ -91,7 +91,8 @@ function Hero() {
               onClick={() => setUserType('b2c')}
               className="px-5 py-2 rounded-full text-sm font-bold transition-all"
               style={{
-                background: userType === 'b2c' ? PALETTE.blue : 'rgba(255,255,255,0.1)',
+style={{
+  background: userType === 'b2c' ? PALETTE.black : 'rgba(255,255,255,0.1)',
                 color: PALETTE.white,
                 border: `2px solid ${userType === 'b2c' ? PALETTE.blue : 'rgba(255,255,255,0.2)'}`,
               }}
@@ -119,7 +120,8 @@ function Hero() {
                   href="/configurateur"
                   className="px-8 py-5 rounded-lg text-lg font-bold no-underline transition-all hover:scale-105"
                   style={{
-                    background: PALETTE.blue,
+style={{
+  background: PALETTE.black,
                     color: PALETTE.white,
                     boxShadow: '0 8px 24px rgba(12,74,110,0.3)',
                   }}
