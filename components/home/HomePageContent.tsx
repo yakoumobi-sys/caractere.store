@@ -62,7 +62,8 @@ function Hero() {
         <div ref={ref} className="text-center">
           {/* Logo */}
           <div className="mb-12 flex justify-center">
-            <img 
+  <div className="text-9xl font-black">C</div>
+</div>
               src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png"
               alt="Caractère"
               className="h-16 w-auto"
