@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 
 const PALETTE = {
@@ -10,7 +10,7 @@ const PALETTE = {
   grayMed: '#E5E7EB',
   grayDark: '#6B7280',
   lime: '#84CC16',
-  blue: '#0C4A6E',
+  gold: '#D4A574',
 }
 
 function useFadeIn(delay = 0) {
@@ -22,11 +22,11 @@ function useFadeIn(delay = 0) {
     el.style.transform = 'translateY(20px)'
     el.style.transition = `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`
     const obs = new IntersectionObserver(
-      ([e]) => { 
-        if (e.isIntersecting) { 
+      ([e]) => {
+        if (e.isIntersecting) {
           el.style.opacity = '1'
-          el.style.transform = 'translateY(0)' 
-        } 
+          el.style.transform = 'translateY(0)'
+        }
       },
       { threshold: 0.1 }
     )
@@ -37,77 +37,81 @@ function useFadeIn(delay = 0) {
 }
 
 function Hero() {
-  const [userType, setUserType] = useState<'b2c' | 'b2b'>('b2c')
   const ref = useFadeIn(0)
-
   return (
-    <section 
-      className="relative w-full pt-20 pb-32 px-6"
+    <section
+      className="w-full pt-20 pb-16 px-6"
       style={{ background: PALETTE.black, color: PALETTE.white }}
     >
-      <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="text-center">
-          <div className="mb-12 flex justify-center">
-            <div className="text-9xl font-black">C</div>
-          </div>
+      <div className="max-w-5xl mx-auto text-center" ref={ref}>
+        <div className="text-8xl font-black mb-8">C</div>
+        <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight mb-6">
+          Personnalisez. Développez. Livrez.
+        </h1>
+        <p className="text-lg md:text-xl max-w-2xl mx-auto" style={{ color: '#D1D5DB' }}>
+          Atelier de personnalisation textile à Alger. DTF, broderie, uniformes.
+          Production 48h, livraison nationale.
+        </p>
+      </div>
+    </section>
+  )
+}
 
-          <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight mb-6 max-w-4xl mx-auto">
-            Personnalisez.
-            <br />
-            <span style={{ color: PALETTE.grayDark }}>Développez.</span>
-            <br />
-            Livrez.
-          </h1>
+function ChoicePaths() {
+  const ref = useFadeIn(100)
+  return (
+    <section className="w-full py-16 px-6" style={{ background: PALETTE.black }}>
+      <div className="max-w-5xl mx-auto" ref={ref}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10" style={{ color: '#D1D5DB' }}>
-            Vêtements personnalisés DTF & broderie. Dès 1 pièce, sans minimum.
-            Production 48h, livraison nationale 3-5 jours.
-          </p>
-
-          <div className="flex gap-2 justify-center mb-10">
-            <button
-              onClick={() => setUserType('b2c')}
-              className="px-5 py-2 rounded-full text-sm font-bold transition-all"
-              style={{
-                background: userType === 'b2c' ? PALETTE.black : 'rgba(255,255,255,0.1)',
-                color: PALETTE.white,
-                border: `2px solid ${userType === 'b2c' ? PALETTE.black : 'rgba(255,255,255,0.2)'} `,
-              }}
-            >
-              👤 Particulier
-            </button>
-            <button
-              onClick={() => setUserType('b2b')}
-              className="px-5 py-2 rounded-full text-sm font-bold transition-all"
-              style={{
-                background: userType === 'b2b' ? PALETTE.black : 'rgba(255,255,255,0.1)',
-                color: PALETTE.white,
-                border: `2px solid ${userType === 'b2b' ? PALETTE.black : 'rgba(255,255,255,0.2)'} `,
-              }}
-            >
-              🏢 Entreprise
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center gap-4 mb-8">
-            <button
-              className="px-8 py-5 rounded-lg text-lg font-bold transition-all hover:scale-105"
-              style={{
-                background: PALETTE.black,
-                color: PALETTE.white,
-                boxShadow: '0 8px 24px rgba(12,74,110,0.3)',
-              }}
-            >
-              {userType === 'b2c' ? 'Commencer une commande' : 'Demander un devis'}
-            </button>
-            <p className="text-sm" style={{ color: '#9CA3AF' }}>
-              {userType === 'b2c' ? 'À partir de 1 950 DA / pièce' : 'À partir de 1 200 DA / pièce'}
+          <Link
+            href="/entreprise"
+            className="block p-10 rounded-2xl transition-all hover:scale-105 no-underline"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: `2px solid ${PALETTE.gold}`,
+            }}
+          >
+            <p className="text-5xl mb-4">🏢</p>
+            <h2 className="text-2xl font-black mb-3" style={{ color: PALETTE.gold }}>
+              Vous êtes une entreprise
+            </h2>
+            <p className="mb-6" style={{ color: '#B0BEC5' }}>
+              Uniformes, polos brodés, gilets de chantier, blouses.
+              Rabais volume jusqu’à -30%.
             </p>
-          </div>
+            <span
+              className="inline-block px-6 py-3 rounded-lg font-bold"
+              style={{ background: PALETTE.gold, color: PALETTE.black }}
+            >
+              Espace Entreprise →
+            </span>
+          </Link>
 
-          <p className="text-sm" style={{ color: '#9CA3AF' }}>
-            ✓ Devis gratuit en 2h  •  ✓ Dès 1 pièce  •  ✓ Délai garanti
-          </p>
+          <Link
+            href="/print-on-demand"
+            className="block p-10 rounded-2xl transition-all hover:scale-105 no-underline"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: `2px solid ${PALETTE.lime}`,
+            }}
+          >
+            <p className="text-5xl mb-4">🚀</p>
+            <h2 className="text-2xl font-black mb-3" style={{ color: PALETTE.lime }}>
+              Vous êtes un créateur
+            </h2>
+            <p className="mb-6" style={{ color: '#B0BEC5' }}>
+              Lancez votre marque sans stock. Print on Demand dès 1 pièce.
+              Designer en ligne + Studio 3D.
+            </p>
+            <span
+              className="inline-block px-6 py-3 rounded-lg font-bold"
+              style={{ background: PALETTE.lime, color: PALETTE.black }}
+            >
+              Print on Demand →
+            </span>
+          </Link>
+
         </div>
       </div>
     </section>
@@ -117,22 +121,17 @@ function Hero() {
 function TrustSection() {
   const ref = useFadeIn()
   const stats = [
-    { number: '50K+', label: 'Pièces produites', icon: '📦' },
-    { number: '500+', label: 'Marques & entreprises', icon: '🏢' },
-    { number: '4.9★', label: 'Note clients', icon: '⭐' },
-    { number: '48h', label: 'Délai production', icon: '⚡' },
+    { number: '50K+', label: 'Pièces produites' },
+    { number: '500+', label: 'Marques & entreprises' },
+    { number: '4.9★', label: 'Note clients' },
+    { number: '48h', label: 'Délai production' },
   ]
-
   return (
-    <section 
-      className="py-20 px-6"
-      style={{ background: PALETTE.grayLight }}
-    >
-      <div className="max-w-6xl mx-auto">
+    <section className="py-16 px-6" style={{ background: PALETTE.grayLight }}>
+      <div className="max-w-5xl mx-auto">
         <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((s, i) => (
             <div key={i} className="text-center">
-              <p className="text-3xl mb-2">{s.icon}</p>
               <p className="text-3xl font-black" style={{ color: PALETTE.black }}>
                 {s.number}
               </p>
@@ -147,222 +146,31 @@ function TrustSection() {
   )
 }
 
-function BestsellersSection() {
+function QuickLinks() {
   const ref = useFadeIn()
-  const products = [
-    { name: 'BMW M Power', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7474.jpeg' },
-    { name: 'Ferrari Legends', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7473.jpeg' },
-    { name: 'Essential Basics', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7468.jpeg' },
-    { name: 'Code Club', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7465.jpeg' },
+  const links = [
+    { emoji: '👕', label: 'Produits', href: '/produits' },
+    { emoji: '⭐', label: 'The Collection', href: '/collection' },
+    { emoji: '🎨', label: 'Designer', href: '/designer' },
+    { emoji: '🧊', label: 'Studio 3D', href: '/studio-3d' },
   ]
-
   return (
-    <section className="py-24 px-6" style={{ background: PALETTE.white }}>
-      <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-16 text-center">
-          <h2 className="text-4xl font-black mb-2" style={{ color: PALETTE.black }}>
-            Bestsellers
-          </h2>
-          <p style={{ color: PALETTE.grayDark }}>
-            Les produits les plus commandés
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {products.map((p, i) => (
-            <div 
+    <section className="py-16 px-6" style={{ background: PALETTE.white }}>
+      <div className="max-w-5xl mx-auto" ref={ref}>
+        <h2 className="text-3xl font-black mb-8 text-center" style={{ color: PALETTE.black }}>
+          Accès rapide
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {links.map((l, i) => (
+            <Link
               key={i}
-              className="rounded-lg overflow-hidden border transition-all hover:shadow-lg"
-              style={{ background: PALETTE.white, borderColor: PALETTE.grayMed }}
+              href={l.href}
+              className="p-6 rounded-lg text-center transition-all hover:shadow-lg no-underline"
+              style={{ background: PALETTE.grayLight, border: `1px solid ${PALETTE.grayMed}` }}
             >
-              <div className="h-48 bg-gray-300 overflow-hidden">
-                <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="p-5">
-                <p className="font-black text-black mb-1">{p.name}</p>
-                <p className="text-sm" style={{ color: PALETTE.grayDark }}>{p.desc}</p>
-                <p className="font-bold text-lg mt-3 mb-4" style={{ color: PALETTE.black }}>
-                  {p.price}
-                </p>
-                <button
-                  className="w-full py-2 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90"
-                  style={{ background: PALETTE.black }}
-                >
-                  Commander
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center">
-          <button
-            className="inline-block px-6 py-3 rounded-lg font-bold transition-all"
-            style={{
-              background: PALETTE.grayLight,
-              color: PALETTE.black,
-              border: `2px solid ${PALETTE.grayMed}`,
-            }}
-          >
-            Voir tous les produits →
-          </button>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function CollectionSection() {
-  const ref = useFadeIn()
-  const themes = [
-    { name: 'Automotive', desc: 'Speed & Passion', color: '#DC2626' },
-    { name: 'Minimalist', desc: 'Clean & Bold', color: '#2563EB' },
-    { name: 'Graphic & Art', desc: 'Urban Canvas', color: '#7C3AED' },
-    { name: 'Limited', desc: 'Exclusif', color: '#F59E0B' },
-  ]
-
-  return (
-    <section className="py-24 px-6" style={{ background: PALETTE.grayLight }}>
-      <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-16 text-center">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: PALETTE.black, color: PALETTE.white }}>
-            ⭐ 18 DESIGNS EXCLUSIFS
-          </span>
-          <h2 className="text-4xl font-black mb-3" style={{ color: PALETTE.black }}>
-            The Collection
-          </h2>
-          <p style={{ color: PALETTE.grayDark }}>
-            Designs premium par thème • 3200 DA pièce • Dès 1 pièce
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
-          {themes.map((t, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-lg border-2 transition-all hover:shadow-lg cursor-pointer"
-              style={{
-                background: PALETTE.white,
-                borderColor: t.color,
-              }}
-            >
-              <p className="text-3xl mb-2">✨</p>
-              <p className="font-bold text-black mb-1">{t.name}</p>
-              <p className="text-sm mb-4" style={{ color: PALETTE.grayDark }}>
-                {t.desc}
-              </p>
-              <p className="text-xs font-bold" style={{ color: t.color }}>
-                Voir →
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center">
-          <button
-            className="inline-block px-8 py-4 rounded-lg font-bold transition-all"
-            style={{
-              background: PALETTE.black,
-              color: PALETTE.white,
-            }}
-          >
-            Découvrir les 18 designs →
-          </button>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function HowItWorks() {
-  const ref = useFadeIn()
-  const steps = [
-    { num: 1, title: 'Choisissez', desc: 'T-shirt, polo, gilet...' },
-    { num: 2, title: 'Personnalisez', desc: 'DTF ou broderie' },
-    { num: 3, title: 'Produisez', desc: '48h à Alger' },
-    { num: 4, title: 'Livrez', desc: '3-5 jours national' },
-  ]
-
-  return (
-    <section className="py-24 px-6" style={{ background: PALETTE.white }}>
-      <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-16 text-center">
-          <h2 className="text-4xl font-black mb-2" style={{ color: PALETTE.black }}>
-            Comment ça marche
-          </h2>
-          <p style={{ color: PALETTE.grayDark }}>4 étapes simples</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {steps.map((s, i) => (
-            <div key={i} className="text-center">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 font-black text-white text-2xl"
-                style={{ background: PALETTE.black }}
-              >
-                {s.num}
-              </div>
-              <p className="font-bold text-black mb-1">{s.title}</p>
-              <p className="text-sm" style={{ color: PALETTE.grayDark }}>
-                {s.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function TestimonialsSection() {
-  const ref = useFadeIn()
-  const testimonials = [
-    { init: 'K', name: 'Karim B.', role: 'Restaurant El Kef', text: '80 polos brodés. Rendu impeccable, délai respecté.' },
-    { init: 'S', name: 'Samira M.', role: 'Clinique Al Chifa', text: 'Blouses brodées. Qualité et précision au-dessus des attentes.' },
-    { init: 'Y', name: 'Yacine O.', role: 'BTP Construct', text: '120 gilets en 5 jours. Troisième commande — régularité garantie.' },
-    { init: 'L', name: 'Lina K.', role: 'Brand Vert', text: 'J'ai lancé ma marque sans stock grâce à Caractère.' },
-  ]
-
-  return (
-    <section className="py-24 px-6" style={{ background: PALETTE.white }}>
-      <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-16 text-center">
-          <h2 className="text-4xl font-black mb-2" style={{ color: PALETTE.black }}>
-            Ils nous font confiance
-          </h2>
-          <p style={{ color: PALETTE.grayDark }}>De vrais clients, de vrais retours</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-lg border"
-              style={{
-                background: PALETTE.grayLight,
-                borderColor: PALETTE.grayMed,
-              }}
-            >
-              <p className="text-sm italic mb-4" style={{ color: PALETTE.black }}>
-                "{t.text}"
-              </p>
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
-                  style={{ background: PALETTE.black }}
-                >
-                  {t.init}
-                </div>
-                <div>
-                  <p className="font-bold text-sm" style={{ color: PALETTE.black }}>
-                    {t.name}
-                  </p>
-                  <p className="text-xs" style={{ color: PALETTE.grayDark }}>
-                    {t.role}
-                  </p>
-                </div>
-              </div>
-            </div>
+              <p className="text-4xl mb-2">{l.emoji}</p>
+              <p className="font-bold" style={{ color: PALETTE.black }}>{l.label}</p>
+            </Link>
           ))}
         </div>
       </div>
@@ -372,41 +180,20 @@ function TestimonialsSection() {
 
 function FinalCTA() {
   const ref = useFadeIn()
-
   return (
-    <section 
-      className="py-24 px-6"
-      style={{ background: PALETTE.black, color: PALETTE.white }}
-    >
+    <section className="py-20 px-6" style={{ background: PALETTE.black, color: PALETTE.white }}>
       <div className="max-w-4xl mx-auto text-center" ref={ref}>
-        <h2 className="text-4xl md:text-5xl font-black mb-6">
-          Prêt à démarrer?
-        </h2>
-        <p className="text-lg mb-10" style={{ color: '#D1D5DB' }}>
-          Devis gratuit · Réponse en 2h · Sans engagement
+        <h2 className="text-4xl font-black mb-4">Une question?</h2>
+        <p className="text-lg mb-8" style={{ color: '#D1D5DB' }}>
+          Réponse en 2h · Devis gratuit · Sans engagement
         </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105"
-            style={{
-              background: PALETTE.white,
-              color: PALETTE.black,
-            }}
-          >
-            Commencer maintenant →
-          </button>
-          <button
-            className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              color: PALETTE.white,
-              border: `2px solid rgba(255,255,255,0.3)`,
-            }}
-          >
-            💬 WhatsApp direct
-          </button>
-        </div>
+        <a
+          href="https://wa.me/213557440522"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:scale-105 no-underline"
+          style={{ background: PALETTE.white, color: PALETTE.black }}
+        >
+          💬 WhatsApp direct
+        </a>
       </div>
     </section>
   )
@@ -416,13 +203,10 @@ export default function HomePageContent({ produits = [] }: { produits?: any[] })
   return (
     <main style={{ background: PALETTE.white }}>
       <Hero />
+      <ChoicePaths />
       <TrustSection />
-      <BestsellersSection />
-      <CollectionSection />
-      <HowItWorks />
-      <TestimonialsSection />
+      <QuickLinks />
       <FinalCTA />
     </main>
   )
 }
-
