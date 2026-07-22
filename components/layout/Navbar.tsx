@@ -98,6 +98,8 @@ export default function Navbar() {
         <Link href="/configurateur" className="bg-brand-dark text-white px-7 py-3.5 rounded-full text-[15px] font-medium no-underline text-center" onClick={() => setOpen(false)}>
           Configurer ma commande
         </Link>
+<Link href="/particuliers">👤 Particulier</Link>
+<Link href="/entreprises">🏢 Entreprise</Link>
       </div>
     </>
   )
