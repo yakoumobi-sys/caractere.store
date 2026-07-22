@@ -24,7 +24,6 @@ const IMAGE_URLS = {
 }
 
 // TODO: Remplace par ton vrai logo Supabase
-// Format: https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/logos/caracterere-logo.png
 const LOGO_URL = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/logos/caracterere-logo.png'
 
 function Icon({ name, size = 20, color = 'currentColor' }: { name: string; size?: number; color?: string }) {
