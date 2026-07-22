@@ -268,7 +268,7 @@ export default function HomePageContent() {
       role: 'Restaurant El Kef'
     },
     {
-      text: '45 blouses pour l'équipe. Broderie précise, tout est parfait.',
+      text: '45 blouses pour l\'equipe. Broderie precise, tout est parfait.',
       author: 'Dr. Samira M.',
       role: 'Clinique Al Chifa'
     },
