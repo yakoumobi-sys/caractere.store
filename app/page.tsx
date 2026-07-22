@@ -19,7 +19,7 @@ export default async function HomePage() {
     <>
       <Navbar />
       <main>
-        <HomePageContent produits={produits} />
+        <HomePageContent />
       </main>
     </>
   )
