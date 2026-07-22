@@ -2,11 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// PALETTE — Noir/Blanc/Gris clair + accent bleu
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const PALETTE = {
   black: '#0C1A26',
@@ -14,13 +9,9 @@ const PALETTE = {
   grayLight: '#F3F4F6',
   grayMed: '#E5E7EB',
   grayDark: '#6B7280',
+  lime: '#84CC16',
   blue: '#0C4A6E',
-  blueMid: '#1E6FA8',
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// HOOK: Fade In on Scroll
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function useFadeIn(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
@@ -45,10 +36,6 @@ function useFadeIn(delay = 0) {
   return ref
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// HERO — Minimaliste, puissant, 2 CTAs uniquement
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 function Hero() {
   const [userType, setUserType] = useState<'b2c' | 'b2b'>('b2c')
   const ref = useFadeIn(0)
@@ -60,99 +47,64 @@ function Hero() {
     >
       <div className="max-w-6xl mx-auto">
         <div ref={ref} className="text-center">
-          {/* Logo */}
           <div className="mb-12 flex justify-center">
-  <div className="text-9xl font-black">C</div>
-</div>
-              src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png"
-              alt="Caractère"
-              className="h-16 w-auto"
-            />
+            <div className="text-9xl font-black">C</div>
           </div>
 
-          {/* Headline — Minimaliste, puissant */}
-          <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6 max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight mb-6 max-w-4xl mx-auto">
             Personnalisez.
             <br />
-<span style={{ color: PALETTE.grayDark }}>Développez.</span>
+            <span style={{ color: PALETTE.grayDark }}>Développez.</span>
             <br />
             Livrez.
           </h1>
 
-          {/* Subheading */}
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10" style={{ color: '#D1D5DB' }}>
             Vêtements personnalisés DTF & broderie. Dès 1 pièce, sans minimum.
             Production 48h, livraison nationale 3-5 jours.
           </p>
 
-          {/* Segmentation: B2C / B2B — Hick's Law: Max 2 choix */}
           <div className="flex gap-2 justify-center mb-10">
             <button
               onClick={() => setUserType('b2c')}
               className="px-5 py-2 rounded-full text-sm font-bold transition-all"
               style={{
-style={{
-  background: userType === 'b2c' ? PALETTE.black : 'rgba(255,255,255,0.1)',
+                background: userType === 'b2c' ? PALETTE.black : 'rgba(255,255,255,0.1)',
                 color: PALETTE.white,
-                border: `2px solid ${userType === 'b2c' ? PALETTE.blue : 'rgba(255,255,255,0.2)'}`,
+                border: `2px solid ${userType === 'b2c' ? PALETTE.black : 'rgba(255,255,255,0.2)'} `,
               }}
             >
-              Particulier
+              👤 Particulier
             </button>
             <button
               onClick={() => setUserType('b2b')}
               className="px-5 py-2 rounded-full text-sm font-bold transition-all"
               style={{
-                background: userType === 'b2b' ? PALETTE.blue : 'rgba(255,255,255,0.1)',
+                background: userType === 'b2b' ? PALETTE.black : 'rgba(255,255,255,0.1)',
                 color: PALETTE.white,
-                border: `2px solid ${userType === 'b2b' ? PALETTE.blue : 'rgba(255,255,255,0.2)'}`,
+                border: `2px solid ${userType === 'b2b' ? PALETTE.black : 'rgba(255,255,255,0.2)'} `,
               }}
             >
-              Entreprise
+              🏢 Entreprise
             </button>
           </div>
 
-          {/* PRIMARY CTA */}
           <div className="flex flex-col items-center gap-4 mb-8">
-            {userType === 'b2c' ? (
-              <>
-                <Link 
-                  href="/configurateur"
-                  className="px-8 py-5 rounded-lg text-lg font-bold no-underline transition-all hover:scale-105"
-                  style={{
-style={{
-  background: PALETTE.black,
-                    color: PALETTE.white,
-                    boxShadow: '0 8px 24px rgba(12,74,110,0.3)',
-                  }}
-                >
-                  Commencer une commande
-                </Link>
-                <p className="text-sm" style={{ color: '#9CA3AF' }}>
-                  À partir de 1 950 DA / pièce
-                </p>
-              </>
-            ) : (
-              <>
-                <Link 
-                  href="/configurateur"
-                  className="px-8 py-5 rounded-lg text-lg font-bold no-underline transition-all hover:scale-105"
-                  style={{
-                    background: PALETTE.blue,
-                    color: PALETTE.white,
-                    boxShadow: '0 8px 24px rgba(12,74,110,0.3)',
-                  }}
-                >
-                  Demander un devis
-                </Link>
-                <p className="text-sm" style={{ color: '#9CA3AF' }}>
-                  À partir de 1 200 DA / pièce (dès 50 pièces)
-                </p>
-              </>
-            )}
+            <button
+              className="px-8 py-5 rounded-lg text-lg font-bold transition-all hover:scale-105"
+              style={{
+                background: PALETTE.black,
+                color: PALETTE.white,
+                boxShadow: '0 8px 24px rgba(12,74,110,0.3)',
+              }}
+            >
+              {userType === 'b2c' ? 'Commencer une commande' : 'Demander un devis'}
+            </button>
+            <p className="text-sm" style={{ color: '#9CA3AF' }}>
+              {userType === 'b2c' ? 'À partir de 1 950 DA / pièce' : 'À partir de 1 200 DA / pièce'}
+            </p>
           </div>
 
-          {/* Trust markers — Réduction friction */}
           <p className="text-sm" style={{ color: '#9CA3AF' }}>
             ✓ Devis gratuit en 2h  •  ✓ Dès 1 pièce  •  ✓ Délai garanti
           </p>
@@ -161,10 +113,6 @@ style={{
     </section>
   )
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TRUST SECTION — Social Proof puissant (Availability Heuristic)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function TrustSection() {
   const ref = useFadeIn()
@@ -199,18 +147,14 @@ function TrustSection() {
   )
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// BESTSELLERS — 4 produits avec images
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 function BestsellersSection() {
   const ref = useFadeIn()
   const products = [
-  { name: 'BMW M Power', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7474.jpeg' },
-  { name: 'Ferrari Legends', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7473.jpeg' },
-  { name: 'Essential Basics', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7468.jpeg' },
-  { name: 'Code Club', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7465.jpeg' },
-]
+    { name: 'BMW M Power', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7474.jpeg' },
+    { name: 'Ferrari Legends', desc: 'Automotive', price: '3200 DA', img: '/collection/IMG_7473.jpeg' },
+    { name: 'Essential Basics', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7468.jpeg' },
+    { name: 'Code Club', desc: 'Minimalist', price: '3200 DA', img: '/collection/IMG_7465.jpeg' },
+  ]
 
   return (
     <section className="py-24 px-6" style={{ background: PALETTE.white }}>
@@ -232,12 +176,12 @@ function BestsellersSection() {
               style={{ background: PALETTE.white, borderColor: PALETTE.grayMed }}
             >
               <div className="h-48 bg-gray-300 overflow-hidden">
-  <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-</div>
+                <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+              </div>
               <div className="p-5">
                 <p className="font-black text-black mb-1">{p.name}</p>
                 <p className="text-sm" style={{ color: PALETTE.grayDark }}>{p.desc}</p>
-                <p className="font-bold text-lg mt-3 mb-4" style={{ color: PALETTE.blue }}>
+                <p className="font-bold text-lg mt-3 mb-4" style={{ color: PALETTE.black }}>
                   {p.price}
                 </p>
                 <button
@@ -252,9 +196,8 @@ function BestsellersSection() {
         </div>
 
         <div className="text-center">
-          <Link
-            href="/produits"
-            className="inline-block px-6 py-3 rounded-lg font-bold no-underline transition-all"
+          <button
+            className="inline-block px-6 py-3 rounded-lg font-bold transition-all"
             style={{
               background: PALETTE.grayLight,
               color: PALETTE.black,
@@ -262,16 +205,12 @@ function BestsellersSection() {
             }}
           >
             Voir tous les produits →
-          </Link>
+          </button>
         </div>
       </div>
     </section>
   )
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// THE COLLECTION — 4 thèmes, 8 designs
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function CollectionSection() {
   const ref = useFadeIn()
@@ -286,8 +225,8 @@ function CollectionSection() {
     <section className="py-24 px-6" style={{ background: PALETTE.grayLight }}>
       <div className="max-w-6xl mx-auto">
         <div ref={ref} className="mb-16 text-center">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: PALETTE.blue, color: PALETTE.white }}>
-            18 DESIGNS EXCLUSIFS
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: PALETTE.black, color: PALETTE.white }}>
+            ⭐ 18 DESIGNS EXCLUSIFS
           </span>
           <h2 className="text-4xl font-black mb-3" style={{ color: PALETTE.black }}>
             The Collection
@@ -299,10 +238,9 @@ function CollectionSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
           {themes.map((t, i) => (
-            <Link
+            <div
               key={i}
-              href="/collection"
-              className="p-6 rounded-lg border-2 transition-all hover:shadow-lg no-underline"
+              className="p-6 rounded-lg border-2 transition-all hover:shadow-lg cursor-pointer"
               style={{
                 background: PALETTE.white,
                 borderColor: t.color,
@@ -316,30 +254,25 @@ function CollectionSection() {
               <p className="text-xs font-bold" style={{ color: t.color }}>
                 Voir →
               </p>
-            </Link>
+            </div>
           ))}
         </div>
 
         <div className="text-center">
-          <Link
-            href="/collection"
-            className="inline-block px-8 py-4 rounded-lg font-bold no-underline transition-all"
+          <button
+            className="inline-block px-8 py-4 rounded-lg font-bold transition-all"
             style={{
-              background: PALETTE.blue,
+              background: PALETTE.black,
               color: PALETTE.white,
             }}
           >
             Découvrir les 18 designs →
-          </Link>
+          </button>
         </div>
       </div>
     </section>
   )
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// HOW IT WORKS — 4 steps minimaliste
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function HowItWorks() {
   const ref = useFadeIn()
@@ -376,106 +309,18 @@ function HowItWorks() {
             </div>
           ))}
         </div>
-
-        <div className="text-center mt-12">
-          <Link
-            href="/comment-ca-marche"
-            className="inline-block px-6 py-3 rounded-lg font-bold no-underline transition-all"
-            style={{
-              background: PALETTE.grayLight,
-              color: PALETTE.black,
-              border: `2px solid ${PALETTE.grayMed}`,
-            }}
-          >
-            Voir en détail →
-          </Link>
-        </div>
       </div>
     </section>
   )
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TECHNIQUES — DTF vs Broderie
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-function TechniquesSection() {
-  const ref = useFadeIn()
-  const techniques = [
-    {
-      icon: '🖨️',
-      name: 'DTF',
-      desc: 'Direct to Film — Rendu photographique, tous tissus',
-      points: ['Résistant lavage 40+', 'Dès 1 pièce', 'Jusqu\'à 60cm'],
-    },
-    {
-      icon: '🪡',
-      name: 'Broderie',
-      desc: 'Machine — Effet 3D, finition relief premium',
-      points: ['Tenue à vie', 'Casquettes & polos', 'Logos structurés'],
-    },
-  ]
-
-  return (
-    <section className="py-24 px-6" style={{ background: PALETTE.grayLight }}>
-      <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-16 text-center">
-          <h2 className="text-4xl font-black mb-2" style={{ color: PALETTE.black }}>
-            Nos techniques
-          </h2>
-          <p style={{ color: PALETTE.grayDark }}>Choisissez la meilleure pour votre projet</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {techniques.map((t, i) => (
-            <div
-              key={i}
-              className="p-8 rounded-lg border"
-              style={{
-                background: PALETTE.white,
-                borderColor: PALETTE.grayMed,
-              }}
-            >
-              <p className="text-4xl mb-4">{t.icon}</p>
-              <p className="font-black text-xl mb-1" style={{ color: PALETTE.black }}>
-                {t.name}
-              </p>
-              <p className="text-sm mb-6" style={{ color: PALETTE.grayDark }}>
-                {t.desc}
-              </p>
-              <ul className="space-y-2 mb-6">
-                {t.points.map((pt, j) => (
-                  <li key={j} className="text-sm" style={{ color: PALETTE.grayDark }}>
-                    ✓ {pt}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/configurateur"
-                className="text-sm font-bold no-underline transition-all"
-                style={{ color: PALETTE.blue }}
-              >
-                Commander →
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TESTIMONIALS — 4 clients réels
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function TestimonialsSection() {
   const ref = useFadeIn()
   const testimonials = [
-    { init: 'K', name: 'Karim B.', role: 'Restaurant El Kef', text: '80 polos brodés. Rendu impeccable, délai respecté. On recommande.' },
-    { init: 'S', name: 'Samira M.', role: 'Clinique Al Chifa', text: 'Blouses brodées pour notre équipe. Qualité et précision au-dessus des attentes.' },
-    { init: 'Y', name: 'Yacine O.', role: 'BTP Construct', text: '120 gilets en 5 jours. Troisième commande — régularité et sérieux garantis.' },
-    { init: 'L', name: 'Lina K.', role: 'Brand Vert', text: 'J\'ai lancé ma marque sans stock. Design simple, qualité premium, clients adorent.' },
+    { init: 'K', name: 'Karim B.', role: 'Restaurant El Kef', text: '80 polos brodés. Rendu impeccable, délai respecté.' },
+    { init: 'S', name: 'Samira M.', role: 'Clinique Al Chifa', text: 'Blouses brodées. Qualité et précision au-dessus des attentes.' },
+    { init: 'Y', name: 'Yacine O.', role: 'BTP Construct', text: '120 gilets en 5 jours. Troisième commande — régularité garantie.' },
+    { init: 'L', name: 'Lina K.', role: 'Brand Vert', text: 'J'ai lancé ma marque sans stock grâce à Caractère.' },
   ]
 
   return (
@@ -504,7 +349,7 @@ function TestimonialsSection() {
               <div className="flex items-center gap-3">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
-                  style={{ background: PALETTE.blue }}
+                  style={{ background: PALETTE.black }}
                 >
                   {t.init}
                 </div>
@@ -525,10 +370,6 @@ function TestimonialsSection() {
   )
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// FINAL CTA — Action puissante
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 function FinalCTA() {
   const ref = useFadeIn()
 
@@ -546,19 +387,17 @@ function FinalCTA() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/configurateur"
-            className="px-8 py-4 rounded-lg font-bold no-underline transition-all"
+          <button
+            className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105"
             style={{
-              background: PALETTE.blue,
-              color: PALETTE.white,
+              background: PALETTE.white,
+              color: PALETTE.black,
             }}
           >
             Commencer maintenant →
-          </Link>
-          <a
-            href="https://wa.me/213557440522"
-            className="px-8 py-4 rounded-lg font-bold no-underline transition-all"
+          </button>
+          <button
+            className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105"
             style={{
               background: 'rgba(255,255,255,0.1)',
               color: PALETTE.white,
@@ -566,16 +405,12 @@ function FinalCTA() {
             }}
           >
             💬 WhatsApp direct
-          </a>
+          </button>
         </div>
       </div>
     </section>
   )
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MAIN EXPORT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function HomePageContent({ produits = [] }: { produits?: any[] }) {
   return (
@@ -585,9 +420,9 @@ export default function HomePageContent({ produits = [] }: { produits?: any[] })
       <BestsellersSection />
       <CollectionSection />
       <HowItWorks />
-      <TechniquesSection />
       <TestimonialsSection />
       <FinalCTA />
     </main>
   )
 }
+
