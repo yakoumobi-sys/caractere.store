@@ -15,16 +15,17 @@ const C = {
   limeSoft: 'rgba(163,230,53,0.12)',
 }
 
-// TODO: Mettre l'URL du logo Supabase ici
-const LOGO_URL = 'https://your-supabase-url.supabase.co/storage/v1/object/public/logos/caracterere-logo.png'
-
-// TODO: URLs des images de collection (GitHub raw ou Supabase)
+// URLs réelles des images de GitHub
 const IMAGE_URLS = {
   img1: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7474.jpeg',
   img2: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7473.jpeg',
   img3: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7468.jpeg',
   img4: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7465.jpeg',
 }
+
+// TODO: Remplace par ton vrai logo Supabase
+// Format: https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/logos/caracterere-logo.png
+const LOGO_URL = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/logos/caracterere-logo.png'
 
 function Icon({ name, size = 20, color = 'currentColor' }: { name: string; size?: number; color?: string }) {
   const paths: Record<string, JSX.Element> = {
@@ -36,7 +37,6 @@ function Icon({ name, size = 20, color = 'currentColor' }: { name: string; size?
     palette: <><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></>,
     cube: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" /></>,
     message: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
-    menu: <><path d="M6 9h12M6 15h12M6 21h12" /></>,
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -61,8 +61,13 @@ const GlobalStyle = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
-    .cs-root { font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #0C0A09 0%, #1a1512 50%, #0f0d0a 100%); color: ${C.white}; overflow-x: hidden; }
-    .cs-root .display { font-family: 'Cormorant', serif; font-weight: 700; }
+    .cs-root { 
+      font-family: 'Montserrat', sans-serif; 
+      background: linear-gradient(135deg, #0A0805 0%, #1a1512 30%, #0f0d0a 60%, #0C0A09 100%);
+      color: ${C.white}; 
+      overflow-x: hidden; 
+    }
+    .cs-root .display { font-family: 'Cormorant', serif; font-weight: 800; }
 
     .reveal { opacity: 0; transform: translateY(34px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
     .reveal.in { opacity: 1; transform: none; }
@@ -83,12 +88,25 @@ const GlobalStyle = () => (
     }
 
     @keyframes slideDown { from { transform: translateY(-100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-    .sticky-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 999; background: rgba(12,10,9,.92); backdrop-filter: blur(20px); border-bottom: 1px solid ${C.border}; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; animation: slideDown .4s cubic-bezier(.16,1,.3,1); }
+    .sticky-nav { 
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999; 
+      background: rgba(12,10,9,.95); backdrop-filter: blur(20px); 
+      border-bottom: 1px solid ${C.border}; 
+      padding: 14px 20px; 
+      display: flex; justify-content: center; gap: 12px;
+      animation: slideDown .4s cubic-bezier(.16,1,.3,1);
+    }
     .sticky-nav.hidden { transform: translateY(-120%); transition: transform .3s; }
-    .sticky-nav .logo { width: 32px; height: 32px; border-radius: 8px; background: ${C.gold}; }
-    .sticky-nav .links { display: flex; gap: 6px; }
-    .sticky-nav a, .sticky-nav-link { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none; color: ${C.white}; transition: all .3s; border: 1px solid ${C.border}; display: inline-block; }
-    .sticky-nav a:hover, .sticky-nav-link:hover { background: ${C.goldSoft}; border-color: ${C.gold}; color: ${C.gold}; }
+    .sticky-nav a { 
+      padding: 8px 16px; border-radius: 8px; 
+      font-size: 13px; font-weight: 700; 
+      text-decoration: none; color: ${C.white}; 
+      transition: all .3s; border: 1px solid ${C.border};
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .sticky-nav a:hover { 
+      background: ${C.goldSoft}; border-color: ${C.gold}; color: ${C.gold}; 
+    }
 
     .glass {
       background: rgba(28,25,23,0.55);
@@ -101,7 +119,7 @@ const GlobalStyle = () => (
     .glass.lime:hover { border-color: rgba(163,230,53,.55); box-shadow: 0 24px 60px -20px rgba(163,230,53,.3); }
 
     .btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 30px; border-radius: 999px;
-      font-weight: 600; font-size: 15px; text-decoration: none; cursor: pointer;
+      font-weight: 700; font-size: 15px; text-decoration: none; cursor: pointer;
       transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .3s, background .3s; }
     .btn:hover { transform: translateY(-3px) scale(1.02); }
     .btn .ic { transition: transform .25s; }
@@ -116,6 +134,10 @@ const GlobalStyle = () => (
       transition: transform .35s cubic-bezier(.16,1,.3,1), border-color .3s, background .3s; cursor: pointer; }
     .quick:hover { transform: translateY(-6px); border-color: rgba(212,165,116,.5); background: #232019; }
 
+    .bestseller { border-radius: 16px; overflow: hidden; background: ${C.surface}; border: 1px solid ${C.border}; }
+    .bestseller img { width: 100%; height: 240px; object-fit: cover; }
+    .bestseller p { padding: 16px 12px; margin: 0; font-weight: 700; text-align: center; font-size: 14px; }
+
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
       .blobA, .blobB, .shimmer { animation: none !important; }
@@ -127,13 +149,10 @@ const GlobalStyle = () => (
 function StickyNav({ visible }: { visible: boolean }) {
   return (
     <nav className={`sticky-nav ${!visible ? 'hidden' : ''}`}>
-      <div className="logo" title="Caractère Store" />
-      <div className="sticky-nav links">
-        <Link href="/designer" className="sticky-nav-link">🎨 Designer</Link>
-        <Link href="/studio-3d" className="sticky-nav-link">🧊 3D</Link>
-        <Link href="/collection" className="sticky-nav-link">⭐ Collection</Link>
-        <Link href="/produits" className="sticky-nav-link">👕 Produits</Link>
-      </div>
+      <Link href="/designer">🎨 Designer</Link>
+      <Link href="/studio-3d">🧊 3D</Link>
+      <Link href="/collection">⭐ Collection</Link>
+      <Link href="/produits">👕 Produits</Link>
     </nav>
   )
 }
@@ -166,7 +185,7 @@ function ChoicePaths() {
   return (
     <section style={{ padding: '90px 24px', position: 'relative' }}>
       <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 6 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
 
           <Link
             href="/entreprise"
@@ -222,7 +241,7 @@ function TrustSection() {
     { number: '48h', label: 'Délai production' },
   ]
   return (
-    <section className="reveal" style={{ padding: '40px 24px', background: C.surface }}>
+    <section style={{ padding: '40px 24px', background: C.surface }}>
       <div style={{ maxWidth: 1080, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 20 }}>
           {stats.map((s, i) => (
@@ -256,11 +275,9 @@ function Bestsellers() {
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18 }}>
           {items.map((i, idx) => (
-            <div key={idx} className={`reveal d${idx}`} style={{ borderRadius: 16, overflow: 'hidden', background: C.surface, border: `1px solid ${C.border}` }}>
-              <div style={{ width: '100%', height: 240, background: C.surface, overflow: 'hidden' }}>
-                <img src={i.img} alt={i.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <p style={{ padding: '16px 12px', margin: 0, fontWeight: 600, textAlign: 'center' }}>{i.name}</p>
+            <div key={idx} className={`bestseller reveal d${idx}`}>
+              <img src={i.img} alt={i.name} loading="lazy" />
+              <p>{i.name}</p>
             </div>
           ))}
         </div>
@@ -319,7 +336,7 @@ export default function HomePageContent({ produits = [] }: { produits?: any[] })
     const handleScroll = () => {
       setNavVisible(window.scrollY > 300)
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
