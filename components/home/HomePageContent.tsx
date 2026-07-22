@@ -1,4 +1,13 @@
-'use client'
+"use client"
+import { Produit } from "@/types" // ou le bon chemin
+
+interface HomePageContentProps {
+  produits?: Produit[]
+}
+
+export default function HomePageContent({ produits }: HomePageContentProps) {
+  // ... reste du code
+}
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
