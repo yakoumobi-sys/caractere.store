@@ -1,457 +1,279 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
+// ============================================
+// CARACTÈRE — HOMEPAGE V5 "NOIR"
+// Theme: noir / blanc / gris clair (style Huly)
+// Deploy to: components/home/HomePageContent.tsx
+// ============================================
+
 const C = {
-  black: '#0C0A09',
-  white: '#FAFAF9',
-  gray: '#1C1917',
-  grayMed: '#A8A29E',
-  gold: '#D4A574',
+  black: '#0A0A0A',
+  white: '#FAFAFA',
+  gray: '#A3A3A3',
+  grayDark: '#525252',
+  line: 'rgba(255,255,255,0.08)',
+  card: 'rgba(255,255,255,0.03)',
 }
 
-const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-black-transparent.png'
-
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll('.reveal')
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
-      { threshold: 0.12 }
-    )
-    els.forEach((el) => obs.observe(el))
-    return () => obs.disconnect()
-  }, [])
-}
-
-const GlobalStyle = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body, html { 
-      font-family: 'Montserrat', sans-serif;
-      background: #FAFAF9;
-      color: #0C0A09;
-      line-height: 1.6;
-      font-weight: 700;
-    }
-
-    .display { font-weight: 800; font-size: 42px; }
-
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease-out, transform .7s ease-out; }
-    .reveal.in { opacity: 1; transform: translateY(0); }
-
-    header {
-      position: sticky; top: 0; z-index: 100;
-      background: ${C.white};
-      border-bottom: 1px solid #E5E7EB;
-      padding: 16px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    header img { height: 36px; width: auto; }
-    header nav { display: flex; gap: 24px; }
-    header a { text-decoration: none; color: #0C0A09; font-weight: 800; font-size: 14px; transition: color .3s; }
-    header a:hover { color: ${C.gold}; }
-
-    .hero {
-      padding: 80px 24px;
-      text-align: center;
-      background: linear-gradient(135deg, #FAFAF9 0%, #F3F4F6 100%);
-    }
-
-    .hero h1 { 
-      font-size: clamp(36px, 8vw, 72px);
-      margin-bottom: 16px;
-      line-height: 1.1;
-      font-weight: 800;
-    }
-
-    .hero p { 
-      font-size: 18px;
-      max-width: 600px;
-      margin: 0 auto 32px;
-      color: #6B7280;
-      font-weight: 700;
-    }
-
-    .cta-group {
-      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 800;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all .3s;
-      border: none;
-      font-size: 14px;
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-
-    .btn-primary { 
-      background: ${C.black}; 
-      color: ${C.white};
-    }
-    .btn-primary:hover { 
-      background: ${C.gold};
-      color: ${C.black};
-      transform: translateY(-2px);
-    }
-
-    .btn-secondary { 
-      border: 2px solid ${C.black};
-      background: transparent;
-      color: ${C.black};
-    }
-    .btn-secondary:hover { 
-      background: ${C.black};
-      color: ${C.white};
-    }
-
-    .logo-section {
-      padding: 60px 24px;
-      text-align: center;
-    }
-
-    .logo-section img {
-      max-width: 240px;
-      height: auto;
-      margin-bottom: 32px;
-    }
-
-    .section {
-      padding: 80px 24px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section h2 {
-      font-size: 42px;
-      margin-bottom: 48px;
-      text-align: center;
-      font-weight: 800;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .card {
-      border-radius: 12px;
-      border: 1px solid #E5E7EB;
-      padding: 32px 20px;
-      text-align: center;
-      transition: transform .3s, box-shadow .3s, background .3s;
-      background: #F9FAFB;
-      text-decoration: none;
-      color: #0C0A09;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.12);
-      background: ${C.white};
-    }
-
-    .card .icon { font-size: 48px; margin-bottom: 16px; display: block; }
-    .card p { font-weight: 800; font-size: 15px; }
-
-    .testimonials {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-    }
-
-    .testimonial {
-      background: #F9FAFB;
-      padding: 24px;
-      border-radius: 12px;
-      border: 1px solid #E5E7EB;
-    }
-
-    .testimonial p { font-size: 14px; margin-bottom: 16px; line-height: 1.8; color: #6B7280; font-weight: 700; }
-    .testimonial .author { font-weight: 800; font-size: 13px; }
-    .testimonial .role { font-size: 12px; color: #9CA3AF; font-weight: 700; }
-
-    .pricing {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-    }
-
-    .price-card {
-      border: 1px solid #E5E7EB;
-      border-radius: 12px;
-      padding: 32px 24px;
-      text-align: center;
-      transition: all .3s;
-      background: #F9FAFB;
-    }
-
-    .price-card.featured {
-      border: 2px solid ${C.gold};
-      transform: scale(1.02);
-      box-shadow: 0 10px 30px rgba(212,165,116,0.2);
-      background: ${C.white};
-    }
-
-    .price-card h3 { font-size: 18px; margin-bottom: 8px; font-weight: 800; }
-    .price-card .amount { font-size: 36px; font-weight: 800; margin: 16px 0; }
-    .price-card p { font-size: 12px; color: #6B7280; margin-bottom: 24px; font-weight: 700; }
-
-    .price-card .btn { width: 100%; justify-content: center; }
-
-    .features {
-      list-style: none;
-      margin-bottom: 24px;
-      text-align: left;
-    }
-
-    .features li { 
-      padding: 12px 0; 
-      font-size: 14px;
-      border-bottom: 1px solid #E5E7EB;
-      font-weight: 700;
-    }
-
-    .faq {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      border-bottom: 1px solid #E5E7EB;
-      padding: 24px 0;
-      cursor: pointer;
-    }
-
-    .faq-item h3 {
-      font-weight: 800;
-      margin-bottom: 8px;
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 15px;
-    }
-
-    .faq-item p { 
-      font-size: 14px; 
-      color: #6B7280;
-      line-height: 1.8;
-      display: none;
-      font-weight: 700;
-    }
-
-    .faq-item.active p { display: block; }
-
-    footer {
-      background: #0C0A09;
-      color: ${C.white};
-      padding: 48px 24px;
-      text-align: center;
-    }
-
-    footer p { font-size: 12px; color: #A8A29E; font-weight: 700; }
-
-    @media (max-width: 768px) {
-      header nav { gap: 12px; }
-      .section { padding: 48px 20px; }
-      .section h2 { font-size: 28px; }
-      .grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
-      .price-card.featured { transform: scale(1); }
-    }
-  `}</style>
-)
-
-export default function HomePageContent() {
-  const [activeTab, setActiveTab] = useState(0)
-
-  useReveal()
-
-  const shortcuts = [
-    { icon: '🎨', name: 'Designer', href: '/designer' },
-    { icon: '🧊', name: 'Studio 3D', href: '/studio-3d' },
-    { icon: '👕', name: 'Produits', href: '/produits' },
-    { icon: '⭐', name: 'Collection', href: '/collection' },
-    { icon: '📚', name: 'Comment ça marche', href: '/comment-ca-marche' },
-  ]
-
-  const testimonials = [
-    { text: '80 polos en 48h. Qualité impeccable.', author: 'Karim B.', role: 'Restaurant El Kef' },
-    { text: '45 blouses parfaites. Livraison rapide.', author: 'Dr. Samira M.', role: 'Clinique Al Chifa' },
-    { text: '120 gilets robustes. On recommande!', author: 'Yacine O.', role: 'BTP Construct' },
-  ]
-
-  const pricing = [
-    { name: 'DTF Standard', price: '1950', desc: 'Dès 1 pièce' },
-    { name: 'DTF Premium', price: '2450', desc: 'Couleurs pleines', featured: true },
-    { name: 'Broderie', price: '3950', desc: 'Logo haute densité' },
-  ]
-
-  const faqs = [
-    { q: 'Délai de production?', a: '48h à Alger. Livraison 3-5 jours selon wilaya.' },
-    { q: 'Minimum de commande?', a: 'Pas de minimum! 1 pièce ou 1000. Prix adapté.' },
-    { q: 'Paiements acceptés?', a: 'BaridiMob, CCP, virement. Paiement livraison pour Alger.' },
-    { q: 'Suivi commande?', a: 'Oui! WhatsApp direct + photos production. Info permanente.' },
-  ]
-
+// ---------- LOGO SVG (blanc sur noir) ----------
+function Logo({ size = 56 }: { size?: number }) {
   return (
-    <div style={{ background: '#FAFAF9', color: '#0C0A09' }}>
-      <GlobalStyle />
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-label="Caractère">
+      <polygon points="18,8 96,2 82,92 4,98" fill={C.white} />
+      <path
+        d="M67 38 A20 20 0 1 0 67 62"
+        stroke={C.black}
+        strokeWidth="13"
+        strokeLinecap="butt"
+        fill="none"
+      />
+    </svg>
+  )
+}
 
-      {/* Header */}
-      <header>
-        <img src={LOGO} alt="Caractère" />
-        <nav>
-          <a href="#raccourcis">Outils</a>
-          <a href="#pricing">Tarifs</a>
-          <a href="#reviews">Avis</a>
-          <a href="https://wa.me/213557440522">WhatsApp</a>
-        </nav>
-      </header>
+// ---------- ICONES SVG (remplacent les emojis) ----------
+type IconProps = { size?: number }
 
-      {/* Hero */}
-      <section className="hero">
-        <div className="reveal">
-          <h1>Votre marque en 48h</h1>
-          <p>DTF • Broderie • Uniformes | Sans stock • Sans risque</p>
-          <div className="cta-group">
-            <Link href="/designer" className="btn btn-primary">🎨 Designer gratuit</Link>
-            <a href="https://wa.me/213557440522" className="btn btn-secondary">💬 Question?</a>
-          </div>
+const stroke = { stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' }
+
+function IconPen({ size = 30 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M12 19l7-7 3 3-7 7-3-3z" />
+      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+      <path d="M2 2l7.586 7.586" />
+      <circle cx="11" cy="11" r="2" />
+    </svg>
+  )
+}
+
+function IconCube({ size = 30 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <path d="M3.27 6.96L12 12.01l8.73-5.05" />
+      <path d="M12 22.08V12" />
+    </svg>
+  )
+}
+
+function IconShirt({ size = 30 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+    </svg>
+  )
+}
+
+function IconStar({ size = 30 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  )
+}
+
+function IconBook({ size = 30 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  )
+}
+
+function IconArrow({ size = 18 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M5 12h14" />
+      <path d="M12 5l7 7-7 7" />
+    </svg>
+  )
+}
+
+function IconChat({ size = 18 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    </svg>
+  )
+}
+
+// ---------- DONNÉES ----------
+const quickLinks = [
+  { href: '/designer', label: 'Designer', desc: 'Crée ton design en 2 minutes', Icon: IconPen },
+  { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
+  { href: '/produits', label: 'Produits', desc: 'T-shirts, hoodies, uniformes', Icon: IconShirt },
+  { href: '/collection', label: 'Collection', desc: 'Nos designs prêts à porter', Icon: IconStar },
+  { href: '/comment-ca-marche', label: 'Comment ça marche', desc: 'Le guide complet, étape par étape', Icon: IconBook },
+]
+
+// ---------- PAGE ----------
+export default function HomePageContent() {
+  return (
+    <div style={{ background: C.black, color: C.white, minHeight: '100vh', fontFamily: "'Inter','Archivo',system-ui,sans-serif", overflowX: 'hidden' }}>
+      <style>{`
+        @keyframes beamPulse {
+          0%, 100% { opacity: 0.7; }
+          50% { opacity: 1; }
+        }
+        @keyframes riseIn {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .anim { animation: none !important; opacity: 1 !important; transform: none !important; }
+        }
+        .anim { animation: riseIn 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+        .card-hover { transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease; }
+        .card-hover:hover { border-color: rgba(255,255,255,0.25) !important; background: rgba(255,255,255,0.06) !important; transform: translateY(-3px); }
+        .btn-glow { box-shadow: 0 0 40px rgba(255,255,255,0.25), 0 0 80px rgba(255,255,255,0.1); transition: box-shadow 0.3s ease, transform 0.2s ease; }
+        .btn-glow:hover { box-shadow: 0 0 60px rgba(255,255,255,0.4), 0 0 120px rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .btn-outline { transition: border-color 0.25s ease, background 0.25s ease; }
+        .btn-outline:hover { border-color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.05); }
+      `}</style>
+
+      {/* ================= HERO ================= */}
+      <section style={{ position: 'relative', textAlign: 'center', padding: '72px 20px 0', minHeight: '92vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+        {/* Faisceau de lumière central (signature Huly, en monochrome) */}
+        <div aria-hidden style={{
+          position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+          width: '2px', height: '100%',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, rgba(255,255,255,0) 100%)',
+          animation: 'beamPulse 4s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+        <div aria-hidden style={{
+          position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
+          width: 'min(90vw, 700px)', height: '60%',
+          background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* LOGO EN GRAND — au-dessus du titre */}
+        <div className="anim" style={{ position: 'relative', zIndex: 2, marginBottom: '36px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '18px' }}>
+          <Logo size={110} />
+          <span style={{ fontWeight: 900, fontSize: '1.9rem', letterSpacing: '-0.02em' }}>Caractère</span>
         </div>
+
+        {/* TITRE */}
+        <h1 className="anim" style={{
+          position: 'relative', zIndex: 2,
+          fontSize: 'clamp(2.6rem, 9vw, 5.5rem)',
+          fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.02,
+          margin: '0 0 24px', animationDelay: '0.1s',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #B8B8B8 100%)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+        }}>
+          Votre marque<br />en 48h
+        </h1>
+
+        {/* SOUS-TITRE — Designer + Studio 3D */}
+        <p className="anim" style={{
+          position: 'relative', zIndex: 2,
+          fontSize: 'clamp(1.05rem, 3.5vw, 1.35rem)', fontWeight: 600,
+          color: C.gray, maxWidth: '560px', lineHeight: 1.5,
+          margin: '0 0 40px', animationDelay: '0.2s',
+        }}>
+          Design ton t-shirt avec le <strong style={{ color: C.white }}>Designer</strong>.<br />
+          Anime-le avec notre <strong style={{ color: C.white }}>Studio 3D</strong>.<br />
+          <span style={{ fontSize: '0.9em', color: C.grayDark }}>DTF • Broderie • Uniformes — Sans stock, sans risque.</span>
+        </p>
+
+        {/* CTA */}
+        <div className="anim" style={{ position: 'relative', zIndex: 2, display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', animationDelay: '0.3s' }}>
+          <Link href="/designer" className="btn-glow" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: C.white, color: C.black,
+            padding: '16px 32px', borderRadius: '999px',
+            fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
+            textTransform: 'uppercase', letterSpacing: '0.04em',
+          }}>
+            Designer gratuit <IconArrow />
+          </Link>
+          <a href="https://wa.me/213557440522" className="btn-outline" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            border: `1px solid ${C.line}`, color: C.white,
+            padding: '16px 32px', borderRadius: '999px',
+            fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
+            textTransform: 'uppercase', letterSpacing: '0.04em',
+          }}>
+            <IconChat /> Question ?
+          </a>
+        </div>
+
+        {/* Base du faisceau : ligne lumineuse horizontale */}
+        <div aria-hidden style={{
+          position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+          width: 'min(92vw, 900px)', height: '1px',
+          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+          boxShadow: '0 0 30px rgba(255,255,255,0.3)',
+        }} />
       </section>
 
-      {/* Logo Grand */}
-      <section className="logo-section">
-        <img src={LOGO} alt="Caractère Store Logo" className="reveal" />
-      </section>
-
-      {/* Raccourcis */}
-      <section className="section" id="raccourcis">
-        <h2 className="display reveal">Accès rapide</h2>
-        <div className="grid">
-          {shortcuts.map((s, i) => (
-            <Link key={i} href={s.href} className="card reveal">
-              <span className="icon">{s.icon}</span>
-              <p>{s.name}</p>
+      {/* ================= ACCÈS RAPIDE ================= */}
+      <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto' }}>
+        <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
+          Accès rapide
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          {quickLinks.map(({ href, label, desc, Icon }) => (
+            <Link key={href} href={href} className="card-hover" style={{
+              display: 'flex', flexDirection: 'column', gap: '16px',
+              background: C.card, border: `1px solid ${C.line}`,
+              borderRadius: '20px', padding: '32px 28px',
+              textDecoration: 'none', color: C.white,
+            }}>
+              <span style={{ color: C.white, opacity: 0.9 }}><Icon /></span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.01em', marginBottom: '6px' }}>{label}</div>
+                <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.92rem', lineHeight: 1.45 }}>{desc}</div>
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="section" style={{ background: '#F9FAFB' }}>
-        <div className="grid">
-          <div className="reveal" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 800, marginBottom: '8px' }}>50K+</div>
-            <p style={{ color: '#6B7280', fontWeight: 700 }}>Pièces produites</p>
-          </div>
-          <div className="reveal" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 800, marginBottom: '8px' }}>500+</div>
-            <p style={{ color: '#6B7280', fontWeight: 700 }}>Entreprises satisfaites</p>
-          </div>
-          <div className="reveal" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 800, marginBottom: '8px' }}>48h</div>
-            <p style={{ color: '#6B7280', fontWeight: 700 }}>Production Alger</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose */}
-      <section className="section">
-        <h2 className="display reveal">Pourquoi Caractère?</h2>
-        <div className="grid">
-          {[
-            { title: 'Production locale', desc: 'À Alger. Sans attente.' },
-            { title: 'Qualité garantie', desc: 'DTF, broderie, uniformes.' },
-            { title: 'Suivi transparent', desc: 'WhatsApp + photos.' },
-            { title: 'Sans stock', desc: 'À la demande. Zéro risque.' },
-            { title: 'Depuis 1 pièce', desc: 'Pas de minimum.' },
-            { title: 'Rabais volume', desc: 'Jusqu\'à −30%.' },
-          ].map((b, i) => (
-            <div key={i} className="card reveal">
-              <p style={{ marginBottom: '8px', fontSize: '16px' }}>{b.title}</p>
-              <p style={{ fontSize: '13px', color: '#6B7280' }}>{b.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="section" id="reviews" style={{ background: '#F9FAFB' }}>
-        <h2 className="display reveal">Clients satisfaits</h2>
-        <div className="testimonials">
-          {testimonials.map((t, i) => (
-            <div key={i} className="testimonial reveal">
-              <p>"{t.text}"</p>
-              <div className="author">{t.author}</div>
-              <div className="role">{t.role}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="section" id="pricing">
-        <h2 className="display reveal">Tarifs simples</h2>
-        <div className="pricing">
-          {pricing.map((p, i) => (
-            <div key={i} className={`price-card reveal ${p.featured ? 'featured' : ''}`}>
-              <h3>{p.name}</h3>
-              <div className="amount">{p.price} DA</div>
-              <p>{p.desc}</p>
-              <Link href="/designer" className="btn btn-primary">Commander</Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="section" style={{ background: '#F9FAFB' }}>
-        <h2 className="display reveal" style={{ marginBottom: '32px' }}>Questions fréquentes</h2>
-        <div className="faq">
-          {faqs.map((f, i) => (
-            <div
-              key={i}
-              className={`faq-item reveal ${activeTab === i ? 'active' : ''}`}
-              onClick={() => setActiveTab(activeTab === i ? -1 : i)}
-            >
-              <h3>
-                {f.q}
-                <span>{activeTab === i ? '−' : '+'}</span>
-              </h3>
-              <p>{f.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="section" style={{ background: C.black, color: C.white, textAlign: 'center' }}>
-        <h2 className="display reveal" style={{ color: C.white, marginBottom: '24px' }}>Prêt à lancer?</h2>
-        <p style={{ marginBottom: '32px', color: '#A8A29E', fontWeight: 700 }}>Commencez maintenant. Zéro stock. Zéro engagement.</p>
-        <div className="cta-group">
-          <Link href="/designer" className="btn btn-primary" style={{ background: C.gold, color: C.black }}>
-            🎨 Designer gratuit
+      {/* ================= CTA FINAL ================= */}
+      <section style={{ position: 'relative', textAlign: 'center', padding: '100px 20px', borderTop: `1px solid ${C.line}` }}>
+        <div aria-hidden style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.07) 0%, transparent 60%)',
+          pointerEvents: 'none',
+        }} />
+        <h2 style={{ position: 'relative', fontSize: 'clamp(1.8rem, 6vw, 3rem)', fontWeight: 900, letterSpacing: '-0.03em', margin: '0 0 16px' }}>
+          Commencez maintenant
+        </h2>
+        <p style={{ position: 'relative', color: C.gray, fontWeight: 600, margin: '0 0 36px' }}>
+          Designer gratuit. Zéro risque. Zéro engagement.
+        </p>
+        <div style={{ position: 'relative', display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Link href="/designer" className="btn-glow" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: C.white, color: C.black,
+            padding: '16px 32px', borderRadius: '999px',
+            fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
+          }}>
+            Designer gratuit <IconArrow />
           </Link>
-          <a href="https://wa.me/213557440522" className="btn btn-secondary" style={{ borderColor: C.white, color: C.white }}>
-            💬 WhatsApp direct
-          </a>
+          <Link href="/studio-3d" className="btn-outline" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            border: `1px solid ${C.line}`, color: C.white,
+            padding: '16px 32px', borderRadius: '999px',
+            fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
+          }}>
+            <IconCube size={18} /> Studio 3D
+          </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer>
-        <p>© 2024 Caractère Store • DTF • Broderie • Uniformes • Production 48h • Alger</p>
-        <p style={{ marginTop: '12px' }}>📞 +213 557 440 522 • 📧 yakoumobi@gmail.com</p>
+      {/* ================= FOOTER ================= */}
+      <footer style={{ borderTop: `1px solid ${C.line}`, padding: '48px 20px', textAlign: 'center', color: C.grayDark, fontSize: '0.85rem', fontWeight: 600 }}>
+        <p style={{ margin: 0 }}>© 2026 Caractère Store • Print on Demand • DTF • Production 48h • Alger</p>
+        <p style={{ margin: '10px 0 0' }}>+213 557 440 522 • yakoumobi@gmail.com</p>
       </footer>
     </div>
   )
