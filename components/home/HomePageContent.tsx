@@ -4,44 +4,20 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 const C = {
-  bg: '#0C0A09',
-  surface: '#1C1917',
+  black: '#0C0A09',
   white: '#FAFAF9',
-  muted: '#A8A29E',
-  border: 'rgba(250,250,249,0.1)',
+  gray: '#1C1917',
+  grayMed: '#A8A29E',
   gold: '#D4A574',
-  goldSoft: 'rgba(212,165,116,0.14)',
   lime: '#A3E635',
-  limeSoft: 'rgba(163,230,53,0.12)',
 }
 
-// URLs réelles des images de GitHub
-const IMAGE_URLS = {
+// Images GitHub
+const IMAGES = {
   img1: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7474.jpeg',
   img2: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7473.jpeg',
   img3: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7468.jpeg',
   img4: 'https://raw.githubusercontent.com/yakoumobi-sys/caractere.store/main/public/collection/IMG_7465.jpeg',
-}
-
-// TODO: Remplace par ton vrai logo Supabase
-const LOGO_URL = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/logos/caracterere-logo.png'
-
-function Icon({ name, size = 20, color = 'currentColor' }: { name: string; size?: number; color?: string }) {
-  const paths: Record<string, JSX.Element> = {
-    arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
-    building: <><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1" /></>,
-    rocket: <><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /></>,
-    shirt: <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />,
-    star: <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />,
-    palette: <><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></>,
-    cube: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" /></>,
-    message: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {paths[name]}
-    </svg>
-  )
 }
 
 function useReveal() {
@@ -58,297 +34,426 @@ function useReveal() {
 
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant:wght@700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
-    .cs-root { 
-      font-family: 'Montserrat', sans-serif; 
-      background: linear-gradient(135deg, #0A0805 0%, #1a1512 30%, #0f0d0a 60%, #0C0A09 100%);
-      color: ${C.white}; 
-      overflow-x: hidden; 
-    }
-    .cs-root .display { font-family: 'Cormorant', serif; font-weight: 800; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .reveal { opacity: 0; transform: translateY(34px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
-    .reveal.in { opacity: 1; transform: none; }
-    .reveal.d1 { transition-delay: .1s } .reveal.d2 { transition-delay: .2s }
-    .reveal.d3 { transition-delay: .3s } .reveal.d4 { transition-delay: .4s }
-
-    @keyframes blobA { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(60px,-40px) scale(1.15) } }
-    @keyframes blobB { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(-50px,50px) scale(.9) } }
-    .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5; pointer-events: none; }
-    .blobA { animation: blobA 14s ease-in-out infinite; }
-    .blobB { animation: blobB 18s ease-in-out infinite; }
-
-    @keyframes shimmer { to { background-position: 200% center } }
-    .shimmer {
-      background: linear-gradient(110deg, ${C.white} 40%, ${C.gold} 50%, ${C.white} 60%);
-      background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; animation: shimmer 5s linear infinite;
+    body { 
+      font-family: 'Montserrat', sans-serif;
+      background: #FAFAF9;
+      color: #0C0A09;
+      line-height: 1.6;
     }
 
-    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-    .sticky-nav { 
-      position: fixed; top: 0; left: 0; right: 0; z-index: 999; 
-      background: rgba(12,10,9,.95); backdrop-filter: blur(20px); 
-      border-bottom: 1px solid ${C.border}; 
-      padding: 14px 20px; 
-      display: flex; justify-content: center; gap: 12px;
-      animation: slideDown .4s cubic-bezier(.16,1,.3,1);
-    }
-    .sticky-nav.hidden { transform: translateY(-120%); transition: transform .3s; }
-    .sticky-nav a { 
-      padding: 8px 16px; border-radius: 8px; 
-      font-size: 13px; font-weight: 700; 
-      text-decoration: none; color: ${C.white}; 
-      transition: all .3s; border: 1px solid ${C.border};
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .sticky-nav a:hover { 
-      background: ${C.goldSoft}; border-color: ${C.gold}; color: ${C.gold}; 
+    .display { font-family: 'Cormorant', serif; font-weight: 800; }
+    .bold { font-weight: 700; }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease-out, transform .7s ease-out; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: ${C.white};
+      border-bottom: 1px solid #E5E7EB;
+      padding: 16px 24px;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    .glass {
-      background: rgba(28,25,23,0.55);
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      border: 1px solid ${C.border}; border-radius: 24px;
-      transition: transform .45s cubic-bezier(.16,1,.3,1), border-color .3s, box-shadow .45s;
+    header .logo { font-size: 20px; font-weight: 800; letter-spacing: -1px; }
+    header nav { display: flex; gap: 24px; }
+    header a { text-decoration: none; color: #0C0A09; font-weight: 600; font-size: 14px; transition: color .3s; }
+    header a:hover { color: ${C.gold}; }
+
+    .hero {
+      padding: 80px 24px;
+      text-align: center;
+      background: linear-gradient(135deg, #FAFAF9 0%, #F3F4F6 100%);
     }
-    .glass:hover { transform: translateY(-8px); }
-    .glass.gold:hover { border-color: rgba(212,165,116,.6); box-shadow: 0 24px 60px -20px rgba(212,165,116,.35); }
-    .glass.lime:hover { border-color: rgba(163,230,53,.55); box-shadow: 0 24px 60px -20px rgba(163,230,53,.3); }
 
-    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 30px; border-radius: 999px;
-      font-weight: 700; font-size: 15px; text-decoration: none; cursor: pointer;
-      transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .3s, background .3s; }
-    .btn:hover { transform: translateY(-3px) scale(1.02); }
-    .btn .ic { transition: transform .25s; }
-    .btn:hover .ic { transform: translateX(4px); }
-    .btn-gold { background: ${C.gold}; color: ${C.bg}; }
-    .btn-gold:hover { box-shadow: 0 16px 40px -12px rgba(212,165,116,.5); }
-    .btn-ghost { background: rgba(250,250,249,.06); color: ${C.white}; border: 1px solid ${C.border}; }
-    .btn-ghost:hover { background: rgba(250,250,249,.12); }
+    .hero h1 { 
+      font-size: clamp(36px, 8vw, 72px);
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
 
-    .quick { border: 1px solid ${C.border}; border-radius: 20px; padding: 28px 20px;
-      background: ${C.surface}; text-decoration: none; display: block; text-align: center;
-      transition: transform .35s cubic-bezier(.16,1,.3,1), border-color .3s, background .3s; cursor: pointer; }
-    .quick:hover { transform: translateY(-6px); border-color: rgba(212,165,116,.5); background: #232019; }
+    .hero p { 
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      color: #6B7280;
+    }
 
-    .bestseller { border-radius: 16px; overflow: hidden; background: ${C.surface}; border: 1px solid ${C.border}; }
-    .bestseller img { width: 100%; height: 240px; object-fit: cover; }
-    .bestseller p { padding: 16px 12px; margin: 0; font-weight: 700; text-align: center; font-size: 14px; }
+    .cta-group {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-      .blobA, .blobB, .shimmer { animation: none !important; }
-      .glass:hover, .btn:hover, .quick:hover { transform: none; }
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .3s;
+      border: none;
+      font-size: 14px;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+
+    .btn-primary { 
+      background: ${C.black}; 
+      color: ${C.white};
+    }
+    .btn-primary:hover { 
+      background: ${C.gold};
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary { 
+      border: 1.5px solid ${C.black};
+      background: transparent;
+      color: ${C.black};
+    }
+    .btn-secondary:hover { 
+      background: ${C.black};
+      color: ${C.white};
+    }
+
+    .section {
+      padding: 80px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section h2 {
+      font-size: 42px;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      border-radius: 12px;
+      border: 1px solid #E5E7EB;
+      overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .card img { width: 100%; height: 200px; object-fit: cover; }
+    .card p { padding: 16px; font-weight: 600; font-size: 14px; }
+
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .testimonial {
+      background: #F9FAFB;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #E5E7EB;
+    }
+
+    .testimonial p { font-size: 14px; margin-bottom: 16px; line-height: 1.8; color: #6B7280; }
+    .testimonial .author { font-weight: 700; font-size: 13px; }
+    .testimonial .role { font-size: 12px; color: #9CA3AF; }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .price-card {
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all .3s;
+    }
+
+    .price-card.featured {
+      border: 2px solid ${C.gold};
+      transform: scale(1.02);
+      box-shadow: 0 10px 30px rgba(212,165,116,0.2);
+    }
+
+    .price-card h3 { font-size: 18px; margin-bottom: 8px; }
+    .price-card .amount { font-size: 36px; font-weight: 800; margin: 16px 0; }
+    .price-card p { font-size: 12px; color: #6B7280; margin-bottom: 24px; }
+
+    .features {
+      list-style: none;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .features li { 
+      padding: 8px 0; 
+      font-size: 13px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .faq {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid #E5E7EB;
+      padding: 20px 0;
+      cursor: pointer;
+    }
+
+    .faq-item h3 {
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .faq-item p { 
+      font-size: 14px; 
+      color: #6B7280;
+      line-height: 1.8;
+      display: none;
+    }
+
+    .faq-item.active p { display: block; }
+
+    footer {
+      background: #0C0A09;
+      color: ${C.white};
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    footer p { font-size: 12px; color: #A8A29E; }
+
+    @media (max-width: 768px) {
+      header nav { gap: 12px; }
+      .section { padding: 48px 20px; }
+      .section h2 { font-size: 28px; }
+      .grid { grid-template-columns: 1fr; }
     }
   `}</style>
 )
 
-function StickyNav({ visible }: { visible: boolean }) {
-  return (
-    <nav className={`sticky-nav ${!visible ? 'hidden' : ''}`}>
-      <Link href="/designer">🎨 Designer</Link>
-      <Link href="/studio-3d">🧊 3D</Link>
-      <Link href="/collection">⭐ Collection</Link>
-      <Link href="/produits">👕 Produits</Link>
-    </nav>
-  )
-}
-
-function Hero() {
-  return (
-    <section style={{ position: 'relative', padding: '120px 24px 80px', textAlign: 'center' }}>
-      <div className="blob blobA" style={{ width: 420, height: 420, top: -120, left: '-8%', background: C.gold, opacity: 0.25 }} />
-      <div className="blob blobB" style={{ width: 380, height: 380, bottom: -80, right: '-6%', background: C.lime, opacity: 0.15 }} />
-
-      <div style={{ position: 'relative', maxWidth: 900, margin: '0 auto' }}>
-        <p className="reveal" style={{ letterSpacing: 5, fontSize: 12, fontWeight: 700, color: C.gold, textTransform: 'uppercase', marginBottom: 24 }}>
-          Atelier de personnalisation textile — Alger
-        </p>
-        <h1 className="display reveal d1" style={{ fontSize: 'clamp(52px, 9vw, 104px)', lineHeight: 1.02, fontWeight: 800, margin: '0 0 28px' }}>
-          Personnalisez.<br />
-          <em className="shimmer" style={{ fontStyle: 'italic' }}>Développez.</em><br />
-          Livrez.
-        </h1>
-        <p className="reveal d2" style={{ fontSize: 18, lineHeight: 1.7, color: C.muted, maxWidth: 560, margin: '0 auto 40px', fontWeight: 300 }}>
-          DTF, broderie, uniformes. Production 48h, livraison nationale.
-          Du créateur solo à l'entreprise de 500 employés.
-        </p>
-      </div>
-    </section>
-  )
-}
-
-function ChoicePaths() {
-  return (
-    <section style={{ padding: '90px 24px', position: 'relative' }}>
-      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
-
-          <Link
-            href="/entreprise"
-            className="glass gold reveal"
-            style={{
-              padding: 44, textDecoration: 'none', color: C.white, display: 'block'
-            }}
-          >
-            <div style={{ width: 60, height: 60, borderRadius: 18, background: C.goldSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 26 }}>
-              <Icon name="building" size={28} color={C.gold} />
-            </div>
-            <h2 className="display" style={{ fontSize: 34, fontWeight: 800, margin: '0 0 12px' }}>Vous êtes une entreprise</h2>
-            <p style={{ color: C.muted, lineHeight: 1.7, fontSize: 15, marginBottom: 28, fontWeight: 300 }}>
-              Uniformes, polos brodés, gilets de chantier, blouses médicales.
-              Rabais volume jusqu'à −30%. Suivi transparent.
-            </p>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: C.gold, fontWeight: 700, fontSize: 15 }}>
-              Espace Entreprise <Icon name="arrow" size={18} color={C.gold} />
-            </span>
-          </Link>
-
-          <Link
-            href="/print-on-demand"
-            className="glass lime reveal d1"
-            style={{
-              padding: 44, textDecoration: 'none', color: C.white, display: 'block'
-            }}
-          >
-            <div style={{ width: 60, height: 60, borderRadius: 18, background: C.limeSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 26 }}>
-              <Icon name="rocket" size={28} color={C.lime} />
-            </div>
-            <h2 className="display" style={{ fontSize: 34, fontWeight: 800, margin: '0 0 12px' }}>Vous êtes un créateur</h2>
-            <p style={{ color: C.muted, lineHeight: 1.7, fontSize: 15, marginBottom: 28, fontWeight: 300 }}>
-              Lancez votre marque sans stock. Print on Demand dès 1 pièce,
-              Designer en ligne et Studio 3D.
-            </p>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: C.lime, fontWeight: 700, fontSize: 15 }}>
-              Print on Demand <Icon name="arrow" size={18} color={C.lime} />
-            </span>
-          </Link>
-
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function TrustSection() {
-  const stats = [
-    { number: '50K+', label: 'Pièces produites' },
-    { number: '500+', label: 'Marques & entreprises' },
-    { number: '4.9★', label: 'Note clients' },
-    { number: '48h', label: 'Délai production' },
-  ]
-  return (
-    <section style={{ padding: '40px 24px', background: C.surface }}>
-      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 20 }}>
-          {stats.map((s, i) => (
-            <div key={i} className={`reveal d${i}`} style={{ textAlign: 'center', padding: '20px 12px' }}>
-              <p className="display" style={{ fontSize: 32, fontWeight: 800, margin: 0, color: C.gold }}>
-                {s.number}
-              </p>
-              <p style={{ fontSize: 11, marginTop: 6, color: C.muted, letterSpacing: 1 }}>
-                {s.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Bestsellers() {
-  const items = [
-    { img: IMAGE_URLS.img1, name: 'DTF Premium T-shirt' },
-    { img: IMAGE_URLS.img2, name: 'Polo Broderie Or' },
-    { img: IMAGE_URLS.img3, name: 'Hoodie Custom' },
-    { img: IMAGE_URLS.img4, name: 'Chemise Uniforme' },
-  ]
-  return (
-    <section style={{ padding: '60px 24px 40px' }}>
-      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-        <h2 className="display reveal" style={{ fontSize: 36, fontWeight: 800, textAlign: 'center', marginBottom: 40 }}>
-          Bestsellers
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18 }}>
-          {items.map((i, idx) => (
-            <div key={idx} className={`bestseller reveal d${idx}`}>
-              <img src={i.img} alt={i.name} loading="lazy" />
-              <p>{i.name}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function QuickLinks() {
-  const links = [
-    { icon: 'shirt', label: 'Produits', href: '/produits' },
-    { icon: 'star', label: 'The Collection', href: '/collection' },
-    { icon: 'palette', label: 'Designer', href: '/designer' },
-    { icon: 'cube', label: 'Studio 3D', href: '/studio-3d' },
-  ]
-  return (
-    <section style={{ padding: '0 24px 100px' }}>
-      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-        <h2 className="display reveal" style={{ fontSize: 40, fontWeight: 800, textAlign: 'center', marginBottom: 40 }}>Accès rapide</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16 }}>
-          {links.map((l, i) => (
-            <Link key={i} href={l.href} className={`quick reveal d${i}`}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
-                <Icon name={l.icon} size={30} color={C.gold} />
-              </div>
-              <span style={{ fontWeight: 700, fontSize: 15, color: C.white }}>{l.label}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function FinalCTA() {
-  return (
-    <section style={{ position: 'relative', padding: '100px 24px', textAlign: 'center', overflow: 'hidden' }}>
-      <div className="blob blobA" style={{ width: 500, height: 300, top: '20%', left: '30%', background: C.gold, opacity: 0.18 }} />
-      <div style={{ position: 'relative' }}>
-        <h2 className="display reveal" style={{ fontSize: 'clamp(38px, 6vw, 64px)', fontWeight: 800, marginBottom: 16 }}>Une question ?</h2>
-        <p className="reveal d1" style={{ color: C.muted, marginBottom: 40, fontWeight: 300 }}>Réponse en 2h · Devis gratuit · Sans engagement</p>
-        <a href="https://wa.me/213557440522" className="btn btn-gold reveal d2">
-          <Icon name="message" size={18} /> WhatsApp direct <span className="ic"><Icon name="arrow" size={18} /></span>
-        </a>
-      </div>
-    </section>
-  )
-}
-
-export default function HomePageContent({ produits = [] }: { produits?: any[] }) {
-  const [navVisible, setNavVisible] = useState(false)
+export default function HomePageContent() {
+  const [activeTab, setActiveTab] = useState(0)
 
   useReveal()
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setNavVisible(window.scrollY > 300)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const products = [
+    { img: IMAGES.img1, name: 'T-shirt DTF' },
+    { img: IMAGES.img2, name: 'Polo Broderie' },
+    { img: IMAGES.img3, name: 'Hoodie Custom' },
+    { img: IMAGES.img4, name: 'Uniforme' },
+  ]
+
+  const testimonials = [
+    {
+      text: '80 polos en 48h. Qualité impeccable, délai respecté. On recommande!',
+      author: 'Karim B.',
+      role: 'Restaurant El Kef'
+    },
+    {
+      text: '45 blouses pour l'équipe. Broderie précise, tout est parfait.',
+      author: 'Dr. Samira M.',
+      role: 'Clinique Al Chifa'
+    },
+    {
+      text: '120 gilets de chantier en 5 jours. Toujours parfait après 1 mois d\'utilisation.',
+      author: 'Yacine O.',
+      role: 'BTP Construct'
+    },
+  ]
+
+  const pricing = [
+    { name: 'DTF Standard', price: '1950', desc: 'Dès 1 pièce' },
+    { name: 'DTF Premium', price: '2450', desc: 'Couleurs pleines', featured: true },
+    { name: 'Broderie', price: '3950', desc: 'Logo haute densité' },
+  ]
+
+  const faqs = [
+    {
+      q: 'Quel est le délai de production?',
+      a: 'Production standard 48h à Alger. Livraison 3-5 jours selon la wilaya.'
+    },
+    {
+      q: 'Quel est le minimum de commande?',
+      a: 'Pas de minimum! Tu peux commander 1 pièce ou 1000. Prix adapté selon quantité.'
+    },
+    {
+      q: 'Quels paiements acceptez-vous?',
+      a: 'BaridiMob, CCP, virement bancaire. Paiement à la livraison possible pour Alger.'
+    },
+    {
+      q: 'Puis-je suivre ma commande?',
+      a: 'Oui! Suivi WhatsApp direct + photos de production. Vous êtes toujours informés.'
+    },
+  ]
 
   return (
-    <div className="cs-root">
+    <div style={{ background: '#FAFAF9', color: '#0C0A09' }}>
       <GlobalStyle />
-      <StickyNav visible={navVisible} />
-      <Hero />
-      <ChoicePaths />
-      <TrustSection />
-      <Bestsellers />
-      <QuickLinks />
-      <FinalCTA />
+
+      {/* Header */}
+      <header>
+        <div className="logo">CARACTÈRE</div>
+        <nav>
+          <a href="#products">Produits</a>
+          <a href="#designer">Designer</a>
+          <a href="#pricing">Tarifs</a>
+          <a href="https://wa.me/213557440522">Contact</a>
+        </nav>
+      </header>
+
+      {/* Hero */}
+      <section className="hero">
+        <div className="reveal">
+          <h1 className="display">Votre marque, en 48h</h1>
+          <p>DTF, broderie, uniformes. Depuis 1 pièce. Sans stock. Sans risque.</p>
+          <div className="cta-group">
+            <Link href="/designer" className="btn btn-primary">🎨 Designer gratuit</Link>
+            <Link href="/print-on-demand" className="btn btn-secondary">En savoir plus</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Products */}
+      <section className="section" id="products">
+        <h2 className="display reveal">Bestsellers</h2>
+        <div className="grid">
+          {products.map((p, i) => (
+            <div key={i} className={`card reveal`}>
+              <img src={p.img} alt={p.name} />
+              <p>{p.name}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="section" style={{ background: '#F9FAFB' }}>
+        <div className="grid">
+          <div className="reveal" style={{ textAlign: 'center' }}>
+            <div className="display" style={{ fontSize: '36px' }}>50K+</div>
+            <p style={{ color: '#6B7280', fontSize: '14px' }}>Pièces produites</p>
+          </div>
+          <div className="reveal" style={{ textAlign: 'center' }}>
+            <div className="display" style={{ fontSize: '36px' }}>500+</div>
+            <p style={{ color: '#6B7280', fontSize: '14px' }}>Entreprises satisfaites</p>
+          </div>
+          <div className="reveal" style={{ textAlign: 'center' }}>
+            <div className="display" style={{ fontSize: '36px' }}>48h</div>
+            <p style={{ color: '#6B7280', fontSize: '14px' }}>Délai de production</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose */}
+      <section className="section">
+        <h2 className="display reveal">Pourquoi Caractère?</h2>
+        <div className="grid">
+          {[
+            { title: 'Production locale', desc: 'À Alger. Pas d\'attente d\'import.' },
+            { title: 'Qualité garantie', desc: 'DTF premium, broderie 3D, uniformes robustes.' },
+            { title: 'Suivi transparent', desc: 'WhatsApp direct + photos de production.' },
+            { title: 'Sans stock', desc: 'Commande à la demande, zéro risque.' },
+            { title: 'Depuis 1 pièce', desc: 'Pas de minimum, prix dès l\'unité.' },
+            { title: 'Rabais volume', desc: 'Jusqu\'à −30% à partir de 500 pièces.' },
+          ].map((b, i) => (
+            <div key={i} className="card reveal" style={{ border: 'none', background: '#F9FAFB' }}>
+              <div style={{ padding: '24px' }}>
+                <p style={{ fontWeight: 700, marginBottom: '8px' }}>{b.title}</p>
+                <p style={{ fontSize: '13px', color: '#6B7280' }}>{b.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="section" id="reviews">
+        <h2 className="display reveal">Ce que disent les clients</h2>
+        <div className="testimonials">
+          {testimonials.map((t, i) => (
+            <div key={i} className="testimonial reveal">
+              <p>"{t.text}"</p>
+              <div className="author">{t.author}</div>
+              <div className="role">{t.role}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="section" id="pricing" style={{ background: '#F9FAFB' }}>
+        <h2 className="display reveal">Tarifs simples</h2>
+        <div className="pricing">
+          {pricing.map((p, i) => (
+            <div key={i} className={`price-card reveal ${p.featured ? 'featured' : ''}`}>
+              <h3>{p.name}</h3>
+              <div className="amount">{p.price} DA</div>
+              <p>{p.desc}</p>
+              <Link href="/designer" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                Commander
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="section">
+        <h2 className="display reveal" style={{ marginBottom: '32px' }}>Questions fréquentes</h2>
+        <div className="faq">
+          {faqs.map((f, i) => (
+            <div
+              key={i}
+              className={`faq-item reveal ${activeTab === i ? 'active' : ''}`}
+              onClick={() => setActiveTab(activeTab === i ? -1 : i)}
+            >
+              <h3>
+                {f.q}
+                <span style={{ fontSize: '16px' }}>{activeTab === i ? '−' : '+'}</span>
+              </h3>
+              <p>{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="section" style={{ background: C.black, color: C.white, textAlign: 'center' }}>
+        <h2 className="display reveal" style={{ color: C.white, marginBottom: '24px' }}>Prêt?</h2>
+        <p style={{ marginBottom: '32px', color: '#A8A29E' }}>Commence maintenant. Zéro stock. Zéro risque.</p>
+        <div className="cta-group">
+          <Link href="/designer" className="btn btn-primary" style={{ background: C.gold, color: C.black }}>
+            🎨 Designer gratuit
+          </Link>
+          <a href="https://wa.me/213557440522" className="btn btn-secondary" style={{ borderColor: C.white, color: C.white }}>
+            💬 WhatsApp
+          </a>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer>
+        <p>© 2024 Caractère Store. DTF • Broderie • Uniformes • Production 48h • Alger</p>
+        <p style={{ marginTop: '12px' }}>+213 557 440 522 · yakoumobi@gmail.com</p>
+      </footer>
     </div>
   )
 }
