@@ -17,19 +17,16 @@ const C = {
   card: 'rgba(255,255,255,0.03)',
 }
 
-// ---------- LOGO SVG (blanc sur noir) ----------
+// ---------- LOGO IMAGE ----------
 function Logo({ size = 56 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-label="Caractère">
-      <polygon points="18,8 96,2 82,92 4,98" fill={C.white} />
-      <path
-        d="M67 38 A20 20 0 1 0 67 62"
-        stroke={C.black}
-        strokeWidth="13"
-        strokeLinecap="butt"
-        fill="none"
-      />
-    </svg>
+    <img 
+      src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png" 
+      alt="Caractère" 
+      width={size} 
+      height={size}
+      style={{ objectFit: 'contain' }}
+    />
   )
 }
 
