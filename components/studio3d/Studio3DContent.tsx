@@ -139,6 +139,11 @@ export default function Studio3DContent() {
   const [rec, setRec] = useState(false);
   const [recSec, setRecSec] = useState(0);
   const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
+  const [logoScale, setLogoScale] = useState(1);
+  const [logoX, setLogoX] = useState(0);
+  const [logoY, setLogoY] = useState(0);
+  const [logoRotate, setLogoRotate] = useState(0);
+  const [logos, setLogos] = useState<Array<{id:string; src:string; scale:number; x:number; y:number; rotate:number}>>([]);
   const glRef = useRef<THREE.WebGLRenderer | null>(null);
   const recRef = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -146,23 +151,45 @@ export default function Studio3DContent() {
 
   useEffect(() => { const c = ALL_COLORS[colorParam]; if (c) setColor(c); }, [colorParam]);
 
-  const dlPNG = useCallback(() => {
-    const gl = glRef.current; if (!gl) return;
-    const a = document.createElement("a");
-    a.href = gl.domElement.toDataURL("image/png");
-    a.download = "caracterstore-3d.png"; a.click();
-  }, []);
-
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         setUploadedLogo(event.target?.result as string);
+        setLogoScale(1);
+        setLogoX(0);
+        setLogoY(0);
+        setLogoRotate(0);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const addLogo = () => {
+    if (!uploadedLogo) return;
+    const newLogo = {
+      id: Date.now().toString(),
+      src: uploadedLogo,
+      scale: logoScale,
+      x: logoX,
+      y: logoY,
+      rotate: logoRotate,
+    };
+    setLogos([...logos, newLogo]);
+    setUploadedLogo(null);
+  };
+
+  const removeLogo = (id: string) => {
+    setLogos(logos.filter(l => l.id !== id));
+  };
+
+  const dlPNG = useCallback(() => {
+    const gl = glRef.current; if (!gl) return;
+    const a = document.createElement("a");
+    a.href = gl.domElement.toDataURL("image/png");
+    a.download = "caracterstore-3d.png"; a.click();
+  }, []);
 
   const stopRec = useCallback(() => recRef.current?.stop(), []);
   const startRec = useCallback(() => {
@@ -206,10 +233,27 @@ export default function Studio3DContent() {
 
         <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
           <div className="relative h-[56vh] min-h-[340px] flex-1 lg:h-[calc(100vh-57px)]" style={{ backgroundColor: bgColor }}>
-            <Canvas camera={{ position: [0, 0.5, 4], fov: 30 }} gl={{ preserveDrawingBuffer: true, antialias: true }}
+            <Canvas camera={{ position: [0, 0, 4], fov: 30 }} gl={{ preserveDrawingBuffer: true, antialias: true }}
               onCreated={({ gl }) => { gl.setPixelRatio(Math.min(window.devicePixelRatio, 2)); glRef.current = gl; }} shadows>
               <Scene bgColor={bgColor} anim={anim} color={color} product={selectedProduct} />
             </Canvas>
+            
+            {/* Logos Overlay */}
+            {logos.map(logo => (
+              <div key={logo.id} className="absolute" style={{
+                left: `calc(50% + ${logo.x}px)`,
+                top: `calc(50% + ${logo.y}px)`,
+                transform: `translate(-50%, -50%) scale(${logo.scale}) rotate(${logo.rotate}deg)`,
+                zIndex: 10,
+                pointerEvents: 'none'
+              }}>
+                <div className="relative">
+                  <img src={logo.src} alt="logo" className="max-w-[150px] drop-shadow-lg" style={{pointerEvents:'none'}} />
+                  <button onClick={() => removeLogo(logo.id)} style={{pointerEvents:'auto'}} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-red-700">✕</button>
+                </div>
+              </div>
+            ))}
+
             {rec && <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur">
               <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
               <span className="text-xs font-semibold text-white">{recSec}s/{MAX_REC}s</span>
@@ -254,18 +298,39 @@ export default function Studio3DContent() {
               </div>
             </section>
 
+            {/* Logo Upload Section */}
             <section className="mt-5">
               <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Votre Logo</p>
               <label className={`block w-full rounded-xl border-2 border-dashed p-3 text-center cursor-pointer transition ${uploadedLogo ? "border-[#d41717] bg-red-50" : "border-gray-300 bg-white"}`}>
                 <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: "none" }} />
                 <p className="text-2xl mb-1">📤</p>
                 <p className="text-xs font-semibold text-[#0a1f2e]">{uploadedLogo ? "✓ Logo uploadé" : "Uploader un logo"}</p>
-                <p className="text-[10px] text-[#0a1f2e]/40">PNG • JPG • SVG</p>
               </label>
+              
               {uploadedLogo && (
-                <button onClick={() => setUploadedLogo(null)} className="w-full mt-2 rounded-lg border border-red-300 bg-red-50 py-1.5 text-xs font-semibold text-red-600">
-                  ✕ Supprimer
-                </button>
+                <div className="mt-3 space-y-2 bg-white p-3 rounded-lg border border-gray-200">
+                  <div className="text-xs font-semibold">Taille: 
+                    <input type="range" min="0.5" max="3" step="0.1" value={logoScale} onChange={(e) => setLogoScale(parseFloat(e.target.value))} className="w-full" />
+                    <span className="text-[10px] text-gray-500">{logoScale.toFixed(1)}x</span>
+                  </div>
+                  <div className="text-xs font-semibold">Position X: 
+                    <input type="range" min="-200" max="200" value={logoX} onChange={(e) => setLogoX(parseInt(e.target.value))} className="w-full" />
+                  </div>
+                  <div className="text-xs font-semibold">Position Y: 
+                    <input type="range" min="-200" max="200" value={logoY} onChange={(e) => setLogoY(parseInt(e.target.value))} className="w-full" />
+                  </div>
+                  <div className="text-xs font-semibold">Rotation: 
+                    <input type="range" min="0" max="360" value={logoRotate} onChange={(e) => setLogoRotate(parseInt(e.target.value))} className="w-full" />
+                    <span className="text-[10px] text-gray-500">{logoRotate}°</span>
+                  </div>
+                  <button onClick={addLogo} className="w-full bg-[#d41717] text-white py-2 rounded-lg text-xs font-bold">➕ Ajouter le logo</button>
+                </div>
+              )}
+
+              {logos.length > 0 && (
+                <div className="mt-3 text-xs font-semibold text-[#0a1f2e]">
+                  {logos.length} logo{logos.length > 1 ? 's' : ''} ajouté{logos.length > 1 ? 's' : ''}
+                </div>
               )}
             </section>
 
