@@ -95,7 +95,7 @@ function Model({ product, color }: { product: string; color: string }) {
   }, [scene]);
 
   return (
-    <Center>
+    <Center position={[0, 0, 0]}>
       <primitive object={scene} />
     </Center>
   );
@@ -120,7 +120,7 @@ function Scene({ bgColor, anim, color, product }: { bgColor: string; anim: Anim;
       <ambientLight intensity={0.9} />
       <directionalLight position={[3, 4, 5]} intensity={1.3} castShadow />
       <directionalLight position={[-4, 2, -3]} intensity={0.5} />
-      <group ref={g}><Model product={product} color={color} /></group>
+      <group ref={g} position={[0, 0, 0]}><Model product={product} color={color} /></group>
       <ContactShadows position={[0,-1,0]} opacity={0.35} scale={4} blur={2.4} far={2} />
       <OrbitControls enablePan={false} minDistance={1.5} maxDistance={6} minPolarAngle={Math.PI/5} maxPolarAngle={3*Math.PI/4} />
     </>
@@ -138,6 +138,7 @@ export default function Studio3DContent() {
   const [anim, setAnim] = useState<Anim>("rotation");
   const [rec, setRec] = useState(false);
   const [recSec, setRecSec] = useState(0);
+  const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
   const glRef = useRef<THREE.WebGLRenderer | null>(null);
   const recRef = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -151,6 +152,17 @@ export default function Studio3DContent() {
     a.href = gl.domElement.toDataURL("image/png");
     a.download = "caracterstore-3d.png"; a.click();
   }, []);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedLogo(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const stopRec = useCallback(() => recRef.current?.stop(), []);
   const startRec = useCallback(() => {
@@ -183,7 +195,7 @@ export default function Studio3DContent() {
       <div className="min-h-screen bg-white text-[#0a1f2e]">
         <header className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d41717]"><span className="text-base font-black text-white">C</span></div>
+            <img src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-black-transparent.png" alt="Caractère" className="h-9 w-auto" />
             <div>
               <p className="text-sm font-bold leading-tight">Caractère</p>
               <p className="text-[10px] leading-tight text-[#0a1f2e]/50">Studio 3D</p>
@@ -240,6 +252,21 @@ export default function Studio3DContent() {
                   <span>{a.icon}</span><span className="text-[11px]">{a.label}</span>
                 </button>)}
               </div>
+            </section>
+
+            <section className="mt-5">
+              <p className="mb-2 text-[10px] font-bold uppercase text-[#0a1f2e]/40">Votre Logo</p>
+              <label className={`block w-full rounded-xl border-2 border-dashed p-3 text-center cursor-pointer transition ${uploadedLogo ? "border-[#d41717] bg-red-50" : "border-gray-300 bg-white"}`}>
+                <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: "none" }} />
+                <p className="text-2xl mb-1">📤</p>
+                <p className="text-xs font-semibold text-[#0a1f2e]">{uploadedLogo ? "✓ Logo uploadé" : "Uploader un logo"}</p>
+                <p className="text-[10px] text-[#0a1f2e]/40">PNG • JPG • SVG</p>
+              </label>
+              {uploadedLogo && (
+                <button onClick={() => setUploadedLogo(null)} className="w-full mt-2 rounded-lg border border-red-300 bg-red-50 py-1.5 text-xs font-semibold text-red-600">
+                  ✕ Supprimer
+                </button>
+              )}
             </section>
 
             <section className="mt-5">
