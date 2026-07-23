@@ -267,8 +267,8 @@ export default function EntreprisePage() {
             sans retard, sans surprise, sans "on vous rappelle".
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WA} className="btn btn-gold">Recevoir ma maquette gratuite →</a>
-            <Link href="/configurateur" className="btn btn-ghost">⚙️ Configurer en ligne</Link>
+            <a href={WA} className="btn btn-gold">Recevoir ma simulation gratuite →</a>
+            <Link href="/configurateur" className="btn btn-ghost">⚙️ produits</Link>
           </div>
           <div className="proofbar">
             <span>✅ <b>500+</b> entreprises équipées</span>
