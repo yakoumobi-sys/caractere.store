@@ -1,46 +1,52 @@
-'use client'
-import { useState } from 'react'
+// app/api/auth/login/route.ts
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { NextRequest, NextResponse } from 'next/server'
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
 
-export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "15m"),
+})
 
-  const handleLogin = async () => {
-    if (!email || !password) { setError('Email et mot de passe requis.'); return }
-    setLoading(true)
-    setError('')
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
-    if (authError) { setError(authError.message); setLoading(false); return }
-    if (!data.session) { setError('Compte non confirme ou introuvable.'); setLoading(false); return }
-    router.push('/dashboard')
+function getIP(request: NextRequest) {
+  return request.headers.get('x-forwarded-for') || 
+         request.headers.get('x-real-ip') || 
+         '127.0.0.1'
+}
+
+export async function POST(request: NextRequest) {
+  const ip = getIP(request)
+  
+  // Vérifier rate limit
+  const { success } = await ratelimit.limit(ip)
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+      { status: 429 }
+    )
   }
 
-  return (
-    <main className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <h1 className="text-[24px] font-bold text-center mb-6">Connexion</h1>
-        {error !== '' && (
-          <div className="bg-red-100 text-red-700 text-[13px] rounded-xl px-4 py-3 mb-4">
-            {error}
-          </div>
-        )}
-        <div className="space-y-3">
-          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full border border-black/15 rounded-xl px-4 py-3 text-[14px] outline-none" />
-          <input type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} className="w-full border border-black/15 rounded-xl px-4 py-3 text-[14px] outline-none" />
-          <button onClick={handleLogin} disabled={loading} className="w-full bg-black text-white py-3 rounded-full text-[15px] font-medium disabled:opacity-50">
-            {loading ? 'Connexion...' : 'Se connecter'}
-          </button>
-        </div>
-        <p className="text-center mt-4 text-[13px]">
-          Pas de compte ? <Link href="/auth/register" className="underline">S inscrire</Link>
-        </p>
-      </div>
-    </main>
-  )
+  const { email, password } = await request.json()
+
+  if (!email || !password) {
+    return NextResponse.json(
+      { error: 'Email et mot de passe requis' },
+      { status: 400 }
+    )
+  }
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (error) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 401 }
+    )
+  }
+
+  return NextResponse.json({ data })
 }
