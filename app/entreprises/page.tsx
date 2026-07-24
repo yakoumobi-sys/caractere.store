@@ -4,11 +4,14 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 const C = {
-  black: '#0C0A09',
-  dark: '#111113',
-  white: '#FAFAF9',
-  gold: '#D4A574',
-  muted: '#A8A29E',
+  bg: '#FAFAF8',
+  bg_sec: '#F3F1ED',
+  text_dark: '#1A1816',
+  text_muted: '#6B6763',
+  accent: '#2563EB',
+  accent_light: '#DBEAFE',
+  border: '#E5E1DB',
+  white: '#FFFFFF',
 }
 
 const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png'
@@ -19,178 +22,178 @@ type Lang = 'fr' | 'ar'
 const T = {
   fr: {
     dir: 'ltr',
-    langBtn: 'AR',
-    devisBtn: '💬 Devis en 2h',
-    eyebrow: 'Espace Entreprise — Atelier Alger',
-    h1a: 'Vos uniformes livrés en ',
-    h1b: '48h.',
-    h1c: 'Validés en photo. ',
-    h1d: 'Garantis.',
-    sub: "L'atelier textile qui équipe les restaurants, cliniques et chantiers d'Algérie — sans retard, sans surprise, sans \"on vous rappelle\".",
-    ctaMaquette: 'Recevoir ma maquette gratuite →',
-    ctaConfig: '⚙️ Configurer en ligne',
+    langBtn: 'العربية',
+    devisBtn: '💬 Devis gratuit',
+    eyebrow: 'Pour les entreprises • Atelier Alger',
+    h1a: 'Uniformes de qualité en ',
+    h1b: '48 heures',
+    h1c: 'validés en photos, ',
+    h1d: 'garantis.',
+    sub: "L'atelier qui équipe restaurants, cliniques et chantiers en Algérie. Pas de retard, pas de surprise, pas d'intermédiaire.",
+    ctaMaquette: 'Envoyer mon logo →',
+    ctaConfig: '⚙️ Commander en ligne',
     proof1: 'entreprises équipées',
     proof2: 'pièces produites',
     proof3: 'de satisfaction',
     proof4: 'Réponse en',
     proof4b: 'moins de 2h',
-    painKicker: "Le vrai coût d'un mauvais fournisseur",
-    painH2a: "Un uniforme raté, c'est votre image qui prend le coup. ",
-    painH2b: 'Pas la nôtre.',
-    painLead: 'Si vous avez déjà commandé des tenues personnalisées en Algérie, vous connaissez probablement ça:',
+    painKicker: 'Le coût réel d\'un mauvais fournisseur',
+    painH2a: 'Un uniforme raté = ',
+    painH2b: 'votre image qui paye.',
+    painLead: 'Si vous avez commandé des tenues personnalisées en Algérie, vous connaissez probablement ça:',
     pains: [
       { title: 'Fournisseur en retard', desc: 'Votre événement est dans 5 jours. Lui, il répond dans 5 jours.' },
       { title: 'Qualité aléatoire', desc: 'Logo de travers, broderie qui se défait au premier lavage.' },
-      { title: 'Zéro visibilité', desc: "Vous payez, puis silence radio jusqu'à la livraison. Ou pas." },
-      { title: 'Import = attente', desc: '6 semaines de Chine. Douane. Surprises. Stress.' },
+      { title: 'Zéro transparence', desc: 'Vous payez, puis silence radio jusqu\'à la livraison. Ou pas.' },
+      { title: 'Délai d\'import', desc: '6 semaines depuis la Chine. Douane. Stress. Surprises.' },
     ],
     valueKicker: 'Pourquoi 500+ entreprises nous font confiance',
-    valueH2a: "On a construit l'atelier qu'on aurait voulu avoir ",
-    valueH2b: 'comme client.',
-    valueLead: "Chaque point ci-dessous répond à une galère qu'on a entendue des centaines de fois.",
+    valueH2a: 'On a bâti l\'atelier qu\'on aurait',
+    valueH2b: 'voulu avoir comme client.',
+    valueLead: 'Chaque point ci-dessous résout un problème qu\'on a entendu des centaines de fois.',
     values: [
-      { ico: '⏱️', title: 'Production 48h — garantie écrite', desc: "Votre commande sort de notre atelier d'Alger en 48h ouvrées. Pas \"environ\". 48h.", val: "Le délai le plus court d'Algérie" },
-      { ico: '📸', title: 'Photos avant expédition', desc: 'Vous validez chaque pièce en photo AVANT qu\'elle parte. Zéro mauvaise surprise à la réception.', val: 'Transparence totale' },
-      { ico: '🎨', title: 'Maquette gratuite en 2h', desc: 'Envoyez votre logo, recevez la maquette professionnelle de vos uniformes en 2h. Sans engagement.', val: 'Valeur: 5 000 DA — offerte' },
-      { ico: '🏭', title: 'Atelier local, 20 personnes', desc: 'DTF, broderie industrielle, presse. Tout sous un même toit à Alger. Vous pouvez même visiter.', val: 'Zéro intermédiaire' },
-      { ico: '📉', title: "Rabais volume jusqu'à −30%", desc: "Plus vous commandez, moins vous payez l'unité. Grille tarifaire claire, sans négociation pénible.", val: 'Dès 51 pièces' },
-      { ico: '🔁', title: 'Réassort en 1 message', desc: 'Vos designs sont archivés. Nouveau salarié? Un WhatsApp et son uniforme part en production.', val: 'Gain: des heures chaque mois' },
+      { ico: '⏱️', title: '48h garanties', desc: 'Production et sortie de votre commande en 48h ouvrées, écrit sur devis. Point.', val: 'Plus rapide d\'Algérie' },
+      { ico: '📸', title: 'Photos avant envoi', desc: 'Validez chaque pièce en image avant expédition. Zéro mauvaise surprise à la réception.', val: 'Contrôle qualité garanti' },
+      { ico: '🎨', title: 'Maquette gratuite 2h', desc: 'Logo → maquette professionnelle en 2 heures. Sans engagement, sans coût caché.', val: 'Valeur: 5 000 DA' },
+      { ico: '🏭', title: 'Atelier local complet', desc: 'DTF, broderie, sérigraphie. Tout sous un toit à Alger. Vous pouvez visiter.', val: 'Zéro intermédiaire' },
+      { ico: '📉', title: 'Rabais volume clair', desc: 'Tarif transparent qui baisse avec la quantité. Pas de négociation. Pas de devis cachés.', val: 'Jusqu\'à −30%' },
+      { ico: '🔁', title: 'Réassort en 1 message', desc: 'Vos designs archivés. Nouveau salarié? Un WhatsApp et son uniforme rentre en production.', val: 'Économise des heures' },
     ],
-    processKicker: 'Simple, volontairement',
-    processH2a: 'De votre logo à vos équipes habillées: ',
-    processH2b: '4 étapes, zéro friction.',
-    processLead: 'Votre seul travail: envoyer un logo et valider. On s\'occupe du reste.',
+    processKicker: 'Processus simple, volontairement',
+    processH2a: 'Du logo à votre équipe habillée: ',
+    processH2b: '4 étapes, sans friction.',
+    processLead: 'Votre seul travail: envoyer un logo. On gère le reste.',
     steps: [
-      { title: 'Envoyez votre logo', desc: 'Sur WhatsApp ou via le configurateur. 2 minutes, montre en main.' },
-      { title: 'Validez la maquette', desc: 'Reçue en 2h, gratuite. Devis précis inclus. Modifiable jusqu\'à validation.' },
-      { title: 'On produit en 48h', desc: "DTF ou broderie dans notre atelier d'Alger. Photos de contrôle envoyées." },
-      { title: "Vous recevez. C'est tout.", desc: 'Livraison 58 wilayas. Designs archivés pour vos futurs réassorts.' },
+      { title: 'Envoyez votre logo', desc: 'WhatsApp, email ou formulaire. Littéralement 2 minutes.' },
+      { title: 'Validez la maquette', desc: 'Reçue en 2h, gratuite. Devis clair. Modifiable jusqu\'à validation.' },
+      { title: 'Production 48h', desc: 'DTF ou broderie dans notre atelier. Vous recevez photos de contrôle.' },
+      { title: 'Livraison 58 wilayas', desc: 'Designs sauvegardés pour les réassorts. Un message = une commande.' },
     ],
-    testiKicker: 'Ils ont testé. Ils sont restés.',
-    testiH2a: 'Des résultats, ',
-    testiH2b: 'pas des promesses.',
+    testiKicker: 'Qui nous fait confiance',
+    testiH2a: 'Ils ont testé.',
+    testiH2b: 'Ils sont restés.',
     testimonials: [
-      { quote: "On avait un salon dans 4 jours et notre fournisseur habituel nous a lâchés. Caractère a produit 80 polos brodés en 48h. Qualité irréprochable, équipe au top le jour J.", who: 'Karim B.', role: 'Gérant — Restaurant El Kef', result: '80 polos • 48h chrono' },
-      { quote: 'Les photos avant expédition, ça change tout. 45 blouses pour la clinique, chaque broderie validée avant l\'envoi. Zéro retour, zéro déception.', who: 'Dr. Samira M.', role: 'Directrice — Clinique Al Chifa', result: '45 blouses • 0 défaut' },
-      { quote: "120 gilets haute visibilité avec notre logo. Un mois de chantier intensif plus tard: impeccables. Et le réassort se fait en un message WhatsApp.", who: 'Yacine O.', role: 'Directeur travaux — BTP Construct', result: '120 gilets • réassort auto' },
+      { quote: 'Salon dans 4 jours. Fournisseur habituel nous a lâchés. Caractère a produit 80 polos brodés en 48h chrono. Qualité impeccable.', who: 'Karim B.', role: 'Restaurant El Kef, Alger', result: '80 polos • 48h' },
+      { quote: 'Les photos avant envoi changent tout. 45 blouses pour la clinique, chaque détail validé avant expédition. Zéro retour.', who: 'Dr. Samira M.', role: 'Clinique Al Chifa', result: '45 blouses • 0 défaut' },
+      { quote: '120 gilets haute visibilité. Un mois de chantier intensif plus tard: impeccables. Le réassort se fait en un WhatsApp.', who: 'Yacine O.', role: 'BTP Construct', result: '120 gilets • réassort auto' },
     ],
-    offerKicker: "L'offre entreprise",
-    offerTitle: 'Le Pack Première Commande',
-    offerSub: 'Tout ce qu\'il faut pour tester notre qualité sans risque:',
+    offerKicker: 'Offre première commande',
+    offerTitle: 'Testez sans risque',
+    offerSub: 'Tout ce qu\'il faut pour découvrir notre qualité:',
     offerItems: [
-      'Maquette professionnelle en 2h — Offerte (valeur 5 000 DA)',
-      'Production prioritaire 48h garantie par écrit',
-      'Photos de contrôle avant expédition',
-      'Archivage de vos designs pour réassorts en 1 message',
-      'Rabais volume: −15% dès 51 pièces, jusqu\'à −30% dès 200',
-      'Interlocuteur dédié sur WhatsApp (réponse < 2h, 6j/7)',
+      'Maquette gratuite en 2h (valeur 5 000 DA)',
+      'Production 48h garantie écrit',
+      'Photos de contrôle avant livraison',
+      'Vos designs archivés (réassort en 1 message)',
+      'Rabais volume: −15% à 51 pièces, −30% à 200+',
+      'Support dédié WhatsApp (< 2h, 6j/7)',
     ],
-    offerCta: 'Démarrer ma première commande →',
-    offerScarcity: '⚡ Capacité limitée: nous acceptons 12 nouveaux comptes entreprise par mois pour tenir le 48h.',
-    guaranteeTitle: 'La Garantie "Zéro Pièce Ratée"',
-    guaranteeText: 'Vous validez la maquette avant production. Vous validez les photos avant expédition. Et si malgré ces deux contrôles une pièce arrive avec un défaut de fabrication, on la refait gratuitement, sans débat. Le risque est entièrement de notre côté — c\'est normal, c\'est notre métier.',
-    faqKicker: "Les questions qu'on nous pose vraiment",
-    faqH2: 'Tout ce que vous voulez savoir avant de commander.',
+    offerCta: 'Démarrer maintenant →',
+    offerScarcity: '⚡ Places limitées: 12 nouveaux comptes/mois pour tenir les 48h.',
+    guaranteeTitle: 'Garantie Zéro Risque',
+    guaranteeText: 'Vous validez le design avant production. Vous validez les photos avant expédition. Si malgré ça une pièce arrive défectueuse, on la refait gratuitement. Le risque est entièrement de notre côté—c\'est normal, c\'est notre métier.',
+    faqKicker: 'Questions récurrentes',
+    faqH2: 'Avant de vous engager, clarifiez tout.',
     faqs: [
-      { q: "C'est vraiment 48h? Même pour 200 pièces?", a: "Oui. Notre atelier tourne avec 20 personnes et des machines industrielles DTF + broderie. Jusqu'à 500 pièces, le délai de production de 48h ouvrées est garanti par écrit sur votre devis. Au-delà, on vous donne un délai précis avant que vous payiez quoi que ce soit." },
-      { q: 'Et si la qualité ne me convient pas?', a: 'Vous validez la maquette avant production, puis les photos avant expédition. Si malgré ça une pièce présente un défaut de fabrication, on la refait gratuitement. C\'est notre garantie, sans discussion.' },
-      { q: 'Quel est le minimum de commande?', a: 'Une pièce. Sérieusement. Mais les tarifs entreprise deviennent vraiment intéressants dès 51 pièces (−15%) et 200 pièces (jusqu\'à −30%).' },
-      { q: 'Comment se passe le paiement?', a: 'Devis clair sous 2h. Paiement par BaridiMob, CCP ou virement. Acompte à la commande, solde validé après les photos de contrôle. Vous ne payez jamais le solde à l\'aveugle.' },
-      { q: 'Vous livrez partout en Algérie?', a: 'Oui, les 58 wilayas. Alger en 24h après production, le reste du pays en 2 à 5 jours selon la zone.' },
+      { q: 'C\'est vraiment 48h? Même pour 200 pièces?', a: 'Oui. Notre atelier tourne avec 20 personnes et des machines industrielles. Production 48h ouvrées garantie écrit jusqu\'à 500 pièces. Au-delà, devis avant paiement.' },
+      { q: 'Et si la qualité ne me convient pas?', a: 'Vous validez la maquette avant production, puis les photos avant expédition. Si un défaut de fabrication apparaît malgré ça, on refait la pièce gratuitement.' },
+      { q: 'Minimum de commande?', a: 'Une pièce. Mais les tarifs entreprise deviennent vraiment intéressants à partir de 51 pièces (−15%).' },
+      { q: 'Comment ça marche pour le paiement?', a: 'Devis transparent en 2h. Paiement BaridiMob, CCP ou virement. Acompte à la commande, solde après validation photos. Jamais à l\'aveugle.' },
+      { q: 'Livraison partout en Algérie?', a: 'Oui, 58 wilayas. Alger 24h post-production, reste du pays 2-5 jours selon la zone.' },
     ],
-    finalH2: 'Votre maquette gratuite vous attend.',
-    finalP: 'Envoyez votre logo maintenant. Dans 2h, vous voyez exactement à quoi ressembleront vos équipes. Sans payer. Sans engagement.',
-    finalCta: '💬 Envoyer mon logo sur WhatsApp',
-    finalMicro: 'Réponse en moins de 2h, 6j/7 • +213 557 440 522',
-    footer1: '© 2026 Caractère Store • Uniformes & Branding B2B • Atelier Alger • Livraison 58 wilayas',
+    finalH2: 'Prêt à tester?',
+    finalP: 'Envoyer votre logo maintenant. Maquette gratuite en 2h, sans engagement.',
+    finalCta: '💬 Envoyer mon logo',
+    finalMicro: 'Réponse < 2h, 6j/7 • +213 557 440 522',
+    footer1: '© 2026 Caractère Store • Uniformes & Branding B2B • Alger',
     footer2: '📞 +213 557 440 522 • 📧 yakoumobi@gmail.com',
   },
   ar: {
     dir: 'rtl',
-    langBtn: 'FR',
-    devisBtn: '💬 عرض سعر في ساعتين',
-    eyebrow: 'فضاء المؤسسات — ورشة الجزائر',
-    h1a: 'أزياء موحدة تُسلَّم في ',
-    h1b: '48 ساعة.',
-    h1c: 'مُعتمدة بالصور. ',
+    langBtn: 'Français',
+    devisBtn: '💬 عرض السعر',
+    eyebrow: 'للمؤسسات • ورشة الجزائر',
+    h1a: 'أزياء موحدة في ',
+    h1b: '48 ساعة',
+    h1c: 'مُعتمدة بالصور، ',
     h1d: 'مضمونة.',
-    sub: 'الورشة النسيجية التي تجهّز المطاعم والعيادات وورشات البناء في الجزائر — بدون تأخير، بدون مفاجآت، بدون "سنعاود الاتصال بك".',
-    ctaMaquette: 'أرسل شعارك واستلم التصميم مجاناً ←',
-    ctaConfig: '⚙️ صمّم طلبك عبر الموقع',
+    sub: 'الورشة التي تجهّز المطاعم والعيادات والبناء في الجزائر. بدون تأخير، بدون مفاجآت، بدون وسطاء.',
+    ctaMaquette: 'أرسل شعارك ←',
+    ctaConfig: '⚙️ اطلب أونلاين',
     proof1: 'مؤسسة جهّزناها',
     proof2: 'قطعة أنتجناها',
-    proof3: 'نسبة الرضا',
+    proof3: 'رضا الزبائن',
     proof4: 'الرد خلال',
     proof4b: 'أقل من ساعتين',
-    painKicker: 'التكلفة الحقيقية للمورّد السيّئ',
-    painH2a: 'الزيّ الفاشل يضرّ بصورة مؤسستك أنت. ',
-    painH2b: 'وليس بصورتنا.',
-    painLead: 'إذا سبق لك أن طلبت ملابس مخصصة في الجزائر، فأنت على الأرجح تعرف هذا:',
+    painKicker: 'تكلفة المورّد السيّئ',
+    painH2a: 'زي فاشل = ',
+    painH2b: 'سمعة مؤسستك تتضرر.',
+    painLead: 'إذا طلبت ملابس مخصصة في الجزائر، تعرف غالباً ما يحدث:',
     pains: [
-      { title: 'مورّد متأخر دائماً', desc: 'مناسبتك بعد 5 أيام. وهو يردّ بعد 5 أيام.' },
-      { title: 'جودة عشوائية', desc: 'شعار مائل، تطريز يتفكك من أول غسلة.' },
-      { title: 'انعدام الشفافية', desc: 'تدفع، ثم صمت تام حتى التسليم. أو لا تسليم أصلاً.' },
-      { title: 'الاستيراد = انتظار', desc: '6 أسابيع من الصين. جمارك. مفاجآت. توتر.' },
+      { title: 'مورّد متأخر', desc: 'حدثك بعد 5 أيام وهو يرد بعد 5 أيام.' },
+      { title: 'جودة غير منتظمة', desc: 'شعار مائل، تطريز يتفكك من أول غسلة.' },
+      { title: 'انعدام الشفافية', desc: 'تدفع ثم صمت تام. قد لا يأتي الطلب أصلاً.' },
+      { title: 'استيراد من الخارج', desc: '6 أسابيع من الصين. جمارك. مفاجآت. توتر.' },
     ],
-    valueKicker: 'لماذا تثق بنا أكثر من 500 مؤسسة',
-    valueH2a: 'بنينا الورشة التي كنا نتمنى التعامل معها ',
-    valueH2b: 'كزبائن.',
-    valueLead: 'كل نقطة أدناه تحلّ مشكلة سمعناها مئات المرات.',
+    valueKicker: 'لماذا تثق بنا 500+ مؤسسة',
+    valueH2a: 'بنينا الورشة التي كنا',
+    valueH2b: 'نتمنى التعامل معها.',
+    valueLead: 'كل ميزة أدناه تحل مشكلة سمعناها مئات المرات.',
     values: [
-      { ico: '⏱️', title: 'إنتاج في 48 ساعة — ضمان مكتوب', desc: 'طلبك يخرج من ورشتنا بالجزائر العاصمة خلال 48 ساعة عمل. ليس "تقريباً". 48 ساعة.', val: 'أقصر مدة في الجزائر' },
-      { ico: '📸', title: 'صور قبل الشحن', desc: 'تعتمد كل قطعة بالصورة قبل أن تُشحن. صفر مفاجآت سيئة عند الاستلام.', val: 'شفافية كاملة' },
-      { ico: '🎨', title: 'تصميم مجاني في ساعتين', desc: 'أرسل شعارك، واستلم التصميم الاحترافي لأزيائكم في ساعتين. بدون أي التزام.', val: 'قيمته: 5000 دج — مجاناً' },
-      { ico: '🏭', title: 'ورشة محلية، 20 عاملاً', desc: 'طباعة DTF، تطريز صناعي، كبس حراري. كل شيء تحت سقف واحد بالعاصمة. يمكنك حتى زيارتنا.', val: 'بدون وسطاء' },
-      { ico: '📉', title: 'تخفيضات الكمية حتى −30%', desc: 'كلما زادت الكمية، انخفض سعر القطعة. جدول أسعار واضح، بدون مفاوضات مرهقة.', val: 'ابتداءً من 51 قطعة' },
-      { ico: '🔁', title: 'إعادة الطلب برسالة واحدة', desc: 'تصاميمكم محفوظة عندنا. موظف جديد؟ رسالة واتساب واحدة وزيّه يدخل الإنتاج.', val: 'توفير: ساعات كل شهر' },
+      { ico: '⏱️', title: '48 ساعة مضمونة', desc: 'الإنتاج والتسليم من ورشتنا خلال 48 ساعة عمل. مكتوب في العرض.', val: 'الأسرع في الجزائر' },
+      { ico: '📸', title: 'صور قبل الشحن', desc: 'تعتمد كل قطعة بالصورة قبل الإرسال. صفر مفاجآت سيئة.', val: 'تحكم جودة مضمون' },
+      { ico: '🎨', title: 'تصميم مجاني في ساعتين', desc: 'شعار → تصميم احترافي في ساعتين. بدون التزام، بدون تكلفة.', val: 'قيمته 5000 دج' },
+      { ico: '🏭', title: 'ورشة محلية كاملة', desc: 'طباعة DTF، تطريز، سيريجرافي. كل شيء في مكان واحد بالعاصمة.', val: 'بدون وسطاء' },
+      { ico: '📉', title: 'تسعير شفاف', desc: 'السعر ينخفض مع الكمية. بدون مفاوضات. بدون عروض مخفية.', val: 'حتى −30%' },
+      { ico: '🔁', title: 'إعادة الطلب برسالة', desc: 'تصاميمك محفوظة. موظف جديد? رسالة واحدة وزيّه ينتج.', val: 'توفير ساعات' },
     ],
-    processKicker: 'بسيط، عن قصد',
-    processH2a: 'من شعارك إلى فريقك بالزي الموحد: ',
+    processKicker: 'عملية بسيطة، مقصودة',
+    processH2a: 'من الشعار إلى فريقك بالزي الموحد: ',
     processH2b: '4 خطوات، بدون تعقيد.',
-    processLead: 'عملك الوحيد: إرسال الشعار والاعتماد. نحن نتكفل بالباقي.',
+    processLead: 'عملك الوحيد: إرسال الشعار. نحن نتولى الباقي.',
     steps: [
-      { title: 'أرسل شعارك', desc: 'عبر واتساب أو عبر الموقع. دقيقتان فقط.' },
-      { title: 'اعتمد التصميم', desc: 'يصلك في ساعتين، مجاناً. مع عرض سعر دقيق. قابل للتعديل حتى الاعتماد.' },
-      { title: 'ننتج في 48 ساعة', desc: 'طباعة DTF أو تطريز في ورشتنا بالعاصمة. نرسل لك صور المراقبة.' },
-      { title: 'تستلم. هذا كل شيء.', desc: 'توصيل لـ58 ولاية. التصاميم محفوظة لطلباتكم القادمة.' },
+      { title: 'أرسل شعارك', desc: 'واتساب أو إيميل أو الموقع. دقيقتان فقط.' },
+      { title: 'اعتمد التصميم', desc: 'يصلك مجاني في ساعتين. عرض سعر واضح. قابل للتعديل.' },
+      { title: 'إنتاج 48 ساعة', desc: 'طباعة أو تطريز في ورشتنا. نرسل صور المراقبة.' },
+      { title: 'توصيل 58 ولاية', desc: 'تصاميمك محفوظة للطلبات القادمة. رسالة واحدة = طلب جديد.' },
     ],
-    testiKicker: 'جرّبوا. وبقوا معنا.',
-    testiH2a: 'نتائج ملموسة، ',
-    testiH2b: 'وليست وعوداً.',
+    testiKicker: 'من يثق بنا',
+    testiH2a: 'جرّبوا.',
+    testiH2b: 'وبقوا معنا.',
     testimonials: [
-      { quote: 'كان عندنا معرض بعد 4 أيام وتخلى عنا المورد المعتاد. كاراكتير أنتجت 80 بولو مطرز في 48 ساعة. جودة ممتازة وفريق في المستوى يوم الحدث.', who: 'كريم ب.', role: 'مسيّر — مطعم الكاف', result: '80 بولو • 48 ساعة بالضبط' },
-      { quote: 'الصور قبل الشحن غيّرت كل شيء. 45 وزرة طبية للعيادة، كل تطريز اعتمدناه قبل الإرسال. صفر إرجاع، صفر خيبة.', who: 'د. سميرة م.', role: 'مديرة — عيادة الشفاء', result: '45 وزرة • 0 عيب' },
-      { quote: '120 صدرية عاكسة بشعارنا. بعد شهر من العمل المكثف في الورشة: ممتازة. وإعادة الطلب تتم برسالة واتساب واحدة.', who: 'ياسين و.', role: 'مدير أشغال — BTP Construct', result: '120 صدرية • إعادة طلب تلقائية' },
+      { quote: 'معرض بعد 4 أيام والمورد تخلى عنا. كاراكتير أنتجت 80 بولو مطرز في 48 ساعة. جودة عالية جداً.', who: 'كريم ب.', role: 'مطعم الكاف، الجزائر', result: '80 بولو • 48 ساعة' },
+      { quote: 'صور المراقبة غيّرت كل شيء. 45 وزرة للعيادة، كل تطريزة اعتمدناها قبل الإرسال. صفر إرجاع.', who: 'د. سميرة م.', role: 'عيادة الشفاء', result: '45 وزرة • 0 عيب' },
+      { quote: '120 صدرية عاكسة. شهر عمل مكثف وظلت ممتازة. الطلب الثاني تم برسالة واتساب واحدة.', who: 'ياسين و.', role: 'BTP Construct', result: '120 صدرية • طلب تلقائي' },
     ],
-    offerKicker: 'عرض المؤسسات',
-    offerTitle: 'باقة الطلب الأول',
-    offerSub: 'كل ما تحتاجه لتجربة جودتنا بدون أي مخاطرة:',
+    offerKicker: 'عرض أول طلب',
+    offerTitle: 'جرّب بدون مخاطرة',
+    offerSub: 'كل ما تحتاجه لاكتشاف جودتنا:',
     offerItems: [
-      'تصميم احترافي في ساعتين — مجاناً (قيمته 5000 دج)',
-      'إنتاج بأولوية في 48 ساعة بضمان مكتوب',
-      'صور مراقبة قبل الشحن',
-      'حفظ تصاميمكم لإعادة الطلب برسالة واحدة',
-      'تخفيضات الكمية: −15% من 51 قطعة، حتى −30% من 200 قطعة',
-      'مسؤول مخصص لكم على واتساب (رد < ساعتين، 6 أيام/7)',
+      'تصميم مجاني في ساعتين (قيمته 5000 دج)',
+      'إنتاج 48 ساعة مضمون كتابياً',
+      'صور مراقبة قبل التسليم',
+      'تصاميمك محفوظة (إعادة طلب برسالة)',
+      'تخفيضات: −15% من 51 قطعة، −30% من 200+',
+      'دعم واتساب مخصص (< ساعتين، 6 أيام)',
     ],
-    offerCta: 'ابدأ طلبك الأول ←',
-    offerScarcity: '⚡ طاقة محدودة: نقبل 12 حساب مؤسسة جديد شهرياً فقط للحفاظ على ضمان الـ48 ساعة.',
-    guaranteeTitle: 'ضمان "صفر قطعة فاشلة"',
-    guaranteeText: 'تعتمد التصميم قبل الإنتاج. تعتمد الصور قبل الشحن. وإذا رغم هاتين المراقبتين وصلتك قطعة بها عيب صناعي، نعيد صنعها مجاناً، بدون نقاش. المخاطرة كلها علينا — هذا طبيعي، هذه مهنتنا.',
-    faqKicker: 'الأسئلة التي تُطرح علينا فعلاً',
-    faqH2: 'كل ما تريد معرفته قبل الطلب.',
+    offerCta: 'ابدأ الآن ←',
+    offerScarcity: '⚡ أماكن محدودة: 12 حساب جديد شهرياً فقط.',
+    guaranteeTitle: 'ضمان بدون مخاطرة',
+    guaranteeText: 'تعتمد التصميم قبل الإنتاج. تعتمد الصور قبل الشحن. لو وصلتك قطعة معيبة رغم ذلك، نعيد صنعها مجاناً. المخاطرة علينا—هذا منطقي، هذه مهنتنا.',
+    faqKicker: 'أسئلة متكررة',
+    faqH2: 'قبل الانطلاق، وضّح كل شيء.',
     faqs: [
-      { q: 'هل فعلاً 48 ساعة؟ حتى لـ200 قطعة؟', a: 'نعم. ورشتنا تعمل بـ20 شخصاً وآلات صناعية للطباعة والتطريز. حتى 500 قطعة، مدة الإنتاج 48 ساعة عمل مضمونة كتابياً في عرض السعر. أكثر من ذلك، نعطيك مدة دقيقة قبل أن تدفع أي شيء.' },
-      { q: 'وإذا لم تعجبني الجودة؟', a: 'تعتمد التصميم قبل الإنتاج، ثم الصور قبل الشحن. وإذا رغم ذلك ظهر عيب صناعي في قطعة، نعيد صنعها مجاناً. هذا ضماننا، بدون نقاش.' },
-      { q: 'ما هو الحد الأدنى للطلب؟', a: 'قطعة واحدة. بجدية. لكن أسعار المؤسسات تصبح مثيرة للاهتمام فعلاً من 51 قطعة (−15%) ومن 200 قطعة (حتى −30%).' },
-      { q: 'كيف يتم الدفع؟', a: 'عرض سعر واضح خلال ساعتين. الدفع عبر بريدي موب، CCP أو تحويل بنكي. تسبيق عند الطلب، والباقي بعد اعتماد صور المراقبة. لا تدفع الباقي أبداً على العمياء.' },
-      { q: 'هل توصلون لكل ولايات الجزائر؟', a: 'نعم، الـ58 ولاية. العاصمة في 24 ساعة بعد الإنتاج، وباقي الولايات من 2 إلى 5 أيام حسب المنطقة.' },
+      { q: 'فعلاً 48 ساعة؟ حتى 200 قطعة?', a: 'نعم. ورشتنا بـ20 شخص وآلات صناعية. 48 ساعة عمل مضمونة حتى 500 قطعة، مكتوب في العرض. أكثر من ذلك، عرض قبل دفع.' },
+      { q: 'إذا الجودة ما أعجبتني؟', a: 'تعتمد التصميم قبل الإنتاج والصور قبل الشحن. لو عيب صناعي ظهر، نعيد مجاناً.' },
+      { q: 'حد أدنى للطلب؟', a: 'قطعة واحدة. لكن أسعار المؤسسات تصبح ممتازة من 51 قطعة (−15%).' },
+      { q: 'الدفع كيف؟', a: 'عرض واضح في ساعتين. ديناردز، بريدي موب أو تحويل. تسبيق عند الطلب، والباقي بعد الصور. بدون عمياء.' },
+      { q: 'توصيل لكل الجزائر؟', a: 'نعم، 58 ولاية. العاصمة 24 ساعة بعد الإنتاج، باقي الولايات 2–5 أيام.' },
     ],
-    finalH2: 'تصميمك المجاني في انتظارك.',
-    finalP: 'أرسل شعارك الآن. خلال ساعتين، سترى بالضبط كيف سيبدو فريقك. بدون دفع. بدون التزام.',
-    finalCta: '💬 أرسل شعاري عبر واتساب',
-    finalMicro: 'رد خلال أقل من ساعتين، 6 أيام/7 • 0557440522',
-    footer1: '© 2026 كاراكتير ستور • أزياء موحدة وهوية بصرية للمؤسسات • ورشة الجزائر • توصيل 58 ولاية',
+    finalH2: 'جاهز للبدء؟',
+    finalP: 'أرسل شعارك الآن. تصميم مجاني في ساعتين، بدون التزام.',
+    finalCta: '💬 أرسل شعاري',
+    finalMicro: 'رد < ساعتين، 6 أيام • 0557440522',
+    footer1: '© 2026 كاراكتير ستور • أزياء موحدة وهوية بصرية • الجزائر',
     footer2: '📞 0557440522 • 📧 yakoumobi@gmail.com',
   },
 }
@@ -209,194 +212,200 @@ function useReveal(lang: Lang) {
 
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Cairo:wght@600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Cairo:wght@600;700;800;900&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body, html {
-      background: ${C.black};
-      color: ${C.white};
-      font-weight: 600;
+      background: ${C.bg};
+      color: ${C.text_dark};
+      font-weight: 500;
       line-height: 1.6;
     }
 
-    .lang-fr { font-family: 'Montserrat', sans-serif; }
+    .lang-fr { font-family: 'Inter', sans-serif; }
     .lang-ar { font-family: 'Cairo', sans-serif; }
 
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease-out, transform .7s ease-out; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease-out, transform .6s ease-out; }
     .reveal.in { opacity: 1; transform: translateY(0); }
 
     header {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(12,10,9,.92);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(250,250,249,.08);
-      padding: 14px 24px;
+      background: rgba(250,250,248,.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid ${C.border};
+      padding: 16px 24px;
       display: flex; justify-content: space-between; align-items: center;
     }
-    header img { height: 34px; width: auto; }
-    header .actions { display: flex; align-items: center; gap: 10px; }
+    header img { height: 32px; width: auto; }
+    header .actions { display: flex; align-items: center; gap: 12px; }
     header .wa-btn {
-      background: ${C.gold}; color: ${C.black};
-      padding: 10px 18px; border-radius: 8px;
-      font-weight: 800; font-size: 13px; text-decoration: none;
-      transition: transform .25s;
+      background: ${C.accent}; color: ${C.white};
+      padding: 10px 20px; border-radius: 8px;
+      font-weight: 700; font-size: 13px; text-decoration: none;
+      transition: all .25s;
     }
-    header .wa-btn:hover { transform: translateY(-2px); }
+    header .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.25); }
     header .lang-btn {
-      border: 1.5px solid rgba(250,250,249,.3);
-      background: transparent; color: ${C.white};
+      border: 1.5px solid ${C.border};
+      background: ${C.white}; color: ${C.text_dark};
       padding: 9px 14px; border-radius: 8px;
-      font-weight: 900; font-size: 13px; cursor: pointer;
-      transition: all .25s; letter-spacing: 1px;
+      font-weight: 700; font-size: 12px; cursor: pointer;
+      transition: all .25s;
     }
-    header .lang-btn:hover { border-color: ${C.gold}; color: ${C.gold}; }
+    header .lang-btn:hover { border-color: ${C.accent}; color: ${C.accent}; }
 
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-    .hero { padding: 90px 0 70px; text-align: center; position: relative; }
+    .hero { padding: 100px 0 80px; text-align: center; }
     .hero .eyebrow {
       display: inline-block;
-      border: 1px solid rgba(212,165,116,.4);
-      color: ${C.gold};
-      padding: 6px 16px; border-radius: 999px;
-      font-size: 12px; font-weight: 800; letter-spacing: 1px;
-      margin-bottom: 28px;
+      border: 1px solid ${C.border};
+      color: ${C.accent};
+      padding: 8px 18px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; letter-spacing: .5px;
+      margin-bottom: 32px;
+      background: ${C.accent_light};
     }
     .hero h1 {
-      font-size: clamp(32px, 6.5vw, 64px);
-      font-weight: 900; line-height: 1.15;
-      margin-bottom: 22px;
+      font-size: clamp(36px, 7vw, 64px);
+      font-weight: 900; line-height: 1.1;
+      margin-bottom: 24px; color: ${C.text_dark};
     }
-    .hero h1 .accent { color: ${C.gold}; }
+    .hero h1 .accent { color: ${C.accent}; }
     .hero .sub {
-      font-size: 17px; color: ${C.muted};
-      max-width: 640px; margin: 0 auto 36px; font-weight: 600;
+      font-size: 18px; color: ${C.text_muted};
+      max-width: 680px; margin: 0 auto 40px; font-weight: 500;
     }
 
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 16px 32px; border-radius: 10px;
-      font-weight: 800; font-size: 15px;
+      padding: 14px 32px; border-radius: 10px;
+      font-weight: 700; font-size: 14px;
       text-decoration: none; cursor: pointer;
-      transition: transform .25s, box-shadow .3s; border: none;
+      transition: all .25s; border: none;
     }
     .btn:hover { transform: translateY(-3px); }
-    .btn-gold { background: ${C.gold}; color: ${C.black}; box-shadow: 0 12px 34px -12px rgba(212,165,116,.45); }
-    .btn-ghost { border: 1.5px solid rgba(250,250,249,.25); color: ${C.white}; background: transparent; }
-    .btn-ghost:hover { border-color: ${C.gold}; color: ${C.gold}; }
+    .btn-accent { background: ${C.accent}; color: ${C.white}; box-shadow: 0 8px 24px rgba(37,99,235,.25); }
+    .btn-outline { border: 1.5px solid ${C.border}; color: ${C.text_dark}; background: ${C.white}; }
+    .btn-outline:hover { border-color: ${C.accent}; color: ${C.accent}; }
 
     .proofbar {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;
-      margin-top: 44px; font-size: 13px; color: ${C.muted}; font-weight: 700;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 18px;
+      margin-top: 48px; font-size: 13px; color: ${C.text_muted}; font-weight: 600;
     }
-    .proofbar span { display: flex; align-items: center; gap: 7px; }
-    .proofbar b { color: ${C.white}; }
+    .proofbar span { display: flex; align-items: center; gap: 8px; }
+    .proofbar b { color: ${C.text_dark}; }
 
-    .section { padding: 80px 0; }
-    .section-dark { background: ${C.dark}; }
-    .kicker { color: ${C.gold}; font-size: 12px; font-weight: 800; letter-spacing: 2px; margin-bottom: 14px; text-align: center; }
-    .h2 { font-size: clamp(26px, 4.5vw, 42px); font-weight: 900; text-align: center; line-height: 1.2; margin-bottom: 18px; }
-    .h2 .accent { color: ${C.gold}; }
-    .lead { text-align: center; color: ${C.muted}; max-width: 620px; margin: 0 auto 52px; font-size: 16px; }
+    .section { padding: 90px 0; }
+    .section-light { background: ${C.bg_sec}; }
+    .kicker { color: ${C.accent}; font-size: 11px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 16px; text-align: center; text-transform: uppercase; }
+    .h2 { font-size: clamp(28px, 5vw, 48px); font-weight: 900; text-align: center; line-height: 1.15; margin-bottom: 20px; color: ${C.text_dark}; }
+    .h2 .accent { color: ${C.accent}; }
+    .lead { text-align: center; color: ${C.text_muted}; max-width: 640px; margin: 0 auto 56px; font-size: 16px; font-weight: 500; }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
 
     .pain {
-      background: rgba(250,250,249,.03);
-      border: 1px solid rgba(250,250,249,.08);
-      border-radius: 14px; padding: 26px;
+      background: ${C.white};
+      border: 1px solid ${C.border};
+      border-radius: 14px; padding: 28px;
+      transition: all .3s;
     }
-    .pain .x { color: #EF4444; font-size: 20px; margin-bottom: 12px; display: block; }
-    .pain p.title { font-weight: 800; font-size: 15px; margin-bottom: 6px; }
-    .pain p.desc { font-size: 13px; color: ${C.muted}; }
+    .pain:hover { border-color: ${C.accent}; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+    .pain .x { color: #EF4444; font-size: 20px; margin-bottom: 14px; display: block; }
+    .pain .title { font-weight: 800; font-size: 15px; margin-bottom: 6px; color: ${C.text_dark}; }
+    .pain .desc { font-size: 14px; color: ${C.text_muted}; }
 
     .value-card {
-      background: rgba(250,250,249,.04);
-      border: 1px solid rgba(250,250,249,.09);
-      border-radius: 16px; padding: 30px 26px;
-      transition: transform .3s, border-color .3s;
+      background: ${C.white};
+      border: 1px solid ${C.border};
+      border-radius: 16px; padding: 32px;
+      transition: all .3s;
     }
-    .value-card:hover { transform: translateY(-5px); border-color: rgba(212,165,116,.45); }
-    .value-card .ico { font-size: 30px; margin-bottom: 16px; display: block; }
-    .value-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
-    .value-card p { font-size: 13px; color: ${C.muted}; }
-    .value-card .val { display: inline-block; margin-top: 14px; color: ${C.gold}; font-size: 12px; font-weight: 800; }
+    .value-card:hover { transform: translateY(-6px); border-color: ${C.accent}; box-shadow: 0 12px 32px rgba(37,99,235,.12); }
+    .value-card .ico { font-size: 32px; margin-bottom: 16px; display: block; }
+    .value-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; color: ${C.text_dark}; }
+    .value-card p { font-size: 14px; color: ${C.text_muted}; }
+    .value-card .val { display: inline-block; margin-top: 14px; color: ${C.accent}; font-size: 12px; font-weight: 800; }
 
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
     .step {
-      background: rgba(250,250,249,.03);
-      border: 1px solid rgba(250,250,249,.08);
-      border-radius: 14px; padding: 28px 24px; position: relative;
+      background: ${C.white};
+      border: 1px solid ${C.border};
+      border-radius: 14px; padding: 30px;
     }
     .step .num {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: rgba(212,165,116,.14); color: ${C.gold};
+      width: 44px; height: 44px; border-radius: 10px;
+      background: ${C.accent_light}; color: ${C.accent};
       display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 17px; margin-bottom: 16px;
+      font-weight: 900; font-size: 18px; margin-bottom: 16px;
     }
-    .step h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
-    .step p { font-size: 13px; color: ${C.muted}; }
+    .step h3 { font-size: 15px; font-weight: 800; margin-bottom: 8px; color: ${C.text_dark}; }
+    .step p { font-size: 14px; color: ${C.text_muted}; }
 
     .testi {
-      background: rgba(250,250,249,.04);
-      border: 1px solid rgba(250,250,249,.09);
+      background: ${C.white};
+      border: 1px solid ${C.border};
       border-radius: 16px; padding: 28px;
     }
-    .testi .stars { color: ${C.gold}; letter-spacing: 2px; margin-bottom: 14px; font-size: 14px; }
-    .testi .quote { font-size: 14px; line-height: 1.8; margin-bottom: 18px; color: ${C.white}; }
-    .testi .who { font-weight: 800; font-size: 13px; }
-    .testi .role { font-size: 12px; color: ${C.muted}; font-weight: 700; }
-    .testi .result { display: inline-block; margin-top: 12px; background: rgba(212,165,116,.12); color: ${C.gold}; padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .testi .stars { color: #FBBF24; letter-spacing: 1px; margin-bottom: 14px; font-size: 14px; }
+    .testi .quote { font-size: 14px; line-height: 1.8; margin-bottom: 16px; color: ${C.text_dark}; font-weight: 500; }
+    .testi .who { font-weight: 800; font-size: 13px; color: ${C.text_dark}; }
+    .testi .role { font-size: 12px; color: ${C.text_muted}; }
+    .testi .result { display: inline-block; margin-top: 12px; background: ${C.accent_light}; color: ${C.accent}; padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; }
 
     .offer-box {
-      background: linear-gradient(160deg, rgba(212,165,116,.12) 0%, rgba(250,250,249,.03) 60%);
-      border: 1.5px solid rgba(212,165,116,.45);
-      border-radius: 22px; padding: 46px 34px; text-align: center;
+      background: ${C.white};
+      border: 2px solid ${C.accent};
+      border-radius: 20px; padding: 50px 36px; text-align: center;
       max-width: 720px; margin: 0 auto;
     }
-    .offer-box h3 { font-size: clamp(24px, 4vw, 34px); font-weight: 900; margin-bottom: 12px; }
-    .offer-box .sub { color: ${C.muted}; font-size: 15px; margin-bottom: 30px; }
-    .offer-list { max-width: 480px; margin: 0 auto 32px; }
+    .offer-box h3 { font-size: clamp(26px, 4vw, 36px); font-weight: 900; margin-bottom: 12px; color: ${C.text_dark}; }
+    .offer-box .sub { color: ${C.text_muted}; font-size: 16px; margin-bottom: 32px; }
+    .offer-list { max-width: 500px; margin: 0 auto 36px; }
     .offer-list li {
-      list-style: none; display: flex; gap: 12px; align-items: flex-start;
-      padding: 11px 0; border-bottom: 1px solid rgba(250,250,249,.07);
-      font-size: 14px; font-weight: 700; text-align: start;
+      list-style: none; display: flex; gap: 14px; align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid ${C.border};
+      font-size: 14px; font-weight: 600; text-align: start; color: ${C.text_dark};
     }
-    .offer-list li .check { color: ${C.gold}; font-weight: 900; }
+    .offer-list li:last-child { border-bottom: none; }
+    .offer-list li .check { color: ${C.accent}; font-weight: 900; font-size: 16px; }
 
     .guarantee {
-      display: flex; gap: 18px; align-items: flex-start;
-      background: rgba(250,250,249,.04);
-      border: 1px solid rgba(250,250,249,.1);
-      border-radius: 16px; padding: 28px; max-width: 720px; margin: 0 auto;
+      display: flex; gap: 20px; align-items: flex-start;
+      background: ${C.white};
+      border: 1.5px solid ${C.border};
+      border-radius: 16px; padding: 32px; max-width: 720px; margin: 0 auto;
     }
-    .guarantee .shield { font-size: 40px; }
-    .guarantee h3 { font-size: 17px; font-weight: 900; margin-bottom: 8px; }
-    .guarantee p { font-size: 14px; color: ${C.muted}; }
+    .guarantee .shield { font-size: 42px; flex-shrink: 0; }
+    .guarantee h3 { font-size: 17px; font-weight: 900; margin-bottom: 8px; color: ${C.text_dark}; }
+    .guarantee p { font-size: 14px; color: ${C.text_muted}; }
 
     .faq { max-width: 680px; margin: 0 auto; }
-    .faq-item { border-bottom: 1px solid rgba(250,250,249,.09); padding: 22px 0; cursor: pointer; }
-    .faq-item h3 { font-weight: 800; font-size: 15px; display: flex; justify-content: space-between; gap: 16px; }
-    .faq-item .toggle { color: ${C.gold}; font-weight: 900; }
-    .faq-item p { font-size: 14px; color: ${C.muted}; line-height: 1.8; margin-top: 12px; display: none; }
+    .faq-item { border-bottom: 1px solid ${C.border}; padding: 20px 0; cursor: pointer; }
+    .faq-item h3 { font-weight: 800; font-size: 15px; display: flex; justify-content: space-between; gap: 16px; color: ${C.text_dark}; }
+    .faq-item .toggle { color: ${C.accent}; font-weight: 900; }
+    .faq-item p { font-size: 14px; color: ${C.text_muted}; line-height: 1.8; margin-top: 12px; display: none; }
     .faq-item.active p { display: block; }
 
     .final {
-      text-align: center; padding: 90px 24px;
-      background: linear-gradient(160deg, rgba(212,165,116,.1) 0%, ${C.black} 65%);
+      text-align: center; padding: 100px 24px;
+      background: linear-gradient(135deg, ${C.bg} 0%, ${C.bg_sec} 100%);
     }
-    .final h2 { font-size: clamp(28px, 5.5vw, 50px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
-    .final p { color: ${C.muted}; margin-bottom: 36px; font-size: 16px; }
-    .final .micro { font-size: 12px; color: ${C.muted}; margin-top: 18px; }
+    .final h2 { font-size: clamp(32px, 6vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 18px; color: ${C.text_dark}; }
+    .final p { color: ${C.text_muted}; margin-bottom: 40px; font-size: 17px; }
+    .final .micro { font-size: 12px; color: ${C.text_muted}; margin-top: 20px; }
 
-    footer { background: ${C.black}; border-top: 1px solid rgba(250,250,249,.07); padding: 40px 24px; text-align: center; }
-    footer img { height: 30px; margin-bottom: 16px; opacity: .9; }
-    footer p { font-size: 12px; color: ${C.muted}; font-weight: 700; }
+    footer { background: ${C.white}; border-top: 1px solid ${C.border}; padding: 48px 24px; text-align: center; }
+    footer img { height: 30px; margin-bottom: 18px; }
+    footer p { font-size: 12px; color: ${C.text_muted}; font-weight: 600; }
 
     @media (max-width: 768px) {
-      .section { padding: 56px 0; }
+      .section { padding: 60px 0; }
       .guarantee { flex-direction: column; }
+      header { padding: 12px 16px; }
+      .hero { padding: 70px 0 50px; }
     }
   `}</style>
 )
@@ -413,7 +422,7 @@ export default function EntreprisePage() {
   }
 
   return (
-    <div dir={t.dir} className={lang === 'ar' ? 'lang-ar' : 'lang-fr'} style={{ background: C.black, color: C.white }}>
+    <div dir={t.dir} className={lang === 'ar' ? 'lang-ar' : 'lang-fr'} style={{ background: C.bg, color: C.text_dark }}>
       <GlobalStyle />
 
       {/* HEADER */}
@@ -434,9 +443,9 @@ export default function EntreprisePage() {
             {t.h1c}<span className="accent">{t.h1d}</span>
           </h1>
           <p className="sub">{t.sub}</p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WA} className="btn btn-gold">{t.ctaMaquette}</a>
-            <Link href="/configurateur" className="btn btn-ghost">{t.ctaConfig}</Link>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href={WA} className="btn btn-accent">{t.ctaMaquette}</a>
+            <Link href="/configurateur" className="btn btn-outline">{t.ctaConfig}</Link>
           </div>
           <div className="proofbar">
             <span>✅ <b>500+</b> {t.proof1}</span>
@@ -448,7 +457,7 @@ export default function EntreprisePage() {
       </section>
 
       {/* DOULEURS */}
-      <section className="section section-dark">
+      <section className="section section-light">
         <div className="wrap">
           <p className="kicker reveal">{t.painKicker}</p>
           <h2 className="h2 reveal">{t.painH2a}<span className="accent">{t.painH2b}</span></h2>
@@ -485,7 +494,7 @@ export default function EntreprisePage() {
       </section>
 
       {/* PROCESS */}
-      <section className="section section-dark">
+      <section className="section section-light">
         <div className="wrap">
           <p className="kicker reveal">{t.processKicker}</p>
           <h2 className="h2 reveal">{t.processH2a}<span className="accent">{t.processH2b}</span></h2>
@@ -507,7 +516,7 @@ export default function EntreprisePage() {
         <div className="wrap">
           <p className="kicker reveal">{t.testiKicker}</p>
           <h2 className="h2 reveal">{t.testiH2a}<span className="accent">{t.testiH2b}</span></h2>
-          <div className="grid" style={{ marginTop: 48 }}>
+          <div className="grid" style={{ marginTop: 52 }}>
             {t.testimonials.map((tm, i) => (
               <div key={i} className="testi reveal">
                 <div className="stars">★★★★★</div>
@@ -522,7 +531,7 @@ export default function EntreprisePage() {
       </section>
 
       {/* OFFRE */}
-      <section className="section section-dark">
+      <section className="section section-light">
         <div className="wrap">
           <p className="kicker reveal">{t.offerKicker}</p>
           <div className="offer-box reveal">
@@ -533,8 +542,8 @@ export default function EntreprisePage() {
                 <li key={i}><span className="check">✓</span><span>{item}</span></li>
               ))}
             </ul>
-            <a href={WA} className="btn btn-gold" style={{ width: '100%', maxWidth: 380 }}>{t.offerCta}</a>
-            <p style={{ fontSize: 12, color: C.muted, marginTop: 16 }}>{t.offerScarcity}</p>
+            <a href={WA} className="btn btn-accent" style={{ width: '100%', maxWidth: 380 }}>{t.offerCta}</a>
+            <p style={{ fontSize: 12, color: C.text_muted, marginTop: 18 }}>{t.offerScarcity}</p>
           </div>
         </div>
       </section>
@@ -553,11 +562,11 @@ export default function EntreprisePage() {
       </section>
 
       {/* FAQ */}
-      <section className="section section-dark">
+      <section className="section section-light">
         <div className="wrap">
           <p className="kicker reveal">{t.faqKicker}</p>
           <h2 className="h2 reveal">{t.faqH2}</h2>
-          <div className="faq" style={{ marginTop: 44 }}>
+          <div className="faq" style={{ marginTop: 52 }}>
             {t.faqs.map((f, i) => (
               <div key={i} className={`faq-item reveal ${faqOpen === i ? 'active' : ''}`} onClick={() => setFaqOpen(faqOpen === i ? -1 : i)}>
                 <h3>{f.q}<span className="toggle">{faqOpen === i ? '−' : '+'}</span></h3>
@@ -570,11 +579,13 @@ export default function EntreprisePage() {
 
       {/* CTA FINAL */}
       <section className="final">
-        <div className="reveal">
-          <h2>{t.finalH2}</h2>
-          <p>{t.finalP}</p>
-          <a href={WA} className="btn btn-gold" style={{ fontSize: 16, padding: '18px 40px' }}>{t.finalCta}</a>
-          <p className="micro">{t.finalMicro}</p>
+        <div className="wrap">
+          <div className="reveal">
+            <h2>{t.finalH2}</h2>
+            <p>{t.finalP}</p>
+            <a href={WA} className="btn btn-accent" style={{ fontSize: 15, padding: '16px 40px' }}>{t.finalCta}</a>
+            <p className="micro">{t.finalMicro}</p>
+          </div>
         </div>
       </section>
 
