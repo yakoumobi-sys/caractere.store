@@ -108,7 +108,30 @@ const T = {
     footer1: '© 2026 Caractère Store • Uniformes & Branding B2B • Alger',
     footer2: '📞 +213 557 440 522 • 📧 yakoumobi@gmail.com',
     menuItems: [
-      { label: 'Navigation', items: ['Fonctionnalités', 'Processus', 'Pourquoi nous', 'Témoignages', 'FAQ', 'Contacter'] },
+      {
+        label: 'Outils',
+        items: [
+          { label: 'Designer', href: '/designer' },
+          { label: 'Studio 3D', href: '/studio-3d' },
+          { label: 'Configurateur', href: '/configurateur' },
+        ]
+      },
+      {
+        label: 'Découvrir',
+        items: [
+          { label: 'Comment ça marche', href: '/comment-ca-marche' },
+          { label: 'Produits', href: '/produits' },
+          { label: 'Catalogue', href: '/collection' },
+          { label: 'Print on Demand', href: '/print-on-demand' },
+        ]
+      },
+      {
+        label: 'Pour qui',
+        items: [
+          { label: 'Entreprises', href: '/entreprises' },
+          { label: 'Particuliers', href: '/particuliers' },
+        ]
+      },
     ],
   },
   ar: {
@@ -199,7 +222,30 @@ const T = {
     footer1: '© 2026 كاراكتير ستور • أزياء موحدة وهوية بصرية • الجزائر',
     footer2: '📞 0557440522 • 📧 yakoumobi@gmail.com',
     menuItems: [
-      { label: 'التنقل', items: ['الميزات', 'العملية', 'لماذا نختارنا', 'الشهادات', 'الأسئلة', 'تواصل'] },
+      {
+        label: 'الأدوات',
+        items: [
+          { label: 'المصمم', href: '/designer' },
+          { label: 'الاستوديو 3D', href: '/studio-3d' },
+          { label: 'محرر الطلبات', href: '/configurateur' },
+        ]
+      },
+      {
+        label: 'اكتشف',
+        items: [
+          { label: 'كيف يعمل', href: '/comment-ca-marche' },
+          { label: 'المنتجات', href: '/produits' },
+          { label: 'الكتالوج', href: '/collection' },
+          { label: 'الطباعة عند الطلب', href: '/print-on-demand' },
+        ]
+      },
+      {
+        label: 'من أجل من',
+        items: [
+          { label: 'المؤسسات', href: '/entreprises' },
+          { label: 'الأفراد', href: '/particuliers' },
+        ]
+      },
     ],
   },
 }
@@ -314,6 +360,7 @@ const GlobalStyle = () => (
       font-size: 14px; text-decoration: none;
       cursor: pointer; transition: all .2s;
       text-align: left;
+      display: block;
     }
     .menu-drawer[dir="rtl"] .menu-nav a,
     .menu-drawer[dir="rtl"] .menu-nav button { text-align: right; }
@@ -524,13 +571,13 @@ export default function EntreprisePage() {
               <span className="label">{section.label}</span>
               <div className="menu-nav">
                 {section.items.map((item, j) => (
-                  <button key={j} onClick={() => setMenuOpen(false)}>{item}</button>
+                  <Link key={j} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</Link>
                 ))}
               </div>
             </div>
           ))}
           <div className="menu-divider" />
-          <a href={WA} className="menu-cta" onClick={() => setMenuOpen(false)}>💬 {t.finalCta}</a>
+          <a href={WA} className="menu-cta" onClick={() => setMenuOpen(false)}>💬 Envoyer mon logo</a>
         </div>
       </div>
 
