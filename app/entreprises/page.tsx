@@ -14,7 +14,7 @@ const C = {
   white: '#FFFFFF',
 }
 
-const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png'
+const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-dark.png' // Logo noir
 const WA = 'https://wa.me/213557440522'
 
 type Lang = 'fr' | 'ar'
@@ -23,12 +23,12 @@ const T = {
   fr: {
     dir: 'ltr',
     langBtn: 'العربية',
-    devisBtn: '💬 Devis gratuit',
+    devisBtn: '☰', // Menu hamburger
     eyebrow: 'Pour les entreprises • Atelier Alger',
     h1a: 'Uniformes de qualité en ',
     h1b: '48 heures',
-    h1c: 'validés en photos, ',
-    h1d: 'garantis.',
+    h1c: 'Satisfait ou remboursé.',
+    h1d: 'Vous validez, on produit.',
     sub: "L'atelier qui équipe restaurants, cliniques et chantiers en Algérie. Pas de retard, pas de surprise, pas d'intermédiaire.",
     ctaMaquette: 'Envoyer mon logo sur whatsapp →',
     ctaConfig: 'configurer ma commande',
@@ -47,16 +47,16 @@ const T = {
       { title: 'Zéro transparence', desc: 'Vous payez, puis silence radio jusqu\'à la livraison. Ou pas.' },
       { title: 'Délai d\'import', desc: '6 semaines depuis la Chine. Douane. Stress. Surprises.' },
     ],
-    valueKicker: 'Pourquoi 500+ entreprises nous font confiance',
+    valueKicker: 'Pourquoi nous choisir',
     valueH2a: 'On a bâti l\'atelier qu\'on aurait',
     valueH2b: 'voulu avoir comme client.',
     valueLead: 'Chaque point ci-dessous résout un problème qu\'on a entendu des centaines de fois.',
     values: [
+      { ico: '💰', title: 'Simulation gratuite', desc: 'Logo → devis clair en 2 heures. Aucun engagement, aucun coût caché.', val: 'Valeur: 5 000 DA' },
+      { ico: '🛡️', title: 'Garantie complète', desc: 'Nous prenons en charge toute erreur de notre part. Pièce défectueuse? Nous la refaisons gratuitement.', val: 'Zéro risque' },
+      { ico: '🎧', title: 'Service client dédié', desc: 'Réponse < 2h sur WhatsApp, 6j/7. Un vrai contact, pas un bot, pas de silence radio.', val: '0557 440 522' },
       { ico: '⏱️', title: '48h garanties', desc: 'Production et sortie de votre commande en 48h ouvrées, écrit sur devis. Point.', val: 'Plus rapide d\'Algérie' },
       { ico: '📸', title: 'Photos avant envoi', desc: 'Validez chaque pièce en image avant expédition. Zéro mauvaise surprise à la réception.', val: 'Contrôle qualité garanti' },
-      { ico: '🎨', title: 'Maquette gratuite 2h', desc: 'Logo → maquette professionnelle en 2 heures. Sans engagement, sans coût caché.', val: 'Valeur: 5 000 DA' },
-      { ico: '🏭', title: 'Atelier local complet', desc: 'DTF, broderie, sérigraphie. Tout sous un toit à Alger. Vous pouvez visiter.', val: 'Zéro intermédiaire' },
-      { ico: '📉', title: 'Rabais volume clair', desc: 'Tarif transparent qui baisse avec la quantité. Pas de négociation. Pas de devis cachés.', val: 'Jusqu\'à −30%' },
       { ico: '🔁', title: 'Réassort en 1 message', desc: 'Vos designs archivés. Nouveau salarié? Un WhatsApp et son uniforme rentre en production.', val: 'Économise des heures' },
     ],
     processKicker: 'Processus simple, volontairement',
@@ -111,12 +111,12 @@ const T = {
   ar: {
     dir: 'rtl',
     langBtn: 'Français',
-    devisBtn: '💬 عرض السعر',
+    devisBtn: '☰', // Menu hamburger
     eyebrow: 'للمؤسسات • ورشة الجزائر',
     h1a: 'أزياء موحدة في ',
     h1b: '48 ساعة',
-    h1c: 'مُعتمدة بالصور، ',
-    h1d: 'مضمونة.',
+    h1c: 'مضمونة أو استرجاع.',
+    h1d: 'أنت تعتمد، نحن ننتج.',
     sub: 'الورشة التي تجهّز المطاعم والعيادات والبناء في الجزائر. بدون تأخير، بدون مفاجآت، بدون وسطاء.',
     ctaMaquette: 'أرسل شعارك ←',
     ctaConfig: '⚙️ اطلب أونلاين',
@@ -135,16 +135,16 @@ const T = {
       { title: 'انعدام الشفافية', desc: 'تدفع ثم صمت تام. قد لا يأتي الطلب أصلاً.' },
       { title: 'استيراد من الخارج', desc: '6 أسابيع من الصين. جمارك. مفاجآت. توتر.' },
     ],
-    valueKicker: 'لماذا تثق بنا 500+ مؤسسة',
+    valueKicker: 'لماذا تختارنا',
     valueH2a: 'بنينا الورشة التي كنا',
     valueH2b: 'نتمنى التعامل معها.',
     valueLead: 'كل ميزة أدناه تحل مشكلة سمعناها مئات المرات.',
     values: [
+      { ico: '💰', title: 'محاكاة مجانية', desc: 'شعار → عرض سعر واضح في ساعتين. بدون التزام، بدون تكلفة.', val: 'قيمته 5000 دج' },
+      { ico: '🛡️', title: 'ضمان شامل', desc: 'نحن نتحمل أي خطأ من طرفنا. قطعة معيبة؟ نعيدها مجاناً.', val: 'بدون مخاطرة' },
+      { ico: '🎧', title: 'خدمة عملاء مخصصة', desc: 'رد < ساعتين عبر واتساب، 6 أيام. شخص حقيقي وليس آلة.', val: '0557 440 522' },
       { ico: '⏱️', title: '48 ساعة مضمونة', desc: 'الإنتاج والتسليم من ورشتنا خلال 48 ساعة عمل. مكتوب في العرض.', val: 'الأسرع في الجزائر' },
       { ico: '📸', title: 'صور قبل الشحن', desc: 'تعتمد كل قطعة بالصورة قبل الإرسال. صفر مفاجآت سيئة.', val: 'تحكم جودة مضمون' },
-      { ico: '🎨', title: 'تصميم مجاني في ساعتين', desc: 'شعار → تصميم احترافي في ساعتين. بدون التزام، بدون تكلفة.', val: 'قيمته 5000 دج' },
-      { ico: '🏭', title: 'ورشة محلية كاملة', desc: 'طباعة DTF، تطريز، سيريجرافي. كل شيء في مكان واحد بالعاصمة.', val: 'بدون وسطاء' },
-      { ico: '📉', title: 'تسعير شفاف', desc: 'السعر ينخفض مع الكمية. بدون مفاوضات. بدون عروض مخفية.', val: 'حتى −30%' },
       { ico: '🔁', title: 'إعادة الطلب برسالة', desc: 'تصاميمك محفوظة. موظف جديد? رسالة واحدة وزيّه ينتج.', val: 'توفير ساعات' },
     ],
     processKicker: 'عملية بسيطة، مقصودة',
@@ -239,13 +239,13 @@ const GlobalStyle = () => (
     }
     header img { height: 32px; width: auto; }
     header .actions { display: flex; align-items: center; gap: 12px; }
-    header .wa-btn {
+    header .menu-btn {
       background: ${C.accent}; color: ${C.white};
-      padding: 10px 20px; border-radius: 8px;
-      font-weight: 700; font-size: 13px; text-decoration: none;
+      padding: 10px 16px; border-radius: 8px;
+      font-weight: 700; font-size: 18px; border: none; cursor: pointer;
       transition: all .25s;
     }
-    header .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.25); }
+    header .menu-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.25); }
     header .lang-btn {
       border: 1.5px solid ${C.border};
       background: ${C.white}; color: ${C.text_dark};
@@ -430,7 +430,7 @@ export default function EntreprisePage() {
         <Link href="/"><img src={LOGO} alt="Caractère" /></Link>
         <div className="actions">
           <button className="lang-btn" onClick={toggleLang}>{t.langBtn}</button>
-          <a href={WA} className="wa-btn">{t.devisBtn}</a>
+          <button className="menu-btn">{t.devisBtn}</button>
         </div>
       </header>
 
@@ -440,7 +440,8 @@ export default function EntreprisePage() {
           <span className="eyebrow">{t.eyebrow}</span>
           <h1>
             {t.h1a}<span className="accent">{t.h1b}</span><br />
-            {t.h1c}<span className="accent">{t.h1d}</span>
+            {t.h1c}<br/>
+            <span className="accent">{t.h1d}</span>
           </h1>
           <p className="sub">{t.sub}</p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
