@@ -30,7 +30,7 @@ const T = {
     h1c: 'validés en photos, ',
     h1d: 'garantis.',
     sub: "L'atelier qui équipe restaurants, cliniques et chantiers en Algérie. Pas de retard, pas de surprise, pas d'intermédiaire.",
-    ctaMaquette: 'Envoyer mon logo →',
+    ctaMaquette: 'Envoyer mon logo sur whatsapp →',
     ctaConfig: 'configurer ma commande',
     proof1: 'entreprises équipées',
     proof2: 'pièces produites',
