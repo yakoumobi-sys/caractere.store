@@ -31,7 +31,7 @@ const T = {
     h1d: 'garantis.',
     sub: "L'atelier qui équipe restaurants, cliniques et chantiers en Algérie. Pas de retard, pas de surprise, pas d'intermédiaire.",
     ctaMaquette: 'Envoyer mon logo →',
-    ctaConfig: '⚙️ Commander en ligne',
+    ctaConfig: 'configurer ma commande',
     proof1: 'entreprises équipées',
     proof2: 'pièces produites',
     proof3: 'de satisfaction',
