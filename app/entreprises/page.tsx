@@ -14,7 +14,7 @@ const C = {
   white: '#FFFFFF',
 }
 
-const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-dark.png' // Logo noir
+const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-black-transparent.png'
 const WA = 'https://wa.me/213557440522'
 
 type Lang = 'fr' | 'ar'
@@ -107,6 +107,9 @@ const T = {
     finalMicro: 'Réponse < 2h, 6j/7 • +213 557 440 522',
     footer1: '© 2026 Caractère Store • Uniformes & Branding B2B • Alger',
     footer2: '📞 +213 557 440 522 • 📧 yakoumobi@gmail.com',
+    menuItems: [
+      { label: 'Navigation', items: ['Fonctionnalités', 'Processus', 'Pourquoi nous', 'Témoignages', 'FAQ', 'Contacter'] },
+    ],
   },
   ar: {
     dir: 'rtl',
@@ -195,6 +198,9 @@ const T = {
     finalMicro: 'رد < ساعتين، 6 أيام • 0557440522',
     footer1: '© 2026 كاراكتير ستور • أزياء موحدة وهوية بصرية • الجزائر',
     footer2: '📞 0557440522 • 📧 yakoumobi@gmail.com',
+    menuItems: [
+      { label: 'التنقل', items: ['الميزات', 'العملية', 'لماذا نختارنا', 'الشهادات', 'الأسئلة', 'تواصل'] },
+    ],
   },
 }
 
@@ -254,6 +260,79 @@ const GlobalStyle = () => (
       transition: all .25s;
     }
     header .lang-btn:hover { border-color: ${C.accent}; color: ${C.accent}; }
+
+    /* MENU DRAWER */
+    .menu-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      z-index: 99; opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .menu-overlay.open { opacity: 1; pointer-events: all; }
+
+    .menu-drawer {
+      position: fixed; top: 0; left: 0; height: 100vh; width: 80%;
+      max-width: 300px;
+      background: ${C.white};
+      z-index: 101; overflow-y: auto;
+      transform: translateX(-100%); transition: transform .3s ease-out;
+    }
+    .menu-drawer.open { transform: translateX(0); }
+    .menu-drawer[dir="rtl"] { left: auto; right: 0; transform: translateX(100%); }
+    .menu-drawer[dir="rtl"].open { transform: translateX(0); }
+
+    .menu-close {
+      background: none; border: none;
+      font-size: 24px; color: ${C.text_dark};
+      cursor: pointer; padding: 16px; width: 100%;
+      text-align: right;
+    }
+    .menu-drawer[dir="rtl"] .menu-close { text-align: left; }
+
+    .menu-content {
+      padding: 0 24px 40px;
+    }
+
+    .menu-section {
+      margin-bottom: 32px;
+    }
+
+    .menu-section .label {
+      font-size: 11px; font-weight: 900;
+      color: ${C.accent}; text-transform: uppercase;
+      letter-spacing: 1.5px; margin-bottom: 16px;
+      display: block;
+    }
+
+    .menu-nav {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .menu-nav a, .menu-nav button {
+      padding: 12px 16px; border-radius: 8px;
+      border: none; background: ${C.bg_sec};
+      color: ${C.text_dark}; font-weight: 600;
+      font-size: 14px; text-decoration: none;
+      cursor: pointer; transition: all .2s;
+      text-align: left;
+    }
+    .menu-drawer[dir="rtl"] .menu-nav a,
+    .menu-drawer[dir="rtl"] .menu-nav button { text-align: right; }
+
+    .menu-nav a:hover, .menu-nav button:hover {
+      background: ${C.accent_light}; color: ${C.accent};
+    }
+
+    .menu-divider {
+      height: 1px; background: ${C.border}; margin: 24px 0;
+    }
+
+    .menu-cta {
+      width: 100%; padding: 14px 16px; border-radius: 10px;
+      background: ${C.accent}; color: ${C.white};
+      border: none; font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: all .2s;
+    }
+    .menu-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.25); }
 
     .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
@@ -415,6 +494,7 @@ export default function EntreprisePage() {
   const t = T[lang]
   useReveal(lang)
   const [faqOpen, setFaqOpen] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const toggleLang = () => {
     setLang(lang === 'fr' ? 'ar' : 'fr')
@@ -430,9 +510,29 @@ export default function EntreprisePage() {
         <Link href="/"><img src={LOGO} alt="Caractère" /></Link>
         <div className="actions">
           <button className="lang-btn" onClick={toggleLang}>{t.langBtn}</button>
-          <button className="menu-btn">{t.devisBtn}</button>
+          <button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)}>{t.devisBtn}</button>
         </div>
       </header>
+
+      {/* MENU DRAWER */}
+      <div className={`menu-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
+      <div className={`menu-drawer ${menuOpen ? 'open' : ''}`} dir={t.dir}>
+        <button className="menu-close" onClick={() => setMenuOpen(false)}>✕</button>
+        <div className="menu-content">
+          {t.menuItems.map((section, i) => (
+            <div key={i} className="menu-section">
+              <span className="label">{section.label}</span>
+              <div className="menu-nav">
+                {section.items.map((item, j) => (
+                  <button key={j} onClick={() => setMenuOpen(false)}>{item}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div className="menu-divider" />
+          <a href={WA} className="menu-cta" onClick={() => setMenuOpen(false)}>💬 {t.finalCta}</a>
+        </div>
+      </div>
 
       {/* HERO */}
       <section className="hero wrap">
