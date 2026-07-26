@@ -5,7 +5,7 @@ import Link from 'next/link'
 // ============================================
 // CARACTÈRE — HOMEPAGE V5 "NOIR"
 // Theme: noir / blanc / gris clair (style Huly)
-// Deploy to: components/home/HomePageContent.tsx
+// CTA: "Designer mon tshirt" + "Collection"
 // ============================================
 
 const C = {
@@ -30,7 +30,7 @@ function Logo({ size = 56 }: { size?: number }) {
   )
 }
 
-// ---------- ICONES SVG (remplacent les emojis) ----------
+// ---------- ICONES SVG ----------
 type IconProps = { size?: number }
 
 const stroke = { stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' }
@@ -135,7 +135,7 @@ export default function HomePageContent() {
       {/* ================= HERO ================= */}
       <section style={{ position: 'relative', textAlign: 'center', padding: '72px 20px 0', minHeight: '92vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-        {/* Faisceau de lumière central (signature Huly, en monochrome) */}
+        {/* Faisceau de lumière central */}
         <div aria-hidden style={{
           position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
           width: '2px', height: '100%',
@@ -150,7 +150,7 @@ export default function HomePageContent() {
           pointerEvents: 'none',
         }} />
 
-        {/* LOGO EN GRAND — au-dessus du titre */}
+        {/* LOGO EN GRAND */}
         <div className="anim" style={{ position: 'relative', zIndex: 2, marginBottom: '36px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '18px' }}>
           <Logo size={110} />
           <span style={{ fontWeight: 900, fontSize: '1.9rem', letterSpacing: '-0.02em' }}>Caractère</span>
@@ -168,7 +168,7 @@ export default function HomePageContent() {
           Votre marque<br />en 48h
         </h1>
 
-        {/* SOUS-TITRE — Designer + Studio 3D */}
+        {/* SOUS-TITRE */}
         <p className="anim" style={{
           position: 'relative', zIndex: 2,
           fontSize: 'clamp(1.05rem, 3.5vw, 1.35rem)', fontWeight: 600,
@@ -180,8 +180,8 @@ export default function HomePageContent() {
           <span style={{ fontSize: '0.9em', color: C.grayDark }}>DTF • Broderie • Uniformes — Sans stock, sans risque.</span>
         </p>
 
-        {/* CTA */}
-        <div className="anim" style={{ position: 'relative', zIndex: 2, display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', animationDelay: '0.3s' }}>
+        {/* CTA BUTTONS */}
+        <div className="anim" style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', animationDelay: '0.3s' }}>
           <Link href="/designer" className="btn-glow" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             background: C.white, color: C.black,
@@ -189,20 +189,20 @@ export default function HomePageContent() {
             fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
             textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
-            Designer gratuit <IconArrow />
+            Designer mon tshirt <IconArrow />
           </Link>
-          <a href="https://wa.me/213557440522" className="btn-outline" style={{
+          <Link href="/collection" className="btn-outline" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             border: `1px solid ${C.line}`, color: C.white,
             padding: '16px 32px', borderRadius: '999px',
             fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
             textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
-            <IconChat /> Question ?
-          </a>
+            Collection
+          </Link>
         </div>
 
-        {/* Base du faisceau : ligne lumineuse horizontale */}
+        {/* Base du faisceau */}
         <div aria-hidden style={{
           position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
           width: 'min(92vw, 900px)', height: '1px',
@@ -247,22 +247,22 @@ export default function HomePageContent() {
         <p style={{ position: 'relative', color: C.gray, fontWeight: 600, margin: '0 0 36px' }}>
           Designer gratuit. Zéro risque. Zéro engagement.
         </p>
-        <div style={{ position: 'relative', display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
           <Link href="/designer" className="btn-glow" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             background: C.white, color: C.black,
             padding: '16px 32px', borderRadius: '999px',
             fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
-            Designer gratuit <IconArrow />
+            Designer mon tshirt <IconArrow />
           </Link>
-          <Link href="/studio-3d" className="btn-outline" style={{
+          <Link href="/collection" className="btn-outline" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             border: `1px solid ${C.line}`, color: C.white,
             padding: '16px 32px', borderRadius: '999px',
             fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
-            <IconCube size={18} /> Studio 3D
+            Collection
           </Link>
         </div>
       </section>
