@@ -1,5 +1,17 @@
 'use client'
 
+import Navbar from '@/components/layout/Navbar'
+
+export default function Home() {
+  return (
+    <>
+      <Navbar />
+      {/* rest of the page */}
+    </>
+  )
+}
+
+
 import Link from 'next/link'
 
 // ============================================
