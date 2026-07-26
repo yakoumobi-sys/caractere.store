@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
+import { AdminLogout } from '@/components/AdminLogout'
 
 export const revalidate = 0
 
@@ -36,10 +37,24 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      {/* Titre */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 20, fontWeight: 800, color: '#1E293B', letterSpacing: -0.3 }}>Dashboard</div>
-        <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>Vue d'ensemble de Caractère Store</div>
+      {/* Header avec logout */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 20,
+        paddingBottom: 16,
+        borderBottom: '1px solid #E2E8F0',
+      }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: '#1E293B', letterSpacing: -0.3 }}>
+            Dashboard
+          </div>
+          <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
+            Vue d'ensemble de Caractère Store
+          </div>
+        </div>
+        <AdminLogout />
       </div>
 
       {/* Bouton Résumé */}
