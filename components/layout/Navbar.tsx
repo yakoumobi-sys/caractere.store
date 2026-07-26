@@ -65,7 +65,7 @@ export default function Navbar() {
 
         {/* DROITE : Hamburger + Se connecter */}
         <div className="nav-right" style={{ position: 'relative' }}>
-          <Link href="/admin/login" className="nav-login">
+          <Link href="/auth/login" className="nav-login">
             Se connecter
           </Link>
           
