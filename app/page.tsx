@@ -3,12 +3,6 @@
 import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 
-// ============================================
-// CARACTÈRE — HOMEPAGE V5 "NOIR"
-// Theme: noir / blanc / gris clair (style Huly)
-// CTA: "Designer mon tshirt" + "Collection"
-// ============================================
-
 const C = {
   black: '#0A0A0A',
   white: '#FAFAFA',
@@ -18,7 +12,6 @@ const C = {
   card: 'rgba(255,255,255,0.03)',
 }
 
-// ---------- LOGO IMAGE ----------
 function Logo({ size = 56 }) {
   return (
     <img 
@@ -31,12 +24,9 @@ function Logo({ size = 56 }) {
   )
 }
 
-// ---------- ICONES SVG ----------
-const stroke = { stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round', fill: 'none' }
-
 function IconPen({ size = 30 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M12 19l7-7 3 3-7 7-3-3z" />
       <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
       <path d="M2 2l7.586 7.586" />
@@ -47,7 +37,7 @@ function IconPen({ size = 30 }) {
 
 function IconCube({ size = 30 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
       <path d="M3.27 6.96L12 12.01l8.73-5.05" />
       <path d="M12 22.08V12" />
@@ -57,7 +47,7 @@ function IconCube({ size = 30 }) {
 
 function IconShirt({ size = 30 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
     </svg>
   )
@@ -65,7 +55,7 @@ function IconShirt({ size = 30 }) {
 
 function IconStar({ size = 30 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   )
@@ -73,7 +63,7 @@ function IconStar({ size = 30 }) {
 
 function IconBook({ size = 30 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
     </svg>
@@ -82,14 +72,13 @@ function IconBook({ size = 30 }) {
 
 function IconArrow({ size = 18 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M5 12h14" />
       <path d="M12 5l7 7-7 7" />
     </svg>
   )
 }
 
-// ---------- DONNÉES ----------
 const quickLinks = [
   { href: '/designer', label: 'Designer', desc: 'Crée ton design en 2 minutes', Icon: IconPen },
   { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
@@ -98,7 +87,6 @@ const quickLinks = [
   { href: '/comment-ca-marche', label: 'Comment ça marche', desc: 'Le guide complet, étape par étape', Icon: IconBook },
 ]
 
-// ---------- PAGE ----------
 export default function Home() {
   return (
     <>
@@ -125,19 +113,13 @@ export default function Home() {
           .btn-outline:hover { border-color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.05); }
         `}</style>
 
-        {/* ================= HERO ================= */}
+        {/* HERO */}
         <section style={{ position: 'relative', textAlign: 'center', padding: '72px 20px 0', minHeight: '92vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div aria-hidden style={{
             position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
             width: '2px', height: '100%',
             background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, rgba(255,255,255,0) 100%)',
             animation: 'beamPulse 4s ease-in-out infinite',
-            pointerEvents: 'none',
-          }} />
-          <div aria-hidden style={{
-            position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
-            width: 'min(90vw, 700px)', height: '60%',
-            background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 70%)',
             pointerEvents: 'none',
           }} />
 
@@ -188,16 +170,9 @@ export default function Home() {
               Collection
             </Link>
           </div>
-
-          <div aria-hidden style={{
-            position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-            width: 'min(92vw, 900px)', height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
-            boxShadow: '0 0 30px rgba(255,255,255,0.3)',
-          }} />
         </section>
 
-        {/* ================= ACCÈS RAPIDE ================= */}
+        {/* ACCÈS RAPIDE */}
         <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto' }}>
           <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
             Accès rapide
@@ -220,13 +195,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= CTA FINAL ================= */}
+        {/* CTA FINAL */}
         <section style={{ position: 'relative', textAlign: 'center', padding: '100px 20px', borderTop: `1px solid ${C.line}` }}>
-          <div aria-hidden style={{
-            position: 'absolute', inset: 0,
-            background: 'radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.07) 0%, transparent 60%)',
-            pointerEvents: 'none',
-          }} />
           <h2 style={{ position: 'relative', fontSize: 'clamp(1.8rem, 6vw, 3rem)', fontWeight: 900, letterSpacing: '-0.03em', margin: '0 0 16px' }}>
             Commencez maintenant
           </h2>
@@ -253,7 +223,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= FOOTER ================= */}
+        {/* FOOTER */}
         <footer style={{ borderTop: `1px solid ${C.line}`, padding: '48px 20px', textAlign: 'center', color: C.grayDark, fontSize: '0.85rem', fontWeight: 600 }}>
           <p style={{ margin: 0 }}>© 2026 Caractère Store • Print on Demand • DTF • Production 48h • Alger</p>
           <p style={{ margin: '10px 0 0' }}>+213 557 440 522 • yakoumobi@gmail.com</p>
