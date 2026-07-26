@@ -49,7 +49,9 @@ export default function NavbarPoD() {
             <Link href="/produits" className="menu-item" onClick={() => setMenuOpen(false)}>Produits</Link>
             <Link href="/collection" className="menu-item" onClick={() => setMenuOpen(false)}>Collection</Link>
             <div className="menu-divider" />
-            <Link href="/auth/login" className="menu-item" onClick={() => setMenuOpen(false)}>Se connecter</Link>
+            <Link href="/auth/login" className="menu-item" onClick={() => setMenuOpen(false)}>🔓 Se connecter</Link>
+            <Link href="/auth/signup" className="menu-item" onClick={() => setMenuOpen(false)}>📝 Créer un compte</Link>
+            <div className="menu-divider" />
             <a href="https://wa.me/213557440522" className="menu-item" onClick={() => setMenuOpen(false)}>💬 WhatsApp</a>
           </div>
         )}
