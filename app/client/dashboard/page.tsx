@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabaseClient } from '@/lib/supabase'
+import { useProtected } from '@/lib/hooks/useProtected'
 
 
 const C = { black: '#0C0A09', white: '#FAFAF9', lime: '#A3E635', muted: '#A8A29E', line: 'rgba(250,250,249,.07)' }
