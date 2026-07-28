@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { Commande } from '@/types'
+import { adminFetch } from '@/lib/adminFetch'
 
 const STATUTS = ['nouveau', 'en_cours', 'termine', 'annule']
 
@@ -19,7 +20,7 @@ export default function CommandesAdmin() {
   const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
-    fetch('/api/commandes')
+    adminFetch('/api/commandes')
       .then(r => r.ok ? r.json() : [])
       .then(data => setCommandes(Array.isArray(data) ? data : []))
       .catch(() => setCommandes([]))
@@ -27,7 +28,7 @@ export default function CommandesAdmin() {
 
   const updateStatut = async (id: string, statut: string) => {
     setUpdating(true)
-    await fetch(`/api/commandes/${id}`, {
+    await adminFetch(`/api/commandes/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ statut }),
