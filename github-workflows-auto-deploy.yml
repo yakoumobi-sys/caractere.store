@@ -1,0 +1,52 @@
+# ⚠️ À placer dans: .github/workflows/auto-deploy.yml
+
+name: Auto Deploy Audit Fix
+
+on:
+  workflow_dispatch:  # Lance manuellement depuis GitHub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: 🗑️  Supprimer fichiers morts
+        run: |
+          rm -rf \
+            app/client \
+            app/admin/login \
+            caractere-full \
+            components/layout/NavbarPod.tsx \
+            components/layout/CaracterePopup.jsx \
+            components/home/Studio3DPreview.tsx \
+            WhatsappButton.tsx \
+            supabase.ts \
+            middleware.js \
+            middleware.ts \
+            logo.jpg \
+            publicpublic
+      
+      - name: 📥 Télécharger compact.zip
+        run: |
+          # Télécharge directement depuis GitHub
+          wget -q https://github.com/yakoumobi-sys/caractere.store/raw/main/compact.zip
+          unzip -q compact.zip
+      
+      - name: 📁 Copier fichiers
+        run: |
+          cp -r compact/lib/* lib/
+          cp -r compact/app/* app/
+          cp compact/.env.local.example .
+          cp compact/next.config.js .
+      
+      - name: 📦 Build
+        run: npm install && npm run build
+      
+      - name: 📤 Commit & Push
+        run: |
+          git config user.name "Claude Audit"
+          git config user.email "audit@caractere.local"
+          git add -A
+          git commit -m "Audit: sécurisation APIs, cleanup code mort, fix dashboards" || echo "Rien à commiter"
+          git push
