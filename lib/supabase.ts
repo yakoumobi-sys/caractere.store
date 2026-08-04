@@ -1,14 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  return createClient(url, key)
+}
 
-// Client-side (navigateur)
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
-export const supabase = supabaseClient // Alias
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  return createClient(url, key, { auth: { persistSession: false } })
+}
 
-// Server-side (Node.js)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { persistSession: false }
-})
+export const supabaseClient = getSupabaseClient()
+export const supabase = supabaseClient
+export const supabaseAdmin = getSupabaseAdmin()
