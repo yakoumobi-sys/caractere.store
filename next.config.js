@@ -6,6 +6,11 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      { source: '/catalogue', destination: '/catalogue/index.html', permanent: false },
+    ]
+  },
 }
 
 module.exports = nextConfig

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Produit } from '@/types'
+import { adminFetch } from '@/lib/adminFetch'
 
 const EMOJIS = ['👕','👔','🧥','🧢','🩲','👗','🧣','🧤']
 
@@ -11,15 +12,15 @@ export default function ProduitsAdmin() {
   const [editing, setEditing] = useState<string|null>(null)
   const [showForm, setShowForm] = useState(false)
 
-  const load = () => fetch('/api/produits').then(r=>r.json()).then(setProduits)
+  const load = () => adminFetch('/api/produits').then(r=>r.json()).then(setProduits)
   useEffect(() => { load() }, [])
 
   const save = async () => {
     if (!form.nom || !form.prix_base) return alert('Nom et prix requis')
     if (editing) {
-      await fetch(`/api/produits/${editing}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
+      await adminFetch(`/api/produits/${editing}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
     } else {
-      await fetch('/api/produits', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
+      await adminFetch('/api/produits', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
     }
     setForm({ nom:'', emoji:'👕', description:'', prix_base:0, actif:true })
     setEditing(null); setShowForm(false); load()
@@ -27,12 +28,12 @@ export default function ProduitsAdmin() {
 
   const del = async (id: string) => {
     if (!confirm('Supprimer ce produit ?')) return
-    await fetch(`/api/produits/${id}`, { method:'DELETE' })
+    await adminFetch(`/api/produits/${id}`, { method:'DELETE' })
     load()
   }
 
   const toggleActif = async (id: string, actif: boolean) => {
-    await fetch(`/api/produits/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({actif}) })
+    await adminFetch(`/api/produits/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({actif}) })
     load()
   }
 

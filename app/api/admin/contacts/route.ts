@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/api-auth'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+ const denied = await requireAdmin(req)
+ if (denied) return denied
  try {
    const [leadsRes, commandesRes] = await Promise.all([
      supabaseAdmin.from('leads').select('*').order('created_at', { ascending: false }),

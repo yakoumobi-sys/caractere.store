@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { adminFetch } from '@/lib/adminFetch'
 
 /* ─── TYPES ─────────────────────────────────────────────────────────── */
 interface Contact {
@@ -37,7 +38,7 @@ export default function MarketingPage() {
   const [sent, setSent] = useState(0)
 
   useEffect(() => {
-    fetch('/api/admin/contacts')
+    adminFetch('/api/admin/contacts')
       .then(r => r.json())
       .then(d => { setContacts(d.contacts || []); setLoading(false) })
       .catch(() => setLoading(false))

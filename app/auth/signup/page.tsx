@@ -40,7 +40,7 @@ export default function SignupPage() {
         setSuccess(true)
         // Redirige vers le dashboard après 2s
         setTimeout(() => {
-          router.push('/client/dashboard')
+          router.push('/dashboard')
         }, 2000)
       }
     } catch (err) {

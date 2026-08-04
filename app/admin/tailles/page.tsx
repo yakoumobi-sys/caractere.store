@@ -1,27 +1,28 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { Taille } from '@/types'
+import { adminFetch } from '@/lib/adminFetch'
 
 export default function TaillesAdmin() {
   const [tailles, setTailles] = useState<Taille[]>([])
   const [nom, setNom] = useState('')
 
-  const load = () => fetch('/api/tailles').then(r=>r.json()).then(setTailles)
+  const load = () => adminFetch('/api/tailles').then(r=>r.json()).then(setTailles)
   useEffect(() => { load() }, [])
 
   const add = async () => {
     if (!nom.trim()) return
-    await fetch('/api/tailles', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({nom:nom.trim().toUpperCase(), actif:true}) })
+    await adminFetch('/api/tailles', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({nom:nom.trim().toUpperCase(), actif:true}) })
     setNom(''); load()
   }
 
   const del = async (id: string) => {
     if (!confirm('Supprimer cette taille ?')) return
-    await fetch(`/api/tailles/${id}`, { method:'DELETE' }); load()
+    await adminFetch(`/api/tailles/${id}`, { method:'DELETE' }); load()
   }
 
   const toggle = async (id: string, actif: boolean) => {
-    await fetch(`/api/tailles/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({actif}) })
+    await adminFetch(`/api/tailles/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({actif}) })
     load()
   }
 

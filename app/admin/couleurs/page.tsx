@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { Couleur } from '@/types'
+import { adminFetch } from '@/lib/adminFetch'
 
 export default function CouleursAdmin() {
   const [couleurs, setCouleurs] = useState<Couleur[]>([])
@@ -8,22 +9,22 @@ export default function CouleursAdmin() {
   const [editing, setEditing] = useState<string|null>(null)
   const [showForm, setShowForm] = useState(false)
 
-  const load = () => fetch('/api/couleurs').then(r=>r.json()).then(setCouleurs)
+  const load = () => adminFetch('/api/couleurs').then(r=>r.json()).then(setCouleurs)
   useEffect(() => { load() }, [])
 
   const save = async () => {
     if (!form.nom || !form.hex) return alert('Nom et couleur requis')
     if (editing) {
-      await fetch(`/api/couleurs/${editing}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
+      await adminFetch(`/api/couleurs/${editing}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
     } else {
-      await fetch('/api/couleurs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
+      await adminFetch('/api/couleurs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
     }
     setForm({ nom:'', hex:'#1d1d1f', actif:true }); setEditing(null); setShowForm(false); load()
   }
 
   const del = async (id: string) => {
     if (!confirm('Supprimer cette couleur ?')) return
-    await fetch(`/api/couleurs/${id}`, { method:'DELETE' }); load()
+    await adminFetch(`/api/couleurs/${id}`, { method:'DELETE' }); load()
   }
 
   return (

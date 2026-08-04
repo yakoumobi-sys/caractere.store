@@ -31,7 +31,8 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        router.push('/client/dashboard')
+        const isAdmin = (data.session.user?.email || '').toLowerCase() === 'yakoumobi@gmail.com'
+        router.push(isAdmin ? '/admin' : '/dashboard')
       }
     } catch (err) {
       setError('Erreur de connexion. Réessaye.')

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { Resend } from 'resend'
+import { requireAdmin } from '@/lib/api-auth'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     if (process.env.RESEND_API_KEY && process.env.ADMIN_EMAIL) {
       try {
-        await resend.emails.send({
+        await getResend().emails.send({
           from: 'Caractere Store <onboarding@resend.dev>',
           to: process.env.ADMIN_EMAIL,
           subject: `Nouvelle commande ${body.reference} - ${body.produit}`,
@@ -87,6 +90,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data)
   }
+
+  // Liste complète : réservée à l'admin
+  const denied = await requireAdmin(req)
+  if (denied) return denied
 
   const { data } = await supabaseAdmin
     .from('commandes')

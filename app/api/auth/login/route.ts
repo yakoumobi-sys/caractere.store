@@ -4,27 +4,32 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(5, "15m"),
-})
+const hasUpstash = !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN
+
+const ratelimit = hasUpstash
+  ? new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(5, "15m"),
+    })
+  : null
 
 function getIP(request: NextRequest) {
-  return request.headers.get('x-forwarded-for') || 
-         request.headers.get('x-real-ip') || 
+  return request.headers.get('x-forwarded-for') ||
+         request.headers.get('x-real-ip') ||
          '127.0.0.1'
 }
 
 export async function POST(request: NextRequest) {
   const ip = getIP(request)
-  
-  // Vérifier rate limit
-  const { success } = await ratelimit.limit(ip)
-  if (!success) {
-    return NextResponse.json(
-      { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
-      { status: 429 }
-    )
+
+  if (ratelimit) {
+    const { success } = await ratelimit.limit(ip)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+        { status: 429 }
+      )
+    }
   }
 
   const { email, password } = await request.json()
