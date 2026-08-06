@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabaseClient as supabase } from '@/lib/supabase'
 import type { Produit, Couleur, Taille } from '@/types'
 import Navbar from '@/components/layout/Navbar'
 
