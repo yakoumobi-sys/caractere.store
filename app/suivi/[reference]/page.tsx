@@ -15,6 +15,29 @@ const STATUT_LABELS: Record<Commande['statut'], { label: string; color: string }
 
 const STEPS: Commande['statut'][] = ['nouveau', 'en_cours', 'termine']
 
+const RIB = process.env.NEXT_PUBLIC_RIB
+const CHARGILY_URL = process.env.NEXT_PUBLIC_CHARGILY_URL
+
+function RibCopyButton({ rib }: { rib: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const copy = () => {
+    navigator.clipboard.writeText(rib).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <button
+      onClick={copy}
+      className="mt-3 text-[13px] font-medium text-brand-dark bg-white border border-black/15 rounded-full px-4 py-1.5 hover:bg-black/[0.03] transition-colors"
+    >
+      {copied ? 'Copié ✓' : 'Copier le RIB'}
+    </button>
+  )
+}
+
 export default function SuiviPage() {
   const params = useParams()
   const reference = params?.reference as string
@@ -131,7 +154,31 @@ export default function SuiviPage() {
                     Notre équipe vous contacte par WhatsApp au {commande.telephone} pour finaliser
                     le paiement.
                   </p>
-                  {/* TODO: remplacer par les vraies infos RIB / bouton Chargily une fois fournies */}
+
+                  {RIB && (
+                    <div className="mt-4 pt-4 border-t border-black/10">
+                      <p className="text-[13px] text-brand-gray mb-1">
+                        Ou réglez par virement bancaire (RIB)
+                      </p>
+                      <p className="text-[14px] font-mono font-medium text-brand-dark break-all">
+                        {RIB}
+                      </p>
+                      <RibCopyButton rib={RIB} />
+                    </div>
+                  )}
+
+                  {CHARGILY_URL && (
+                    <div className="mt-4 pt-4 border-t border-black/10">
+                      <a
+                        href={CHARGILY_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block text-[13px] font-medium text-white bg-brand-dark rounded-full px-5 py-2 hover:opacity-90 transition-opacity no-underline"
+                      >
+                        Payer en ligne
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
             </>
