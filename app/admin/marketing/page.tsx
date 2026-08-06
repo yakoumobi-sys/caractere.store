@@ -33,9 +33,12 @@ export default function MarketingPage() {
   const [filterSource, setFilterSource] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [message, setMessage] = useState('')
+  const [subject, setSubject] = useState('')
   const [tab, setTab] = useState<'contacts'|'campagne'|'stats'>('contacts')
+  const [channel, setChannel] = useState<'whatsapp'|'email'|'sms'>('whatsapp')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(0)
+  const [result, setResult] = useState<{ sent: number, failed: number, errors: string[] } | null>(null)
 
   useEffect(() => {
     adminFetch('/api/admin/contacts')
@@ -107,6 +110,60 @@ const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean)))
     }
     setSending(false)
     alert(`✅ ${selectedContacts.length} messages WhatsApp ouverts.`)
+  }
+
+  /* Envoi Email (Resend, côté serveur) */
+  const handleSendEmail = async () => {
+    if (!subject.trim()) return alert('Écrivez un sujet.')
+    if (!message.trim()) return alert('Écrivez un message.')
+    const selectedContacts = contacts.filter(c => selected.has(c.id) && c.email)
+    if (selectedContacts.length === 0) return alert('Aucun contact sélectionné avec une adresse email.')
+    setSending(true)
+    setResult(null)
+    try {
+      const res = await adminFetch('/api/admin/marketing/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contacts: selectedContacts.map(c => ({ nom: c.nom, email: c.email })),
+          subject,
+          message,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { alert(`❌ ${data.error || 'Erreur envoi email.'}`); return }
+      setResult(data)
+    } catch {
+      alert('❌ Erreur réseau lors de l\'envoi.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  /* Envoi SMS (Twilio, côté serveur) */
+  const handleSendSMS = async () => {
+    if (!message.trim()) return alert('Écrivez un message.')
+    const selectedContacts = contacts.filter(c => selected.has(c.id))
+    if (selectedContacts.length === 0) return alert('Sélectionnez au moins 1 contact.')
+    setSending(true)
+    setResult(null)
+    try {
+      const res = await adminFetch('/api/admin/marketing/sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contacts: selectedContacts.map(c => ({ nom: c.nom, telephone: c.telephone })),
+          message,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { alert(`❌ ${data.error || 'Erreur envoi SMS.'}`); return }
+      setResult(data)
+    } catch {
+      alert('❌ Erreur réseau lors de l\'envoi.')
+    } finally {
+      setSending(false)
+    }
   }
 
   /* Export CSV */
@@ -238,10 +295,29 @@ const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean)))
         {/* ── TAB CAMPAGNE ──────────────────────────────────────────── */}
         {tab === 'campagne' && (
           <>
+            {/* Canal */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+              {([
+                { key: 'whatsapp', label: '💬 WhatsApp' },
+                { key: 'email', label: '📧 Email' },
+                { key: 'sms', label: '📱 SMS' },
+              ] as const).map(c => (
+                <button key={c.key} onClick={() => { setChannel(c.key); setResult(null) }}
+                  style={{ ...ST.btn(channel === c.key ? '#1E293B' : '#E2E8F0'), color: channel === c.key ? '#fff' : '#64748B', flex: 1 }}>
+                  {c.label}
+                </button>
+              ))}
+            </div>
+
             {/* Résumé sélection */}
             <div style={{ ...ST.card, padding: '14px' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 8 }}>
                 Destinataires : {selected.size > 0 ? `${selected.size} contact${selected.size > 1 ? 's' : ''} sélectionné${selected.size > 1 ? 's' : ''}` : 'Aucun sélectionné'}
+                {channel === 'email' && selected.size > 0 && (
+                  <span style={{ color: '#94A3B8', fontWeight: 400 }}>
+                    {' '}({contacts.filter(c => selected.has(c.id) && c.email).length} avec email)
+                  </span>
+                )}
               </div>
               {selected.size === 0 && (
                 <button style={{ ...ST.btn('#64748B') }} onClick={() => { setSelected(new Set(filtered.map(c => c.id))); }}>
@@ -249,6 +325,16 @@ const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean)))
                 </button>
               )}
             </div>
+
+            {/* Sujet (email uniquement) */}
+            {channel === 'email' && (
+              <div style={{ ...ST.card, padding: '14px' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Sujet
+                </div>
+                <input style={ST.input} placeholder="Ex : -10% sur votre prochaine commande" value={subject} onChange={e => setSubject(e.target.value)} />
+              </div>
+            )}
 
             {/* Templates */}
             <div style={{ ...ST.card, padding: '14px' }}>
@@ -297,13 +383,40 @@ const sources = Array.from(new Set(contacts.map(c => c.source).filter(Boolean)))
 
             {/* Boutons envoi */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button style={{ ...ST.btn('#25D366'), fontSize: 15, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                onClick={handleSendWhatsApp} disabled={sending}>
-                {sending ? `⏳ Envoi ${sent}/${selected.size}...` : `💬 Envoyer WhatsApp (${selected.size} contacts)`}
-              </button>
-              <div style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center' }}>
-                Chaque message s'ouvre dans WhatsApp. Confirmez l'envoi manuellement pour chaque contact.
-              </div>
+              {channel === 'whatsapp' && (
+                <>
+                  <button style={{ ...ST.btn('#25D366'), fontSize: 15, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                    onClick={handleSendWhatsApp} disabled={sending}>
+                    {sending ? `⏳ Envoi ${sent}/${selected.size}...` : `💬 Envoyer WhatsApp (${selected.size} contacts)`}
+                  </button>
+                  <div style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center' }}>
+                    Chaque message s'ouvre dans WhatsApp. Confirmez l'envoi manuellement pour chaque contact.
+                  </div>
+                </>
+              )}
+
+              {channel === 'email' && (
+                <button style={{ ...ST.btn('#8B5CF6'), fontSize: 15, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  onClick={handleSendEmail} disabled={sending}>
+                  {sending ? '⏳ Envoi en cours...' : `📧 Envoyer par email (${contacts.filter(c => selected.has(c.id) && c.email).length} contacts)`}
+                </button>
+              )}
+
+              {channel === 'sms' && (
+                <button style={{ ...ST.btn('#F97316'), fontSize: 15, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  onClick={handleSendSMS} disabled={sending}>
+                  {sending ? '⏳ Envoi en cours...' : `📱 Envoyer par SMS (${selected.size} contacts)`}
+                </button>
+              )}
+
+              {result && (
+                <div style={{ background: result.failed > 0 ? '#FEF2F2' : '#F0FDF4', border: `1px solid ${result.failed > 0 ? '#FECACA' : '#BBF7D0'}`, borderRadius: 10, padding: 12, fontSize: 12, color: '#1E293B' }}>
+                  ✅ {result.sent} envoyé{result.sent > 1 ? 's' : ''}{result.failed > 0 ? ` · ❌ ${result.failed} échec${result.failed > 1 ? 's' : ''}` : ''}
+                  {result.errors.length > 0 && (
+                    <div style={{ marginTop: 4, color: '#EF4444' }}>{result.errors[0]}</div>
+                  )}
+                </div>
+              )}
             </div>
           </>
         )}

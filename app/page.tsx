@@ -79,12 +79,34 @@ function IconArrow({ size = 18 }) {
   )
 }
 
+function IconBriefcase({ size = 30 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      <path d="M2 13h20" />
+    </svg>
+  )
+}
+
+function IconPrinter({ size = 30 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <path d="M6 9V2h12v7" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <rect x="6" y="14" width="12" height="8" />
+    </svg>
+  )
+}
+
 const quickLinks = [
   { href: '/designer', label: 'Designer', desc: 'Crée ton design en 2 minutes', Icon: IconPen },
   { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
   { href: '/produits', label: 'Produits', desc: 'T-shirts, hoodies, uniformes', Icon: IconShirt },
   { href: '/collection', label: 'Collection', desc: 'Nos designs prêts à porter', Icon: IconStar },
   { href: '/comment-ca-marche', label: 'Comment ça marche', desc: 'Le guide complet, étape par étape', Icon: IconBook },
+  { href: '/entreprises', label: 'Entreprises', desc: 'Uniformes pro en 48h — restaurants, cliniques, chantiers', Icon: IconBriefcase },
+  { href: '/print-on-demand', label: 'Print on Demand', desc: 'Sans stock, sans risque — vendez vos designs', Icon: IconPrinter },
 ]
 
 export default function Home() {

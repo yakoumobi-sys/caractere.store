@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 const C = {
   black: '#0A0A0A',
@@ -32,6 +33,23 @@ const links = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  // Reflète l'état de connexion (persisté via cookie/localStorage par
+  // lib/supabase.ts) — même pattern que app/admin/layout.tsx.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription?.unsubscribe()
+  }, [])
+
+  const prenom = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0]
 
   return (
     <nav style={{
@@ -65,8 +83,8 @@ export default function Navbar() {
 
         {/* DROITE : Hamburger + Se connecter */}
         <div className="nav-right" style={{ position: 'relative' }}>
-          <Link href="/auth/login" className="nav-login">
-            Se connecter
+          <Link href={user ? '/dashboard' : '/auth/login'} className="nav-login">
+            {user ? prenom : 'Se connecter'}
           </Link>
           
           <button 
