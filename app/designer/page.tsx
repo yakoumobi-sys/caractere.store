@@ -4,7 +4,6 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import { MOCKUPS } from '@/components/designer/mockups-data'
 import { TSHIRT_VIEWS } from '@/components/designer/tshirt-views'
-import { MOCKUP_MAP } from '@/components/designer/ProductMockups'
 
 interface Layer {
   id: string
@@ -95,9 +94,6 @@ function DesignerInner() {
   const [viewIndex, setViewIndex] = useState(0)
   const views = product.id === 'tshirt' ? TSHIRT_VIEWS : [MOCKUPS[product.id] || MOCKUPS['tshirt']]
   const mockupSrc = views[viewIndex] || views[0]
-  // Mockup vectoriel teintable par couleur (déjà présent dans le repo, jamais branché
-  // jusqu'ici) — on garde les vraies photos recto/verso/côté du t-shirt telles quelles.
-  const SvgMockup = product.id !== 'tshirt' ? MOCKUP_MAP[product.id === 'hoodie' ? 'sweat' : product.id] : undefined
 
   // Reset view when product changes
   const handleProductWithReset = (p: typeof PRODUCTS[0]) => {
@@ -276,12 +272,8 @@ function DesignerInner() {
             className="relative w-full bg-white rounded-[24px] shadow-lg overflow-hidden mx-auto"
             style={{ aspectRatio: '1', maxWidth: '560px' }}>
 
-            {SvgMockup ? (
-              <SvgMockup color={currentColor.hex} className="absolute inset-0 w-full h-full pointer-events-none p-6" />
-            ) : (
-              <img src={mockupSrc} alt={product.name}
-                className="absolute inset-0 w-full h-full object-contain pointer-events-none p-3" />
-            )}
+            <img src={mockupSrc} alt={product.name}
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none p-3" />
 
             {/* Grille de repère (placement/taille) */}
             {showGrid && (
