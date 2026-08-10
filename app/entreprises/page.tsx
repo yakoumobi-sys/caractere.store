@@ -3,18 +3,27 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
+// Palette "Premium Corporate" — navy/gold.
 const C = {
-  bg: '#FAFAF8',
-  bg_sec: '#F3F1ED',
-  text_dark: '#1A1816',
-  text_muted: '#6B6763',
-  accent: '#2563EB',
-  accent_light: '#DBEAFE',
-  border: '#E5E1DB',
+  navy: '#1A3A52',
+  navyDark: '#0F2438',
+  gold: '#D4A574',
+  // Variante plus foncée de l'or — utilisée en texte sur fond clair (kicker, accents
+  // de titre) : #D4A574 seul n'a pas assez de contraste sur blanc/gris clair pour
+  // l'AA WCAG. Réservé au texte ; les fonds/boutons gardent l'or clair de la charte.
+  goldText: '#8B5E2F',
+  textDark: '#2C2C2C',
+  textMuted: '#6B7280',
+  bgLight: '#F5F5F5',
   white: '#FFFFFF',
+  green: '#2D7A3E',
+  red: '#D63D3D',
+  border: '#E2E2E2',
 }
 
-const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-black-transparent.png'
+// Logo blanc — nécessaire sur les fonds navy (header/footer) du nouveau design ;
+// l'ancien logo noir disparaissait sur fond sombre.
+const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png'
 const WA = 'https://wa.me/213557440522'
 
 type Lang = 'fr' | 'ar'
@@ -264,14 +273,14 @@ function useReveal(lang: Lang) {
 
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Cairo:wght@600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@600;700;800;900&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body, html {
-      background: ${C.bg};
-      color: ${C.text_dark};
-      font-weight: 500;
+      background: ${C.white};
+      color: ${C.textDark};
+      font-weight: 400;
       line-height: 1.6;
     }
 
@@ -281,35 +290,37 @@ const GlobalStyle = () => (
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease-out, transform .6s ease-out; }
     .reveal.in { opacity: 1; transform: translateY(0); }
 
+    a { transition: color .2s ease; }
+    a:hover { text-decoration: underline; }
+
     header {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(250,250,248,.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid ${C.border};
-      padding: 16px 24px;
+      background: ${C.navy};
+      padding: 16px 40px;
       display: flex; justify-content: space-between; align-items: center;
     }
     header img { height: 32px; width: auto; }
     header .actions { display: flex; align-items: center; gap: 12px; }
     header .menu-btn {
-      background: ${C.accent}; color: ${C.white};
-      padding: 10px 16px; border-radius: 8px;
-      font-weight: 700; font-size: 18px; border: none; cursor: pointer;
+      background: ${C.gold}; color: ${C.navy};
+      padding: 10px 18px; border-radius: 8px;
+      font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .5px;
+      border: none; cursor: pointer;
       transition: all .25s;
     }
-    header .menu-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.25); }
+    header .menu-btn:hover { box-shadow: 0 8px 24px rgba(212,165,116,.35); transform: translateY(-2px); }
     header .lang-btn {
-      border: 1.5px solid ${C.border};
-      background: ${C.white}; color: ${C.text_dark};
+      border: 1.5px solid rgba(255,255,255,.3);
+      background: transparent; color: ${C.white};
       padding: 9px 14px; border-radius: 8px;
       font-weight: 700; font-size: 12px; cursor: pointer;
       transition: all .25s;
     }
-    header .lang-btn:hover { border-color: ${C.accent}; color: ${C.accent}; }
+    header .lang-btn:hover { border-color: ${C.gold}; color: ${C.gold}; }
 
     /* MENU DRAWER */
     .menu-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      position: fixed; inset: 0; background: rgba(15,36,56,.5);
       z-index: 99; opacity: 0; pointer-events: none;
       transition: opacity .3s;
     }
@@ -328,7 +339,7 @@ const GlobalStyle = () => (
 
     .menu-close {
       background: none; border: none;
-      font-size: 24px; color: ${C.text_dark};
+      font-size: 24px; color: ${C.textDark};
       cursor: pointer; padding: 16px; width: 100%;
       text-align: right;
     }
@@ -344,7 +355,7 @@ const GlobalStyle = () => (
 
     .menu-section .label {
       font-size: 11px; font-weight: 900;
-      color: ${C.accent}; text-transform: uppercase;
+      color: ${C.navy}; text-transform: uppercase;
       letter-spacing: 1.5px; margin-bottom: 16px;
       display: block;
     }
@@ -355,18 +366,19 @@ const GlobalStyle = () => (
 
     .menu-nav a, .menu-nav button {
       padding: 12px 16px; border-radius: 8px;
-      border: none; background: ${C.bg_sec};
-      color: ${C.text_dark}; font-weight: 600;
+      border: none; background: ${C.bgLight};
+      color: ${C.textDark}; font-weight: 600;
       font-size: 14px; text-decoration: none;
       cursor: pointer; transition: all .2s;
       text-align: left;
       display: block;
     }
+    .menu-nav a:hover { text-decoration: none; }
     .menu-drawer[dir="rtl"] .menu-nav a,
     .menu-drawer[dir="rtl"] .menu-nav button { text-align: right; }
 
     .menu-nav a:hover, .menu-nav button:hover {
-      background: ${C.accent_light}; color: ${C.accent};
+      background: ${C.gold}; color: ${C.navy};
     }
 
     .menu-divider {
@@ -374,164 +386,211 @@ const GlobalStyle = () => (
     }
 
     .menu-cta {
-      width: 100%; padding: 14px 16px; border-radius: 10px;
-      background: ${C.accent}; color: ${C.white};
+      width: 100%; padding: 14px 16px; border-radius: 8px;
+      background: ${C.gold}; color: ${C.navy};
       border: none; font-weight: 700; font-size: 14px;
+      text-transform: uppercase; letter-spacing: .5px;
       cursor: pointer; transition: all .2s;
     }
-    .menu-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.25); }
+    .menu-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,165,116,.35); text-decoration: none; }
 
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
 
-    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero {
+      padding: 96px 0 64px; text-align: center;
+      background: linear-gradient(135deg, ${C.navy} 0%, ${C.navyDark} 100%);
+      color: ${C.white};
+    }
     .hero .eyebrow {
       display: inline-block;
-      border: 1px solid ${C.border};
-      color: ${C.accent};
+      border: 1px solid rgba(212,165,116,.4);
+      color: ${C.gold};
       padding: 8px 18px; border-radius: 999px;
       font-size: 12px; font-weight: 700; letter-spacing: .5px;
       margin-bottom: 32px;
-      background: ${C.accent_light};
+      background: rgba(212,165,116,.12);
     }
     .hero h1 {
-      font-size: clamp(36px, 7vw, 64px);
-      font-weight: 900; line-height: 1.1;
-      margin-bottom: 24px; color: ${C.text_dark};
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 700; line-height: 1.15;
+      margin-bottom: 24px; color: ${C.white};
     }
-    .hero h1 .accent { color: ${C.accent}; }
+    .hero h1 .accent { color: ${C.gold}; }
     .hero .sub {
-      font-size: 18px; color: ${C.text_muted};
-      max-width: 680px; margin: 0 auto 40px; font-weight: 500;
+      font-size: 20px; color: rgba(255,255,255,.85);
+      max-width: 680px; margin: 0 auto 40px; font-weight: 400;
     }
 
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 14px 32px; border-radius: 10px;
+      padding: 14px 32px; border-radius: 8px;
       font-weight: 700; font-size: 14px;
       text-decoration: none; cursor: pointer;
       transition: all .25s; border: none;
     }
-    .btn:hover { transform: translateY(-3px); }
-    .btn-accent { background: ${C.accent}; color: ${C.white}; box-shadow: 0 8px 24px rgba(37,99,235,.25); }
-    .btn-outline { border: 1.5px solid ${C.border}; color: ${C.text_dark}; background: ${C.white}; }
-    .btn-outline:hover { border-color: ${C.accent}; color: ${C.accent}; }
+    .btn:hover { transform: translateY(-3px); text-decoration: none; }
+    .btn-accent { background: ${C.gold}; color: ${C.navy}; box-shadow: 0 8px 24px rgba(212,165,116,.3); }
+    .btn-accent:hover { box-shadow: 0 12px 32px rgba(212,165,116,.45); }
+    /* Bouton secondaire — utilisé sur les sections à fond navy (hero, CTA final) :
+       contour blanc pour rester lisible sur fond sombre. */
+    .btn-outline { border: 1.5px solid rgba(255,255,255,.5); color: ${C.white}; background: transparent; }
+    .btn-outline:hover { border-color: ${C.white}; background: rgba(255,255,255,.08); }
+
+    /* Pulse au chargement sur le CTA principal du hero */
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(212,165,116,.3); }
+      50% { box-shadow: 0 8px 32px rgba(212,165,116,.6); }
+    }
+    .hero .btn-accent { animation: ctaPulse 1.8s ease-in-out 1; }
 
     .proofbar {
       display: flex; flex-wrap: wrap; justify-content: center; gap: 18px;
-      margin-top: 48px; font-size: 13px; color: ${C.text_muted}; font-weight: 600;
+      margin-top: 48px; font-size: 13px; color: rgba(255,255,255,.75); font-weight: 600;
     }
     .proofbar span { display: flex; align-items: center; gap: 8px; }
-    .proofbar b { color: ${C.text_dark}; }
+    .proofbar .check { color: ${C.gold}; }
+    .proofbar b { color: ${C.white}; }
 
-    .section { padding: 90px 0; }
-    .section-light { background: ${C.bg_sec}; }
-    .kicker { color: ${C.accent}; font-size: 11px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 16px; text-align: center; text-transform: uppercase; }
-    .h2 { font-size: clamp(28px, 5vw, 48px); font-weight: 900; text-align: center; line-height: 1.15; margin-bottom: 20px; color: ${C.text_dark}; }
-    .h2 .accent { color: ${C.accent}; }
-    .lead { text-align: center; color: ${C.text_muted}; max-width: 640px; margin: 0 auto 56px; font-size: 16px; font-weight: 500; }
+    .section { padding: 64px 0; }
+    .section-light { background: ${C.bgLight}; }
+    /* Toujours sur fond blanc/gris clair dans cette page → navy (l'or clair de la
+       charte n'a pas assez de contraste en petit texte sur fond clair). */
+    .kicker { color: ${C.navy}; font-size: 11px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 16px; text-align: center; text-transform: uppercase; }
+    .h2 { font-size: clamp(26px, 4.5vw, 36px); font-weight: 700; text-align: center; line-height: 1.2; margin-bottom: 20px; color: ${C.navy}; }
+    .h2 .accent { color: ${C.goldText}; }
+    .lead { text-align: center; color: ${C.textMuted}; max-width: 640px; margin: 0 auto 56px; font-size: 16px; line-height: 1.6; }
 
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
 
     .pain {
       background: ${C.white};
       border: 1px solid ${C.border};
-      border-radius: 14px; padding: 28px;
+      border-left: 4px solid ${C.red};
+      border-radius: 8px; padding: 32px;
       transition: all .3s;
     }
-    .pain:hover { border-color: ${C.accent}; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
-    .pain .x { color: #EF4444; font-size: 20px; margin-bottom: 14px; display: block; }
-    .pain .title { font-weight: 800; font-size: 15px; margin-bottom: 6px; color: ${C.text_dark}; }
-    .pain .desc { font-size: 14px; color: ${C.text_muted}; }
+    .pain:hover { box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+    .pain .x {
+      width: 32px; height: 32px; border-radius: 999px;
+      background: ${C.red}; color: ${C.white};
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; margin-bottom: 16px;
+    }
+    .pain .title { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: ${C.textDark}; }
+    .pain .desc { font-size: 14px; color: ${C.textMuted}; }
 
     .value-card {
       background: ${C.white};
       border: 1px solid ${C.border};
-      border-radius: 16px; padding: 32px;
+      border-left: 4px solid ${C.gold};
+      border-radius: 8px; padding: 32px;
       transition: all .3s;
     }
-    .value-card:hover { transform: translateY(-6px); border-color: ${C.accent}; box-shadow: 0 12px 32px rgba(37,99,235,.12); }
-    .value-card .ico { font-size: 32px; margin-bottom: 16px; display: block; }
-    .value-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; color: ${C.text_dark}; }
-    .value-card p { font-size: 14px; color: ${C.text_muted}; }
-    .value-card .val { display: inline-block; margin-top: 14px; color: ${C.accent}; font-size: 12px; font-weight: 800; }
+    .value-card:hover { transform: scale(1.02); border-left-width: 6px; box-shadow: 0 12px 32px rgba(26,58,82,.12); }
+    .value-card .ico-circle {
+      width: 40px; height: 40px; border-radius: 999px;
+      background: ${C.navy};
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; margin-bottom: 16px;
+    }
+    .value-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: ${C.navy}; }
+    .value-card p { font-size: 16px; line-height: 1.6; color: ${C.textMuted}; }
+    .value-card .val { display: inline-block; margin-top: 14px; color: ${C.navy}; font-size: 12px; font-weight: 800; }
 
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
     .step {
       background: ${C.white};
       border: 1px solid ${C.border};
-      border-radius: 14px; padding: 30px;
+      border-radius: 8px; padding: 32px;
     }
     .step .num {
-      width: 44px; height: 44px; border-radius: 10px;
-      background: ${C.accent_light}; color: ${C.accent};
+      width: 44px; height: 44px; border-radius: 999px;
+      background: ${C.navy}; color: ${C.gold};
       display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 18px; margin-bottom: 16px;
     }
-    .step h3 { font-size: 15px; font-weight: 800; margin-bottom: 8px; color: ${C.text_dark}; }
-    .step p { font-size: 14px; color: ${C.text_muted}; }
+    .step h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: ${C.textDark}; }
+    .step p { font-size: 14px; color: ${C.textMuted}; }
 
     .testi {
-      background: ${C.white};
-      border: 1px solid ${C.border};
-      border-radius: 16px; padding: 28px;
+      background: ${C.navy};
+      border-radius: 8px; padding: 32px;
     }
-    .testi .stars { color: #FBBF24; letter-spacing: 1px; margin-bottom: 14px; font-size: 14px; }
-    .testi .quote { font-size: 14px; line-height: 1.8; margin-bottom: 16px; color: ${C.text_dark}; font-weight: 500; }
-    .testi .who { font-weight: 800; font-size: 13px; color: ${C.text_dark}; }
-    .testi .role { font-size: 12px; color: ${C.text_muted}; }
-    .testi .result { display: inline-block; margin-top: 12px; background: ${C.accent_light}; color: ${C.accent}; padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .testi .stars { color: ${C.gold}; letter-spacing: 2px; margin-bottom: 14px; font-size: 14px; }
+    .testi .quote { font-size: 18px; font-style: italic; line-height: 1.7; margin-bottom: 16px; color: ${C.white}; font-weight: 400; }
+    .testi .who { font-weight: 700; font-size: 13px; color: ${C.gold}; }
+    .testi .role { font-size: 12px; color: rgba(255,255,255,.65); }
+    .testi .result { display: inline-block; margin-top: 12px; background: rgba(212,165,116,.15); color: ${C.gold}; padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; }
 
     .offer-box {
       background: ${C.white};
-      border: 2px solid ${C.accent};
-      border-radius: 20px; padding: 50px 36px; text-align: center;
+      border: 2px solid ${C.gold};
+      border-radius: 8px; padding: 48px 32px; text-align: center;
       max-width: 720px; margin: 0 auto;
     }
-    .offer-box h3 { font-size: clamp(26px, 4vw, 36px); font-weight: 900; margin-bottom: 12px; color: ${C.text_dark}; }
-    .offer-box .sub { color: ${C.text_muted}; font-size: 16px; margin-bottom: 32px; }
+    .offer-box h3 { font-size: clamp(24px, 4vw, 36px); font-weight: 700; margin-bottom: 12px; color: ${C.navy}; }
+    .offer-box .sub { color: ${C.textMuted}; font-size: 16px; margin-bottom: 32px; }
     .offer-list { max-width: 500px; margin: 0 auto 36px; }
     .offer-list li {
       list-style: none; display: flex; gap: 14px; align-items: flex-start;
       padding: 12px 0; border-bottom: 1px solid ${C.border};
-      font-size: 14px; font-weight: 600; text-align: start; color: ${C.text_dark};
+      font-size: 14px; font-weight: 600; text-align: start; color: ${C.textDark};
     }
     .offer-list li:last-child { border-bottom: none; }
-    .offer-list li .check { color: ${C.accent}; font-weight: 900; font-size: 16px; }
+    .offer-list li .check { color: ${C.green}; font-weight: 900; font-size: 16px; }
 
     .guarantee {
       display: flex; gap: 20px; align-items: flex-start;
       background: ${C.white};
-      border: 1.5px solid ${C.border};
-      border-radius: 16px; padding: 32px; max-width: 720px; margin: 0 auto;
+      border: 1px solid ${C.border};
+      border-left: 4px solid ${C.gold};
+      border-radius: 8px; padding: 32px; max-width: 720px; margin: 0 auto;
     }
     .guarantee .shield { font-size: 42px; flex-shrink: 0; }
-    .guarantee h3 { font-size: 17px; font-weight: 900; margin-bottom: 8px; color: ${C.text_dark}; }
-    .guarantee p { font-size: 14px; color: ${C.text_muted}; }
+    .guarantee h3 { font-size: 17px; font-weight: 900; margin-bottom: 8px; color: ${C.navy}; }
+    .guarantee p { font-size: 14px; color: ${C.textMuted}; }
 
-    .faq { max-width: 680px; margin: 0 auto; }
-    .faq-item { border-bottom: 1px solid ${C.border}; padding: 20px 0; cursor: pointer; }
-    .faq-item h3 { font-weight: 800; font-size: 15px; display: flex; justify-content: space-between; gap: 16px; color: ${C.text_dark}; }
-    .faq-item .toggle { color: ${C.accent}; font-weight: 900; }
-    .faq-item p { font-size: 14px; color: ${C.text_muted}; line-height: 1.8; margin-top: 12px; display: none; }
-    .faq-item.active p { display: block; }
+    .faq { max-width: 680px; margin: 0 auto; border-radius: 8px; overflow: hidden; border: 1px solid ${C.border}; }
+    .faq-item { background: ${C.navy}; border-bottom: 1px solid rgba(255,255,255,.12); cursor: pointer; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3 {
+      font-weight: 700; font-size: 15px; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      color: ${C.white}; padding: 20px 24px;
+    }
+    .faq-item .toggle { color: ${C.gold}; font-weight: 900; font-size: 18px; flex-shrink: 0; }
+    .faq-item .answer {
+      max-height: 0; overflow: hidden; transition: max-height .25s ease;
+      background: ${C.bgLight};
+    }
+    .faq-item.active .answer { max-height: 240px; }
+    .faq-item p { font-size: 14px; color: ${C.textMuted}; line-height: 1.8; padding: 0 24px 20px; }
 
     .final {
-      text-align: center; padding: 100px 24px;
-      background: linear-gradient(135deg, ${C.bg} 0%, ${C.bg_sec} 100%);
+      text-align: center; padding: 96px 40px;
+      background: linear-gradient(135deg, ${C.navy} 0%, ${C.navyDark} 100%);
     }
-    .final h2 { font-size: clamp(32px, 6vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 18px; color: ${C.text_dark}; }
-    .final p { color: ${C.text_muted}; margin-bottom: 40px; font-size: 17px; }
-    .final .micro { font-size: 12px; color: ${C.text_muted}; margin-top: 20px; }
+    .final h2 { font-size: clamp(28px, 5vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 18px; color: ${C.white}; }
+    .final p { color: rgba(255,255,255,.8); margin-bottom: 40px; font-size: 17px; }
+    .final .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .final .micro { font-size: 12px; color: rgba(255,255,255,.6); margin-top: 20px; }
 
-    footer { background: ${C.white}; border-top: 1px solid ${C.border}; padding: 48px 24px; text-align: center; }
+    footer { background: ${C.navy}; padding: 48px 40px; text-align: center; }
     footer img { height: 30px; margin-bottom: 18px; }
-    footer p { font-size: 12px; color: ${C.text_muted}; font-weight: 600; }
+    footer p { font-size: 12px; color: rgba(255,255,255,.65); font-weight: 600; }
+
+    @media (max-width: 1199px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+    }
 
     @media (max-width: 768px) {
-      .section { padding: 60px 0; }
+      .wrap { padding: 0 20px; }
+      .grid, .steps { grid-template-columns: 1fr; }
+      .section { padding: 48px 0; }
       .guarantee { flex-direction: column; }
-      header { padding: 12px 16px; }
-      .hero { padding: 70px 0 50px; }
+      header { padding: 12px 20px; }
+      .hero { padding: 64px 0 48px; }
+      .final { padding: 64px 20px; }
     }
   `}</style>
 )
@@ -549,7 +608,7 @@ export default function EntreprisePage() {
   }
 
   return (
-    <div dir={t.dir} className={lang === 'ar' ? 'lang-ar' : 'lang-fr'} style={{ background: C.bg, color: C.text_dark }}>
+    <div dir={t.dir} className={lang === 'ar' ? 'lang-ar' : 'lang-fr'} style={{ background: C.white, color: C.textDark }}>
       <GlobalStyle />
 
       {/* HEADER */}
@@ -577,29 +636,33 @@ export default function EntreprisePage() {
             </div>
           ))}
           <div className="menu-divider" />
-          <a href={WA} className="menu-cta" onClick={() => setMenuOpen(false)}>💬 Envoyer mon logo</a>
+          {/* Réutilise finalCta (déjà traduit FR/AR) — l'ancien texte était toujours en
+              français ici, y compris en mode arabe. */}
+          <a href={WA} className="menu-cta" onClick={() => setMenuOpen(false)}>{t.finalCta}</a>
         </div>
       </div>
 
       {/* HERO */}
-      <section className="hero wrap">
-        <div className="reveal in">
-          <span className="eyebrow">{t.eyebrow}</span>
-          <h1>
-            {t.h1a}<span className="accent">{t.h1b}</span><br />
-            {t.h1c}<br/>
-            <span className="accent">{t.h1d}</span>
-          </h1>
-          <p className="sub">{t.sub}</p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WA} className="btn btn-accent">{t.ctaMaquette}</a>
-            <Link href="/configurateur" className="btn btn-outline">{t.ctaConfig}</Link>
-          </div>
-          <div className="proofbar">
-            <span>✅ <b>500+</b> {t.proof1}</span>
-            <span>✅ <b>50 000+</b> {t.proof2}</span>
-            <span>✅ <b>4,9/5</b> {t.proof3}</span>
-            <span>✅ {t.proof4} <b>{t.proof4b}</b></span>
+      <section className="hero">
+        <div className="wrap">
+          <div className="reveal in">
+            <span className="eyebrow">{t.eyebrow}</span>
+            <h1>
+              {t.h1a}<span className="accent">{t.h1b}</span><br />
+              {t.h1c}<br/>
+              <span className="accent">{t.h1d}</span>
+            </h1>
+            <p className="sub">{t.sub}</p>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a href={WA} className="btn btn-accent">{t.ctaMaquette}</a>
+              <Link href="/configurateur" className="btn btn-outline">{t.ctaConfig}</Link>
+            </div>
+            <div className="proofbar">
+              <span><span className="check">✓</span> <b>500+</b> {t.proof1}</span>
+              <span><span className="check">✓</span> <b>50 000+</b> {t.proof2}</span>
+              <span><span className="check">✓</span> <b>4,9/5</b> {t.proof3}</span>
+              <span><span className="check">✓</span> {t.proof4} <b>{t.proof4b}</b></span>
+            </div>
           </div>
         </div>
       </section>
@@ -626,12 +689,12 @@ export default function EntreprisePage() {
       <section className="section">
         <div className="wrap">
           <p className="kicker reveal">{t.valueKicker}</p>
-          <h2 className="h2 reveal">{t.valueH2a}<span className="accent">{t.valueH2b}</span></h2>
+          <h2 className="h2 reveal">{t.valueH2a} <span className="accent">{t.valueH2b}</span></h2>
           <p className="lead reveal">{t.valueLead}</p>
           <div className="grid">
             {t.values.map((v, i) => (
               <div key={i} className="value-card reveal">
-                <span className="ico">{v.ico}</span>
+                <span className="ico-circle">{v.ico}</span>
                 <h3>{v.title}</h3>
                 <p>{v.desc}</p>
                 <span className="val">{v.val}</span>
@@ -663,7 +726,7 @@ export default function EntreprisePage() {
       <section className="section">
         <div className="wrap">
           <p className="kicker reveal">{t.testiKicker}</p>
-          <h2 className="h2 reveal">{t.testiH2a}<span className="accent">{t.testiH2b}</span></h2>
+          <h2 className="h2 reveal">{t.testiH2a} <span className="accent">{t.testiH2b}</span></h2>
           <div className="grid" style={{ marginTop: 52 }}>
             {t.testimonials.map((tm, i) => (
               <div key={i} className="testi reveal">
@@ -691,7 +754,7 @@ export default function EntreprisePage() {
               ))}
             </ul>
             <a href={WA} className="btn btn-accent" style={{ width: '100%', maxWidth: 380 }}>{t.offerCta}</a>
-            <p style={{ fontSize: 12, color: C.text_muted, marginTop: 18 }}>{t.offerScarcity}</p>
+            <p style={{ fontSize: 12, color: C.textMuted, marginTop: 18 }}>{t.offerScarcity}</p>
           </div>
         </div>
       </section>
@@ -718,7 +781,7 @@ export default function EntreprisePage() {
             {t.faqs.map((f, i) => (
               <div key={i} className={`faq-item reveal ${faqOpen === i ? 'active' : ''}`} onClick={() => setFaqOpen(faqOpen === i ? -1 : i)}>
                 <h3>{f.q}<span className="toggle">{faqOpen === i ? '−' : '+'}</span></h3>
-                <p>{f.a}</p>
+                <div className="answer"><p>{f.a}</p></div>
               </div>
             ))}
           </div>
@@ -731,7 +794,10 @@ export default function EntreprisePage() {
           <div className="reveal">
             <h2>{t.finalH2}</h2>
             <p>{t.finalP}</p>
-            <a href={WA} className="btn btn-accent" style={{ fontSize: 15, padding: '16px 40px' }}>{t.finalCta}</a>
+            <div className="cta-row">
+              <a href={WA} className="btn btn-accent" style={{ fontSize: 15, padding: '16px 40px', height: 48 }}>{t.finalCta}</a>
+              <Link href="/configurateur" className="btn btn-outline" style={{ fontSize: 15, padding: '16px 40px', height: 48 }}>{t.ctaConfig}</Link>
+            </div>
             <p className="micro">{t.finalMicro}</p>
           </div>
         </div>
