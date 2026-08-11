@@ -73,16 +73,18 @@ export function ServicesSection() {
   )
 }
 
-// Galerie — photos réelles déjà sourcées pour le designer (public/designer-mockups),
-// aucune image générée.
+// Galerie — vraies photos produits (public/produits-photos), les mêmes déjà
+// utilisées en production sur /configurateur (recadrées pour la vignette).
+// Volontairement pas de Gilet de sécurité / Tablier / Hoodie ici : les fichiers
+// actuellement liés à ces produits ne sont pas de vraies photos (icône stock
+// générique et clipart) — à remplacer par de vraies photos quand disponibles.
 const GALLERY = [
-  { src: '/designer-mockups/polo.jpg', label: 'Polo brodé' },
-  { src: '/designer-mockups/hoodie.jpg', label: 'Sweat à capuche' },
-  { src: '/designer-mockups/casquette.jpg', label: 'Casquette brodée' },
-  { src: '/designer-mockups/gilet.jpg', label: 'Gilet de travail' },
-  { src: '/designer-mockups/totebag.jpg', label: 'Totebag' },
-  { src: '/designer-mockups/tablier.jpg', label: 'Tablier' },
-  { src: '/designer-mockups/gilet_securite.jpg', label: 'Gilet de sécurité' },
+  { src: '/produits-photos/tshirt.jpg', label: 'T-shirt' },
+  { src: '/produits-photos/tshirt-oversized.jpg', label: 'T-shirt Oversized' },
+  { src: '/produits-photos/polo.jpg', label: 'Polo' },
+  { src: '/produits-photos/gilet.jpg', label: 'Gilet de travail' },
+  { src: '/produits-photos/casquette.jpg', label: 'Casquette' },
+  { src: '/produits-photos/totebag.jpg', label: 'Totebag' },
 ]
 
 export function GallerySection() {
