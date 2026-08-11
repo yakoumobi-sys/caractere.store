@@ -26,7 +26,7 @@ export default function Footer() {
           <div>
             <div className="text-[11px] font-bold tracking-widest uppercase text-white/45 mb-4">Contact</div>
             <ul className="flex flex-col gap-2.5 list-none">
-              <li><a href="https://wa.me/213XXXXXXXXX" className="text-[13px] text-white/60 hover:text-white no-underline" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a></li>
+              <li><a href="https://wa.me/213557440522" className="text-[13px] text-white/60 hover:text-white no-underline" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a></li>
               <li><a href="https://instagram.com/caractere.store" className="text-[13px] text-white/60 hover:text-white no-underline" target="_blank" rel="noopener noreferrer">📸 @caractere.store</a></li>
               <li><span className="text-[13px] text-white/60">📍 Alger, Algérie</span></li>
             </ul>
@@ -36,7 +36,7 @@ export default function Footer() {
           <p className="text-[12px] text-white/35">© {new Date().getFullYear()} Caractère Store.</p>
           <div className="flex gap-5">
             <a href="https://instagram.com/caractere.store" className="text-[12px] text-white/35 hover:text-white/60 no-underline" target="_blank" rel="noopener noreferrer">Instagram</a>
-            <a href="https://wa.me/213XXXXXXXXX" className="text-[12px] text-white/35 hover:text-white/60 no-underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a href="https://wa.me/213557440522" className="text-[12px] text-white/35 hover:text-white/60 no-underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </div>
         </div>
       </div>

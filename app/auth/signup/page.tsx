@@ -38,9 +38,11 @@ export default function SignupPage() {
 
       if (data?.user) {
         setSuccess(true)
-        // Redirige vers le dashboard après 2s
+        // Redirige vers l'onboarding (choix d'intention + accueil personnalisé)
+        // après 2s, comme le fait déjà /auth/register.
+        const prenom = fullName.trim().split(' ')[0] || 'toi'
         setTimeout(() => {
-          router.push('/dashboard')
+          router.push(`/auth/onboarding?prenom=${encodeURIComponent(prenom)}`)
         }, 2000)
       }
     } catch (err) {

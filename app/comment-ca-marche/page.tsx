@@ -57,7 +57,7 @@ const STEPS: Step[] = [
       'Aucun minimum de commande',
       'Accès au catalogue complet',
     ],
-    cta: { label: 'Créer mon compte →', href: '/auth/register' },
+    cta: { label: 'Créer mon compte →', href: '/auth/signup' },
   },
   {
     n: '02',
@@ -307,7 +307,7 @@ export default function CommentCaMarchePage() {
                 Créez votre compte gratuit et commencez maintenant.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/auth/register"
+                <Link href="/auth/signup"
                   className="px-7 py-3.5 rounded-full text-[14px] font-bold no-underline transition-all hover:-translate-y-0.5"
                   style={{ background: C.white, color: C.blue, boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>
                   Créer mon compte gratuit →
