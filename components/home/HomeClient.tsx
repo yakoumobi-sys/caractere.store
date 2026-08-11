@@ -3,7 +3,10 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Navbar from '@/components/layout/Navbar'
+import EntryGate from '@/components/home/EntryGate'
 import type { Avis } from '@/types'
+
+const GATE_KEY = 'caractere_gate_seen'
 
 const C = {
   black: '#0A0A0A',
@@ -121,6 +124,10 @@ const quickLinks = [
 
 export default function HomeClient() {
   const [avis, setAvis] = useState<Avis[]>([])
+  // `true` par défaut pour que le rendu serveur et le premier rendu client
+  // restent identiques (pas de mismatch d'hydratation) — on le désactive
+  // ensuite au montage si ce visiteur a déjà choisi son parcours cette session.
+  const [showGate, setShowGate] = useState(true)
 
   useEffect(() => {
     fetch('/api/avis')
@@ -129,8 +136,20 @@ export default function HomeClient() {
       .catch(() => setAvis([]))
   }, [])
 
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(GATE_KEY)) setShowGate(false)
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = showGate ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [showGate])
+
   return (
     <>
+      {showGate && <EntryGate onDismiss={() => setShowGate(false)} />}
       <Navbar />
       <div style={{ background: C.black, color: C.white, minHeight: '100vh', fontFamily: "'Inter','Archivo',system-ui,sans-serif", overflowX: 'hidden' }}>
         <style>{`
