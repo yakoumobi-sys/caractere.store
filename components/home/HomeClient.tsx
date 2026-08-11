@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import EntryGate from '@/components/home/EntryGate'
+import { CapabilityStrip, ServicesSection, GallerySection, ProcessSection } from '@/components/home/HomeRichSections'
 import type { Avis } from '@/types'
 
 const GATE_KEY = 'caractere_gate_seen'
@@ -231,6 +232,11 @@ export default function HomeClient() {
             </Link>
           </div>
         </section>
+
+        <CapabilityStrip />
+        <ServicesSection />
+        <GallerySection />
+        <ProcessSection />
 
         {/* ACCÈS RAPIDE */}
         <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto' }}>
