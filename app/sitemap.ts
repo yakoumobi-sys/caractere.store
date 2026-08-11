@@ -16,6 +16,8 @@ const routes: { path: string; priority: number; changeFrequency: MetadataRoute.S
   { path: '/designer', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/studio-3d', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/configurateur', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/avis', priority: 0.6, changeFrequency: 'weekly' },
+  { path: '/mentions-legales', priority: 0.3, changeFrequency: 'yearly' },
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

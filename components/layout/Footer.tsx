@@ -29,12 +29,14 @@ export default function Footer() {
               <li><a href="https://wa.me/213557440522" className="text-[13px] text-white/60 hover:text-white no-underline" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a></li>
               <li><a href="https://instagram.com/caractere.store" className="text-[13px] text-white/60 hover:text-white no-underline" target="_blank" rel="noopener noreferrer">📸 @caractere.store</a></li>
               <li><span className="text-[13px] text-white/60">📍 Alger, Algérie</span></li>
+              <li><a href="/avis" className="text-[13px] text-white/60 hover:text-white no-underline">⭐ Avis clients</a></li>
             </ul>
           </div>
         </div>
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[12px] text-white/35">© {new Date().getFullYear()} Caractère Store.</p>
           <div className="flex gap-5">
+            <a href="/mentions-legales" className="text-[12px] text-white/35 hover:text-white/60 no-underline">Mentions légales</a>
             <a href="https://instagram.com/caractere.store" className="text-[12px] text-white/35 hover:text-white/60 no-underline" target="_blank" rel="noopener noreferrer">Instagram</a>
             <a href="https://wa.me/213557440522" className="text-[12px] text-white/35 hover:text-white/60 no-underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </div>

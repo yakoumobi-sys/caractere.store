@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import Navbar from '@/components/layout/Navbar'
+import type { Avis } from '@/types'
 
 const C = {
   black: '#0A0A0A',
@@ -99,6 +101,14 @@ function IconPrinter({ size = 30 }) {
   )
 }
 
+function StarFilled({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#F5A623" stroke="#F5A623" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  )
+}
+
 const quickLinks = [
   { href: '/designer', label: 'Designer', desc: 'Crée ton design en 2 minutes', Icon: IconPen },
   { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
@@ -110,6 +120,15 @@ const quickLinks = [
 ]
 
 export default function HomeClient() {
+  const [avis, setAvis] = useState<Avis[]>([])
+
+  useEffect(() => {
+    fetch('/api/avis')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setAvis(Array.isArray(data) ? data.slice(0, 3) : []))
+      .catch(() => setAvis([]))
+  }, [])
+
   return (
     <>
       <Navbar />
@@ -215,6 +234,48 @@ export default function HomeClient() {
               </Link>
             ))}
           </div>
+        </section>
+
+        {/* AVIS CLIENTS */}
+        <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto', borderTop: `1px solid ${C.line}` }}>
+          <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
+            Avis clients
+          </p>
+          {avis.length === 0 ? (
+            <div style={{ textAlign: 'center', color: C.gray, fontWeight: 600 }}>
+              <p style={{ margin: '0 0 20px' }}>Soyez le premier à laisser un avis.</p>
+              <Link href="/avis" className="btn-outline" style={{
+                display: 'inline-flex', alignItems: 'center', gap: '10px',
+                border: `1px solid ${C.line}`, color: C.white,
+                padding: '14px 28px', borderRadius: '999px',
+                fontWeight: 800, textDecoration: 'none', fontSize: '0.9rem',
+              }}>
+                Laisser un avis
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+                {avis.map(a => (
+                  <div key={a.id} style={{
+                    background: C.card, border: `1px solid ${C.line}`,
+                    borderRadius: '20px', padding: '28px',
+                  }}>
+                    <div style={{ display: 'flex', gap: '3px', marginBottom: '14px' }}>
+                      {Array.from({ length: a.note }).map((_, i) => <StarFilled key={i} size={15} />)}
+                    </div>
+                    <p style={{ color: C.white, fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '16px' }}>« {a.commentaire} »</p>
+                    <p style={{ color: C.gray, fontWeight: 700, fontSize: '0.85rem' }}>{a.nom}</p>
+                  </div>
+                ))}
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <Link href="/avis" style={{ color: C.gray, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'underline' }}>
+                  Voir tous les avis / laisser le vôtre →
+                </Link>
+              </div>
+            </>
+          )}
         </section>
 
         {/* CTA FINAL */}

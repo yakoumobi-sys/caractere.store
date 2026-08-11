@@ -29,6 +29,7 @@ const links = [
   { href: '/studio-3d', label: 'Studio 3D' },
   { href: '/collection', label: 'Collection' },
   { href: '/produits', label: 'Produits' },
+  { href: '/avis', label: 'Avis clients' },
 ]
 
 export default function Navbar() {

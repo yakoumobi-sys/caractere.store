@@ -47,6 +47,15 @@ export interface Commande {
   created_at: string
 }
 
+export interface Avis {
+  id: string
+  nom: string
+  note: number
+  commentaire: string
+  statut: 'en_attente' | 'approuve' | 'rejete'
+  created_at: string
+}
+
 export interface SiteConfig {
   id: string
   cle: string

@@ -101,12 +101,24 @@ insert into site_config (cle, valeur) values
   ('delai_reponse',    'Sous 24 heures')
 on conflict do nothing;
 
+-- Avis clients (témoignages)
+-- Ouvert à tous (pas lié à une commande), modéré par l'admin avant publication.
+create table if not exists avis (
+  id uuid default gen_random_uuid() primary key,
+  nom text not null,
+  note integer not null check (note between 1 and 5),
+  commentaire text not null,
+  statut text default 'en_attente' check (statut in ('en_attente','approuve','rejete')),
+  created_at timestamptz default now()
+);
+
 -- ── RLS (Row Level Security) ──
 alter table produits enable row level security;
 alter table couleurs enable row level security;
 alter table tailles enable row level security;
 alter table commandes enable row level security;
 alter table site_config enable row level security;
+alter table avis enable row level security;
 
 -- Lecture publique pour produits, couleurs, tailles, config
 create policy "lecture publique produits"    on produits    for select using (true);
@@ -116,5 +128,10 @@ create policy "lecture publique site_config" on site_config for select using (tr
 
 -- Insertion commandes publique (pour que les clients puissent commander)
 create policy "insertion commandes"          on commandes   for insert with check (true);
+
+-- Avis : n'importe qui peut soumettre un avis (statut toujours "en_attente" côté API,
+-- jamais de lecture publique directe — la liste "approuvés" passe par l'API service role
+-- pour ne jamais exposer les avis en attente/rejetés).
+create policy "insertion avis"               on avis        for insert with check (true);
 
 -- Tout le reste nécessite le service role (API admin uniquement)
