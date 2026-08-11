@@ -43,10 +43,11 @@ const PRODUCT_IMAGES: Record<string, string> = {
   'Casquette': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5853.jpeg',
   'Totebag': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5854.jpeg',
   'Gilet de travail': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5852.jpeg',
-  'Gilet de securite': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/images.jpg',
-  'Tablier': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/png-clipart-apron-apron-thumbnail.png',
+  'Gilet de securite': '/produits-photos/gilet-securite.jpg',
+  'Tablier': '/produits-photos/tablier.jpg',
 }
-const FALLBACK_IMG = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5509.png'
+// Ancien lien (IMG_5509.png) cassé — remplacé par une vraie photo produit.
+const FALLBACK_IMG = '/produits-photos/tshirt.jpg'
 
 export default function ConfigurateurPage() {
   const [order, setOrder] = useState<OrderState>(DEFAULT)

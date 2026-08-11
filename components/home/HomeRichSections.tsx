@@ -73,11 +73,9 @@ export function ServicesSection() {
   )
 }
 
-// Galerie — vraies photos produits (public/produits-photos), les mêmes déjà
-// utilisées en production sur /configurateur (recadrées pour la vignette).
-// Volontairement pas de Gilet de sécurité / Tablier / Hoodie ici : les fichiers
-// actuellement liés à ces produits ne sont pas de vraies photos (icône stock
-// générique et clipart) — à remplacer par de vraies photos quand disponibles.
+// Galerie — vraies photos produits (public/produits-photos) : celles déjà en
+// production sur /configurateur (recadrées pour la vignette), plus tablier,
+// hoodie et gilet de sécurité fournis directement par l'utilisateur.
 const GALLERY = [
   { src: '/produits-photos/tshirt.jpg', label: 'T-shirt' },
   { src: '/produits-photos/tshirt-oversized.jpg', label: 'T-shirt Oversized' },
@@ -85,6 +83,9 @@ const GALLERY = [
   { src: '/produits-photos/gilet.jpg', label: 'Gilet de travail' },
   { src: '/produits-photos/casquette.jpg', label: 'Casquette' },
   { src: '/produits-photos/totebag.jpg', label: 'Totebag' },
+  { src: '/produits-photos/tablier.jpg', label: 'Tablier' },
+  { src: '/produits-photos/hoodie.jpg', label: 'Sweat à capuche' },
+  { src: '/produits-photos/gilet-securite.jpg', label: 'Gilet de sécurité' },
 ]
 
 export function GallerySection() {
