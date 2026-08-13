@@ -162,3 +162,28 @@ export function ProcessSection() {
     </section>
   )
 }
+
+// Relance CTA à mi-page — après savoir-faire + réalisations + process, le
+// visiteur a assez d'info pour convertir avant de redescendre vers la
+// navigation secondaire (Accès rapide).
+export function MidPageCta() {
+  return (
+    <section style={{ padding: '64px 20px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}` }}>
+      <h2 style={{ fontWeight: 900, letterSpacing: '-0.02em', fontSize: 'clamp(1.4rem, 4vw, 2rem)', margin: '0 0 10px' }}>
+        Prêt à commander ?
+      </h2>
+      <p style={{ color: C.gray, fontWeight: 600, fontSize: '0.95rem', margin: '0 0 28px' }}>
+        Produit, couleur, quantité — devis instantané en 2 minutes.
+      </p>
+      <Link href="/configurateur" className="btn-glow" style={{
+        display: 'inline-flex', alignItems: 'center', gap: '10px',
+        background: C.white, color: C.black,
+        padding: '16px 32px', borderRadius: '999px',
+        fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
+        textTransform: 'uppercase', letterSpacing: '0.04em',
+      }}>
+        Commander maintenant
+      </Link>
+    </section>
+  )
+}

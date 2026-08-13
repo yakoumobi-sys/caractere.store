@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import EntryGate from '@/components/home/EntryGate'
-import { CapabilityStrip, ServicesSection, GallerySection, ProcessSection } from '@/components/home/HomeRichSections'
+import StickyOrderBar from '@/components/home/StickyOrderBar'
+import { CapabilityStrip, ServicesSection, GallerySection, ProcessSection, MidPageCta } from '@/components/home/HomeRichSections'
 import type { Avis } from '@/types'
 
 const GATE_KEY = 'caractere_gate_seen'
@@ -27,6 +28,22 @@ function Logo({ size = 56 }) {
       height={size}
       style={{ objectFit: 'contain' }}
     />
+  )
+}
+
+function IconSliders({ size = 30 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <line x1="4" y1="21" x2="4" y2="14" />
+      <line x1="4" y1="10" x2="4" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12" y2="3" />
+      <line x1="20" y1="21" x2="20" y2="16" />
+      <line x1="20" y1="12" x2="20" y2="3" />
+      <line x1="1" y1="14" x2="7" y2="14" />
+      <line x1="9" y1="8" x2="15" y2="8" />
+      <line x1="17" y1="16" x2="23" y2="16" />
+    </svg>
   )
 }
 
@@ -114,9 +131,10 @@ function StarFilled({ size = 16 }) {
 }
 
 const quickLinks = [
+  { href: '/configurateur', label: 'Configurateur', desc: 'Produit, couleur, quantité — devis instantané', Icon: IconSliders },
+  { href: '/produits', label: 'Produits', desc: 'T-shirts, hoodies, uniformes', Icon: IconShirt },
   { href: '/designer', label: 'Designer', desc: 'Crée ton design en 2 minutes', Icon: IconPen },
   { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
-  { href: '/produits', label: 'Produits', desc: 'T-shirts, hoodies, uniformes', Icon: IconShirt },
   { href: '/collection', label: 'Collection', desc: 'Nos designs prêts à porter', Icon: IconStar },
   { href: '/comment-ca-marche', label: 'Comment ça marche', desc: 'Le guide complet, étape par étape', Icon: IconBook },
   { href: '/entreprises', label: 'Entreprises', desc: 'Uniformes pro en 48h — restaurants, cliniques, chantiers', Icon: IconBriefcase },
@@ -151,6 +169,7 @@ export default function HomeClient() {
   return (
     <>
       {showGate && <EntryGate onDismiss={() => setShowGate(false)} />}
+      <StickyOrderBar hidden={showGate} />
       <Navbar />
       <div style={{ background: C.black, color: C.white, minHeight: '100vh', fontFamily: "'Inter','Archivo',system-ui,sans-serif", overflowX: 'hidden' }}>
         <style>{`
@@ -206,29 +225,29 @@ export default function HomeClient() {
             color: C.gray, maxWidth: '560px', lineHeight: 1.5,
             margin: '0 0 40px', animationDelay: '0.2s',
           }}>
-            Design ton t-shirt avec le <strong style={{ color: C.white }}>Designer</strong>.<br />
-            Anime-le avec notre <strong style={{ color: C.white }}>Studio 3D</strong>.<br />
+            Configurez votre commande en <strong style={{ color: C.white }}>2 minutes</strong>.<br />
+            Besoin d&rsquo;aide pour le design ? Notre <strong style={{ color: C.white }}>Designer</strong> est gratuit.<br />
             <span style={{ fontSize: '0.9em', color: C.grayDark }}>DTF • Broderie • Uniformes — Sans stock, sans risque.</span>
           </p>
 
           <div className="anim" style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', animationDelay: '0.3s' }}>
-            <Link href="/designer" className="btn-glow" style={{
+            <Link href="/configurateur" className="btn-glow" style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
               background: C.white, color: C.black,
               padding: '16px 32px', borderRadius: '999px',
               fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
               textTransform: 'uppercase', letterSpacing: '0.04em',
             }}>
-              Designer mon tshirt <IconArrow />
+              Commander maintenant <IconArrow />
             </Link>
-            <Link href="/collection" className="btn-outline" style={{
+            <Link href="/designer" className="btn-outline" style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
               border: `1px solid ${C.line}`, color: C.white,
               padding: '16px 32px', borderRadius: '999px',
               fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
               textTransform: 'uppercase', letterSpacing: '0.04em',
             }}>
-              Collection
+              Designer mon tshirt
             </Link>
           </div>
         </section>
@@ -237,6 +256,7 @@ export default function HomeClient() {
         <ServicesSection />
         <GallerySection />
         <ProcessSection />
+        <MidPageCta />
 
         {/* ACCÈS RAPIDE */}
         <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -309,24 +329,24 @@ export default function HomeClient() {
             Commencez maintenant
           </h2>
           <p style={{ position: 'relative', color: C.gray, fontWeight: 600, margin: '0 0 36px' }}>
-            Designer gratuit. Zéro risque. Zéro engagement.
+            Devis instantané. Zéro risque. Zéro engagement.
           </p>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-            <Link href="/designer" className="btn-glow" style={{
+            <Link href="/configurateur" className="btn-glow" style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
               background: C.white, color: C.black,
               padding: '16px 32px', borderRadius: '999px',
               fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
             }}>
-              Designer mon tshirt <IconArrow />
+              Commander maintenant <IconArrow />
             </Link>
-            <Link href="/collection" className="btn-outline" style={{
+            <Link href="/designer" className="btn-outline" style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
               border: `1px solid ${C.line}`, color: C.white,
               padding: '16px 32px', borderRadius: '999px',
               fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
             }}>
-              Collection
+              Designer mon tshirt
             </Link>
           </div>
         </section>

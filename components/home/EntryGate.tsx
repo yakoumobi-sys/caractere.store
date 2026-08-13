@@ -47,6 +47,15 @@ function IconPrinter({ size = 34 }) {
   )
 }
 
+function IconCompass({ size = 34 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    </svg>
+  )
+}
+
 function IconArrow({ size = 15 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
@@ -104,11 +113,15 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
           text-decoration: none;
           color: ${C.white};
           overflow: hidden;
+          text-align: left;
+          font-family: inherit;
+          cursor: pointer;
           transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
         }
         .gate-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.05); }
         .gate-card--entreprises:hover { border-color: ${C.gold}; }
         .gate-card--pod:hover { border-color: ${C.lime}; }
+        .gate-card--continue:hover { border-color: rgba(255,255,255,0.4); }
         .gate-card-icon {
           width: 56px; height: 56px; border-radius: 16px;
           display: flex; align-items: center; justify-content: center;
@@ -117,13 +130,12 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         }
         .gate-card--entreprises:hover .gate-card-icon { background: ${C.navy}; color: ${C.gold}; }
         .gate-card--pod:hover .gate-card-icon { background: rgba(163,230,53,0.15); color: ${C.lime}; }
+        .gate-card--continue:hover .gate-card-icon { background: rgba(255,255,255,0.12); color: ${C.white}; }
         .gate-card-cta { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: ${C.gray}; transition: color 0.25s ease, gap 0.25s ease; }
         .gate-card:hover .gate-card-cta { gap: 10px; color: ${C.white}; }
-        .gate-skip { background: none; border: none; color: ${C.grayDark}; font-weight: 700; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; transition: color 0.2s ease; padding: 10px; }
-        .gate-skip:hover { color: ${C.white}; }
-        .gate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; width: 100%; max-width: 760px; }
-        @media (max-width: 680px) {
-          .gate-grid { grid-template-columns: 1fr; }
+        .gate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 1020px; }
+        @media (max-width: 900px) {
+          .gate-grid { grid-template-columns: 1fr; max-width: 480px; }
         }
       `}</style>
 
@@ -173,15 +185,18 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
           </div>
           <span className="gate-card-cta">Découvrir <IconArrow /></span>
         </Link>
-      </div>
 
-      <button
-        onClick={handleContinue}
-        className="gate-anim gate-skip"
-        style={{ marginTop: '36px', animationDelay: '0.2s' }}
-      >
-        Continuer vers le site
-      </button>
+        <button type="button" onClick={handleContinue} className="gate-card gate-card--continue">
+          <span className="gate-card-icon"><IconCompass /></span>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Explorer le site</div>
+            <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
+              Produits, designer, configurateur — tout voir avant de choisir.
+            </div>
+          </div>
+          <span className="gate-card-cta">Continuer <IconArrow /></span>
+        </button>
+      </div>
     </div>
   )
 }
