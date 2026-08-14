@@ -1,12 +1,17 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import EntryGate from '@/components/home/EntryGate'
 import StickyOrderBar from '@/components/home/StickyOrderBar'
+import Reveal from '@/components/home/Reveal'
 import { CapabilityStrip, ServicesSection, GallerySection, ProcessSection, MidPageCta } from '@/components/home/HomeRichSections'
 import type { Avis } from '@/types'
+
+// Fond 3D "liquid glass" — three.js/WebGL, jamais côté serveur.
+const LiquidGlassHero = dynamic(() => import('@/components/home/LiquidGlassHero'), { ssr: false })
 
 const GATE_KEY = 'caractere_gate_seen'
 
@@ -194,9 +199,11 @@ export default function HomeClient() {
         `}</style>
 
         {/* HERO */}
-        <section style={{ position: 'relative', textAlign: 'center', padding: '72px 20px 0', minHeight: '92vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <section style={{ position: 'relative', textAlign: 'center', padding: '72px 20px 0', minHeight: '92vh', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
+          <LiquidGlassHero />
+
           <div aria-hidden style={{
-            position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+            position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 1,
             width: '2px', height: '100%',
             background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, rgba(255,255,255,0) 100%)',
             animation: 'beamPulse 4s ease-in-out infinite',
@@ -240,7 +247,7 @@ export default function HomeClient() {
             }}>
               Commander maintenant <IconArrow />
             </Link>
-            <Link href="/designer" className="btn-outline" style={{
+            <Link href="/designer" className="btn-outline btn-glass" style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
               border: `1px solid ${C.line}`, color: C.white,
               padding: '16px 32px', borderRadius: '999px',
@@ -260,32 +267,37 @@ export default function HomeClient() {
 
         {/* ACCÈS RAPIDE */}
         <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto' }}>
-          <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
-            Accès rapide
-          </p>
+          <Reveal>
+            <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
+              Accès rapide
+            </p>
+          </Reveal>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
-            {quickLinks.map(({ href, label, desc, Icon }) => (
-              <Link key={href} href={href} className="card-hover" style={{
-                display: 'flex', flexDirection: 'column', gap: '16px',
-                background: C.card, border: `1px solid ${C.line}`,
-                borderRadius: '20px', padding: '32px 28px',
-                textDecoration: 'none', color: C.white,
-              }}>
-                <span style={{ color: C.white, opacity: 0.9 }}><Icon /></span>
-                <div>
-                  <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.01em', marginBottom: '6px' }}>{label}</div>
-                  <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.92rem', lineHeight: 1.45 }}>{desc}</div>
-                </div>
-              </Link>
+            {quickLinks.map(({ href, label, desc, Icon }, i) => (
+              <Reveal key={href} delay={(i % 4) * 60}>
+                <Link href={href} className="card-hover liquid-glass-card" style={{
+                  display: 'flex', flexDirection: 'column', gap: '16px',
+                  borderRadius: '20px', padding: '32px 28px',
+                  textDecoration: 'none', color: C.white,
+                }}>
+                  <span style={{ color: C.white, opacity: 0.9 }}><Icon /></span>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.01em', marginBottom: '6px' }}>{label}</div>
+                    <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.92rem', lineHeight: 1.45 }}>{desc}</div>
+                  </div>
+                </Link>
+              </Reveal>
             ))}
           </div>
         </section>
 
         {/* AVIS CLIENTS */}
         <section style={{ padding: '80px 20px', maxWidth: '1100px', margin: '0 auto', borderTop: `1px solid ${C.line}` }}>
-          <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
-            Avis clients
-          </p>
+          <Reveal>
+            <p style={{ textAlign: 'center', color: C.grayDark, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.78rem', marginBottom: '40px' }}>
+              Avis clients
+            </p>
+          </Reveal>
           {avis.length === 0 ? (
             <div style={{ textAlign: 'center', color: C.gray, fontWeight: 600 }}>
               <p style={{ margin: '0 0 20px' }}>Soyez le premier à laisser un avis.</p>
@@ -301,17 +313,16 @@ export default function HomeClient() {
           ) : (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '32px' }}>
-                {avis.map(a => (
-                  <div key={a.id} style={{
-                    background: C.card, border: `1px solid ${C.line}`,
-                    borderRadius: '20px', padding: '28px',
-                  }}>
-                    <div style={{ display: 'flex', gap: '3px', marginBottom: '14px' }}>
-                      {Array.from({ length: a.note }).map((_, i) => <StarFilled key={i} size={15} />)}
+                {avis.map((a, i) => (
+                  <Reveal key={a.id} delay={(i % 3) * 60}>
+                    <div className="liquid-glass-card" style={{ borderRadius: '20px', padding: '28px' }}>
+                      <div style={{ display: 'flex', gap: '3px', marginBottom: '14px' }}>
+                        {Array.from({ length: a.note }).map((_, j) => <StarFilled key={j} size={15} />)}
+                      </div>
+                      <p style={{ color: C.white, fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '16px' }}>« {a.commentaire} »</p>
+                      <p style={{ color: C.gray, fontWeight: 700, fontSize: '0.85rem' }}>{a.nom}</p>
                     </div>
-                    <p style={{ color: C.white, fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '16px' }}>« {a.commentaire} »</p>
-                    <p style={{ color: C.gray, fontWeight: 700, fontSize: '0.85rem' }}>{a.nom}</p>
-                  </div>
+                  </Reveal>
                 ))}
               </div>
               <div style={{ textAlign: 'center' }}>
@@ -340,7 +351,7 @@ export default function HomeClient() {
             }}>
               Commander maintenant <IconArrow />
             </Link>
-            <Link href="/designer" className="btn-outline" style={{
+            <Link href="/designer" className="btn-outline btn-glass" style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
               border: `1px solid ${C.line}`, color: C.white,
               padding: '16px 32px', borderRadius: '999px',
