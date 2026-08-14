@@ -45,6 +45,7 @@ const PRODUCT_IMAGES: Record<string, string> = {
   'Gilet de travail': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5852.jpeg',
   'Gilet de securite': '/produits-photos/gilet-securite.jpg',
   'Tablier': '/produits-photos/tablier.jpg',
+  'Combinaison de travail': '/produits-photos/combinaison-travail.jpg',
 }
 // Ancien lien (IMG_5509.png) cassé — remplacé par une vraie photo produit.
 const FALLBACK_IMG = '/produits-photos/tshirt.jpg'
@@ -69,6 +70,7 @@ export default function ConfigurateurPage() {
       { id: '5', nom: 'Casquette', emoji: '', description: 'Broderie structurée', prix_base: 1200, actif: true, ordre: 5 },
       { id: '6', nom: 'Totebag', emoji: '', description: 'Coton canvas DTF', prix_base: 950, actif: true, ordre: 6 },
       { id: '7', nom: 'Tablier', emoji: '', description: 'Cuisine ou commerce', prix_base: 1500, actif: true, ordre: 7 },
+      { id: '8', nom: 'Combinaison de travail', emoji: '🦺', description: 'Combinaison professionnelle multipoches', prix_base: 5900, actif: true, ordre: 8 },
     ]
     const fallbackCouleurs = [
       { id: '1', nom: 'Noir', hex: '#1A1A1A', actif: true, ordre: 1, produits: [] },
