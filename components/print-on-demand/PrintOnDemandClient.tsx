@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
+
+// Hero 3D liquid glass — jamais côté serveur
+const LiquidGlassHeroPod = dynamic(() => import('@/components/print-on-demand/LiquidGlassHeroPod'), { ssr: false })
 
 const C = {
   black: '#0C0A09',
@@ -215,6 +219,13 @@ const GlobalStyle = () => (
     footer img { height: 30px; margin-bottom: 16px; opacity: .9; }
     footer p { font-size: 12px; color: ${C.muted}; font-weight: 700; }
 
+    /* Glassmorphism pour les cartes */
+    .pain, .value-card, .step {
+      background: linear-gradient(135deg, rgba(250,250,249,0.05), rgba(250,250,249,0.01));
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+    }
+
     @media (max-width: 768px) {
       .section { padding: 56px 0; }
       .guarantee { flex-direction: column; }
@@ -268,8 +279,10 @@ export default function PrintOnDemandClient() {
       </header>
 
       {/* HERO — dream outcome + délai + zéro risque */}
-      <section className="hero wrap">
-        <div className="reveal in">
+      <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
+        <LiquidGlassHeroPod />
+        <div className="wrap" style={{ position: 'relative', zIndex: 2 }}>
+          <div className="reveal in">
           <span className="eyebrow">Print on Demand — Alger</span>
           <h1>
             Lance ta marque <span className="accent">cette semaine.</span><br />
@@ -289,6 +302,7 @@ export default function PrintOnDemandClient() {
             <span>✅ Production <b>48h</b></span>
             <span>✅ Dès <b>1 pièce</b></span>
           </div>
+        </div>
         </div>
       </section>
 

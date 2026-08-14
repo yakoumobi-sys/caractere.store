@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
+
+// Hero 3D liquid glass — jamais côté serveur
+const LiquidGlassHeroEntreprises = dynamic(() => import('@/components/entreprises/LiquidGlassHeroEntreprises'), { ssr: false })
 
 // Palette "Premium Corporate" — navy/gold.
 const C = {
@@ -583,6 +587,18 @@ const GlobalStyle = () => (
       .steps { grid-template-columns: repeat(2, 1fr); }
     }
 
+    /* Glassmorphism pour les cartes */
+    .value-card, .step, .pain {
+      background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+    }
+    .testi {
+      background: linear-gradient(135deg, rgba(26,58,82,0.85), rgba(15,36,56,0.9));
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+    }
+
     @media (max-width: 768px) {
       .wrap { padding: 0 20px; }
       .grid, .steps { grid-template-columns: 1fr; }
@@ -643,8 +659,9 @@ export default function EntreprisesClient() {
       </div>
 
       {/* HERO */}
-      <section className="hero">
-        <div className="wrap">
+      <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
+        <LiquidGlassHeroEntreprises />
+        <div className="wrap" style={{ position: 'relative', zIndex: 2 }}>
           <div className="reveal in">
             <span className="eyebrow">{t.eyebrow}</span>
             <h1>
