@@ -106,8 +106,11 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         .gate-card {
           position: relative;
           display: flex; flex-direction: column; gap: 18px;
-          background: rgba(255,255,255,0.03);
+          background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
+          backdrop-filter: blur(20px) saturate(160%);
+          -webkit-backdrop-filter: blur(20px) saturate(160%);
           border: 1px solid ${C.line};
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
           border-radius: 24px;
           padding: 36px 30px;
           text-decoration: none;
@@ -116,9 +119,21 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
           text-align: left;
           font-family: inherit;
           cursor: pointer;
-          transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+          transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
         }
-        .gate-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.05); }
+        .gate-card::before {
+          content: '';
+          position: absolute; inset: 0;
+          background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.14) 48%, transparent 65%);
+          transform: translateX(-130%);
+          transition: transform 0.9s cubic-bezier(0.22,1,0.36,1);
+          pointer-events: none;
+        }
+        .gate-card:hover::before { transform: translateX(130%); }
+        .gate-card:hover { transform: translateY(-4px); background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 16px 40px rgba(0,0,0,0.4); }
+        @media (prefers-reduced-motion: reduce) {
+          .gate-card::before { display: none; }
+        }
         .gate-card--entreprises:hover { border-color: ${C.gold}; }
         .gate-card--pod:hover { border-color: ${C.lime}; }
         .gate-card--continue:hover { border-color: rgba(255,255,255,0.4); }
