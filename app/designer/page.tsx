@@ -256,6 +256,94 @@ function DesignerInner() {
     router.push(`/configurateur?produit=${encodeURIComponent(product.name)}&couleur=${encodeURIComponent(currentColor.name)}`)
   }
 
+  // Exporte le design en tant qu'image PNG
+  const downloadDesign = async () => {
+    if (!stageRef.current) return
+    try {
+      // Crée un canvas pour exporter le design
+      const canvas = document.createElement('canvas')
+      const size = 1200 // Haute résolution
+      canvas.width = size
+      canvas.height = size
+      const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('Impossible de créer un contexte canvas')
+
+      // Remplit avec la couleur du produit
+      ctx.fillStyle = currentColor.hex
+      ctx.fillRect(0, 0, size, size)
+
+      // Charge l'image mockup
+      const mockupImg = new Image()
+      mockupImg.crossOrigin = 'anonymous'
+
+      await new Promise((resolve, reject) => {
+        mockupImg.onload = resolve
+        mockupImg.onerror = reject
+        mockupImg.src = mockupSrc
+      })
+
+      // Dessine l'image mockup
+      ctx.drawImage(mockupImg, 0, 0, size, size)
+
+      // Dessine chaque layer
+      for (const layer of layers) {
+        const x = (layer.x / 100) * size
+        const y = (layer.y / 100) * size
+        const scaledSize = size * layer.scale
+
+        ctx.save()
+        ctx.translate(x + scaledSize / 2, y + scaledSize / 2)
+        ctx.rotate((layer.rotation * Math.PI) / 180)
+        ctx.translate(-(scaledSize / 2), -(scaledSize / 2))
+
+        if (layer.type === 'image' && layer.src) {
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          await new Promise((resolve, reject) => {
+            img.onload = resolve
+            img.onerror = reject
+            img.src = layer.src!
+          })
+          if (layer.flipped) {
+            ctx.scale(-1, 1)
+            ctx.drawImage(img, -scaledSize, 0, scaledSize, scaledSize)
+          } else {
+            ctx.drawImage(img, 0, 0, scaledSize, scaledSize)
+          }
+        } else if (layer.type === 'text' && layer.text) {
+          ctx.font = `${layer.fontWeight} ${layer.fontSize! * layer.scale}px ${layer.fontFamily || 'Inter'}`
+          ctx.fillStyle = layer.color || '#000000'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(layer.text, scaledSize / 2, scaledSize / 2)
+        }
+
+        ctx.restore()
+      }
+
+      // Télécharge l'image
+      const link = document.createElement('a')
+      link.href = canvas.toDataURL('image/png')
+      link.download = `design-${product.name.replace(/\s+/g, '-')}-${Date.now()}.png`
+      link.click()
+    } catch (error) {
+      console.error('Erreur lors de l\'export:', error)
+      alert('Impossible d\'exporter l\'image. Veuillez réessayer.')
+    }
+  }
+
+  // Navigue vers le studio 3D avec le design actuel
+  const handleNavigateTo3D = () => {
+    // Sauvegarde les données du design dans sessionStorage
+    sessionStorage.setItem('designer_data', JSON.stringify({
+      product: product.id,
+      color: currentColor.hex,
+      layers: layers,
+      qty: qty,
+    }))
+    router.push(`/studio-3d?product=${product.id}&color=${encodeURIComponent(currentColor.hex)}`)
+  }
+
   const BASE_W = 110
   const activeLayer = layers.find(l => l.id === activeId)
 
@@ -507,6 +595,20 @@ function DesignerInner() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
             </button>
             <p className="text-[11px] text-gray-400 text-center mt-2">Ton design + produit sont repris automatiquement, suivi de commande inclus</p>
+
+            {/* Nouveaux boutons: Enregistrer + Animer en 3D */}
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <button onClick={downloadDesign}
+                className="flex items-center justify-center gap-2 py-3 rounded-2xl text-[14px] font-bold border-2 border-[#0C4A6E] text-[#0C4A6E] bg-white hover:bg-blue-50 transition-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Enregistrer l'image
+              </button>
+              <button onClick={handleNavigateTo3D}
+                className="flex items-center justify-center gap-2 py-3 rounded-2xl text-[14px] font-bold border-2 border-[#0C4A6E] text-[#0C4A6E] bg-white hover:bg-blue-50 transition-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>
+                Animer en 3D
+              </button>
+            </div>
 
             <button onClick={handleOrder}
               className="w-full flex items-center justify-center gap-2 mt-3 text-[13px] font-semibold text-[#25D366]">

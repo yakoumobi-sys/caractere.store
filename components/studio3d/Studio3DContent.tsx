@@ -151,6 +151,41 @@ export default function Studio3DContent() {
 
   useEffect(() => { const c = ALL_COLORS[colorParam]; if (c) setColor(c); }, [colorParam]);
 
+  // Charge les données du designer si elles existent
+  useEffect(() => {
+    try {
+      const designerDataStr = sessionStorage.getItem('designer_data');
+      if (designerDataStr) {
+        const designerData = JSON.parse(designerDataStr);
+
+        // Charge la couleur du design
+        if (designerData.color) setColor(designerData.color);
+
+        // Charge le premier logo du design
+        if (designerData.layers && designerData.layers.length > 0) {
+          const logoLayer = designerData.layers.find((l: any) => l.type === 'image' && l.src);
+          if (logoLayer) {
+            // Convertit les positions du designer (0-100) en pixels pour le studio 3D
+            const newLogo = {
+              id: Date.now().toString(),
+              src: logoLayer.src,
+              scale: logoLayer.scale || 1,
+              x: (logoLayer.x - 50) * 2, // Centre et convertit
+              y: (logoLayer.y - 50) * 2,
+              rotate: logoLayer.rotation || 0,
+            };
+            setLogos([newLogo]);
+          }
+        }
+
+        // Nettoie les données du designer après utilisation
+        sessionStorage.removeItem('designer_data');
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du design:', error);
+    }
+  }, []);
+
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
