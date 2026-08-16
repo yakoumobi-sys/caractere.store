@@ -2,7 +2,7 @@
 import { useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
-import { MOCKUPS } from '@/components/designer/mockups-data'
+import { MOCKUPS, MOCKUPS_VERSO } from '@/components/designer/mockups-data'
 import { TSHIRT_VIEWS } from '@/components/designer/tshirt-views'
 
 interface Layer {
@@ -60,7 +60,9 @@ function DesignerInner() {
 
   const [product, setProduct] = useState(initialProduct)
   const [colorKey, setColorKey] = useState<ColorKey>(initialProduct.colors[0])
-  const [layers, setLayers] = useState<Layer[]>([])
+  const [layersRecto, setLayersRecto] = useState<Layer[]>([])
+  const [layersVerso, setLayersVerso] = useState<Layer[]>([])
+  const [side, setSide] = useState<'recto' | 'verso'>('recto')
   const [activeId, setActiveId] = useState<string | null>(null)
   const [qty, setQty] = useState(1)
   const [note, setNote] = useState('')
@@ -71,6 +73,14 @@ function DesignerInner() {
   const [textBold, setTextBold] = useState(true)
   const [textColor, setTextColor] = useState('#000000')
   const [showGrid, setShowGrid] = useState(false)
+
+  // ── Helpers pour recto/verso ──
+  const layers = side === 'recto' ? layersRecto : layersVerso
+  const setLayers = side === 'recto' ? setLayersRecto : setLayersVerso
+
+  const duplicateToBack = () => {
+    setLayersVerso([...layersRecto.map(l => ({ ...l, id: Date.now().toString(36) + Math.random().toString(36).substr(2, 9) }))])
+  }
 
   // ── Rognage d'image avant insertion ──
   const [cropSrc, setCropSrc] = useState<string | null>(null)
@@ -92,7 +102,11 @@ function DesignerInner() {
   const availableColors = product.colors.map(k => ({ key: k, ...ALL_COLORS[k] }))
   const { unit, total, remise } = calcPrice(product.prix, qty)
   const [viewIndex, setViewIndex] = useState(0)
-  const views = product.id === 'tshirt' ? TSHIRT_VIEWS : [MOCKUPS[product.id] || MOCKUPS['tshirt']]
+
+  // Use verso mockup when in verso mode, recto otherwise
+  const rectoMockups = product.id === 'tshirt' ? TSHIRT_VIEWS : [MOCKUPS[product.id] || MOCKUPS['tshirt']]
+  const versoMockups = [MOCKUPS_VERSO[product.id] || MOCKUPS_VERSO['tshirt']]
+  const views = side === 'verso' ? versoMockups : rectoMockups
   const mockupSrc = views[viewIndex] || views[0]
 
   // Reset view when product changes
@@ -103,8 +117,10 @@ function DesignerInner() {
 
   const handleProduct = (p: typeof PRODUCTS[0]) => {
     setProduct(p)
-    setLayers([])
+    setLayersRecto([])
+    setLayersVerso([])
     setActiveId(null)
+    setSide('recto')
     if (!p.colors.includes(colorKey)) setColorKey(p.colors[0])
     router.replace(`/designer?product=${p.id}`, { scroll: false })
   }
@@ -231,12 +247,17 @@ function DesignerInner() {
   }
 
   const handleOrder = () => {
+    const totalElements = layersRecto.length + layersVerso.length
+    const totalImages = layersRecto.filter(l=>l.type==='image').length + layersVerso.filter(l=>l.type==='image').length
+    const totalTexts = layersRecto.filter(l=>l.type==='text').length + layersVerso.filter(l=>l.type==='text').length
+    const sidesInfo = layersRecto.length > 0 && layersVerso.length > 0 ? ' (recto + verso)' : layersVerso.length > 0 ? ' (verso)' : layersRecto.length > 0 ? ' (recto)' : ''
+
     const msg = encodeURIComponent(
       `Bonjour Caractère Store 👋\n\nCommande Designer :\n\n` +
       `👕 *Produit* : ${product.name}\n` +
       `🎨 *Couleur* : ${currentColor.name}\n` +
       `📦 *Quantité* : ${qty} pièce${qty > 1 ? 's' : ''}\n` +
-      `🎨 *Éléments* : ${layers.length} (${layers.filter(l=>l.type==='image').length} image, ${layers.filter(l=>l.type==='text').length} texte)\n` +
+      `🎨 *Éléments* : ${totalElements} (${totalImages} image, ${totalTexts} texte)${sidesInfo}\n` +
       (note ? `💬 *Note* : ${note}\n` : '') +
       `💰 *Total* : ${total.toLocaleString('fr-FR')} DA\n\nMerci !`
     )
@@ -249,7 +270,7 @@ function DesignerInner() {
   // commande réel (suivi de commande, admin) n'était jamais atteint depuis le
   // designer.
   const handleContinueToOrder = () => {
-    const imageLayer = layers.find(l => l.type === 'image' && l.src)
+    const imageLayer = layersRecto.find(l => l.type === 'image' && l.src)
     if (imageLayer?.src) {
       sessionStorage.setItem('designer_layers', JSON.stringify([{ src: imageLayer.src, name: 'logo-designer.png' }]))
     }
@@ -285,7 +306,7 @@ function DesignerInner() {
       // Dessine l'image mockup
       ctx.drawImage(mockupImg, 0, 0, size, size)
 
-      // Dessine chaque layer
+      // Dessine chaque layer (de la face actuelle)
       for (const layer of layers) {
         const x = (layer.x / 100) * size
         const y = (layer.y / 100) * size
@@ -334,11 +355,12 @@ function DesignerInner() {
 
   // Navigue vers le studio 3D avec le design actuel
   const handleNavigateTo3D = () => {
-    // Sauvegarde les données du design dans sessionStorage
+    // Sauvegarde les données du design dans sessionStorage (recto side)
     sessionStorage.setItem('designer_data', JSON.stringify({
       product: product.id,
       color: currentColor.hex,
-      layers: layers,
+      layers: layersRecto,
+      layersVerso: layersVerso,
       qty: qty,
     }))
     router.push(`/studio-3d?product=${product.id}&color=${encodeURIComponent(currentColor.hex)}`)
@@ -372,11 +394,29 @@ function DesignerInner() {
               }} />
             )}
 
+            {/* Recto/Verso toggle */}
+            <div className="absolute top-3 left-3 flex gap-1.5 z-20">
+              <button
+                onClick={e => { e.stopPropagation(); setSide('recto'); setViewIndex(0) }}
+                className={`px-3 py-1.5 rounded-full text-[11px] font-bold shadow-md border transition-all ${
+                  side === 'recto' ? 'bg-[#0C4A6E] text-white border-[#0C4A6E]' : 'bg-white text-[#0C4A6E] border-black/10'
+                }`}>
+                RECTO
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); setSide('verso'); setViewIndex(0) }}
+                className={`px-3 py-1.5 rounded-full text-[11px] font-bold shadow-md border transition-all ${
+                  side === 'verso' ? 'bg-[#0C4A6E] text-white border-[#0C4A6E]' : 'bg-white text-[#0C4A6E] border-black/10'
+                }`}>
+                VERSO
+              </button>
+            </div>
+
             {/* Bouton grille */}
             <button
               onClick={e => { e.stopPropagation(); setShowGrid(g => !g) }}
               title="Grille de repère"
-              className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center shadow-md border border-black/10 z-10 transition-all"
+              className="absolute top-3 right-16 w-9 h-9 rounded-full flex items-center justify-center shadow-md border border-black/10 z-10 transition-all"
               style={{ background: showGrid ? '#0C4A6E' : 'rgba(255,255,255,0.9)', color: showGrid ? '#fff' : '#0C4A6E' }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
             </button>
@@ -464,6 +504,17 @@ function DesignerInner() {
               Ajouter du texte
             </button>
           </div>
+
+          {/* ── BOUTON DUPLIQUER SUR L'ARRIÈRE (après upload d'une image) ── */}
+          {side === 'recto' && layersRecto.some(l => l.type === 'image') && layersVerso.length === 0 && (
+            <div className="mt-3 max-w-[560px] mx-auto">
+              <button onClick={duplicateToBack}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-[14px] font-bold border-2 border-[#0C4A6E] text-[#0C4A6E] bg-white hover:bg-blue-50 transition-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M8 16H6a2 2 0 01-2-2V4a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                Dupliquer sur l'arrière
+              </button>
+            </div>
+          )}
 
           {/* ── PANNEAU TEXTE ── */}
           {showText && (

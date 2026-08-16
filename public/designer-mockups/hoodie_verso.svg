@@ -1,0 +1,7 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" fill="#f5f5f5"/>
+  <path d="M 180 200 L 350 200 L 400 100 L 450 200 L 620 200 L 670 350 L 670 720 L 130 720 L 130 350 Z" fill="white" stroke="#333" stroke-width="3"/>
+  <path d="M 320 200 Q 400 160 480 200" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="280" y1="350" x2="520" y2="350" stroke="#999" stroke-width="2"/>
+  <text x="400" y="750" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Hoodie Verso</text>
+</svg>
