@@ -451,6 +451,84 @@ export default function PrintOnDemandClient() {
         </div>
       </section>
 
+      {/* REVENDEURS — tarifs professionnels */}
+      <section className="section section-dark">
+        <div className="wrap">
+          <p className="kicker reveal">Pour les revendeurs & agences</p>
+          <h2 className="h2 reveal">Tarifs dégressifs à <span className="accent">volume constant.</span></h2>
+          <p className="lead reveal">Réductions automatiques qui s'appliquent dès que tu passes un certain nombre de pièces.</p>
+          <div style={{ marginTop: 48, maxWidth: 800, margin: '48px auto 0' }}>
+            <div style={{
+              background: 'rgba(250,250,249,.04)',
+              border: '1px solid rgba(250,250,249,.09)',
+              borderRadius: 16,
+              overflow: 'hidden'
+            }}>
+              <div style={{ padding: '28px 26px', borderBottom: '1px solid rgba(250,250,249,.09)', background: 'rgba(163,230,53,.06)' }}>
+                <p style={{ fontSize: 13, color: C.muted, margin: 0, marginBottom: 8 }}>PRIX DE PRODUCTION DTF — Production 48h</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: C.white, margin: 0 }}>Tarif dégressif selon quantité</p>
+              </div>
+
+              <div style={{ padding: '24px 26px', borderBottom: '1px solid rgba(250,250,249,.09)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16 }}>
+                  <div>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '0 0 8px 0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>1–9 pièces</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: C.white, margin: 0 }}>1 950 DA</p>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '6px 0 0 0' }}>test & petites commandes</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '0 0 8px 0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>10–49 pièces</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: C.lime, margin: 0 }}>1 650 DA <span style={{ fontSize: 12, color: C.white }}>(-15%)</span></p>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '6px 0 0 0' }}>petite production</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '24px 26px', borderBottom: '1px solid rgba(250,250,249,.09)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16 }}>
+                  <div>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '0 0 8px 0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>50–99 pièces</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: C.lime, margin: 0 }}>1 465 DA <span style={{ fontSize: 12, color: C.white }}>(-25%)</span></p>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '6px 0 0 0' }}>production moyenne</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '0 0 8px 0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>100–249 pièces</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: C.lime, margin: 0 }}>1 365 DA <span style={{ fontSize: 12, color: C.white }}>(-30%)</span></p>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '6px 0 0 0' }}>revendeurs réguliers</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '24px 26px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                  <div>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '0 0 8px 0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>250–499 pièces</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: C.lime, margin: 0 }}>1 270 DA <span style={{ fontSize: 12, color: C.white }}>(-35%)</span></p>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '6px 0 0 0' }}>agences & marques</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '0 0 8px 0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>500+ pièces</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: C.lime, margin: 0 }}>À négocier</p>
+                    <p style={{ fontSize: 12, color: C.muted, margin: '6px 0 0 0' }}>partenaires volume</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 32, padding: '24px', background: 'rgba(163,230,53,.08)', border: `1.5px solid rgba(163,230,53,.3)`, borderRadius: 14 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: C.white, margin: '0 0 12px 0' }}>📞 Tarifs revendeurs & gros volumes</p>
+              <p style={{ fontSize: 13, color: C.muted, margin: 0, lineHeight: 1.6 }}>
+                Pour les commandes régulières de 250+ pièces ou des projets exceptionnels (500+, 1000+),
+                contacte-nous directement sur WhatsApp pour obtenir un devis personnalisé et des conditions commerciales adaptées à ton modèle.
+              </p>
+              <a href={WA} className="btn btn-lime" style={{ marginTop: 16, width: '100%', maxWidth: 'none', justifyContent: 'center' }}>
+                💬 Demander un devis personnalisé
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA FINAL — coût de l'inaction */}
       <section className="final">
         <div className="reveal">
