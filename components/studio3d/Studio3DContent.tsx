@@ -137,6 +137,7 @@ function ModelWithDecals({
 function LogoDecal({ logo }: { logo: LogoDecal }) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const zone = PLACEMENT_ZONES.find(z => z.id === logo.zone);
+  const meshRef = useRef<THREE.Mesh>(null);
 
   useEffect(() => {
     if (!logo.src) return;
@@ -150,12 +151,14 @@ function LogoDecal({ logo }: { logo: LogoDecal }) {
   if (!zone || !texture) return null;
 
   return (
-    <Decal
-      position={zone.position}
-      rotation={[0, 0, logo.rotation]}
-      scale={zone.scale * logo.scale}
-      map={texture}
-    />
+    <mesh ref={meshRef} position={zone.position}>
+      <Decal
+        position={[0, 0, 0]}
+        rotation={[0, 0, logo.rotation]}
+        scale={zone.scale * logo.scale}
+        map={texture}
+      />
+    </mesh>
   );
 }
 
@@ -192,7 +195,7 @@ function Scene({
         <ModelWithDecals product={product} color={color} logos={logos} />
       </group>
       <ContactShadows position={[0,-1,0]} opacity={0.35} scale={4} blur={2.4} far={2} />
-      <OrbitControls enablePan={false} minDistance={1.5} maxDistance={6} minPolarAngle={Math.PI/5} maxPolarAngle={3*Math.PI/4} />
+      <OrbitControls enablePan={false} minDistance={0.8} maxDistance={4} minPolarAngle={Math.PI/5} maxPolarAngle={3*Math.PI/4} />
     </>
   );
 }
