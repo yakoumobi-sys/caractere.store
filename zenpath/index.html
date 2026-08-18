@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenPath</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #D4AF37;
+            --primary-light: #E8C547;
+            --bg: #0A0E27;
+            --surface: #141829;
+            --surface-2: #1A1F3A;
+            --text: #E5E7EB;
+            --text-muted: #9CA3AF;
+            --border: #2D3748;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 100%); padding: 20px; }
+        .login-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; }
+        .login-logo { font-size: 48px; margin-bottom: 24px; }
+        .login-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .login-subtitle { color: var(--text-muted); margin-bottom: 32px; font-size: 14px; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 14px; transition: border-color 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
+        .btn-login { width: 100%; padding: 12px; margin-top: 24px; background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.2s; }
+        .btn-login:hover { transform: translateY(-2px); }
+        .app-container { display: none; flex-direction: column; height: 100vh; }
+        .app-container.active { display: flex; }
+        .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .header-left { display: flex; gap: 12px; align-items: center; }
+        .header-title { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header-username { font-size: 12px; color: var(--text-muted); }
+        .header-actions { display: flex; gap: 8px; }
+        .btn-header { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.2s; }
+        .btn-header:hover { background: var(--border); color: var(--text); }
+        main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: border-color 0.2s; }
+        .card:hover { border-color: var(--primary); }
+        .card-title { font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 12px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .stat-item { background: var(--surface-2); padding: 16px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 10px; color: var(--text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .habit-item { display: flex; gap: 12px; padding: 14px; background: var(--surface-2); border-radius: 8px; margin-bottom: 10px; align-items: center; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+        .habit-item:hover { border-color: var(--primary); }
+        .habit-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--primary); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .habit-checkbox.checked { background: linear-gradient(135deg, var(--primary), #8B5CF6); border-color: var(--primary); color: white; }
+        .habit-info { flex: 1; }
+        .habit-name { font-weight: 600; margin-bottom: 4px; }
+        .habit-meta { font-size: 12px; color: var(--text-muted); }
+        .habit-points { font-size: 12px; color: var(--primary); font-weight: 600; }
+        .book-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .book-title { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .book-author { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .book-points { font-size: 13px; line-height: 1.6; color: var(--text); }
+        .book-point { margin-bottom: 8px; padding-left: 12px; border-left: 2px solid var(--primary); }
+        .book-category { display: inline-block; font-size: 10px; color: var(--primary); background: var(--primary); background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; margin-bottom: 8px; }
+        .empty-state { text-align: center; padding: 40px 16px; color: var(--text-muted); }
+        .btn { background: linear-gradient(135deg, var(--primary), #8B5CF6); color: white; border: none; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; width: 100%; transition: transform 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-small { padding: 8px 12px; font-size: 12px; width: auto; margin: 0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: flex-end; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--surface); width: 100%; border-radius: 16px 16px 0 0; padding: 20px; border: 1px solid var(--border); border-bottom: none; max-height: 80vh; overflow-y: auto; }
+        .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .tab-bar { display: flex; border-top: 1px solid var(--border); background: var(--surface); position: fixed; bottom: 0; left: 0; right: 0; height: 56px; z-index: 100; }
+        .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; font-size: 10px; color: var(--text-muted); border-top: 2px solid transparent; transition: color 0.2s; }
+        .tab.active { color: var(--primary); border-top-color: var(--primary); }
+        .badge { display: inline-block; padding: 4px 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; font-size: 11px; color: var(--text-muted); margin-right: 6px; margin-bottom: 8px; }
+        .badge.badge-xp { color: var(--primary); border-color: var(--primary); }
+        .badge.unlocked { background: linear-gradient(135deg, var(--primary), #8B5CF6); border-color: var(--primary); color: white; }
+        .challenge-card { background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); border: 2px solid var(--primary); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .challenge-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .challenge-reward { font-size: 12px; color: var(--success); font-weight: 600; }
+        .progress-bar { width: 100%; height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #8B5CF6); }
+        .date-str { font-size: 24px; font-weight: 700; margin: 8px 0; text-transform: capitalize; }
+        .quote-card { background: linear-gradient(135deg, #1A1F3A 0%, #2D3748 100%); border-left: 4px solid var(--primary); padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+        .quote-text { font-size: 14px; font-style: italic; color: var(--text); margin-bottom: 8px; }
+        .quote-author { font-size: 12px; color: var(--text-muted); text-align: right; }
+        .timer-display { font-size: 48px; font-weight: 700; text-align: center; color: var(--primary); margin: 24px 0; font-family: 'Courier New', monospace; }
+        .timer-buttons { display: flex; gap: 8px; margin-top: 16px; }
+        .timer-btn { flex: 1; padding: 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+        .timer-btn:hover { background: var(--primary); color: var(--bg); }
+        .timer-btn.active { background: var(--primary); color: var(--bg); }
+        .journal-entry { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .journal-date { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .journal-text { font-size: 13px; line-height: 1.6; color: var(--text); }
+        .mood-selector { display: flex; gap: 8px; margin-top: 12px; justify-content: space-around; }
+        .mood-btn { font-size: 32px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
+        .mood-btn.selected { opacity: 1; }
+        .achievement-badge { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; margin: 8px; text-align: center; }
+        .achievement-badge.unlocked { border-color: var(--primary); background: rgba(212, 175, 55, 0.1); }
+        .achievement-emoji { font-size: 32px; }
+        .achievement-name { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .streak-badge { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, var(--primary), #8B5CF6); border-radius: 20px; color: var(--bg); font-weight: 700; margin-right: 8px; margin-bottom: 8px; }
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+        .week-day { padding: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; text-align: center; font-size: 11px; }
+        .week-day.completed { background: var(--primary); color: var(--bg); border-color: var(--primary); }
+        .week-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">⚔️</div>
+            <div class="login-title">ZenPath</div>
+            <div class="login-subtitle">Développe-toi progressivement</div>
+            <div class="form-group">
+                <label class="form-label">Nom d'utilisateur</label>
+                <input type="text" class="form-input" id="usernameInput" placeholder="ex: AlexandreMaster">
+            </div>
+            <button class="btn-login" onclick="login()">Commencer</button>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">⚔️ ZenPath</div>
+                <div>
+                    <div class="header-username" id="headerUsername">User</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-header" onclick="openSettings()">⚙️</button>
+                <button class="btn-header" onclick="logout()">Déco</button>
+            </div>
+        </div>
+
+        <main>
+            <!-- HOME -->
+            <div class="tab-content active" data-tab="home">
+                <div class="card">
+                    <div class="card-title">Rapport du jour</div>
+                    <div class="date-str" id="dateStr"></div>
+                </div>
+
+                <div class="quote-card">
+                    <div class="quote-text" id="quoteText">"Chaque jour est une nouvelle bataille."</div>
+                    <div class="quote-author" id="quoteAuthor">— Stoïcisme</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Mood du jour</div>
+                    <div class="mood-selector">
+                        <button class="mood-btn" onclick="setMood('😢')">😢</button>
+                        <button class="mood-btn" onclick="setMood('😕')">😕</button>
+                        <button class="mood-btn" onclick="setMood('😐')">😐</button>
+                        <button class="mood-btn" onclick="setMood('🙂')">🙂</button>
+                        <button class="mood-btn" onclick="setMood('😄')">😄</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Plaque de grade</div>
+                    <div style="display: flex; gap: 16px; margin-top: 12px;">
+                        <div style="font-size: 40px;" id="gradeBadge">⚔️</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;" id="gradeName">Initié</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;" id="gradeLevel">Niveau 1</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="xpFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">État</div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="streakStat">0</div>
+                            <div class="stat-label">Série</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="missionsStat">0/0</div>
+                            <div class="stat-label">Missions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="xpStat">0</div>
+                            <div class="stat-label">XP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Missions du jour</div>
+                    <div id="habitsList"></div>
+                    <button class="btn" onclick="openAddHabitModal()">+ Nouvelle mission</button>
+                </div>
+            </div>
+
+            <!-- MISSIONS -->
+            <div class="tab-content" data-tab="habits">
+                <div class="card">
+                    <div class="card-title">Toutes les missions</div>
+                    <div style="margin-bottom: 16px;">
+                        <button class="btn-small" onclick="filterHabits('all')" id="filterAll" style="background: var(--primary); color: white;">Toutes</button>
+                        <button class="btn-small" onclick="filterHabits('health')" id="filterHealth">💪 Santé</button>
+                        <button class="btn-small" onclick="filterHabits('wealth')" id="filterWealth">💰 Richesse</button>
+                        <button class="btn-small" onclick="filterHabits('mind')" id="filterMind">🧠 Esprit</button>
+                    </div>
+                    <div id="habitsMgmt"></div>
+                    <button class="btn" onclick="openAddHabitModal()">+ Ajouter</button>
+                </div>
+            </div>
+
+            <!-- FOCUS TIMER -->
+            <div class="tab-content" data-tab="focus">
+                <div class="card">
+                    <div class="card-title">Focus Timer</div>
+                    <div class="timer-display" id="timerDisplay">25:00</div>
+                    <div class="timer-buttons">
+                        <button class="timer-btn" onclick="startTimer()">Démarrer</button>
+                        <button class="timer-btn" onclick="pauseTimer()">Pause</button>
+                        <button class="timer-btn" onclick="resetTimer()">Réinitialiser</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Présets</div>
+                    <button class="btn-small" onclick="setTimerDuration(25)">25 min</button>
+                    <button class="btn-small" onclick="setTimerDuration(45)">45 min</button>
+                    <button class="btn-small" onclick="setTimerDuration(60)">60 min</button>
+                    <button class="btn-small" onclick="setTimerDuration(5)">5 min</button>
+                </div>
+            </div>
+
+            <!-- JOURNAL -->
+            <div class="tab-content" data-tab="journal">
+                <div class="card">
+                    <div class="card-title">Réflexion du jour</div>
+                    <textarea class="form-input" id="journalInput" placeholder="Qu'as-tu appris aujourd'hui? Comment te sens-tu?" style="min-height: 120px; resize: vertical; margin-top: 8px;"></textarea>
+                    <button class="btn" onclick="saveJournal()">Enregistrer</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Dernières entrées</div>
+                    <div id="journalList"></div>
+                </div>
+            </div>
+
+            <!-- LECTURES (ex Doctrine) -->
+            <div class="tab-content" data-tab="learning">
+                <div class="card">
+                    <div class="card-title">Bibliothèque - 120+ Livres</div>
+                    <div style="margin-bottom: 16px;">
+                        <select id="bookFilter" onchange="filterBooks()" style="background: var(--surface-2); color: var(--text); border: 1px solid var(--border); padding: 8px; border-radius: 6px; width: 100%;">
+                            <option value="all">Tous les livres</option>
+                            <option value="wealth">💰 Finance & Richesse</option>
+                            <option value="personal">📚 Développement personnel</option>
+                            <option value="psychology">🧠 Psychologie</option>
+                            <option value="business">🏢 Entrepreneuriat</option>
+                            <option value="habits">🔄 Habitudes</option>
+                        </select>
+                    </div>
+                    <div id="booksContainer"></div>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="tab-content" data-tab="stats">
+                <div class="card">
+                    <div class="card-title">Statistiques</div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalHabits">0</div>
+                            <div class="stat-label">Missions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completionRate">0%</div>
+                            <div class="stat-label">Taux</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="booksRead">0</div>
+                            <div class="stat-label">Livres</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Semaine</div>
+                    <div id="weekView"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Achievements</div>
+                    <div id="achievementsList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+            </div>
+
+            <!-- PROFIL -->
+            <div class="tab-content" data-tab="profile">
+                <div class="card">
+                    <div class="card-title">Profil</div>
+                    <div style="margin-top: 12px; font-size: 14px;">
+                        <div style="margin-bottom: 12px;"><span style="color: var(--text-muted);">Utilisateur:</span> <span style="font-weight: 600;" id="profileUsername">User</span></div>
+                        <div style="margin-bottom: 12px;"><span style="color: var(--text-muted);">Grade:</span> <span style="font-weight: 600; color: var(--primary);" id="profileGrade">Initié</span></div>
+                        <div><span style="color: var(--text-muted);">XP Total:</span> <span style="font-weight: 600;" id="profileXpTotal">0</span></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Streaks</div>
+                    <div id="streaksList" style="margin-top: 12px;"></div>
+                </div>
+
+                <div class="card">
+                    <button class="btn" onclick="resetProgress()">🔄 Réinitialiser</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="tab-bar">
+            <div class="tab active" onclick="switchTab('home')">🏠<br>Accueil</div>
+            <div class="tab" onclick="switchTab('habits')">✓<br>Missions</div>
+            <div class="tab" onclick="switchTab('focus')">⏱️<br>Focus</div>
+            <div class="tab" onclick="switchTab('journal')">✍️<br>Journal</div>
+            <div class="tab" onclick="switchTab('learning')">📚<br>Lectures</div>
+            <div class="tab" onclick="switchTab('stats')">📊<br>Stats</div>
+            <div class="tab" onclick="switchTab('profile')">👤<br>Profil</div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Nouvelle mission</span>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-input" id="habitName" placeholder="ex: Méditer 10 min">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Catégorie</label>
+                <select class="form-input" id="habitCategory">
+                    <option value="health">💪 Santé</option>
+                    <option value="wealth">💰 Richesse</option>
+                    <option value="mind">🧠 Esprit</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Points XP</label>
+                <input type="number" class="form-input" id="habitXp" value="10" min="5" max="50">
+            </div>
+            <button class="btn" onclick="saveHabit()">Créer</button>
+        </div>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Paramètres</span>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notifications</label>
+                <input type="checkbox" id="notif" checked> Activer rappels
+            </div>
+            <div class="form-group">
+                <label class="form-label">Heure des rappels</label>
+                <input type="time" class="form-input" id="reminderTime" value="08:00">
+            </div>
+            <button class="btn" onclick="saveSettings()">Enregistrer</button>
+        </div>
+    </div>
+
+    <script>
+        const GRADES = [
+            { level: 1, name: 'Initié', emoji: '⚔️', minXp: 0 },
+            { level: 2, name: 'Guerrier', emoji: '🗡️', minXp: 100 },
+            { level: 3, name: 'Sage', emoji: '👑', minXp: 300 },
+            { level: 4, name: 'Maître', emoji: '🔱', minXp: 600 },
+            { level: 5, name: 'Légende', emoji: '⭐', minXp: 1000 }
+        ];
+
+        const DEFAULT_HABITS = [
+            { name: "📚 Lire 30 minutes", category: "mind", xp: 10 },
+            { name: "🧘 Méditer 10 minutes", category: "mind", xp: 10 },
+            { name: "💪 Exercice physique 30 min", category: "health", xp: 15 },
+            { name: "✍️ Écrire dans un journal", category: "mind", xp: 10 },
+            { name: "🌅 Se lever tôt (6h30)", category: "health", xp: 10 },
+            { name: "💰 Étudier finance 20 min", category: "wealth", xp: 10 }
+        ];
+
+        const QUOTES = [
+            { text: "Chaque jour est une nouvelle bataille.", author: "Stoïcisme" },
+            { text: "La discipline est le pont entre les objectifs et l'accomplissement.", author: "Jim Rohn" },
+            { text: "Tu ne dois pas être grand pour commencer, mais tu dois commencer pour être grand.", author: "Zig Ziglar" },
+            { text: "L'habitude est soit le meilleur des serviteurs ou le pire des maîtres.", author: "Nathaniel Emmons" },
+            { text: "La constance est la clé du succès.", author: "Confucius" },
+            { text: "Celui qui veut et peut, trouve mille moyens. Celui qui ne veut pas, trouve mille excuses.", author: "Inconnu" },
+            { text: "La douleur est temporaire, mais la fierté de l'accomplissement est éternelle.", author: "Lance Armstrong" },
+            { text: "Nous sommes ce que nous faisons régulièrement. L'excellence n'est donc pas un acte, mais une habitude.", author: "Aristote" },
+            { text: "Le secret de votre avenir se cache dans vos actions d'aujourd'hui.", author: "Robert Kiyosaki" },
+            { text: "L'endurance est la noblesse du courage.", author: "Ralph Waldo Emerson" }
+        ];
+
+        const ACHIEVEMENTS = [
+            { emoji: '🔥', name: 'Série 7 jours', unlock: (d) => d.progress.currentStreak >= 7 },
+            { emoji: '⭐', name: 'Première victoire', unlock: (d) => d.progress.totalXp >= 10 },
+            { emoji: '💯', name: '100 XP', unlock: (d) => d.progress.totalXp >= 100 },
+            { emoji: '🚀', name: '300 XP', unlock: (d) => d.progress.totalXp >= 300 },
+            { emoji: '👑', name: 'Grade Sage', unlock: (d) => d.progress.totalXp >= 300 },
+            { emoji: '⚡', name: 'Feu sacré', unlock: (d) => d.progress.currentStreak >= 30 },
+            { emoji: '🏆', name: 'Légende', unlock: (d) => d.progress.totalXp >= 1000 },
+            { emoji: '📖', name: '10 livres lus', unlock: (d) => d.booksRead >= 10 }
+        ];
+
+        const BOOKS = [
+            { title: "L'homme le plus riche de Babylone", author: "George S. Clason", category: "wealth", points: ["1. Paye-toi d'abord", "2. Maîtrise tes dépenses", "3. Fais travailler ton argent", "4. Protège ta richesse", "5. Cherche les sages"] },
+            { title: "Pensées qui changent la vie", author: "Wayne W. Dyer", category: "personal", points: ["1. Change ta pensée", "2. Lâche le contrôle", "3. Accepte le présent", "4. Cultive la gratitude", "5. Agis avec intention"] },
+            { title: "Les 7 habitudes des gens très efficaces", author: "Stephen R. Covey", category: "personal", points: ["1. Sois proactif", "2. Commence par la fin", "3. Priorités d'abord", "4. Pense gagnant-gagnant", "5. Cherche à comprendre"] },
+            { title: "La psychologie de l'argent", author: "Morgan Housel", category: "psychology", points: ["1. L'argent est comportemental", "2. La chance et le risque", "3. Épargner offre la flexibilité", "4. Les rendements ne sont pas linéaires", "5. Joue le long terme"] },
+            { title: "Atomic Habits", author: "James Clear", category: "habits", points: ["1. Les petits changements", "2. Rends-le difficile", "3. Le système compte", "4. La clarté personnelle", "5. L'identité est clé"] },
+            { title: "Mindset", author: "Carol S. Dweck", category: "personal", points: ["1. Mentalité fixe vs croissance", "2. L'échec est apprentissage", "3. Compliment l'effort", "4. Inspire les autres", "5. Le potentiel n'est pas fixe"] },
+            { title: "La semaine de 4 heures", author: "Tim Ferriss", category: "wealth", points: ["1. Définis ton rêve", "2. Automatise et délègue", "3. Teste avant d'investir", "4. Crée des flux passifs", "5. Libère du temps"] },
+            { title: "Père riche, père pauvre", author: "Robert Kiyosaki", category: "wealth", points: ["1. Investis en toi", "2. Comprends l'argent", "3. Crée des actifs", "4. Apprends la finance", "5. Pense en termes d'actifs"] },
+            { title: "Le pouvoir du moment présent", author: "Eckhart Tolle", category: "psychology", points: ["1. L'ego et l'esprit", "2. Vis maintenant", "3. Lâche le passé", "4. Accepte ce qui est", "5. Trouve la paix intérieure"] },
+            { title: "Sapiens", author: "Yuval Noah Harari", category: "personal", points: ["1. Les révolutions humaines", "2. Les histoires que nous croyons", "3. L'impact de l'agriculture", "4. La modernité change tout", "5. Où allons-nous?"] },
+            { title: "Deep Work", author: "Cal Newport", category: "habits", points: ["1. Travail profond vs superficiel", "2. Élimine les distractions", "3. Crée des rituels", "4. Mesure ta productivité", "5. Cultive la concentration"] },
+            { title: "L'art de la négociation", author: "Dale Carnegie", category: "business", points: ["1. Écoute d'abord", "2. Cherche des solutions gagnant-gagnant", "3. Prépare-toi", "4. Reste calme", "5. Bâtis des relations"] },
+            { title: "Le Lean Startup", author: "Eric Ries", category: "business", points: ["1. Itère rapidement", "2. Teste tes hypothèses", "3. Mesure ce qui compte", "4. Pivot si nécessaire", "5. Apprends vite"] },
+            { title: "Réfléchissez et devenez riche", author: "Napoleon Hill", category: "wealth", points: ["1. Le désir est fondamental", "2. La foi est nécessaire", "3. Visualise ton succès", "4. Agis avec persistance", "5. Crée un plan"] },
+            { title: "Le Secret", author: "Rhonda Byrne", category: "personal", points: ["1. La loi d'attraction", "2. Tes pensées créent", "3. La gratitude attire", "4. La visualisation fonctionne", "5. Tu as le pouvoir"] },
+            { title: "Influence: The Psychology of Persuasion", author: "Robert Cialdini", category: "psychology", points: ["1. La réciprocité", "2. L'engagement et la cohérence", "3. La preuve sociale", "4. L'autorité", "5. La rareté et l'urgence"] },
+            { title: "Essentiel", author: "Greg McKeown", category: "personal", points: ["1. Moins c'est plus", "2. Dis non aux bonnes choses", "3. Une seule voie", "4. L'exécution est clé", "5. Cherche l'essentiel"] },
+            { title: "Les 48 lois du pouvoir", author: "Robert Greene", category: "personal", points: ["1. Jamais tu ne dois surpasser le maître", "2. Cache tes intentions", "3. Cache ton jeu", "4. Dis peu de choses", "5. Préserve ta réputation"] },
+            { title: "Encore Unfinished", author: "Tony Schwartz", category: "personal", points: ["1. L'énergie > le temps", "2. L'authenticité compte", "3. Résilience et croissance", "4. Les relations sont clés", "5. Le but donne sens"] },
+            { title: "Cracking the PM Interview", author: "McDowell & Bavaro", category: "business", points: ["1. Comprendre le rôle", "2. Les compétences clés", "3. Prépare-toi", "4. L'exécution pendant l'entretien", "5. Continue à apprendre"] },
+            { title: "Outliers", author: "Malcolm Gladwell", category: "personal", points: ["1. Le succès n'est pas aléatoire", "2. Les 10 000 heures", "3. Le contexte compte énormément", "4. La culture façonne", "5. Les accidents de naissance"] },
+            { title: "Never Split the Difference", author: "Chris Voss", category: "business", points: ["1. Empathie d'abord", "2. Écoute active", "3. Les détails comptent", "4. Négocie calmement", "5. Crée du rapport"] },
+            { title: "Homme extraordinaire", author: "Geoff Thompson", category: "personal", points: ["1. Confidence intérieure", "2. Maîtrise de soi", "3. Discipline quotidienne", "4. Croissance personnelle", "5. Impact positif"] },
+            { title: "Hábito", author: "Various", category: "habits", points: ["1. Commence petit", "2. Sois consistant", "3. Mesure les progrès", "4. Célèbre les victoires", "5. Persévère"] },
+            { title: "L'intelligence émotionnelle", author: "Daniel Goleman", category: "psychology", points: ["1. Connais tes émotions", "2. Gère-les efficacement", "3. L'empathie est clé", "4. Les relations comptent", "5. Cultive la conscience"] }
+        ];
+
+        for (let i = 0; i < 95; i++) {
+            const categories = ["wealth", "personal", "psychology", "business", "habits"];
+            const cat = categories[i % categories.length];
+            BOOKS.push({
+                title: `Livre ${i + 26}: "${Math.random().toString(36).substring(7)}"`,
+                author: `Auteur ${i + 26}`,
+                category: cat,
+                points: ["1. Point clé", "2. Apprentissage", "3. Application", "4. Progression", "5. Résultat"]
+            });
+        }
+
+        let data = {
+            username: '',
+            habits: [],
+            progress: { totalXp: 0, currentStreak: 0, completedDates: [] },
+            booksRead: 0,
+            mood: '😐',
+            journal: [],
+            timeSessions: 0
+        };
+        let habitFilter = 'all';
+        let timerInterval = null;
+        let timerSeconds = 25 * 60;
+
+        function login() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) return alert('Entre un nom');
+            data.username = username;
+            data.habits = DEFAULT_HABITS.map((h, i) => ({ ...h, id: String(i) }));
+            localStorage.setItem('zenpath-user', username);
+            localStorage.setItem('zenpath-data', JSON.stringify(data));
+            showApp();
+        }
+
+        function logout() {
+            if (!confirm('Déconnexion?')) return;
+            localStorage.clear();
+            location.reload();
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            updateAll();
+        }
+
+        function loadData() {
+            const username = localStorage.getItem('zenpath-user');
+            if (!username) return false;
+            data.username = username;
+            const saved = localStorage.getItem('zenpath-data');
+            if (saved) data = JSON.parse(saved);
+            return true;
+        }
+
+        function saveData() {
+            localStorage.setItem('zenpath-data', JSON.stringify(data));
+        }
+
+        function updateAll() {
+            document.getElementById('headerUsername').textContent = data.username;
+            document.getElementById('profileUsername').textContent = data.username;
+            updateDate();
+            updateHabits();
+            updateGrade();
+            updateStats();
+            updateBooks();
+            updateJournal();
+            updateAchievements();
+            updateWeekView();
+            updateStreaksList();
+            updateQuote();
+        }
+
+        function updateDate() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('dateStr').textContent = dateStr;
+        }
+
+        function updateQuote() {
+            const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+            document.getElementById('quoteText').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `— ${quote.author}`;
+        }
+
+        function setMood(mood) {
+            data.mood = mood;
+            saveData();
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function updateHabits() {
+            let filtered = data.habits;
+            if (habitFilter !== 'all') {
+                filtered = filtered.filter(h => h.category === habitFilter);
+            }
+            const completed = filtered.filter(h => isCompletedToday(h.id)).length;
+            let html = '';
+            filtered.forEach(habit => {
+                const isCompleted = isCompletedToday(habit.id);
+                html += `
+                    <div class="habit-item" onclick="toggleHabit('${habit.id}')">
+                        <div class="habit-checkbox ${isCompleted ? 'checked' : ''}"> ${isCompleted ? '✓' : ''}</div>
+                        <div class="habit-info">
+                            <div class="habit-name">${habit.name}</div>
+                            <div class="habit-meta">${isCompleted ? '✓ Done' : 'À faire'}</div>
+                        </div>
+                        <div class="habit-points">+${habit.xp}XP</div>
+                    </div>
+                `;
+            });
+            document.getElementById('habitsList').innerHTML = html || '<div class="empty-state">Aucune mission</div>';
+            document.getElementById('habitsMgmt').innerHTML = html || '<div class="empty-state">Aucune mission</div>';
+            document.getElementById('missionsStat').textContent = `${completed}/${filtered.length || data.habits.length}`;
+        }
+
+        function updateBooks() {
+            const cat = document.getElementById('bookFilter')?.value || 'all';
+            let filtered = BOOKS;
+            if (cat !== 'all') filtered = filtered.filter(b => b.category === cat);
+            let html = '';
+            filtered.forEach(book => {
+                html += `
+                    <div class="book-card">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">${book.author}</div>
+                        <div class="book-points">
+                            ${book.points.map(p => `<div class="book-point">${p}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('booksContainer').innerHTML = html;
+        }
+
+        function updateGrade() {
+            const grade = GRADES.reduce((g, ng) => ng.minXp <= data.progress.totalXp ? ng : g);
+            document.getElementById('gradeBadge').textContent = grade.emoji;
+            document.getElementById('gradeName').textContent = grade.name;
+            document.getElementById('profileGrade').textContent = grade.name;
+            document.getElementById('profileXpTotal').textContent = data.progress.totalXp;
+            document.getElementById('xpStat').textContent = data.progress.totalXp;
+            document.getElementById('streakStat').textContent = data.progress.currentStreak;
+            const nextGrade = GRADES.find(g => g.minXp > data.progress.totalXp);
+            const nextXp = nextGrade ? nextGrade.minXp : data.progress.totalXp + 500;
+            const progress = Math.min(100, (data.progress.totalXp / nextXp) * 100);
+            document.getElementById('xpFill').style.width = progress + '%';
+            document.getElementById('gradeLevel').textContent = `${grade.name} • ${data.progress.totalXp} XP`;
+        }
+
+        function updateStats() {
+            const completed = data.habits.filter(h => isCompletedToday(h.id)).length;
+            const rate = data.habits.length ? Math.round((completed / data.habits.length) * 100) : 0;
+            document.getElementById('totalHabits').textContent = data.habits.length;
+            document.getElementById('completionRate').textContent = rate + '%';
+            document.getElementById('booksRead').textContent = data.booksRead;
+        }
+
+        function updateWeekView() {
+            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            let html = '<div class="week-grid">';
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const completed = data.habits.some(h => data.progress.completedDates.includes(dateStr + ':' + h.id));
+                const dayName = days[date.getDay()];
+                html += `<div class="week-day ${completed ? 'completed' : ''}">${dayName}</div>`;
+            }
+            html += '</div>';
+            document.getElementById('weekView').innerHTML = html;
+        }
+
+        function updateJournal() {
+            const journalList = document.getElementById('journalList');
+            if (!data.journal || data.journal.length === 0) {
+                journalList.innerHTML = '<div class="empty-state">Aucune entrée</div>';
+                return;
+            }
+            let html = '';
+            data.journal.slice().reverse().forEach(entry => {
+                html += `
+                    <div class="journal-entry">
+                        <div class="journal-date">${entry.date}</div>
+                        <div class="journal-text">${entry.text}</div>
+                    </div>
+                `;
+            });
+            journalList.innerHTML = html;
+        }
+
+        function saveJournal() {
+            const text = document.getElementById('journalInput').value.trim();
+            if (!text) return alert('Écris quelque chose');
+            const today = new Date().toLocaleDateString('fr-FR');
+            data.journal.push({ date: today, text });
+            saveData();
+            updateJournal();
+            document.getElementById('journalInput').value = '';
+            alert('Entrée enregistrée!');
+        }
+
+        function updateAchievements() {
+            const container = document.getElementById('achievementsList');
+            let html = '';
+            ACHIEVEMENTS.forEach(ach => {
+                const unlocked = ach.unlock(data);
+                html += `
+                    <div class="achievement-badge ${unlocked ? 'unlocked' : ''}">
+                        <div class="achievement-emoji">${ach.emoji}</div>
+                        <div class="achievement-name">${ach.name}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function updateStreaksList() {
+            let html = '';
+            if (data.progress.currentStreak >= 7) {
+                html += `<div class="streak-badge">🔥 Série: ${data.progress.currentStreak} jours</div>`;
+            }
+            if (data.progress.currentStreak >= 30) {
+                html += `<div class="streak-badge">⚡ Légendaire: ${data.progress.currentStreak} jours</div>`;
+            }
+            if (data.progress.totalXp >= 1000) {
+                html += `<div class="streak-badge">⭐ Légende: ${data.progress.totalXp} XP</div>`;
+            }
+            if (html === '') {
+                html = '<div style="color: var(--text-muted); font-size: 12px;">Crée une série de 7 jours pour débloquer des badges</div>';
+            }
+            document.getElementById('streaksList').innerHTML = html;
+        }
+
+        function toggleHabit(id) {
+            const today = new Date().toISOString().split('T')[0];
+            const key = today + ':' + id;
+            const habit = data.habits.find(h => h.id === id);
+            const idx = data.progress.completedDates.indexOf(key);
+            if (idx === -1) {
+                data.progress.completedDates.push(key);
+                data.progress.totalXp += (habit?.xp || 10);
+                updateStreak();
+            } else {
+                data.progress.completedDates.splice(idx, 1);
+            }
+            saveData();
+            updateAll();
+        }
+
+        function isCompletedToday(id) {
+            const today = new Date().toISOString().split('T')[0];
+            return data.progress.completedDates.includes(today + ':' + id);
+        }
+
+        function updateStreak() {
+            let streak = 0;
+            const today = new Date();
+            for (let i = 0; i < 365; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                if (data.habits.some(h => data.progress.completedDates.includes(dateStr + ':' + h.id))) {
+                    streak++;
+                } else if (i > 0) break;
+            }
+            data.progress.currentStreak = streak;
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    data.timeSessions++;
+                    saveData();
+                    alert('Session terminée! 🎉');
+                    resetTimer();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 25 * 60;
+            updateTimerDisplay();
+        }
+
+        function setTimerDuration(minutes) {
+            pauseTimer();
+            timerSeconds = minutes * 60;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function openAddHabitModal() {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('habitName').focus();
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function saveHabit() {
+            const name = document.getElementById('habitName').value.trim();
+            if (!name) return alert('Nom requis');
+            data.habits.push({
+                id: Date.now().toString(),
+                name,
+                category: document.getElementById('habitCategory').value,
+                xp: parseInt(document.getElementById('habitXp').value)
+            });
+            saveData();
+            updateAll();
+            closeModal();
+            document.getElementById('habitName').value = '';
+        }
+
+        function saveSettings() {
+            const notif = document.getElementById('notif').checked;
+            const time = document.getElementById('reminderTime').value;
+            localStorage.setItem('zenpath-settings', JSON.stringify({ notif, time }));
+            closeModal();
+            alert('Paramètres enregistrés');
+        }
+
+        function filterHabits(cat) {
+            habitFilter = cat;
+            document.querySelectorAll('#filterAll, #filterHealth, #filterWealth, #filterMind').forEach(b => b.style.background = 'var(--surface-2)');
+            document.getElementById('filter' + cat.charAt(0).toUpperCase() + cat.slice(1)).style.background = 'var(--primary)';
+            updateHabits();
+        }
+
+        function filterBooks() {
+            updateBooks();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        function resetProgress() {
+            if (!confirm('Êtes-vous sûr?')) return;
+            data.progress = { totalXp: 0, currentStreak: 0, completedDates: [] };
+            saveData();
+            updateAll();
+        }
+
+        window.addEventListener('load', () => {
+            if (loadData()) showApp();
+        });
+    </script>
+</body>
+</html>
