@@ -7,15 +7,15 @@
   </defs>
   <rect width="800" height="800" fill="#fafafa"/>
   <!-- Polo shirt back -->
-  <path d="M 200 180 L 250 180 L 290 140 L 350 110 L 400 100 L 450 110 L 510 140 L 550 180 L 600 180 L 650 300 L 650 700 L 150 700 L 150 300 Z" fill="url(#poloGrad)" stroke="#333" stroke-width="2"/>
+  <path d="M 200 150 Q 400 115 600 150 L 650 300 L 650 700 L 150 700 L 150 300 Z" fill="url(#poloGrad)" stroke="#333" stroke-width="2"/>
   <!-- Collar back part -->
-  <path d="M 370 180 Q 400 160 430 180" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <path d="M 370 170 Q 400 152 430 170" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="3,2"/>
   <!-- Design area on back -->
   <rect x="280" y="310" width="240" height="260" fill="none" stroke="#FF6B9D" stroke-width="3" stroke-dasharray="8,4" rx="4"/>
   <text x="400" y="330" font-size="14" fill="#999" text-anchor="middle">Zone de design</text>
   <!-- Seams -->
-  <path d="M 200 180 L 200 700" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
-  <path d="M 600 180 L 600 700" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M 200 150 L 150 300" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M 600 150 L 650 300" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
   <!-- Label -->
   <text x="400" y="760" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">Polo VERSO</text>
 </svg>

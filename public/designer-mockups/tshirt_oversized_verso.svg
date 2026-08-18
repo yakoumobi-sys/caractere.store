@@ -7,15 +7,15 @@
   </defs>
   <rect width="800" height="800" fill="#fafafa"/>
   <!-- Oversized T-shirt back -->
-  <path d="M 150 160 L 220 160 L 270 120 L 330 100 L 400 95 L 470 100 L 530 120 L 580 160 L 650 160 L 680 300 L 680 720 L 120 720 L 120 300 Z" fill="url(#shirtGrad2)" stroke="#333" stroke-width="2"/>
-  <!-- Neck area -->
-  <ellipse cx="400" cy="160" rx="95" ry="60" fill="#fafafa" stroke="#333" stroke-width="2"/>
+  <path d="M 150 150 Q 400 100 650 150 L 700 300 L 700 700 L 100 700 L 100 300 Z" fill="url(#shirtGrad2)" stroke="#333" stroke-width="2"/>
+  <!-- Collar seam (back neckline stitching) -->
+  <path d="M 330 170 Q 400 150 470 170" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="4,3"/>
   <!-- Design area on back -->
-  <rect x="260" y="280" width="280" height="320" fill="none" stroke="#FF6B9D" stroke-width="3" stroke-dasharray="8,4" rx="4"/>
-  <text x="400" y="300" font-size="14" fill="#999" text-anchor="middle">Zone de design</text>
+  <rect x="260" y="290" width="280" height="320" fill="none" stroke="#FF6B9D" stroke-width="3" stroke-dasharray="8,4" rx="4"/>
+  <text x="400" y="310" font-size="14" fill="#999" text-anchor="middle">Zone de design</text>
   <!-- Seams -->
-  <path d="M 150 160 L 150 720" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
-  <path d="M 650 160 L 650 720" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M 150 150 L 100 300" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M 650 150 L 700 300" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
   <!-- Label -->
   <text x="400" y="760" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">T-shirt Oversized VERSO</text>
 </svg>

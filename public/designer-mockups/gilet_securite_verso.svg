@@ -7,7 +7,7 @@
   </defs>
   <rect width="800" height="800" fill="#fafafa"/>
   <!-- Safety vest back -->
-  <path d="M 220 150 L 300 150 L 350 120 L 400 110 L 450 120 L 500 150 L 580 150 L 630 280 L 630 700 L 170 700 L 170 280 Z" fill="url(#secuGrad)" stroke="#333" stroke-width="2"/>
+  <path d="M 200 150 L 600 150 L 650 250 L 650 700 L 150 700 L 150 250 Z" fill="url(#secuGrad)" stroke="#333" stroke-width="2"/>
   <!-- Reflective strips (yellow) -->
   <rect x="250" y="200" width="300" height="40" fill="none" stroke="#FFD700" stroke-width="6" stroke-dasharray="10,8"/>
   <rect x="250" y="420" width="300" height="40" fill="none" stroke="#FFD700" stroke-width="6" stroke-dasharray="10,8"/>
