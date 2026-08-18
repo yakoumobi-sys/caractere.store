@@ -6,6 +6,10 @@ import { OrbitControls, ContactShadows, useGLTF, Center, Decal } from "@react-th
 import { useSearchParams } from "next/navigation";
 import * as THREE from "three";
 
+// Décodeur Draco auto-hébergé (les .glb sont compressés KHR_draco_mesh_compression) —
+// évite de dépendre du CDN gstatic.com par défaut de drei pour ce fetch critique.
+useGLTF.setDecoderPath("/draco/");
+
 const WHATSAPP = "213557440522";
 const MAX_REC = 30;
 
@@ -102,6 +106,10 @@ function ModelWithDecals({
   const tint = PRODUCTS[product]?.tint;
   const tc = useRef(new THREE.Color(color));
   const meshRef = useRef<THREE.Group>(null);
+  // Le maillage réel du vêtement (trouvé dans le glTF) sur lequel projeter
+  // les décals, plus l'étendue de sa boîte englobante pour recalibrer les
+  // zones de placement — voir commentaire sur PLACEMENT_ZONES plus bas.
+  const [decalTarget, setDecalTarget] = useState<{ mesh: THREE.Mesh; size: THREE.Vector3; center: THREE.Vector3 } | null>(null);
 
   useFrame(() => {
     if (!tint || !meshRef.current) return;
@@ -112,12 +120,35 @@ function ModelWithDecals({
   });
 
   useEffect(() => {
+    let target: THREE.Mesh | null = null;
+    let targetVolume = -Infinity;
     scene.traverse((o: any) => {
       if (o.isMesh) {
         o.castShadow = true;
         o.receiveShadow = true;
+        // Un même modèle peut avoir plusieurs maillages (extérieur, doublure
+        // intérieure...) — on décale sur le plus volumineux : c'est presque
+        // toujours la surface extérieure visible du vêtement.
+        if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+        const bb = o.geometry.boundingBox;
+        if (bb) {
+          const size = new THREE.Vector3();
+          bb.getSize(size);
+          const volume = size.x * size.y * size.z;
+          if (volume > targetVolume) { targetVolume = volume; target = o; }
+        }
       }
     });
+    if (target) {
+      const bb = (target as THREE.Mesh).geometry.boundingBox!;
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      bb.getSize(size);
+      bb.getCenter(center);
+      setDecalTarget({ mesh: target, size, center });
+    } else {
+      setDecalTarget(null);
+    }
   }, [scene]);
 
   return (
@@ -126,18 +157,25 @@ function ModelWithDecals({
         <primitive object={scene} />
 
         {/* Applique les logos comme décals sur le modèle */}
-        {logos.map(logo => (
-          <LogoDecal key={logo.id} logo={logo} />
+        {decalTarget && logos.map(logo => (
+          <LogoDecal key={logo.id} logo={logo} target={decalTarget} />
         ))}
       </group>
     </Center>
   );
 }
 
-function LogoDecal({ logo }: { logo: LogoDecal }) {
+function LogoDecal({
+  logo,
+  target,
+}: {
+  logo: LogoDecal;
+  target: { mesh: THREE.Mesh; size: THREE.Vector3; center: THREE.Vector3 };
+}) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const zone = PLACEMENT_ZONES.find(z => z.id === logo.zone);
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshTargetRef = useRef<THREE.Mesh>(target.mesh);
+  meshTargetRef.current = target.mesh;
 
   useEffect(() => {
     if (!logo.src) return;
@@ -150,15 +188,31 @@ function LogoDecal({ logo }: { logo: LogoDecal }) {
 
   if (!zone || !texture) return null;
 
+  // Decal.position/scale sont exprimés dans l'espace local du maillage
+  // cible (pas de la scène recentrée), et rien ne garantit que son origine
+  // coïncide avec le centre géométrique du vêtement (ex. origine au niveau
+  // de l'ourlet plutôt qu'au centre du buste) ni que les PLACEMENT_ZONES —
+  // pensées comme des fractions [-1,1] d'une boîte centrée sur l'origine —
+  // tombent au bon endroit une fois appliquées telles quelles. On reprojette
+  // donc chaque zone comme une fraction de la vraie boîte englobante du
+  // maillage (centre + demi-étendue par axe) plutôt que comme une position
+  // absolue, pour rester correct quel que soit l'export.
+  const position: [number, number, number] = [
+    target.center.x + zone.position[0] * (target.size.x / 2),
+    target.center.y + zone.position[1] * (target.size.y / 2),
+    target.center.z + zone.position[2] * (target.size.z / 2),
+  ];
+  const maxDim = Math.max(target.size.x, target.size.y, target.size.z);
+  const scale = zone.scale * logo.scale * (maxDim / 2);
+
   return (
-    <mesh ref={meshRef} position={zone.position}>
-      <Decal
-        position={[0, 0, 0]}
-        rotation={[0, 0, logo.rotation]}
-        scale={zone.scale * logo.scale}
-        map={texture}
-      />
-    </mesh>
+    <Decal
+      mesh={meshTargetRef}
+      position={position}
+      rotation={[0, 0, logo.rotation]}
+      scale={scale}
+      map={texture}
+    />
   );
 }
 
@@ -342,7 +396,17 @@ export default function Studio3DAdvanced() {
 
         <div className="mx-auto flex max-w-7xl flex-col lg:flex-row gap-4 p-4">
           {/* Canvas 3D */}
-          <div className="relative flex-1 rounded-2xl overflow-hidden" style={{ minHeight: "600px", backgroundColor: bgColor }}>
+          {/*
+            h-[600px] (au lieu de minHeight seul) : en colonne (mobile), ce
+            conteneur n'a que min-height, donc sa hauteur "réelle" n'est pas
+            définie pour le calcul CSS — le <canvas> de R3F (qui utilise
+            height:100%) ne peut alors pas s'y référer et retombe sur la
+            taille par défaut du navigateur pour <canvas> (300x150), d'où un
+            rendu 3D minuscule collé en haut. lg:h-auto lg:min-h-[600px]
+            restaure le comportement d'origine en desktop (flex-row, où le
+            stretch de flexbox donne déjà une hauteur définie).
+          */}
+          <div className="relative flex-1 h-[600px] lg:h-auto lg:min-h-[600px] rounded-2xl overflow-hidden" style={{ backgroundColor: bgColor }}>
             <Canvas
               camera={{ position: [0, 0, 4], fov: 30 }}
               gl={{ preserveDrawingBuffer: true, antialias: true, alpha: false }}
