@@ -94,7 +94,7 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         overflowY: 'auto',
       }}
     >
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes gateIn {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
@@ -152,7 +152,7 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         @media (max-width: 900px) {
           .gate-grid { grid-template-columns: 1fr; max-width: 480px; }
         }
-      `}</style>
+      `}} />
 
       <div className="gate-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '36px' }}>
         <Logo />

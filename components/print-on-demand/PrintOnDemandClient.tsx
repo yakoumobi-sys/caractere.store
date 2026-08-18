@@ -31,7 +31,7 @@ function useReveal() {
 }
 
 const GlobalStyle = () => (
-  <style>{`
+  <style dangerouslySetInnerHTML={{ __html: `
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -230,7 +230,7 @@ const GlobalStyle = () => (
       .section { padding: 56px 0; }
       .guarantee { flex-direction: column; }
     }
-  `}</style>
+  `}} />
 )
 
 export default function PrintOnDemandClient() {
