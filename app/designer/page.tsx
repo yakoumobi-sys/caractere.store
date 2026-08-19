@@ -3,7 +3,6 @@ import { useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import { MOCKUPS, MOCKUPS_VERSO } from '@/components/designer/mockups-data'
-import { TSHIRT_VIEWS } from '@/components/designer/tshirt-views'
 
 interface Layer {
   id: string
@@ -104,7 +103,7 @@ function DesignerInner() {
   const [viewIndex, setViewIndex] = useState(0)
 
   // Use verso mockup when in verso mode, recto otherwise
-  const rectoMockups = product.id === 'tshirt' ? TSHIRT_VIEWS : [MOCKUPS[product.id] || MOCKUPS['tshirt']]
+  const rectoMockups = [MOCKUPS[product.id] || MOCKUPS['tshirt']]
   const versoMockups = [MOCKUPS_VERSO[product.id] || MOCKUPS_VERSO['tshirt']]
   const views = side === 'verso' ? versoMockups : rectoMockups
   const mockupSrc = views[viewIndex] || views[0]
