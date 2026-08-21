@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabaseClient } from '@/lib/supabase'
 
 const C = { black: '#0C0A09', white: '#FAFAF9', lime: '#A3E635', muted: '#A8A29E', red: '#EF4444' }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -32,7 +33,8 @@ export default function LoginPage() {
 
       if (data?.session) {
         const isAdmin = (data.session.user?.email || '').toLowerCase() === 'yakoumobi@gmail.com'
-        router.push(isAdmin ? '/admin' : '/dashboard')
+        const next = searchParams.get('next')
+        router.push(next || (isAdmin ? '/admin' : '/dashboard'))
       }
     } catch (err) {
       setError('Erreur de connexion. Réessaye.')
@@ -158,5 +160,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: C.black }} />}>
+      <LoginForm />
+    </Suspense>
   )
 }

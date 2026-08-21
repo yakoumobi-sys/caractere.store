@@ -1,3 +1,67 @@
+// ── JARVIS (assistant personnel) ──
+export interface JarvisTask {
+  id: string
+  title: string
+  notes: string | null
+  due_date: string | null
+  due_time: string | null
+  priority: 'basse' | 'normale' | 'haute'
+  category: string
+  status: 'a_faire' | 'en_cours' | 'fait'
+  created_at: string
+}
+
+export interface JarvisEvent {
+  id: string
+  title: string
+  type: 'reunion' | 'dejeuner' | 'diner' | 'rdv' | 'appel' | 'autre'
+  with_person: string | null
+  location: string | null
+  start_at: string
+  end_at: string | null
+  notes: string | null
+  created_at: string
+}
+
+export interface JarvisTransaction {
+  id: string
+  type: 'revenu' | 'depense'
+  amount: number
+  currency: string
+  category: string
+  description: string | null
+  date: string
+  created_at: string
+}
+
+export interface JarvisGoal {
+  id: string
+  title: string
+  description: string | null
+  category: string
+  target_date: string | null
+  progress: number
+  status: 'en_cours' | 'atteint' | 'abandonne'
+  created_at: string
+}
+
+export interface JarvisProject {
+  id: string
+  name: string
+  description: string | null
+  status: 'actif' | 'en_pause' | 'termine'
+  progress: number
+  deadline: string | null
+  created_at: string
+}
+
+export interface JarvisMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  created_at: string
+}
+
 export interface Produit {
   id: string
   nom: string

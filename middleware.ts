@@ -35,8 +35,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // ========== PROTÉGER /admin ==========
-  if (pathname.startsWith('/admin')) {
+  // ========== PROTÉGER /admin ET /jarvis ==========
+  if (pathname.startsWith('/admin') || pathname.startsWith('/jarvis')) {
     let response = NextResponse.next({
       request: { headers: request.headers },
     })
@@ -59,6 +59,7 @@ export async function middleware(request: NextRequest) {
 
     if (!user) {
       const loginUrl = new URL('/auth/login', request.url)
+      loginUrl.searchParams.set('next', pathname)
       return NextResponse.redirect(loginUrl)
     }
 
@@ -98,5 +99,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*', '/api/leads/:path*', '/auth/login'],
+  matcher: ['/admin/:path*', '/jarvis/:path*', '/api/admin/:path*', '/api/leads/:path*', '/auth/login'],
 }

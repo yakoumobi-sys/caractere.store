@@ -116,6 +116,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="mt-auto space-y-3">
+          <Link href="/jarvis" className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] font-semibold no-underline transition-colors" style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.18), rgba(139,92,246,0.18))', color: '#67e8f9' }}>
+            ✦ JARVIS — assistant perso
+          </Link>
           <Link href="/" className="flex items-center gap-2 px-3 py-2 text-[12px] text-white/40 hover:text-white/60 no-underline transition-colors">
             Voir le site
           </Link>
