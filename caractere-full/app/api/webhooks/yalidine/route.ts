@@ -34,9 +34,18 @@ export async function POST(req: Request) {
   const supabase = createClient();
 
   try {
-    // Récupérer le body brut pour vérifier la signature
+    // Récupérer le body brut
     const rawBody = await req.text();
-    const body: YalidineWebhookPayload = JSON.parse(rawBody);
+    const body = JSON.parse(rawBody) as any;
+
+    // ✅ VALIDATION YALIDINE: Répondre avec le crc_token
+    if (body.crc_token) {
+      console.log("✅ Validation webhook Yalidine reçue");
+      return Response.json({ crc_token: body.crc_token });
+    }
+
+    // Typer le body correctement
+    const webhookPayload = body as YalidineWebhookPayload;
 
     // Vérifier la signature (optionnel)
     const signature = headers().get("x-yalidine-signature");
@@ -49,20 +58,20 @@ export async function POST(req: Request) {
     }
 
     console.log("📦 Webhook Yalidine reçu:", {
-      tracking: body.tracking_number,
-      status: body.status,
-      wilaya: body.wilaya,
+      tracking: webhookPayload.tracking_number,
+      status: webhookPayload.status,
+      wilaya: webhookPayload.wilaya,
     });
 
     // 1. Trouver la commande avec ce numéro de suivi
     const { data: order, error: orderError } = await supabase
       .from("pipeline_orders")
       .select("id, yalidine_status")
-      .eq("yalidine_tracking", body.tracking_number)
+      .eq("yalidine_tracking", webhookPayload.tracking_number)
       .single();
 
     if (orderError || !order) {
-      console.warn("⚠️ Commande non trouvée pour:", body.tracking_number);
+      console.warn("⚠️ Commande non trouvée pour:", webhookPayload.tracking_number);
       return Response.json(
         { warning: "Commande non trouvée" },
         { status: 200 } // Retourner 200 pour que Yalidine ne retry pas
@@ -74,13 +83,13 @@ export async function POST(req: Request) {
       .from("yalidine_tracking_history")
       .insert({
         order_id: order.id,
-        tracking_number: body.tracking_number,
-        parcel_number: body.parcel_number,
-        new_status: body.status,
-        status_ar: body.status_ar,
-        wilaya: body.wilaya,
-        location: body.location,
-        updated_at: body.updated_at || new Date().toISOString(),
+        tracking_number: webhookPayload.tracking_number,
+        parcel_number: webhookPayload.parcel_number,
+        new_status: webhookPayload.status,
+        status_ar: webhookPayload.status_ar,
+        wilaya: webhookPayload.wilaya,
+        location: webhookPayload.location,
+        updated_at: webhookPayload.updated_at || new Date().toISOString(),
       });
 
     if (historyError) {
@@ -92,12 +101,12 @@ export async function POST(req: Request) {
     }
 
     // 3. Mettre à jour le statut de la commande
-    if (body.status !== order.yalidine_status) {
+    if (webhookPayload.status !== order.yalidine_status) {
       const { error: updateError } = await supabase
         .from("pipeline_orders")
         .update({
-          yalidine_status: body.status,
-          yalidine_updated_at: body.updated_at || new Date().toISOString(),
+          yalidine_status: webhookPayload.status,
+          yalidine_updated_at: webhookPayload.updated_at || new Date().toISOString(),
         })
         .eq("id", order.id);
 
@@ -109,10 +118,10 @@ export async function POST(req: Request) {
         );
       }
 
-      console.log(`✅ Statut mis à jour: ${order.yalidine_status} → ${body.status}`);
+      console.log(`✅ Statut mis à jour: ${order.yalidine_status} → ${webhookPayload.status}`);
 
       // 4. Si livré, mettre à jour la commande automatiquement
-      if (body.status === "delivered") {
+      if (webhookPayload.status === "delivered") {
         await supabase
           .from("pipeline_orders")
           .update({
@@ -126,7 +135,7 @@ export async function POST(req: Request) {
       }
 
       // 5. Si échec, notifier
-      if (body.status === "failed") {
+      if (webhookPayload.status === "failed") {
         console.error("❌ Livraison échouée pour commande:", order.id);
       }
     }
@@ -134,8 +143,8 @@ export async function POST(req: Request) {
     // Répondre à Yalidine
     return Response.json({
       success: true,
-      message: `Webhook traité: ${body.tracking_number}`,
-      status: body.status,
+      message: `Webhook traité: ${webhookPayload.tracking_number}`,
+      status: webhookPayload.status,
     });
   } catch (error) {
     console.error("❌ Erreur webhook Yalidine:", error);
