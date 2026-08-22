@@ -67,7 +67,7 @@ export default function GrosQueuePage() {
             </div>
           ) : (
             orders.map(order => {
-              const statusDef = STATUS_DEFS[order.status];
+              const statusDef = (STATUS_DEFS as any)[order.status];
 
               return (
                 <div

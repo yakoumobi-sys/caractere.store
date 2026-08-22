@@ -111,8 +111,8 @@ export default function AdminLoginPage() {
             <label className="text-sm font-medium text-slate-700">Employé</label>
             <select
               value={selectedEmployee?.id || ''}
-              onChange={(e) => {
-                const emp = employees.find(e => e.id === e.target.value)
+              onChange={(event) => {
+                const emp = employees.find(e => e.id === event.target.value)
                 setSelectedEmployee(emp || null)
               }}
               className="border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent bg-white"

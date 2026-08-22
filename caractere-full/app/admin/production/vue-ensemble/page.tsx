@@ -44,8 +44,8 @@ export default function ProductionOverviewPage() {
           delivery: 0,
         };
 
-        orders.forEach(order => {
-          const statusDef = STATUS_DEFS[order.status];
+        orders.forEach((order: any) => {
+          const statusDef = (STATUS_DEFS as any)[order.status];
           if (statusDef?.queue) {
             counts[statusDef.queue as QueueName]++;
           }

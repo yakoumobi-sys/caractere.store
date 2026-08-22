@@ -13,13 +13,13 @@ export async function POST(req: Request) {
 
     const result = await loginEmployee(firstName, lastName, password, isFirstLogin);
 
-    if (result.error) {
+    if ("error" in result) {
       return Response.json({ error: result.error }, { status: 401 });
     }
 
     return Response.json({
       success: true,
-      message: result.message,
+      message: result.message || "Connexion réussie",
       token: result.token,
     });
   } catch (error) {

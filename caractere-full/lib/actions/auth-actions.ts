@@ -33,7 +33,7 @@ export async function verifyPassword(
 /**
  * Générer un token de session
  */
-export function generateSessionToken(): string {
+export async function generateSessionToken(): Promise<string> {
   return crypto.randomBytes(32).toString("hex");
 }
 
@@ -115,7 +115,7 @@ export async function loginEmployee(
       }
 
       // Créer une session
-      return await createSession(employee.id, email);
+      return await createSession(employee.id, employee.email);
     }
 
     // 3. Login régulier - vérifier le password
@@ -135,7 +135,7 @@ export async function loginEmployee(
       .eq("id", employee.id);
 
     // Créer une session
-    return await createSession(employee.id, email);
+    return await createSession(employee.id, employee.email);
   } catch (error) {
     console.error("Login error:", error);
     return { error: "Erreur lors de la connexion" };
@@ -149,7 +149,7 @@ export async function createSession(employeeId: string, email: string) {
   const supabase = createClient();
 
   try {
-    const token = generateSessionToken();
+    const token = await generateSessionToken();
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 jours
 
     const { error: sessionError } = await supabase
