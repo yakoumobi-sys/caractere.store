@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return Response.json({ error: result.error }, { status: 400 });
     }
 
-    return Response.json({ success: true, ...result });
+    return Response.json(result);
   } catch (error) {
     console.error("API error:", error);
     return Response.json(
