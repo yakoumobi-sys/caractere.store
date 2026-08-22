@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import DashboardClient from "../components/DashboardClient";
 
 export const revalidate = 0;
 
@@ -88,13 +89,16 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
-            Tableau de bord
-          </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Vue d'ensemble de Caractère Store
-          </p>
+        <div className="mb-10 flex items-center gap-4">
+          <img src="/logo-caractere.png" alt="Caractère" className="w-12 h-12 rounded-lg" />
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
+              Tableau de bord
+            </h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Vue d'ensemble de Caractère Store
+            </p>
+          </div>
         </div>
 
         {/* KPI Cards */}
@@ -270,6 +274,11 @@ export default async function DashboardPage() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Champion du Mois Section */}
+        <div className="mt-8">
+          <DashboardClient />
         </div>
       </div>
     </div>

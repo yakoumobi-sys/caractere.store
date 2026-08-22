@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 flex flex-col py-6 px-4 overflow-y-auto">
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-[16px] font-bold text-white">C</div>
+          <img src="/logo-caractere.png" alt="Caractère" className="w-10 h-10 rounded-lg" />
           <div>
             <div className="text-[14px] font-bold text-slate-900 dark:text-white">CARACTÈRE</div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400">ERP SYSTEM</div>
