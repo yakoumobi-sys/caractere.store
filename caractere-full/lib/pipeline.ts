@@ -3,11 +3,13 @@
 // part dans la file de l'atelier concerné -> chaque prise en charge change
 // son statut -> une fois prête, retour au commercial pour livraison.
 
-export type Technique = "dtf" | "broderie" | "aucune";
+export type Technique = "dtf" | "broderie" | "flocage" | "aucune";
 
 export type OrderStatus =
   | "attente_dtf"
   | "impression_dtf"
+  | "attente_flocage"
+  | "en_flocage"
   | "attente_broderie"
   | "en_broderie"
   | "attente_gros"
@@ -17,10 +19,11 @@ export type OrderStatus =
   | "attente_yalidine"
   | "payee";
 
-export type QueueName = "dtf" | "broderie" | "gros" | "ready" | "delivery";
+export type QueueName = "dtf" | "flocage" | "broderie" | "gros" | "ready" | "delivery";
 
 export const TECHNIQUES: { value: Technique; label: string }[] = [
   { value: "dtf", label: "DTF" },
+  { value: "flocage", label: "Flocage" },
   { value: "broderie", label: "Broderie" },
   { value: "aucune", label: "Rien (commande gros)" },
 ];
@@ -42,6 +45,7 @@ export const LOGO_SOURCES: { value: string; label: string }[] = [
 /** Statut de départ dès que le commercial valide la technique choisie */
 export function initialStatus(technique: Technique): OrderStatus {
   if (technique === "dtf") return "attente_dtf";
+  if (technique === "flocage") return "attente_flocage";
   if (technique === "broderie") return "attente_broderie";
   return "attente_gros";
 }
@@ -73,6 +77,22 @@ export const STATUS_DEFS: Record<OrderStatus, StatusDef> = {
     label: "Impression en cours",
     queue: "dtf",
     department: "Atelier DTF",
+    next: "attente_flocage",
+    action: "Envoyer au flocage",
+  },
+  attente_flocage: {
+    value: "attente_flocage",
+    label: "En attente (Flocage)",
+    queue: "flocage",
+    department: "Atelier Flocage",
+    next: "en_flocage",
+    action: "Prendre la commande",
+  },
+  en_flocage: {
+    value: "en_flocage",
+    label: "En flocage",
+    queue: "flocage",
+    department: "Atelier Flocage",
     next: "prete",
     action: "Marquer terminée",
   },
@@ -154,6 +174,7 @@ export function statusesForQueue(queue: QueueName): OrderStatus[] {
 
 export const QUEUE_TITLES: Record<QueueName, string> = {
   dtf: "File DTF",
+  flocage: "File Flocage",
   broderie: "File Broderie",
   gros: "Commande gros",
   ready: "Commandes prêtes",
