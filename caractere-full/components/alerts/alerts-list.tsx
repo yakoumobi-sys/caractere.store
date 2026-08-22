@@ -17,7 +17,7 @@ interface Alert {
   created_at: string;
 }
 
-const PRIORITY_COLORS: Record<string, { badge: string; bg: string }> = {
+const PRIORITY_COLORS: Record<string, { badge: "blue" | "gray" | "green" | "red"; bg: string }> = {
   low: { badge: "gray", bg: "bg-blue-50 dark:bg-blue-900/20" },
   normal: { badge: "gray", bg: "bg-slate-50 dark:bg-slate-800" },
   high: { badge: "blue", bg: "bg-orange-50 dark:bg-orange-900/20" },
