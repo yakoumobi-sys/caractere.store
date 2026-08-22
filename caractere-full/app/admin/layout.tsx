@@ -74,6 +74,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/production/pret" className="px-3 py-2 text-[12px] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 no-underline">
                   Commandes prêtes
                 </Link>
+                <Link href="/admin/queues/yalidine" className="px-3 py-2 text-[12px] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 no-underline border-t border-slate-200 dark:border-slate-600 mt-1 pt-2">
+                  📦 Yalidine
+                </Link>
               </div>
             )}
           </div>

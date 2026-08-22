@@ -3,7 +3,7 @@
 // part dans la file de l'atelier concerné -> chaque prise en charge change
 // son statut -> une fois prête, retour au commercial pour livraison.
 
-export type Technique = "dtf" | "broderie" | "flocage" | "aucune";
+export type Technique = "dtf" | "broderie" | "flocage" | "aucune" | "yalidine";
 
 export type OrderStatus =
   | "attente_dtf"
@@ -17,15 +17,20 @@ export type OrderStatus =
   | "prete"
   | "livree"
   | "attente_yalidine"
+  | "yalidine_pending"
+  | "yalidine_picked_up"
+  | "yalidine_delivered"
+  | "yalidine_failed"
   | "payee";
 
-export type QueueName = "dtf" | "flocage" | "broderie" | "gros" | "ready" | "delivery";
+export type QueueName = "dtf" | "flocage" | "broderie" | "gros" | "ready" | "delivery" | "yalidine";
 
 export const TECHNIQUES: { value: Technique; label: string }[] = [
   { value: "dtf", label: "DTF" },
   { value: "flocage", label: "Flocage" },
   { value: "broderie", label: "Broderie" },
   { value: "aucune", label: "Rien (commande gros)" },
+  { value: "yalidine", label: "Commande Yalidine" },
 ];
 
 export const LOGO_PLACEMENTS: { value: string; label: string }[] = [
@@ -47,6 +52,7 @@ export function initialStatus(technique: Technique): OrderStatus {
   if (technique === "dtf") return "attente_dtf";
   if (technique === "flocage") return "attente_flocage";
   if (technique === "broderie") return "attente_broderie";
+  if (technique === "yalidine") return "yalidine_pending";
   return "attente_gros";
 }
 
@@ -160,6 +166,38 @@ export const STATUS_DEFS: Record<OrderStatus, StatusDef> = {
     next: null,
     action: null,
   },
+  yalidine_pending: {
+    value: "yalidine_pending",
+    label: "En attente (Yalidine)",
+    queue: "yalidine",
+    department: "Commercial",
+    next: "yalidine_picked_up",
+    action: "Suivi Yalidine",
+  },
+  yalidine_picked_up: {
+    value: "yalidine_picked_up",
+    label: "Récupérée par Yalidine",
+    queue: "yalidine",
+    department: "Commercial",
+    next: "yalidine_delivered",
+    action: "Suivi Yalidine",
+  },
+  yalidine_delivered: {
+    value: "yalidine_delivered",
+    label: "Livrée par Yalidine ✓",
+    queue: null,
+    department: null,
+    next: "payee",
+    action: "Confirmer livraison",
+  },
+  yalidine_failed: {
+    value: "yalidine_failed",
+    label: "Livraison échouée ❌",
+    queue: "yalidine",
+    department: "Commercial",
+    next: null,
+    action: "Contacter client",
+  },
 };
 
 export const ALL_STATUSES = Object.values(STATUS_DEFS);
@@ -178,6 +216,7 @@ export const QUEUE_TITLES: Record<QueueName, string> = {
   broderie: "File Broderie",
   gros: "Commande gros",
   ready: "Commandes prêtes",
+  yalidine: "Commandes Yalidine",
   delivery: "Livraison Yalidine/Alger",
 };
 

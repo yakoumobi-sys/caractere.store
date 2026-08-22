@@ -169,3 +169,128 @@ export async function confirmDeliveryAndPayment(orderId: string) {
 
   return { success: true };
 }
+
+/**
+ * Crée une commande Yalidine complète:
+ * - Crée/récupère le client
+ * - Crée la commande
+ * - Déduit du stock
+ * - Crée l'envoi Yalidine
+ */
+export async function createYalidineOrder(data: {
+  clientName: string;
+  clientPhone: string;
+  clientAddress: string;
+  clientCity: string;
+  postalCode: string;
+  items: Array<{ productName: string; quantity: number }>;
+}) {
+  const supabase = createClient();
+
+  try {
+    // 1. Créer ou récupérer le client
+    let clientId: string;
+    
+    const { data: existingClient } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("phone", data.clientPhone)
+      .single();
+
+    if (existingClient) {
+      clientId = existingClient.id;
+    } else {
+      const { data: newClient, error: clientError } = await supabase
+        .from("clients")
+        .insert({
+          name: data.clientName,
+          phone: data.clientPhone,
+          address: data.clientAddress,
+          city: data.clientCity,
+          client_type: "retail",
+        })
+        .select("id")
+        .single();
+
+      if (clientError || !newClient) {
+        return { error: `Erreur création client: ${clientError?.message}` };
+      }
+      clientId = newClient.id;
+    }
+
+    // 2. Créer la commande Yalidine
+    const totalQuantity = data.items.reduce((sum, item) => sum + item.quantity, 0);
+    
+    const { data: order, error: orderError } = await supabase
+      .from("pipeline_orders")
+      .insert({
+        client_id: clientId,
+        contact_name: data.clientName,
+        technique: "yalidine",
+        is_yalidine_order: true,
+        status: "yalidine_pending",
+        quantity: totalQuantity,
+      })
+      .select("id, number")
+      .single();
+
+    if (orderError || !order) {
+      return { error: `Erreur création commande: ${orderError?.message}` };
+    }
+
+    // 3. Déduire du stock pour chaque article
+    for (const item of data.items) {
+      const { data: inventory } = await supabase
+        .from("inventory")
+        .select("quantity")
+        .eq("product_name", item.productName)
+        .single();
+
+      if (inventory) {
+        const newQuantity = Math.max(0, inventory.quantity - item.quantity);
+        await supabase
+          .from("inventory")
+          .update({ quantity: newQuantity })
+          .eq("product_name", item.productName);
+      }
+    }
+
+    // 4. Créer l'envoi Yalidine (mock pour l'instant, à intégrer avec l'API réelle)
+    const { data: shipment, error: shipmentError } = await supabase
+      .from("yalidine_shipments")
+      .insert({
+        order_id: order.id,
+        shipment_id: `YLD-${Date.now()}`, // Sera remplacé par l'ID réel de Yalidine
+        client_name: data.clientName,
+        client_phone: data.clientPhone,
+        client_address: data.clientAddress,
+        client_city: data.clientCity,
+        postal_code: data.postalCode,
+        status: "pending",
+      })
+      .select("id")
+      .single();
+
+    if (shipmentError) {
+      console.error("Erreur création envoi Yalidine:", shipmentError);
+    }
+
+    // Mettre à jour la commande avec l'ID de l'envoi
+    if (shipment) {
+      await supabase
+        .from("pipeline_orders")
+        .update({ yalidine_shipment_id: shipment.id })
+        .eq("id", order.id);
+    }
+
+    return {
+      success: true,
+      orderId: order.id,
+      orderNumber: order.number,
+      clientId,
+    };
+  } catch (error) {
+    console.error("Erreur création commande Yalidine:", error);
+    return { error: "Erreur lors de la création de la commande Yalidine" };
+  }
+}
