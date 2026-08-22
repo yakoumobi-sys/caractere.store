@@ -77,8 +77,8 @@ export const STATUS_DEFS: Record<OrderStatus, StatusDef> = {
     label: "Impression en cours",
     queue: "dtf",
     department: "Atelier DTF",
-    next: "attente_flocage",
-    action: "Envoyer au flocage",
+    next: null, // Déterminé dynamiquement selon requires_flocage
+    action: "Marquer terminée",
   },
   attente_flocage: {
     value: "attente_flocage",
@@ -180,3 +180,24 @@ export const QUEUE_TITLES: Record<QueueName, string> = {
   ready: "Commandes prêtes",
   delivery: "Livraison Yalidine/Alger",
 };
+
+/**
+ * Calcule le prochain statut en tenant compte du contexte (ex: flocage optionnel après DTF)
+ *
+ * @param currentStatus - Statut actuel
+ * @param order - Données de la commande (pour require_flocage, etc.)
+ * @returns Le statut suivant, ou null si terminal
+ */
+export function getNextStatus(
+  currentStatus: OrderStatus,
+  order?: { requires_flocage?: boolean }
+): OrderStatus | null {
+  // Si on est en impression_dtf et pas de flocage requis, aller directement à prete
+  if (currentStatus === "impression_dtf" && order && !order.requires_flocage) {
+    return "prete";
+  }
+
+  // Sinon, utiliser le next statut par défaut
+  const statusDef = STATUS_DEFS[currentStatus];
+  return statusDef?.next ?? null;
+}
