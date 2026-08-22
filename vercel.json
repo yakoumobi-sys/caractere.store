@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd caractere-full && npm run build",
+  "installCommand": "cd caractere-full && npm install",
+  "outputDirectory": "caractere-full/.next"
+}
