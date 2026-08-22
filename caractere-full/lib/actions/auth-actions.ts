@@ -38,25 +38,54 @@ export function generateSessionToken(): string {
 }
 
 /**
+ * Récupérer la liste des employés actifs
+ */
+export async function getEmployeesList() {
+  const supabase = createClient();
+
+  try {
+    const { data: employees, error } = await supabase
+      .from("employees")
+      .select("id, first_name, last_name, is_active")
+      .eq("is_active", true)
+      .order("first_name", { ascending: true });
+
+    if (error) {
+      return { error: "Erreur lors de la récupération des employés" };
+    }
+
+    return {
+      success: true,
+      employees: employees || [],
+    };
+  } catch (error) {
+    console.error("Get employees error:", error);
+    return { error: "Erreur serveur" };
+  }
+}
+
+/**
  * Login employé - Première connexion ou connexion régulière
  */
 export async function loginEmployee(
-  email: string,
+  firstName: string,
+  lastName: string,
   password: string,
   isFirstLogin: boolean = false
 ) {
   const supabase = createClient();
 
   try {
-    // 1. Trouver l'employé par email
+    // 1. Trouver l'employé par nom
     const { data: employee, error: employeeError } = await supabase
       .from("employees")
       .select("id, first_name, last_name, email, password_hash, password_set_at, is_active")
-      .eq("email", email)
+      .eq("first_name", firstName)
+      .eq("last_name", lastName)
       .single();
 
     if (employeeError || !employee) {
-      return { error: "Email ou mot de passe incorrect" };
+      return { error: "Employé non trouvé ou mot de passe incorrect" };
     }
 
     if (!employee.is_active) {

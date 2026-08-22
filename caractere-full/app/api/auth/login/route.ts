@@ -2,16 +2,16 @@ import { loginEmployee } from "@/lib/actions/auth-actions";
 
 export async function POST(req: Request) {
   try {
-    const { email, password, isFirstLogin } = await req.json();
+    const { firstName, lastName, password, isFirstLogin } = await req.json();
 
-    if (!email || !password) {
+    if (!firstName || !lastName || !password) {
       return Response.json(
-        { error: "Email et mot de passe requis" },
+        { error: "Nom et mot de passe requis" },
         { status: 400 }
       );
     }
 
-    const result = await loginEmployee(email, password, isFirstLogin);
+    const result = await loginEmployee(firstName, lastName, password, isFirstLogin);
 
     if (result.error) {
       return Response.json({ error: result.error }, { status: 401 });

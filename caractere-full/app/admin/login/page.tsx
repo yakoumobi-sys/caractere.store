@@ -1,15 +1,42 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface Employee {
+  id: string
+  first_name: string
+  last_name: string
+}
+
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('')
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isFirstLogin, setIsFirstLogin] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingEmployees, setLoadingEmployees] = useState(true)
   const router = useRouter()
+
+  // Charger la liste des employés
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await fetch('/api/auth/employees')
+        const data = await res.json()
+        if (data.employees) {
+          setEmployees(data.employees)
+        }
+      } catch (err) {
+        console.error('Erreur lors du chargement des employés:', err)
+      } finally {
+        setLoadingEmployees(false)
+      }
+    }
+
+    fetchEmployees()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,8 +44,8 @@ export default function AdminLoginPage() {
     setError('')
 
     // Validation
-    if (!email || !password) {
-      setError('Email et mot de passe requis')
+    if (!selectedEmployee || !password) {
+      setError('Choisissez un employé et entrez un mot de passe')
       setLoading(false)
       return
     }
@@ -40,7 +67,8 @@ export default function AdminLoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email.toLowerCase(),
+          firstName: selectedEmployee.first_name,
+          lastName: selectedEmployee.last_name,
           password,
           isFirstLogin,
         }),
@@ -78,18 +106,28 @@ export default function AdminLoginPage() {
 
         {/* Formulaire */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Email */}
+          {/* Dropdown Employés */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-slate-700">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="votre@email.com"
-              className="border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+            <label className="text-sm font-medium text-slate-700">Employé</label>
+            <select
+              value={selectedEmployee?.id || ''}
+              onChange={(e) => {
+                const emp = employees.find(e => e.id === e.target.value)
+                setSelectedEmployee(emp || null)
+              }}
+              className="border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent bg-white"
               autoFocus
-              disabled={loading}
-            />
+              disabled={loading || loadingEmployees}
+            >
+              <option value="">
+                {loadingEmployees ? 'Chargement...' : 'Sélectionnez votre nom'}
+              </option>
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.first_name} {emp.last_name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Mot de passe */}
@@ -123,7 +161,12 @@ export default function AdminLoginPage() {
           {/* Toggle première connexion */}
           <button
             type="button"
-            onClick={() => setIsFirstLogin(!isFirstLogin)}
+            onClick={() => {
+              setIsFirstLogin(!isFirstLogin)
+              setPassword('')
+              setConfirmPassword('')
+              setError('')
+            }}
             className="text-sm text-brand-dark hover:underline text-left py-1"
           >
             {isFirstLogin ? '← Revenir à la connexion' : 'Première connexion ?'}
@@ -139,7 +182,7 @@ export default function AdminLoginPage() {
           {/* Bouton */}
           <button
             type="submit"
-            disabled={loading || !email || !password}
+            disabled={loading || !selectedEmployee || !password || loadingEmployees}
             className="bg-brand-dark text-white py-3 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {loading ? 'Chargement...' : isFirstLogin ? 'Créer mon compte' : 'Se connecter'}
