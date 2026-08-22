@@ -111,7 +111,50 @@ caractere-full/
 
 ## ✨ Nouvelles fonctionnalités
 
-### 1. Système d'alertes de fournitures ⭐
+### 1. Intégration Yalidine/Alger ⭐ NOUVEAU
+**Livraison intégrée avec suivi en temps réel**
+
+#### Fonctionnalités:
+- ✅ Créer un envoi Yalidine directement depuis l'ERP
+- ✅ Choix entre Yalidine ou Alger Livraison
+- ✅ Sélection wilaya de livraison (58 wilayas)
+- ✅ Suivi en temps réel du colis
+- ✅ Paiement à la livraison (COD) automatique
+- ✅ Confirmation automatique du paiement à la livraison
+- ✅ Historique complet des changements de statut
+- ✅ Webhook support pour mises à jour automatiques
+
+#### Statuts Yalidine:
+- ⏳ **pending** - En attente de récupération Yalidine
+- 🚚 **in_transit** - En transit
+- ✅ **delivered** - Livré (marque auto la commande comme payée)
+- ❌ **failed** - Échec livraison
+- 🚫 **cancelled** - Annulé
+
+#### Configuration:
+```env
+YALIDINE_API_KEY=your-key
+YALIDINE_API_SECRET=your-secret
+YALIDINE_SANDBOX=true  # false en production
+```
+
+#### Pages & Composants:
+- `components/production/yalidine-form.tsx` - Formulaire création envoi
+- `components/production/yalidine-tracking.tsx` - Suivi en temps réel
+- `lib/yalidine/client.ts` - Client API Yalidine
+- `lib/actions/yalidine-actions.ts` - Server actions
+
+#### Tables de base de données:
+- `pipeline_orders` - Colonnes ajoutées:
+  - `yalidine_tracking` - Numéro de suivi
+  - `yalidine_parcel` - Numéro de colis
+  - `yalidine_status` - Statut (pending, in_transit, delivered, etc.)
+  - `yalidine_created_at` - Date création envoi
+  - `yalidine_updated_at` - Dernière mise à jour
+  - `delivery_type` - Type (1=Yalidine, 2=Alger Livraison)
+- `yalidine_tracking_history` - Historique des changements
+
+### 2. Système d'alertes de fournitures ⭐
 **Tous les employés peuvent créer des alertes** pour signaler les manques de matériels:
 
 #### Types d'alertes par département:
