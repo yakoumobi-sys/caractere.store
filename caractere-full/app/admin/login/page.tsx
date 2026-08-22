@@ -3,39 +3,153 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function AdminLoginPage() {
-  const [pw, setPw] = useState('')
-  const [err, setErr] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isFirstLogin, setIsFirstLogin] = useState(false)
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true); setErr('')
-    const res = await fetch('/api/auth', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) })
-    if (res.ok) {
+    setLoading(true)
+    setError('')
+
+    // Validation
+    if (!email || !password) {
+      setError('Email et mot de passe requis')
+      setLoading(false)
+      return
+    }
+
+    if (isFirstLogin && password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas')
+      setLoading(false)
+      return
+    }
+
+    if (isFirstLogin && password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          password,
+          isFirstLogin,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Erreur de connexion')
+        setLoading(false)
+        return
+      }
+
+      // Connexion réussie
       router.push('/admin')
-    } else {
-      setErr('Mot de passe incorrect')
+    } catch (err) {
+      setError('Erreur serveur')
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-brand-light flex items-center justify-center px-6">
-      <div className="bg-white rounded-[24px] p-10 w-full max-w-[380px] shadow-sm border border-black/[0.06]">
-        <div className="w-12 h-12 bg-brand-dark rounded-[14px] flex items-center justify-center text-white text-[20px] font-bold mb-6">C</div>
-        <h1 className="text-[22px] font-bold tracking-tight mb-1">Espace admin</h1>
-        <p className="text-[14px] text-brand-gray mb-8">Caractère Store</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-6 py-12">
+      <div className="bg-white rounded-2xl p-10 w-full max-w-[420px] shadow-lg border border-slate-200">
+        {/* Logo */}
+        <div className="w-14 h-14 bg-brand-dark rounded-xl flex items-center justify-center text-white text-2xl font-bold mb-8 mx-auto">
+          C
+        </div>
+
+        {/* Titre */}
+        <h1 className="text-2xl font-bold tracking-tight mb-2 text-center">Caractère Store</h1>
+        <p className="text-sm text-slate-600 text-center mb-8">
+          {isFirstLogin ? 'Créer votre mot de passe' : 'Connexion'}
+        </p>
+
+        {/* Formulaire */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[12px] font-medium">Mot de passe</label>
-            <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="••••••••" className="border border-black/[0.12] rounded-xl px-4 py-3 text-[14px] focus:outline-none focus:border-black/30" autoFocus />
+          {/* Email */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="votre@email.com"
+              className="border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+              autoFocus
+              disabled={loading}
+            />
           </div>
-          {err && <p className="text-[13px] text-red-500">{err}</p>}
-          <button type="submit" disabled={loading} className="bg-brand-dark text-white py-3 rounded-full text-[14px] font-medium hover:bg-neutral-800 transition-colors disabled:opacity-60">
-            {loading ? 'Connexion...' : 'Se connecter'}
+
+          {/* Mot de passe */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">Mot de passe</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={isFirstLogin ? 'Minimum 8 caractères' : '••••••••'}
+              className="border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Confirmer mot de passe (première connexion) */}
+          {isFirstLogin && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">Confirmer mot de passe</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+                disabled={loading}
+              />
+            </div>
+          )}
+
+          {/* Toggle première connexion */}
+          <button
+            type="button"
+            onClick={() => setIsFirstLogin(!isFirstLogin)}
+            className="text-sm text-brand-dark hover:underline text-left py-1"
+          >
+            {isFirstLogin ? '← Revenir à la connexion' : 'Première connexion ?'}
+          </button>
+
+          {/* Erreur */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Bouton */}
+          <button
+            type="submit"
+            disabled={loading || !email || !password}
+            className="bg-brand-dark text-white py-3 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+          >
+            {loading ? 'Chargement...' : isFirstLogin ? 'Créer mon compte' : 'Se connecter'}
           </button>
         </form>
+
+        {/* Footer */}
+        <p className="text-xs text-slate-500 text-center mt-8">
+          Connexion sécurisée • © 2024 Caractère Store
+        </p>
       </div>
     </div>
   )
