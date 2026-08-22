@@ -20,6 +20,7 @@ export async function createPipelineOrder(formData: FormData) {
   const logoPlacement = formData.get("logo_placement") as string;
   const logoSource = formData.get("logo_source") as string;
   const logoSourceValue = formData.get("logo_source_value") as string;
+  const requiresFlocage = formData.get("requires_flocage") === "on";
 
   // Déterminer le contact
   let finalContactId = contactId;
@@ -65,6 +66,7 @@ export async function createPipelineOrder(formData: FormData) {
       contact_name: contactName,
       technique,
       amount_paid: amountPaid ? parseFloat(amountPaid) : 0,
+      requires_flocage: technique === "dtf" ? requiresFlocage : false,
     })
     .select("id, number")
     .single();

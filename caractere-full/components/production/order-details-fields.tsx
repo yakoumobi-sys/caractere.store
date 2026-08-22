@@ -39,6 +39,7 @@ export function OrderDetailsFields({ contacts }: { contacts: ContactOption[] }) 
   const [logoPlacement, setLogoPlacement] = useState("coeur");
   const [logoSource, setLogoSource] = useState("whatsapp");
   const [amountPaid, setAmountPaid] = useState<string>("");
+  const [requiresFlocage, setRequiresFlocage] = useState(false);
 
   function updateItem(i: number, patch: Partial<ItemRow>) {
     setItems((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
@@ -215,6 +216,24 @@ export function OrderDetailsFields({ contacts }: { contacts: ContactOption[] }) 
             </label>
           ))}
         </div>
+
+        {/* Flocage option for DTF */}
+        {technique === "dtf" && (
+          <div className="mb-4 p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="requires_flocage"
+                checked={requiresFlocage}
+                onChange={(e) => setRequiresFlocage(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 cursor-pointer"
+              />
+              <span className="text-sm font-medium text-orange-900 dark:text-orange-100">
+                Cette commande doit passer par le flocage après l'impression DTF
+              </span>
+            </label>
+          </div>
+        )}
 
         {technique !== "aucune" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
