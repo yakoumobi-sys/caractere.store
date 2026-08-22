@@ -64,6 +64,18 @@ WhatsApp (Lilia/Lydia)
 #### `pipeline_comments` - Collaboration
 - Commentaires et notes sur commandes
 
+#### **`supply_alerts`** ✨ NEW - Alertes de fournitures
+- `id`: UUID unique
+- `number`: Numéro auto-généré (ALR-YYYY-00001)
+- `alert_type`: Type de fourniture (paper_dtf, ink_dtf, powder_dtf, tape_broderie, etc.)
+- `department`: Département (DTF, Broderie, Flocage, Commercial, Autre)
+- `title`: Titre de l'alerte
+- `description`: Détails supplémentaires
+- `priority`: "low" | "normal" | "high" | "urgent"
+- `status`: "open" | "in_progress" | "resolved" | "closed"
+- `created_by`: Employé qui crée l'alerte
+- `assigned_to`: Employé responsable (manager/directeur)
+
 ### Tables de support
 - `chart_of_accounts` - Plan comptable
 - `journal_entries` - Écritures comptables auto-générées
@@ -99,7 +111,39 @@ caractere-full/
 
 ## ✨ Nouvelles fonctionnalités
 
-### 1. Champ "Versement" (montant payé)
+### 1. Système d'alertes de fournitures ⭐
+**Tous les employés peuvent créer des alertes** pour signaler les manques de matériels:
+
+#### Types d'alertes par département:
+- **DTF**: Papier DTF, Encre DTF, Poudre DTF
+- **Broderie**: Fil broderie, Ruban de stabilisation
+- **Flocage**: Film flocage, Colle flocage
+- **Tous**: Autre fourniture
+
+#### Workflow d'une alerte:
+```
+Employé crée alerte (ATF-2026-00001)
+  ↓
+Status: "open" (ouvert) — à traiter
+  ↓
+Manager → Status: "in_progress" (en cours) — commande/traitement
+  ↓
+Status: "resolved" (résolu) — fourniture reçue
+  ↓
+Status: "closed" (clôturé) — archive
+```
+
+#### Priorités:
+- 🟢 **Basse**: Peut attendre
+- 🟡 **Normal**: À traiter normalement
+- 🟠 **Haute**: Important, traiter rapidement
+- 🔴 **Urgent** ⚠️: Bloque la production, priorité immédiate
+
+#### Pages:
+- `/alerts` - Liste complète, créer nouvelle alerte
+- Dashboard widget - Alertes urgentes en résumé
+
+### 2. Champ "Versement" (montant payé)
 À la création de commande, on peut saisir le montant versé par le client.
 ```tsx
 <Field label="Versement (DA)" htmlFor="amount_paid">
