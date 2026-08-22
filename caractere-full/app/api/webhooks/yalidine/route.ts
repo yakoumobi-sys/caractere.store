@@ -34,13 +34,29 @@ export async function POST(req: Request) {
   const supabase = createClient();
 
   try {
+    // Récupérer l'URL pour vérifier les query params
+    const url = new URL(req.url);
+    const crcToken = url.searchParams.get("crc_token");
+
+    // ✅ VALIDATION YALIDINE: Répondre avec le crc_token (depuis query param ou body)
+    if (crcToken) {
+      console.log("✅ Validation webhook Yalidine reçue (query param)");
+      return Response.json({ crc_token: crcToken });
+    }
+
     // Récupérer le body brut
     const rawBody = await req.text();
-    const body = JSON.parse(rawBody) as any;
+    let body: any = {};
 
-    // ✅ VALIDATION YALIDINE: Répondre avec le crc_token
+    try {
+      body = JSON.parse(rawBody);
+    } catch (e) {
+      console.warn("Impossible de parser le body JSON");
+    }
+
+    // Vérifier aussi dans le body
     if (body.crc_token) {
-      console.log("✅ Validation webhook Yalidine reçue");
+      console.log("✅ Validation webhook Yalidine reçue (body)");
       return Response.json({ crc_token: body.crc_token });
     }
 
@@ -158,12 +174,22 @@ export async function POST(req: Request) {
 }
 
 /**
- * GET pour tester que le webhook est accessible
+ * GET pour tester que le webhook est accessible ou valider avec crc_token
  */
-export async function GET() {
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const crcToken = url.searchParams.get("crc_token");
+
+  // Si c'est une validation avec crc_token
+  if (crcToken) {
+    console.log("✅ Validation webhook Yalidine reçue via GET");
+    return Response.json({ crc_token: crcToken });
+  }
+
+  // Sinon, juste tester que le webhook est actif
   return Response.json({
     message: "✅ Webhook Yalidine est actif",
     endpoint: "/api/webhooks/yalidine",
-    methods: ["POST"],
+    methods: ["GET", "POST"],
   });
 }
