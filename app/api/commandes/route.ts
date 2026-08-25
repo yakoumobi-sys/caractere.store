@@ -19,6 +19,24 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error
 
+    // Fait entrer la commande dans la file de confirmation de l'ERP
+    // (Caractère ERP, projet Supabase séparé). Ne doit jamais faire
+    // échouer la commande côté client si l'ERP est indisponible.
+    if (process.env.ERP_WEBHOOK_URL && process.env.SITE_ORDERS_WEBHOOK_SECRET) {
+      try {
+        await fetch(`${process.env.ERP_WEBHOOK_URL}/api/webhooks/site-orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-webhook-secret': process.env.SITE_ORDERS_WEBHOOK_SECRET,
+          },
+          body: JSON.stringify(data),
+        })
+      } catch (webhookError) {
+        console.error('ERP webhook error:', webhookError)
+      }
+    }
+
     if (process.env.RESEND_API_KEY && process.env.ADMIN_EMAIL) {
       try {
         await getResend().emails.send({
