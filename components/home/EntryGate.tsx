@@ -11,6 +11,8 @@ const C = {
   navy: '#1A3A52',
   gold: '#D4A574',
   lime: '#A3E635',
+  btsFrom: '#FF7A3D',
+  btsTo: '#E63965',
 }
 
 const GATE_KEY = 'caractere_gate_seen'
@@ -43,6 +45,19 @@ function IconPrinter({ size = 34 }) {
       <path d="M6 9V2h12v7" />
       <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
       <rect x="6" y="14" width="12" height="8" />
+    </svg>
+  )
+}
+
+function IconBackpack({ size = 34 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <path d="M8 5V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+      <path d="M6 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v11a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V8z" />
+      <path d="M9 8v3h6V8" />
+      <path d="M9 15h6" />
+      <path d="M4 11v5" />
+      <path d="M20 11v5" />
     </svg>
   )
 }
@@ -148,8 +163,29 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         .gate-card--continue:hover .gate-card-icon { background: rgba(255,255,255,0.12); color: ${C.white}; }
         .gate-card-cta { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: ${C.gray}; transition: color 0.25s ease, gap 0.25s ease; }
         .gate-card:hover .gate-card-cta { gap: 10px; color: ${C.white}; }
-        .gate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 1020px; }
-        @media (max-width: 900px) {
+
+        /* Carte "Back to School" — volontairement colorée pour trancher avec les autres */
+        .gate-card--bts {
+          background: linear-gradient(135deg, ${C.btsFrom}, ${C.btsTo});
+          border-color: rgba(255,255,255,0.18);
+        }
+        .gate-card--bts .gate-card-icon { background: rgba(255,255,255,0.2); color: ${C.white}; }
+        .gate-card--bts .gate-card-cta { color: rgba(255,255,255,0.85); }
+        .gate-card--bts:hover { border-color: rgba(255,255,255,0.5); background: linear-gradient(135deg, ${C.btsFrom}, ${C.btsTo}); }
+        .gate-card--bts:hover .gate-card-icon { background: rgba(255,255,255,0.3); color: ${C.white}; }
+        .gate-card--bts:hover .gate-card-cta { color: ${C.white}; }
+        .gate-card--bts .gate-badge {
+          position: absolute; top: 18px; right: 18px;
+          background: rgba(255,255,255,0.22); color: ${C.white};
+          font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+          padding: 5px 10px; border-radius: 999px;
+        }
+
+        .gate-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; width: 100%; max-width: 1280px; }
+        @media (max-width: 1100px) {
+          .gate-grid { grid-template-columns: repeat(2, 1fr); max-width: 680px; }
+        }
+        @media (max-width: 560px) {
           .gate-grid { grid-template-columns: 1fr; max-width: 480px; }
         }
       `}} />
@@ -179,6 +215,18 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
       </p>
 
       <div className="gate-anim gate-grid" style={{ animationDelay: '0.15s' }}>
+        <Link href="/back-to-school" onClick={remember} className="gate-card gate-card--bts">
+          <span className="gate-badge">Nouveau</span>
+          <span className="gate-card-icon"><IconBackpack /></span>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Back to School</div>
+            <div style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
+              Tepyach pour la rentrée, pack et promotion.
+            </div>
+          </div>
+          <span className="gate-card-cta">Voir l&rsquo;offre <IconArrow /></span>
+        </Link>
+
         <Link href="/entreprises" onClick={remember} className="gate-card gate-card--entreprises">
           <span className="gate-card-icon"><IconBriefcase /></span>
           <div>
