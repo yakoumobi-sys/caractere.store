@@ -24,6 +24,8 @@ type Offer = {
   desc: string
   bullets: string[]
   image: string
+  sizes: string[]
+  colors: { name: string; hex: string }[]
 }
 
 const OFFERS: Offer[] = [
@@ -33,14 +35,19 @@ const OFFERS: Offer[] = [
     title: 'Jogger Pack',
     subtitle: '2 Baggy Joggers',
     price: '4 900 DA',
-    desc: "Un jogger gris chiné, un jogger noir à liseré — coupe baggy confortable pour toute la journée en cours. Le duo qui couvre ta semaine.",
-    bullets: ['2 joggers baggy au choix des couleurs', 'Molleton épais, coupe confortable', 'Livraison 58 wilayas'],
+    desc: "Un jogger gris, un jogger noir — coupe baggy confortable pour toute la journée en cours. Le duo qui couvre ta semaine.",
+    bullets: ['2 joggers baggy — 1 gris, 1 noir', 'Molleton épais, coupe confortable', 'Livraison 58 wilayas'],
     image: '/back-to-school/jogger-pack.png',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [
+      { name: 'Gris', hex: '#9CA3AF' },
+      { name: 'Noir', hex: '#111111' },
+    ],
   },
 ]
 
 const waLink = (offer: Offer) =>
-  `${WA}?text=${encodeURIComponent(`Salam ! Je veux commander le ${offer.title} (${offer.subtitle}) à ${offer.price} 🎒`)}`
+  `${WA}?text=${encodeURIComponent(`Salam ! Je veux commander le ${offer.title} (${offer.subtitle}) à ${offer.price} 🎒\nTaille : \nCouleurs souhaitées : `)}`
 
 const GlobalStyle = () => (
   <style dangerouslySetInnerHTML={{ __html: `
@@ -140,6 +147,24 @@ const GlobalStyle = () => (
     .offer-bullets li:last-child { border-bottom: none; }
     .offer-bullets li .check { color: ${C.from}; font-weight: 900; }
 
+    .offer-meta { margin-bottom: 24px; }
+    .offer-meta .meta-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: ${C.muted}; margin-bottom: 10px; }
+    .offer-meta .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .offer-meta .meta-row:last-child { margin-bottom: 0; }
+    .size-chip {
+      min-width: 38px; height: 38px; padding: 0 6px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid rgba(250,250,249,.18); border-radius: 8px;
+      font-size: 13px; font-weight: 800; color: ${C.white};
+    }
+    .color-chip {
+      display: flex; align-items: center; gap: 8px;
+      border: 1.5px solid rgba(250,250,249,.18); border-radius: 999px;
+      padding: 6px 14px 6px 8px;
+      font-size: 13px; font-weight: 700; color: ${C.white};
+    }
+    .color-chip .swatch { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); }
+
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 10px;
       padding: 16px 28px; border-radius: 10px;
@@ -208,6 +233,25 @@ export default function BackToSchoolClient() {
                   {offer.oldPrice && <span className="old-price">{offer.oldPrice}</span>}
                 </div>
                 <p className="desc">{offer.desc}</p>
+
+                <div className="offer-meta">
+                  <div className="meta-label">Tailles disponibles</div>
+                  <div className="meta-row">
+                    {offer.sizes.map((s) => (
+                      <span key={s} className="size-chip">{s}</span>
+                    ))}
+                  </div>
+                  <div className="meta-label">Couleurs</div>
+                  <div className="meta-row">
+                    {offer.colors.map((c) => (
+                      <span key={c.name} className="color-chip">
+                        <span className="swatch" style={{ background: c.hex }} />
+                        {c.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
                 <ul className="offer-bullets">
                   {offer.bullets.map((b, i) => (
                     <li key={i}><span className="check">✓</span>{b}</li>
