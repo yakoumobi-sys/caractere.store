@@ -52,12 +52,10 @@ function IconPrinter({ size = 34 }) {
 function IconBackpack({ size = 34 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
-      <path d="M8 5V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
-      <path d="M6 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v11a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V8z" />
-      <path d="M9 8v3h6V8" />
-      <path d="M9 15h6" />
-      <path d="M4 11v5" />
-      <path d="M20 11v5" />
+      <path d="M8 4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2H8V4z" />
+      <path d="M5 10a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v7a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-7z" />
+      <path d="M9 9.5v3.5h6V9.5" />
+      <path d="M9.5 16.5h5" />
     </svg>
   )
 }

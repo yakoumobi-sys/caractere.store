@@ -298,6 +298,33 @@ export default function CommandesAdmin() {
                 </div>
               </div>
 
+              {/* Livraison (checkout en ligne — Back to School, etc.) */}
+              {(selected.wilaya || selected.mode_livraison) && (
+                <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                  <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>Livraison</p>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#9CA3AF' }}>Mode</p>
+                      <p className="text-[13px] font-medium mt-0.5" style={{ color: '#111827' }}>
+                        {selected.mode_livraison === 'domicile' ? 'Domicile' : selected.mode_livraison === 'bureau' ? 'Bureau Yalidine' : '-'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#9CA3AF' }}>Wilaya / Commune</p>
+                      <p className="text-[13px] font-medium mt-0.5" style={{ color: '#111827' }}>
+                        {selected.wilaya || '-'}{selected.commune ? ` — ${selected.commune}` : ''}
+                      </p>
+                    </div>
+                    {selected.adresse && (
+                      <div className="col-span-2">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#9CA3AF' }}>Adresse</p>
+                        <p className="text-[13px] font-medium mt-0.5" style={{ color: '#111827' }}>{selected.adresse}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Notes */}
               {selected.notes && (
                 <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)', backgroundColor: '#FEFCE8' }}>

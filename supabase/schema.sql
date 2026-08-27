@@ -52,6 +52,13 @@ create table if not exists commandes (
   notes text,
   prix_unitaire integer default 0,
   prix_total integer default 0,
+  -- Livraison (checkout Back to School et futurs checkouts en ligne) —
+  -- nullables : les commandes créées depuis le configurateur/designer
+  -- (prise en charge manuelle par téléphone/WhatsApp) ne les renseignent pas.
+  mode_livraison text check (mode_livraison in ('domicile','bureau')),
+  wilaya text,
+  commune text,
+  adresse text,
   created_at timestamptz default now()
 );
 

@@ -44,6 +44,10 @@ export interface Commande {
   notes: string
   prix_unitaire: number
   prix_total: number
+  mode_livraison: 'domicile' | 'bureau' | null
+  wilaya: string | null
+  commune: string | null
+  adresse: string | null
   created_at: string
 }
 
