@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   const ip = getIP(request)
 
   if (ratelimit) {
-    const { success } = await ratelimit.limit(ip)
+    const { success } = await ratelimit.limit(`login:${ip}`)
     if (!success) {
       return NextResponse.json(
         { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
@@ -32,26 +32,38 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { email, password } = await request.json()
+  try {
+    const body = await request.json()
+    const { email, password } = body as { email?: string; password?: string }
 
-  if (!email || !password) {
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email et mot de passe requis' },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
+    })
+
+    if (error) {
+      // Logging pour sécurité (possibilité d'attaque)
+      console.warn(`Failed login attempt for ${email} from ${ip}`)
+      // Ne pas révéler si l'email existe
+      return NextResponse.json(
+        { error: 'Email ou mot de passe incorrect' },
+        { status: 401 }
+      )
+    }
+
+    return NextResponse.json({ data })
+  } catch (error) {
+    console.error('Erreur sur /api/auth/login:', error)
     return NextResponse.json(
-      { error: 'Email et mot de passe requis' },
-      { status: 400 }
+      { error: 'Erreur serveur' },
+      { status: 500 }
     )
   }
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 401 }
-    )
-  }
-
-  return NextResponse.json({ data })
 }
