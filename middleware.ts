@@ -7,16 +7,22 @@ import { Redis } from '@upstash/redis'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Rate limiter pour login
-const ratelimit = new Ratelimit({
+// Rate limiter pour login (5 tentatives par 15 min)
+const loginRatelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(5, "15m"), // 5 tentatives par 15 min
+  limiter: Ratelimit.slidingWindow(5, '15m'),
+})
+
+// Rate limiter pour API admin (30 requêtes par minute par IP)
+const apiRatelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(30, '1m'),
 })
 
 // Fonction pour extraire l'IP
 function getIP(request: NextRequest) {
-  return request.headers.get('x-forwarded-for') || 
-         request.headers.get('x-real-ip') || 
+  return request.headers.get('x-forwarded-for') ||
+         request.headers.get('x-real-ip') ||
          '127.0.0.1'
 }
 
@@ -26,10 +32,22 @@ export async function middleware(request: NextRequest) {
 
   // ========== RATE LIMIT SUR /auth/login ==========
   if (pathname === '/auth/login' && request.method === 'POST') {
-    const { success } = await ratelimit.limit(ip)
+    const { success } = await loginRatelimit.limit(ip)
     if (!success) {
       return NextResponse.json(
         { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+        { status: 429 }
+      )
+    }
+  }
+
+  // ========== RATE LIMIT SUR API ADMIN ==========
+  if ((pathname.startsWith('/api/admin') || pathname.startsWith('/api/leads')) &&
+      request.method !== 'GET') {
+    const { success } = await apiRatelimit.limit(`${ip}:admin-api`)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Trop de requêtes. Réessayez dans 1 minute.' },
         { status: 429 }
       )
     }
