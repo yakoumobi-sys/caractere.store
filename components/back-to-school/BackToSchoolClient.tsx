@@ -19,21 +19,38 @@ const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/
 const WA_NUMBER = '213557440522'
 const WA = `https://wa.me/${WA_NUMBER}`
 
-const PRODUCT = {
-  id: 'jogger-pack',
-  tag: 'Pack rentrée',
-  title: 'Jogger Pack',
-  subtitle: '2 Baggy Joggers',
-  priceDZD: 4900,
-  desc: "Un jogger gris, un jogger noir — coupe baggy confortable pour toute la journée en cours. Le duo qui couvre ta semaine.",
-  bullets: ['2 joggers baggy — 1 gris, 1 noir', 'Molleton épais, coupe confortable', 'Paiement à la livraison'],
-  images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg'],
-  sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-  colors: [
-    { name: 'Gris', hex: '#9CA3AF' },
-    { name: 'Noir', hex: '#111111' },
-  ],
-}
+const PRODUCTS = [
+  {
+    id: 'jogger-pack',
+    tag: 'Pack rentrée',
+    title: 'Jogger Pack',
+    subtitle: '2 Baggy Joggers',
+    priceDZD: 4900,
+    desc: "Un jogger gris, un jogger noir — coupe baggy confortable pour toute la journée en cours. Le duo qui couvre ta semaine.",
+    bullets: ['2 joggers baggy — 1 gris, 1 noir', 'Molleton épais, coupe confortable', 'Paiement à la livraison'],
+    images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [
+      { name: 'Gris', hex: '#9CA3AF' },
+      { name: 'Noir', hex: '#111111' },
+    ],
+  },
+  {
+    id: 'bro-pack',
+    tag: 'Pack complet',
+    title: 'Bro Pack',
+    subtitle: '2 T-shirts Oversized + 2 Joggers',
+    priceDZD: 10000,
+    desc: '2 T-shirts oversized "BOYZ FROM +213" + 2 baggy joggers (gris et noir). Le pack complet pour la rentrée.',
+    bullets: ['2 T-shirts oversized premium', '2 Joggers baggy — 1 gris, 1 noir', 'Paiement à la livraison'],
+    images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [
+      { name: 'Blanc', hex: '#FFFFFF' },
+      { name: 'Noir', hex: '#111111' },
+    ],
+  },
+]
 
 const money = (n: number) => `${n.toLocaleString('fr-FR')} DA`
 
@@ -102,6 +119,45 @@ const GlobalStyle = () => (
 
     .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
+    .catalog { padding: 60px 0; }
+    .catalog-title { font-size: clamp(32px, 5vw, 48px); font-weight: 900; text-align: center; letter-spacing: -1px; margin-bottom: 12px; }
+    .catalog-sub { text-align: center; color: ${C.muted}; font-size: 16px; margin-bottom: 48px; }
+    .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+    @media (max-width: 768px) { .catalog-grid { grid-template-columns: 1fr; gap: 16px; } }
+
+    .pack-card {
+      position: relative;
+      border: 1.5px solid rgba(250,250,249,.12);
+      border-radius: 20px;
+      padding: 32px 24px;
+      cursor: pointer;
+      transition: all .3s cubic-bezier(0.22,1,0.36,1);
+      background: rgba(250,250,249,.02);
+      overflow: hidden;
+    }
+    .pack-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,122,61,0.1), rgba(230,57,101,0.1));
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    .pack-card:hover {
+      border-color: ${C.from};
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .pack-card:hover::before { opacity: 1; }
+
+    .pack-card-badge { display: inline-block; background: linear-gradient(135deg, ${C.from}, ${C.to}); color: white; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .pack-card-title { font-size: 28px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .pack-card-sub { color: ${C.muted}; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    .pack-card-price { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, ${C.from}, ${C.to}); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 18px; }
+    .pack-card-bullets { list-style: none; margin-bottom: 24px; }
+    .pack-card-bullets li { display: flex; gap: 10px; font-size: 13px; margin-bottom: 8px; color: ${C.muted}; }
+    .pack-card-bullets li:before { content: '✓'; color: ${C.from}; font-weight: 900; min-width: 20px; }
+
     .hero { padding: 44px 0 32px; }
     .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 46px; align-items: start; }
 
@@ -158,12 +214,12 @@ const GlobalStyle = () => (
     .btn:hover { transform: translateY(-2px); }
     .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     .btn-bts { background: linear-gradient(135deg, ${C.from}, ${C.to}); color: ${C.white}; box-shadow: 0 12px 34px -12px rgba(230,57,101,.5); }
+    .btn-back { background: transparent; border: 1.5px solid rgba(250,250,249,.2); color: ${C.white}; }
 
     .section { padding: 10px 0 90px; }
     .section-title { font-size: clamp(22px, 3vw, 30px); font-weight: 900; text-align: center; margin-bottom: 8px; letter-spacing: -.5px; }
     .section-sub { text-align: center; color: ${C.muted}; font-size: 14px; margin-bottom: 40px; }
 
-    /* ── Checkout form ── */
     .checkout-card {
       max-width: 640px; margin: 0 auto;
       background: rgba(250,250,249,.03);
@@ -222,7 +278,6 @@ const GlobalStyle = () => (
 
     .cod-note { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: ${C.muted}; font-weight: 600; margin-top: 14px; text-align: center; justify-content: center; }
 
-    /* Confirmation */
     .confirm-box { max-width: 560px; margin: 0 auto; text-align: center; }
     .confirm-check {
       width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 22px;
@@ -238,7 +293,6 @@ const GlobalStyle = () => (
     .btn-outline { background: transparent; border: 1.5px solid rgba(250,250,249,.2); color: ${C.white}; }
     .btn-wa { background: #25D366; color: #06210F; }
 
-    /* Sticky mobile buy bar */
     .sticky-bar {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
       background: rgba(12,10,9,.96); backdrop-filter: blur(14px);
@@ -264,290 +318,252 @@ const GlobalStyle = () => (
   `}} />
 )
 
-function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
-  return (
-    <div className="field">
-      <label>{label}{required && <span className="req"> *</span>}</label>
-      {children}
-      {error && <p className="error">{error}</p>}
-    </div>
-  )
-}
-
 export default function BackToSchoolClient() {
-  const [activeImg, setActiveImg] = useState(0)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(initialForm)
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
-  const [submitting, setSubmitting] = useState(false)
-  const [confirmed, setConfirmed] = useState<{ ref: string; total: number } | null>(null)
+  const [confirmedRef, setConfirmedRef] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState(false)
   const checkoutRef = useRef<HTMLDivElement>(null)
 
-  const total = PRODUCT.priceDZD * form.qty
+  const selectedProduct = useMemo(
+    () => PRODUCTS.find(p => p.id === selectedProductId),
+    [selectedProductId]
+  )
 
-  const communesForWilaya = useMemo(
-    () => (form.wilayaCode === '' ? [] : COMMUNES.filter((c) => c.wilayaCode === form.wilayaCode)),
+  const filteredCommunes = useMemo(
+    () => form.wilayaCode !== '' ? COMMUNES.filter(c => c.wilayaCode === form.wilayaCode) : [],
     [form.wilayaCode]
   )
 
-  const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
-    setForm((f) => ({ ...f, [key]: value }))
-    setErrors((e) => ({ ...e, [key]: undefined }))
+  const isFormValid = useMemo(() => {
+    if (!selectedProduct) return false
+    if (!form.size || form.qty < 1) return false
+    if (form.nom.length < 3) return false
+    if (!EMAIL_RE.test(form.email)) return false
+    if (!PHONE_RE.test(form.telephone)) return false
+    if (form.wilayaCode === '') return false
+    if (!form.commune) return false
+    if (form.modeLivraison === 'domicile' && !form.adresse) return false
+    return true
+  }, [form, selectedProduct])
+
+  const handleProductSelect = (productId: string) => {
+    setSelectedProductId(productId)
+    setForm(initialForm)
+    setConfirmedRef(null)
+    setTimeout(() => checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
 
-  const scrollToCheckout = () => {
-    checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  const handleConfirm = async () => {
+    if (!selectedProduct || !isFormValid) return
 
-  const validate = (): boolean => {
-    const errs: Partial<Record<keyof FormState, string>> = {}
-    if (!form.size) errs.size = 'Choisissez une taille.'
-    if (form.nom.trim().length < 3) errs.nom = 'Nom complet requis.'
-    if (!EMAIL_RE.test(form.email.trim())) errs.email = 'Email invalide.'
-    if (!PHONE_RE.test(form.telephone.trim())) errs.telephone = 'Numéro invalide (ex: 0555 12 34 56).'
-    if (form.wilayaCode === '') errs.wilayaCode = 'Choisissez une wilaya.'
-    if (!form.commune) errs.commune = 'Choisissez une commune.'
-    if (form.modeLivraison === 'domicile' && form.adresse.trim().length < 6) {
-      errs.adresse = 'Adresse complète requise pour la livraison à domicile.'
-    }
-    setErrors(errs)
-    return Object.keys(errs).length === 0
-  }
-
-  const handleSubmit = async () => {
-    if (!validate()) {
-      const firstError = document.querySelector('.error')
-      firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      return
-    }
-    setSubmitting(true)
-    const ref = 'CAR-' + Date.now().toString(36).toUpperCase()
-    const wilayaName = WILAYAS.find((w) => w.code === form.wilayaCode)?.name ?? ''
-
+    setConfirming(true)
     try {
+      const ref = 'CAR-' + Date.now().toString(36).toUpperCase()
       const res = await fetch('/api/commandes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reference: ref,
-          produit: `Back to School — ${PRODUCT.title}`,
+          produit: selectedProduct.title,
           quantite: form.qty,
-          couleur: 'Gris + Noir',
           tailles: [form.size],
-          position: null,
-          technique: null,
-          urgent: false,
-          nom_client: form.nom.trim(),
-          entreprise: null,
-          telephone: form.telephone.trim(),
-          email: form.email.trim(),
-          notes: null,
-          prix_unitaire: PRODUCT.priceDZD,
-          prix_total: total,
+          nom_client: form.nom,
+          email: form.email,
+          telephone: form.telephone,
+          prix_total: selectedProduct.priceDZD * form.qty,
           mode_livraison: form.modeLivraison,
-          wilaya: wilayaName,
+          wilaya: WILAYAS.find(w => w.code === form.wilayaCode)?.name || '',
           commune: form.commune,
-          adresse: form.modeLivraison === 'domicile' ? form.adresse.trim() : null,
+          adresse: form.adresse || null,
         }),
       })
-      if (!res.ok) throw new Error('order-failed')
-      setConfirmed({ ref, total })
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    } catch {
-      alert("Un souci est survenu lors de l'envoi de votre commande. Réessayez ou contactez-nous sur WhatsApp.")
+
+      if (res.ok) {
+        setConfirmedRef(ref)
+        setForm(initialForm)
+        setSelectedProductId(null)
+      }
     } finally {
-      setSubmitting(false)
+      setConfirming(false)
     }
   }
 
-  const waConfirmLink = confirmed
-    ? `${WA}?text=${encodeURIComponent(
-        `Salam ! Je viens de commander le ${PRODUCT.title} (${form.size}) — réf ${confirmed.ref}. Je confirme ma commande 🎒`
-      )}`
-    : '#'
-
   return (
-    <div style={{ background: C.black, color: C.white, minHeight: '100vh' }}>
+    <div style={{ fontFamily: 'Inter, sans-serif' }}>
       <GlobalStyle />
 
       <header>
-        <Link href="/"><img src={LOGO} alt="Caractère" /></Link>
+        <a href="/"><img src={LOGO} alt="Caractère" /></a>
         <a href={WA} className="cta-nav">💬 WhatsApp</a>
       </header>
 
-      {confirmed ? (
-        <section className="section" style={{ paddingTop: 64 }}>
+      {confirmedRef ? (
+        <section style={{ padding: '80px 20px', background: `rgba(34,197,94,0.05)` }}>
           <div className="wrap confirm-box">
             <div className="confirm-check">✓</div>
-            <h1 style={{ fontSize: 'clamp(24px,4vw,32px)', fontWeight: 900, marginBottom: 10 }}>Commande reçue !</h1>
-            <p style={{ color: C.muted, fontSize: 14 }}>
-              On vous appelle rapidement pour confirmer avant l&rsquo;envoi. Gardez votre référence :
+            <h2 style={{ fontSize: '28px', fontWeight: 900, marginBottom: '12px' }}>Commande confirmée</h2>
+            <p style={{ color: C.muted, marginBottom: '24px' }}>
+              Tu vas recevoir un appel pour confirmer ta commande avant l'expédition.
             </p>
-            <div className="confirm-ref">{confirmed.ref}</div>
-            <p style={{ color: C.muted, fontSize: 13, marginBottom: 24 }}>
-              Total : <strong style={{ color: C.white }}>{money(confirmed.total)}</strong> — paiement à la livraison
+            <div className="confirm-ref">{confirmedRef}</div>
+            <p style={{ color: C.muted, fontSize: '13px', marginBottom: '28px' }}>
+              Garde cette référence pour le suivi
             </p>
             <div className="confirm-actions">
-              <a href={waConfirmLink} className="btn btn-wa" target="_blank" rel="noopener noreferrer">💬 Confirmer sur WhatsApp</a>
-              <Link href={`/suivi/${confirmed.ref}`} className="btn btn-outline">Suivre ma commande</Link>
-              <Link href="/back-to-school" className="btn btn-outline" onClick={() => setConfirmed(null)}>Commander un autre pack</Link>
+              <a href={`${WA}?text=Bonjour,%20ma%20référence%20de%20commande%20est%20${confirmedRef}`} target="_blank" rel="noopener noreferrer" className="btn btn-wa">
+                Confirmer par WhatsApp
+              </a>
+              <a href={`/suivi/${confirmedRef}`} className="btn btn-outline">
+                Suivre ma commande →
+              </a>
+              <button onClick={() => setConfirmedRef(null)} className="btn btn-outline">
+                Retour à la boutique
+              </button>
             </div>
           </div>
         </section>
-      ) : (
+      ) : selectedProductId ? (
         <>
-          <section className="hero">
-            <div className="wrap hero-grid">
-              <div>
-                <div className="gallery-main">
-                  <span className="tag">{PRODUCT.tag}</span>
-                  <img src={PRODUCT.images[activeImg]} alt={PRODUCT.title} />
-                </div>
-                <div className="gallery-thumbs">
-                  {PRODUCT.images.map((src, i) => (
-                    <button key={src} type="button" className={i === activeImg ? 'active' : ''} onClick={() => setActiveImg(i)}>
-                      <img src={src} alt="" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <span className="eyebrow">🎒 Back to School</span>
-                <h1 className="p-title">{PRODUCT.title}</h1>
-                <p className="p-subtitle">{PRODUCT.subtitle}</p>
-                <p className="p-price">{money(PRODUCT.priceDZD)}</p>
-                <p className="p-desc">{PRODUCT.desc}</p>
-
-                <ul className="p-bullets">
-                  {PRODUCT.bullets.map((b, i) => (
-                    <li key={i}><span className="check">✓</span>{b}</li>
-                  ))}
-                </ul>
-
-                <div className="trust-row">
-                  <span className="trust-chip">💳 Paiement à la livraison</span>
-                  <span className="trust-chip">🚚 Livraison 58 wilayas</span>
-                  <span className="trust-chip">📦 Bureau ou domicile</span>
-                </div>
-
-                <button type="button" onClick={scrollToCheckout} className="btn btn-bts">
-                  Acheter maintenant →
-                </button>
-              </div>
-            </div>
-          </section>
-
           <section className="section" ref={checkoutRef}>
             <div className="wrap">
-              <h2 className="section-title">Finaliser ma commande</h2>
-              <p className="section-sub">Remplissez vos infos — on vous appelle pour confirmer avant l&rsquo;envoi.</p>
+              <button onClick={() => setSelectedProductId(null)} className="btn btn-back" style={{ maxWidth: '200px', marginBottom: '40px' }}>
+                ← Changer de pack
+              </button>
+
+              <div className="hero-grid">
+                <div>
+                  <div className="gallery-main">
+                    <span className="tag">{selectedProduct!.tag}</span>
+                    <img src={selectedProduct!.images[0]} alt={selectedProduct!.title} />
+                  </div>
+                  <div className="gallery-thumbs">
+                    {selectedProduct!.images.map((img, i) => (
+                      <button key={i} className={i === 0 ? 'active' : ''}>
+                        <img src={img} alt="" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="eyebrow">🎒 Back to School</span>
+                  <h1 className="p-title">{selectedProduct!.title}</h1>
+                  <p className="p-subtitle">{selectedProduct!.subtitle}</p>
+                  <p className="p-price">{money(selectedProduct!.priceDZD)}</p>
+                  <p className="p-desc">{selectedProduct!.desc}</p>
+                  <ul className="p-bullets">
+                    {selectedProduct!.bullets.map((b, i) => (
+                      <li key={i}><span className="check">✓</span>{b}</li>
+                    ))}
+                  </ul>
+                  <div className="trust-row">
+                    <span className="trust-chip">💳 Paiement à la livraison</span>
+                    <span className="trust-chip">🚚 Livraison 58 wilayas</span>
+                    <span className="trust-chip">📦 Bureau ou domicile</span>
+                  </div>
+                </div>
+              </div>
+
+              <h2 className="section-title" style={{ marginTop: '80px' }}>Finaliser ma commande</h2>
+              <p className="section-sub">Remplissez vos infos — on vous appelle pour confirmer avant l'envoi.</p>
 
               <div className="checkout-card">
-                <Field label="Taille" required error={errors.size}>
+                <div className="field">
+                  <label>Taille<span className="req"> *</span></label>
                   <div className="chip-row">
-                    {PRODUCT.sizes.map((s) => (
+                    {selectedProduct!.sizes.map(s => (
                       <button
                         key={s}
-                        type="button"
+                        onClick={() => setForm({ ...form, size: s })}
                         className={`size-btn ${form.size === s ? 'active' : ''}`}
-                        onClick={() => set('size', s)}
                       >
                         {s}
                       </button>
                     ))}
                   </div>
-                </Field>
-
-                <Field label="Quantité">
-                  <div className="qty-row">
-                    <button type="button" className="qty-btn" onClick={() => set('qty', Math.max(1, form.qty - 1))}>−</button>
-                    <span className="qty-val">{form.qty}</span>
-                    <button type="button" className="qty-btn" onClick={() => set('qty', Math.min(5, form.qty + 1))}>+</button>
-                  </div>
-                </Field>
-
-                <Field label="Nom complet" required error={errors.nom}>
-                  <input type="text" placeholder="Votre nom et prénom" value={form.nom} onChange={(e) => set('nom', e.target.value)} />
-                </Field>
-
-                <div className="field-row">
-                  <Field label="Email" required error={errors.email}>
-                    <input type="email" placeholder="vous@email.com" value={form.email} onChange={(e) => set('email', e.target.value)} />
-                  </Field>
-                  <Field label="Téléphone" required error={errors.telephone}>
-                    <input type="tel" placeholder="05XX XX XX XX" value={form.telephone} onChange={(e) => set('telephone', e.target.value)} />
-                  </Field>
                 </div>
 
-                <Field label="Mode de livraison" required>
+                <div className="field">
+                  <label>Quantité</label>
+                  <div className="qty-row">
+                    <button className="qty-btn" onClick={() => setForm({ ...form, qty: Math.max(1, form.qty - 1) })}>−</button>
+                    <span className="qty-val">{form.qty}</span>
+                    <button className="qty-btn" onClick={() => setForm({ ...form, qty: Math.min(5, form.qty + 1) })}>+</button>
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Nom complet<span className="req"> *</span></label>
+                  <input type="text" placeholder="Votre nom et prénom" value={form.nom} onChange={e => setForm({ ...form, nom: e.target.value })} />
+                </div>
+
+                <div className="field-row">
+                  <div className="field">
+                    <label>Email<span className="req"> *</span></label>
+                    <input type="email" placeholder="vous@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label>Téléphone<span className="req"> *</span></label>
+                    <input type="tel" placeholder="05XX XX XX XX" value={form.telephone} onChange={e => setForm({ ...form, telephone: e.target.value })} />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Mode de livraison<span className="req"> *</span></label>
                   <div className="mode-row">
                     <button
-                      type="button"
                       className={`mode-btn ${form.modeLivraison === 'bureau' ? 'active' : ''}`}
-                      onClick={() => set('modeLivraison', 'bureau')}
+                      onClick={() => setForm({ ...form, modeLivraison: 'bureau' })}
                     >
                       <div className="m-title">📍 Bureau Yalidine</div>
                       <div className="m-sub">Retrait au bureau — souvent plus rapide</div>
                     </button>
                     <button
-                      type="button"
                       className={`mode-btn ${form.modeLivraison === 'domicile' ? 'active' : ''}`}
-                      onClick={() => set('modeLivraison', 'domicile')}
+                      onClick={() => setForm({ ...form, modeLivraison: 'domicile' })}
                     >
                       <div className="m-title">🏠 Domicile</div>
                       <div className="m-sub">Livré directement chez vous</div>
                     </button>
                   </div>
-                </Field>
+                </div>
 
                 <div className="field-row">
-                  <Field label="Wilaya" required error={errors.wilayaCode}>
-                    <select
-                      value={form.wilayaCode}
-                      onChange={(e) => {
-                        const code = e.target.value === '' ? '' : Number(e.target.value)
-                        setForm((f) => ({ ...f, wilayaCode: code, commune: '' }))
-                        setErrors((er) => ({ ...er, wilayaCode: undefined }))
-                      }}
-                    >
+                  <div className="field">
+                    <label>Wilaya<span className="req"> *</span></label>
+                    <select value={form.wilayaCode} onChange={e => setForm({ ...form, wilayaCode: e.target.value ? Number(e.target.value) : '', commune: '' })}>
                       <option value="">Sélectionner</option>
-                      {WILAYAS.map((w) => (
-                        <option key={w.code} value={w.code}>{String(w.code).padStart(2, '0')} — {w.name}</option>
+                      {WILAYAS.map(w => (
+                        <option key={w.code} value={w.code}>{w.code.toString().padStart(2, '0')} — {w.name}</option>
                       ))}
                     </select>
-                  </Field>
-                  <Field label="Commune" required error={errors.commune}>
-                    <select
-                      value={form.commune}
-                      onChange={(e) => set('commune', e.target.value)}
-                      disabled={form.wilayaCode === ''}
-                    >
+                  </div>
+                  <div className="field">
+                    <label>Commune<span className="req"> *</span></label>
+                    <select disabled={form.wilayaCode === ''} value={form.commune} onChange={e => setForm({ ...form, commune: e.target.value })}>
                       <option value="">{form.wilayaCode === '' ? 'Choisir une wilaya d\'abord' : 'Sélectionner'}</option>
-                      {communesForWilaya.map((c) => (
+                      {filteredCommunes.map(c => (
                         <option key={c.id} value={c.name}>{c.name}</option>
                       ))}
                     </select>
-                  </Field>
+                  </div>
                 </div>
 
                 {form.modeLivraison === 'domicile' && (
-                  <Field label="Adresse complète" required error={errors.adresse}>
-                    <textarea
-                      rows={3}
-                      placeholder="N°, rue, quartier, points de repère..."
-                      value={form.adresse}
-                      onChange={(e) => set('adresse', e.target.value)}
-                    />
-                  </Field>
+                  <div className="field">
+                    <label>Adresse complète<span className="req"> *</span></label>
+                    <textarea rows={3} placeholder="N°, rue, quartier, points de repère..." value={form.adresse} onChange={e => setForm({ ...form, adresse: e.target.value })} style={{ resize: 'none' }} />
+                  </div>
                 )}
 
                 <div className="price-recap">
                   <span className="lbl">Total ({form.qty} pack{form.qty > 1 ? 's' : ''})</span>
-                  <span className="val">{money(total)}</span>
+                  <span className="val">{money(selectedProduct!.priceDZD * form.qty)}</span>
                 </div>
 
-                <button type="button" className="btn btn-bts" onClick={handleSubmit} disabled={submitting}>
-                  {submitting ? 'Envoi en cours…' : 'Confirmer ma commande'}
+                <button onClick={handleConfirm} disabled={!isFormValid || confirming} className="btn btn-bts">
+                  {confirming ? 'Confirmation en cours...' : 'Confirmer ma commande'}
                 </button>
                 <p className="cod-note">💳 Paiement en espèces à la réception — rien à payer maintenant.</p>
               </div>
@@ -555,13 +571,36 @@ export default function BackToSchoolClient() {
           </section>
 
           <div className="sticky-bar">
-            <span className="sb-price">
-              {money(PRODUCT.priceDZD)}
-              <small>{PRODUCT.title}</small>
-            </span>
-            <button type="button" className="btn btn-bts" onClick={scrollToCheckout}>Acheter maintenant</button>
+            <span className="sb-price">{money(selectedProduct!.priceDZD * form.qty)}<small>{selectedProduct!.title}</small></span>
+            <button onClick={() => checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn btn-bts">
+              Finaliser →
+            </button>
           </div>
         </>
+      ) : (
+        <section className="catalog">
+          <div className="wrap">
+            <h1 className="catalog-title">Nos packs rentrée</h1>
+            <p className="catalog-sub">Choisis ton essentiels pour la rentrée</p>
+
+            <div className="catalog-grid">
+              {PRODUCTS.map(product => (
+                <div key={product.id} className="pack-card" onClick={() => handleProductSelect(product.id)}>
+                  <div className="pack-card-badge">{product.tag}</div>
+                  <div className="pack-card-title">{product.title}</div>
+                  <div className="pack-card-sub">{product.subtitle}</div>
+                  <div className="pack-card-price">{money(product.priceDZD)}</div>
+                  <ul className="pack-card-bullets">
+                    {product.bullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                  <button className="btn btn-bts">Choisir ce pack →</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
 
       <footer>
