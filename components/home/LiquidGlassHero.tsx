@@ -86,7 +86,7 @@ function Scene({ reduced, compact }: { reduced: boolean; compact: boolean }) {
     <>
       <ambientLight intensity={0.5} />
       <directionalLight position={[3, 4, 5]} intensity={1.1} />
-      <Environment preset="city" />
+      {/* <Environment preset="city" /> */}
       {blobs.map((b, i) => (
         <Float key={i} speed={reduced ? 0 : b.speed} rotationIntensity={reduced ? 0 : 0.25} floatIntensity={reduced ? 0 : 0.5}>
           <GlassBlob {...b} />
