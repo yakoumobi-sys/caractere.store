@@ -43,7 +43,7 @@ const PRODUCTS = [
     priceDZD: 10000,
     desc: '2 T-shirts oversized "BOYZ FROM +213" + 2 baggy joggers (gris et noir). Le pack complet pour la rentrée.',
     bullets: ['2 T-shirts oversized premium', '2 Joggers baggy — 1 gris, 1 noir', 'Paiement à la livraison'],
-    images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg'],
+    images: ['/back-to-school/bro-pack-hero.png', '/back-to-school/bro-gallery-1.jpg'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Blanc', hex: '#FFFFFF' },
