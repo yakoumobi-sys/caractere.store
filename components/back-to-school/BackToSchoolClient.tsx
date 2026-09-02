@@ -28,7 +28,7 @@ const PRODUCTS = [
     priceDZD: 4900,
     desc: "Un jogger gris, un jogger noir — coupe baggy confortable pour toute la journée en cours. Le duo qui couvre ta semaine.",
     bullets: ['2 joggers baggy — 1 gris, 1 noir', 'Molleton épais, coupe confortable', 'Paiement à la livraison'],
-    images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg'],
+    images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg', '/back-to-school/jogger-gallery-3.png'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Gris', hex: '#9CA3AF' },
