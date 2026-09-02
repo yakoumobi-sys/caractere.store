@@ -278,117 +278,104 @@ export default function PrintOnDemandClient() {
         <Link href="/designer" className="cta-nav">🎨 Créer mon design</Link>
       </header>
 
-      {/* HERO — dream outcome + délai + zéro risque */}
-      <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* HERO — titre court + boutons en avant */}
+      <section className="hero" style={{ position: 'relative', overflow: 'hidden', paddingBottom: 40 }}>
         <LiquidGlassHeroPod />
         <div className="wrap" style={{ position: 'relative', zIndex: 2 }}>
           <div className="reveal in">
-          <span className="eyebrow">Print on Demand — Alger</span>
-          <h1>
-            Lance ta marque <span className="accent">cette semaine.</span><br />
-            Sans stock. <span className="accent">Sans risque.</span>
-          </h1>
-          <p className="sub">
-            Tu designs. Ton client commande. On produit en 48h et on livre.
-            Toi, tu encaisses la marge — sans avoir avancé un dinar de stock.
-          </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/designer" className="btn btn-lime">🎨 Créer mon premier design →</Link>
-            <a href={WA} className="btn btn-ghost">💬 Parler à un humain</a>
+            <h1 style={{ fontSize: 'clamp(34px, 6.5vw, 56px)', marginBottom: 28 }}>
+              Lance ta marque <span className="accent">sans stock.</span>
+            </h1>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 32 }}>
+              <Link href="/designer" className="btn btn-lime">🎨 Créer mon design</Link>
+              <a href={WA} className="btn btn-ghost">💬 WhatsApp</a>
+            </div>
+            <div className="proofbar">
+              <span>✅ <b>500+</b> marques</span>
+              <span>✅ Production <b>48h</b></span>
+              <span>✅ Dès <b>1 pièce</b></span>
+            </div>
           </div>
-          <div className="proofbar">
-            <span>✅ <b>500+</b> marques lancées</span>
-            <span>✅ <b>50 000+</b> pièces produites</span>
-            <span>✅ Production <b>48h</b></span>
-            <span>✅ Dès <b>1 pièce</b></span>
-          </div>
-        </div>
         </div>
       </section>
 
-      {/* PROBLÈME — la vraie raison pour laquelle les marques ne se lancent pas */}
-      <section className="section section-dark">
+      {/* PRODUITS RAPIDES — packs & collections */}
+      <section className="section" style={{ paddingTop: 60, paddingBottom: 60 }}>
         <div className="wrap">
-          <p className="kicker reveal">Pourquoi 90% des marques ne voient jamais le jour</p>
-          <h2 className="h2 reveal">Ce n'est pas le talent qui te manque.<br /><span className="accent">C'est le modèle qui est cassé.</span></h2>
-          <p className="lead reveal">L'ancienne façon de lancer une marque de vêtements en Algérie:</p>
-          <div className="grid">
-            {pains.map((p, i) => (
-              <div key={i} className="pain reveal">
-                <span className="x">✕</span>
-                <p className="title">{p.title}</p>
-                <p className="desc">{p.desc}</p>
+          <h2 className="h2 reveal">Nos packs <span className="accent">best-sellers</span></h2>
+          <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+            {[
+              { title: 'Petit', desc: 'T-shirt custom', price: '1 950 DA', icon: '👕' },
+              { title: 'Standard', desc: '5 t-shirts custom', price: '9 000 DA', icon: '🎨' },
+              { title: 'Scaling', desc: '50+ pièces custom', price: 'À partir de 1 465 DA', icon: '📦' },
+            ].map((p, i) => (
+              <div key={i} className="value-card reveal">
+                <span className="ico">{p.icon}</span>
+                <h3>{p.title}</h3>
+                <p style={{ fontSize: 13, color: C.muted, marginBottom: 12 }}>{p.desc}</p>
+                <p style={{ fontSize: 18, fontWeight: 900, color: C.lime }}>{p.price}</p>
+                <Link href="/designer" className="btn btn-lime" style={{ marginTop: 16, width: '100%', maxWidth: 'none' }}>Commander →</Link>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* LE CALCUL — neuromarketing: rendre le gain concret et chiffré */}
-      <section className="section">
+      {/* CHIFFRES — simple math */}
+      <section className="section section-dark">
         <div className="wrap">
-          <p className="kicker reveal">Le nouveau modèle</p>
-          <h2 className="h2 reveal">Fais le calcul <span className="accent">toi-même.</span></h2>
-          <p className="lead reveal">Voici les vrais chiffres d'une vente en Print on Demand avec Caractère:</p>
+          <h2 className="h2 reveal">La marge <span className="accent">en 10 secondes</span></h2>
           <div className="math-box reveal">
-            <h3>💰 Ta marge par t-shirt</h3>
-            <div className="math-row"><span className="lbl">Prix de vente (marché streetwear DZ)</span><span className="num">4 000 DA</span></div>
-            <div className="math-row"><span className="lbl">Production + impression DTF (nous)</span><span className="num">− 1 950 DA</span></div>
-            <div className="math-row"><span className="lbl">Stock avancé par toi</span><span className="num">0 DA</span></div>
-            <div className="math-row total"><span className="lbl" style={{ color: C.white, fontWeight: 900 }}>Ta marge nette par pièce</span><span className="num">+2 050 DA</span></div>
-            <p style={{ fontSize: 13, color: C.muted, marginTop: 18 }}>
-              20 ventes/mois = <b style={{ color: C.white }}>41 000 DA</b> de bénéfice.
-              100 ventes = <b style={{ color: C.lime }}>205 000 DA</b>. Sans local, sans stock, sans salarié.
-            </p>
+            <div className="math-row"><span className="lbl">Vente</span><span className="num">4 000 DA</span></div>
+            <div className="math-row"><span className="lbl">Production (nous)</span><span className="num">− 1 950 DA</span></div>
+            <div className="math-row total"><span className="lbl">Ton bénéfice</span><span className="num" style={{ color: C.lime, fontSize: 24 }}>+ 2 050 DA</span></div>
           </div>
         </div>
       </section>
 
-      {/* VALUE STACK */}
-      <section className="section section-dark">
+      {/* FEATURES CLÉS */}
+      <section className="section">
         <div className="wrap">
-          <p className="kicker reveal">Tout ce qu'il te faut, rien de superflu</p>
-          <h2 className="h2 reveal">On a enlevé toutes les raisons<br />de <span className="accent">ne pas te lancer.</span></h2>
-          <div className="grid" style={{ marginTop: 48 }}>
-            {values.map((v, i) => (
+          <h2 className="h2 reveal">Ce qui change tout</h2>
+          <div className="grid" style={{ marginTop: 40 }}>
+            {[
+              { ico: '⚡', title: '48h', desc: 'Production ultra-rapide à Alger' },
+              { ico: '🎨', title: 'Designer libre', desc: 'Outil en ligne gratuit inclus' },
+              { ico: '📦', title: 'Zéro stock', desc: 'Tu vends, puis on produit' },
+              { ico: '💰', title: 'Marge max', desc: 'Jusqu\'à 50% par pièce' },
+            ].map((v, i) => (
               <div key={i} className="value-card reveal">
                 <span className="ico">{v.ico}</span>
                 <h3>{v.title}</h3>
                 <p>{v.desc}</p>
-                <span className="val">{v.val}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PROCESS */}
-      <section className="section">
+      {/* PROCESS — simple */}
+      <section className="section section-dark">
         <div className="wrap">
-          <p className="kicker reveal">De l'idée à la vente</p>
-          <h2 className="h2 reveal">Ta marque en ligne en <span className="accent">4 étapes.</span></h2>
-          <p className="lead reveal">Certains créateurs font les 4 dans la même journée.</p>
+          <h2 className="h2 reveal">En 4 étapes</h2>
           <div className="steps">
-            <div className="step reveal"><div className="num">1</div><h3>Crée ton design</h3><p>Designer en ligne gratuit. Ou envoie ton idée, on la met au propre.</p></div>
-            <div className="step reveal"><div className="num">2</div><h3>Commande ta pièce test</h3><p>1 950 DA. Vérifie la qualité, prends tes photos, poste sur Insta.</p></div>
-            <div className="step reveal"><div className="num">3</div><h3>Vends d'abord</h3><p>Précommandes en DM ou story. Ton client paie AVANT la production.</p></div>
-            <div className="step reveal"><div className="num">4</div><h3>On produit, tu encaisses</h3><p>48h de production, livraison 58 wilayas. Ta marge reste dans ta poche.</p></div>
+            <div className="step reveal"><div className="num">1</div><h3>Design</h3><p>Crée ou laisse-nous faire</p></div>
+            <div className="step reveal"><div className="num">2</div><h3>Test</h3><p>Commande ta pièce (1 950 DA)</p></div>
+            <div className="step reveal"><div className="num">3</div><h3>Vends</h3><p>Précommandes sur Insta/Tiktok</p></div>
+            <div className="step reveal"><div className="num">4</div><h3>Production</h3><p>On livre en 48h, tu encaisses</p></div>
           </div>
         </div>
       </section>
 
-      {/* PREUVE SOCIALE */}
-      <section className="section section-dark">
+      {/* PREUVE SOCIALE — compact */}
+      <section className="section">
         <div className="wrap">
-          <p className="kicker reveal">Ils ont commencé exactement comme toi</p>
-          <h2 className="h2 reveal">Zéro stock au départ.<br /><span className="accent">De vraies ventes à l'arrivée.</span></h2>
-          <div className="grid" style={{ marginTop: 48 }}>
-            {testimonials.map((t, i) => (
+          <h2 className="h2 reveal">Ça marche <span className="accent">déjà</span></h2>
+          <div className="grid" style={{ marginTop: 40 }}>
+            {testimonials.slice(0, 2).map((t, i) => (
               <div key={i} className="testi reveal">
-                <div className="stars">★★★★★</div>
                 <p className="quote">"{t.quote}"</p>
                 <p className="who">{t.who}</p>
-                <p className="role">{t.role}</p>
                 <span className="result">{t.result}</span>
               </div>
             ))}
@@ -396,51 +383,40 @@ export default function PrintOnDemandClient() {
         </div>
       </section>
 
-      {/* OFFRE — Grand Slam Offer */}
-      <section className="section">
+      {/* CTA FINAL */}
+      <section className="section section-dark">
         <div className="wrap">
-          <p className="kicker reveal">L'offre de lancement</p>
-          <div className="offer-box reveal">
-            <h3>Le Pack Créateur</h3>
-            <p className="sub">Tout pour lancer ta marque aujourd'hui — pour le prix d'une seule pièce:</p>
+          <div className="offer-box reveal" style={{ maxWidth: 600 }}>
+            <h3>Prêt à lancer?</h3>
+            <p className="sub">Première pièce à seulement 1 950 DA</p>
             <ul className="offer-list">
-              <li><span className="check">✓</span><span>Ta première pièce produite en qualité DTF premium — <b>1 950 DA</b></span></li>
-              <li><span className="check">✓</span><span>Designer en ligne illimité <b style={{ color: C.lime }}>(offert)</b></span></li>
-              <li><span className="check">✓</span><span>Studio 3D pour tes visuels Instagram <b style={{ color: C.lime }}>(offert)</b></span></li>
-              <li><span className="check">✓</span><span>Aide au design sur WhatsApp si tu bloques <b style={{ color: C.lime }}>(offert)</b></span></li>
-              <li><span className="check">✓</span><span>Ton design archivé — chaque revente part en prod en 1 message</span></li>
-              <li><span className="check">✓</span><span>Prix dégressifs automatiques quand tu scales</span></li>
+              <li><span className="check">✓</span><span>Qualité DTF premium</span></li>
+              <li><span className="check">✓</span><span>Designer gratuit</span></li>
+              <li><span className="check">✓</span><span>Livraison 48h</span></li>
             </ul>
-            <Link href="/designer" className="btn btn-lime" style={{ width: '100%', maxWidth: 380 }}>Lancer ma marque maintenant →</Link>
-            <p style={{ fontSize: 12, color: C.muted, marginTop: 16 }}>💡 Le seul "investissement" est ta pièce test à 1 950 DA — remboursée si la qualité ne te convient pas.</p>
+            <Link href="/designer" className="btn btn-lime" style={{ width: '100%' }}>Commencer →</Link>
           </div>
         </div>
       </section>
 
-      {/* GARANTIE — risk reversal */}
-      <section className="section section-dark">
+      {/* GARANTIE simple */}
+      <section className="section">
         <div className="wrap">
           <div className="guarantee reveal">
             <span className="shield">🛡️</span>
             <div>
-              <h3>La Garantie "Pièce Test Sans Risque"</h3>
-              <p>
-                Commande ta première pièce. Si la qualité d'impression ne correspond pas à ce que tu
-                attendais, <b style={{ color: C.white }}>on la refait ou on te rembourse intégralement.</b> Tu
-                vérifies notre qualité avant de construire ta marque dessus — c'est toi qui décides,
-                preuve en main.
-              </p>
+              <h3>Pas satisfait? Remboursé</h3>
+              <p>Commande ta pièce test. Si la qualité ne correspond pas, <b>on la refait ou on te rembourse.</b></p>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="section">
+      <section className="section section-dark">
         <div className="wrap">
-          <p className="kicker reveal">Les vraies questions des créateurs</p>
-          <h2 className="h2 reveal">Tout ce que tu te demandes<br />avant de te lancer.</h2>
-          <div className="faq" style={{ marginTop: 44 }}>
+          <h2 className="h2 reveal">Questions fréquentes</h2>
+          <div className="faq" style={{ marginTop: 40 }}>
             {faqs.map((f, i) => (
               <div key={i} className={`faq-item reveal ${faqOpen === i ? 'active' : ''}`} onClick={() => setFaqOpen(faqOpen === i ? -1 : i)}>
                 <h3>{f.q}<span className="toggle">{faqOpen === i ? '−' : '+'}</span></h3>
