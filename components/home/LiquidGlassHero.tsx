@@ -5,7 +5,7 @@
 // texte. Chargé uniquement côté client (voir l'import dynamic dans
 // HomeClient) : aucune dépendance three.js ne doit toucher le rendu serveur.
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Environment, Float, MeshTransmissionMaterial } from '@react-three/drei'
+import { Float, MeshTransmissionMaterial } from '@react-three/drei'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
