@@ -230,10 +230,10 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
           <div>
             <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Entreprises</div>
             <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
-              Uniformes, broderie, DTF — habillez votre équipe en 48h.
+              Uniformes, broderie, DTF — configurez la commande de votre équipe.
             </div>
           </div>
-          <span className="gate-card-cta">Découvrir <IconArrow /></span>
+          <span className="gate-card-cta">Configurer ma commande <IconArrow /></span>
         </Link>
 
         <Link href="/print-on-demand" onClick={remember} className="gate-card gate-card--pod">

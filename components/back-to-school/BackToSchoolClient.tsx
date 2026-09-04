@@ -43,7 +43,7 @@ const PRODUCTS = [
     priceDZD: 10000,
     desc: '2 T-shirts oversized "BOYZ FROM +213" + 2 baggy joggers (gris et noir). Le pack complet pour la rentrée.',
     bullets: ['2 T-shirts oversized premium', '2 Joggers baggy — 1 gris, 1 noir', 'Paiement à la livraison'],
-    images: ['/back-to-school/jogger-pack.png', '/back-to-school/jogger-gallery-2.jpg'],
+    images: ['/produits-photos/tshirt-oversized.jpg', '/back-to-school/jogger-gallery-2.jpg'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Blanc', hex: '#FFFFFF' },
@@ -149,6 +149,13 @@ const GlobalStyle = () => (
       box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
     .pack-card:hover::before { opacity: 1; }
+
+    .pack-card-media {
+      position: relative; border-radius: 14px; overflow: hidden;
+      background: #EDE7E0; aspect-ratio: 4/5; margin-bottom: 20px;
+    }
+    .pack-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s cubic-bezier(0.22,1,0.36,1); }
+    .pack-card:hover .pack-card-media img { transform: scale(1.04); }
 
     .pack-card-badge { display: inline-block; background: linear-gradient(135deg, ${C.from}, ${C.to}); color: white; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; }
     .pack-card-title { font-size: 28px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.5px; }
@@ -320,6 +327,7 @@ const GlobalStyle = () => (
 
 export default function BackToSchoolClient() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
+  const [activeImg, setActiveImg] = useState(0)
   const [form, setForm] = useState<FormState>(initialForm)
   const [confirmedRef, setConfirmedRef] = useState<string | null>(null)
   const [confirming, setConfirming] = useState(false)
@@ -349,6 +357,7 @@ export default function BackToSchoolClient() {
 
   const handleProductSelect = (productId: string) => {
     setSelectedProductId(productId)
+    setActiveImg(0)
     setForm(initialForm)
     setConfirmedRef(null)
     setTimeout(() => checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
@@ -390,7 +399,7 @@ export default function BackToSchoolClient() {
   }
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ background: C.black, color: C.white, minHeight: '100vh', fontFamily: "'Montserrat', sans-serif" }}>
       <GlobalStyle />
 
       <header>
@@ -435,12 +444,12 @@ export default function BackToSchoolClient() {
                 <div>
                   <div className="gallery-main">
                     <span className="tag">{selectedProduct!.tag}</span>
-                    <img src={selectedProduct!.images[0]} alt={selectedProduct!.title} />
+                    <img src={selectedProduct!.images[activeImg]} alt={selectedProduct!.title} />
                   </div>
                   <div className="gallery-thumbs">
                     {selectedProduct!.images.map((img, i) => (
-                      <button key={i} className={i === 0 ? 'active' : ''}>
-                        <img src={img} alt="" />
+                      <button key={img} type="button" className={i === activeImg ? 'active' : ''} onClick={() => setActiveImg(i)}>
+                        <img src={img} alt={`${selectedProduct!.title} — visuel ${i + 1}`} />
                       </button>
                     ))}
                   </div>
@@ -586,6 +595,9 @@ export default function BackToSchoolClient() {
             <div className="catalog-grid">
               {PRODUCTS.map(product => (
                 <div key={product.id} className="pack-card" onClick={() => handleProductSelect(product.id)}>
+                  <div className="pack-card-media">
+                    <img src={product.images[0]} alt={product.title} loading="lazy" />
+                  </div>
                   <div className="pack-card-badge">{product.tag}</div>
                   <div className="pack-card-title">{product.title}</div>
                   <div className="pack-card-sub">{product.subtitle}</div>

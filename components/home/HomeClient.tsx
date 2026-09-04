@@ -142,7 +142,7 @@ const quickLinks = [
   { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
   { href: '/collection', label: 'Collection', desc: 'Nos designs prêts à porter', Icon: IconStar },
   { href: '/comment-ca-marche', label: 'Comment ça marche', desc: 'Le guide complet, étape par étape', Icon: IconBook },
-  { href: '/entreprises', label: 'Entreprises', desc: 'Uniformes pro en 48h — restaurants, cliniques, chantiers', Icon: IconBriefcase },
+  { href: '/entreprises', label: 'Entreprises', desc: 'Configurez la commande de votre équipe — devis immédiat', Icon: IconBriefcase },
   { href: '/print-on-demand', label: 'Print on Demand', desc: 'Sans stock, sans risque — vendez vos designs', Icon: IconPrinter },
 ]
 

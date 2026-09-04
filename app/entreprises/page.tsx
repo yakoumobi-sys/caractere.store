@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import EntreprisesClient from '@/components/entreprises/EntreprisesClient'
+import ConfigurateurClient from '@/components/configurateur/ConfigurateurClient'
 
 export const metadata: Metadata = {
-  title: 'Uniformes & Branding B2B — Entreprises',
-  description: 'Uniformes de qualité en 48h pour restaurants, cliniques et chantiers en Algérie. Maquette gratuite, photos de contrôle avant livraison, garantie zéro risque.',
+  title: 'Commande entreprise — configurez vos uniformes personnalisés',
+  description: "Configurez la commande de votre équipe : uniformes, workwear et goodies personnalisés. Devis en 2h, production 48h, livraison dans les 58 wilayas.",
 }
 
-export default function EntreprisePage() {
-  return <EntreprisesClient />
+export default function EntreprisesPage() {
+  return <ConfigurateurClient variant="b2b" />
 }
