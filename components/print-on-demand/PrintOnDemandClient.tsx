@@ -44,6 +44,7 @@ const PRODUITS = [
   { nom: 'Totebag', detail: 'Coton canvas', prix: '950 DA', img: '/produits-photos/totebag.jpg' },
   { nom: 'Tablier', detail: 'Restauration, café', prix: 'Sur devis', img: '/produits-photos/tablier.jpg' },
   { nom: 'Gilet de travail', detail: 'Chantier, logistique', prix: 'Sur devis', img: '/produits-photos/gilet.jpg' },
+  { nom: 'T-shirt + Baggy Jogger', detail: 'Ensemble coton premium', prix: '4 000 DA', img: '/produits-photos/tshirt-jogger.jpg' },
 ]
 
 const TARIFS = [
