@@ -11,8 +11,8 @@ const C = {
   navy: '#1A3A52',
   gold: '#D4A574',
   lime: '#A3E635',
-  btsFrom: '#FF7A3D',
-  btsTo: '#E63965',
+  promoFrom: '#FF7A3D',
+  promoTo: '#E63965',
 }
 
 const GATE_KEY = 'caractere_gate_seen'
@@ -29,7 +29,7 @@ function Logo({ size = 44 }) {
   )
 }
 
-function IconBriefcase({ size = 34 }) {
+function IconBriefcase({ size = 32 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <rect x="2" y="7" width="20" height="14" rx="2" />
@@ -39,7 +39,7 @@ function IconBriefcase({ size = 34 }) {
   )
 }
 
-function IconPrinter({ size = 34 }) {
+function IconPrinter({ size = 32 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M6 9V2h12v7" />
@@ -49,22 +49,20 @@ function IconPrinter({ size = 34 }) {
   )
 }
 
-function IconBackpack({ size = 34 }) {
+// Étiquette de prix : la promo, c'est d'abord une remise sur un article.
+function IconTag({ size = 32 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
-      <path d="M8 4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2H8V4z" />
-      <path d="M5 10a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v7a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-7z" />
-      <path d="M9 9.5v3.5h6V9.5" />
-      <path d="M9.5 16.5h5" />
+      <path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+      <circle cx="7.5" cy="7.5" r="1.4" />
     </svg>
   )
 }
 
-function IconCompass({ size = 34 }) {
+function IconShirt({ size = 32 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none">
-      <circle cx="12" cy="12" r="10" />
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+      <path d="M8.5 3 12 6l3.5-3L21 6l-2 4-2-1v12H7V9L5 10 3 6l5.5-3z" />
     </svg>
   )
 }
@@ -101,9 +99,7 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         color: C.white,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '32px 20px',
+        padding: '28px 20px',
         overflowY: 'auto',
       }}
     >
@@ -116,16 +112,19 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
           .gate-anim { animation: none !important; opacity: 1 !important; transform: none !important; }
         }
         .gate-anim { animation: gateIn 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+
+        /* Tuile carrée : icône en haut, libellé calé en bas. */
         .gate-card {
           position: relative;
-          display: flex; flex-direction: column; gap: 18px;
+          aspect-ratio: 1 / 1;
+          display: flex; flex-direction: column; justify-content: space-between;
           background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
           backdrop-filter: blur(20px) saturate(160%);
           -webkit-backdrop-filter: blur(20px) saturate(160%);
           border: 1px solid ${C.line};
           box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
-          border-radius: 24px;
-          padding: 36px 30px;
+          border-radius: 22px;
+          padding: 24px;
           text-decoration: none;
           color: ${C.white};
           overflow: hidden;
@@ -146,49 +145,81 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         .gate-card:hover { transform: translateY(-4px); background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 16px 40px rgba(0,0,0,0.4); }
         @media (prefers-reduced-motion: reduce) {
           .gate-card::before { display: none; }
+          .gate-card:hover { transform: none; }
         }
         .gate-card--entreprises:hover { border-color: ${C.gold}; }
         .gate-card--pod:hover { border-color: ${C.lime}; }
-        .gate-card--continue:hover { border-color: rgba(255,255,255,0.4); }
+        .gate-card--produits:hover { border-color: rgba(255,255,255,0.45); }
+
         .gate-card-icon {
-          width: 56px; height: 56px; border-radius: 16px;
+          width: 52px; height: 52px; border-radius: 15px; flex: none;
           display: flex; align-items: center; justify-content: center;
           background: rgba(255,255,255,0.06);
           transition: background 0.25s ease, color 0.25s ease;
         }
         .gate-card--entreprises:hover .gate-card-icon { background: ${C.navy}; color: ${C.gold}; }
         .gate-card--pod:hover .gate-card-icon { background: rgba(163,230,53,0.15); color: ${C.lime}; }
-        .gate-card--continue:hover .gate-card-icon { background: rgba(255,255,255,0.12); color: ${C.white}; }
-        .gate-card-cta { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: ${C.gray}; transition: color 0.25s ease, gap 0.25s ease; }
+        .gate-card--produits:hover .gate-card-icon { background: rgba(255,255,255,0.14); color: ${C.white}; }
+
+        .gate-card-title { font-weight: 800; font-size: 1.18rem; letter-spacing: -0.01em; margin-bottom: 6px; }
+        .gate-card-desc { color: ${C.gray}; font-weight: 500; font-size: 0.9rem; line-height: 1.45; }
+        .gate-card-cta {
+          display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+          font-weight: 800; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.045em;
+          color: ${C.gray}; transition: color 0.25s ease, gap 0.25s ease;
+        }
         .gate-card:hover .gate-card-cta { gap: 10px; color: ${C.white}; }
 
-        /* Carte "Back to School" — volontairement colorée pour trancher avec les autres */
-        .gate-card--bts {
-          background: linear-gradient(135deg, ${C.btsFrom}, ${C.btsTo});
+        /* Promo : la seule tuile colorée, pour qu'elle tranche. */
+        .gate-card--promo {
+          background: linear-gradient(135deg, ${C.promoFrom}, ${C.promoTo});
           border-color: rgba(255,255,255,0.18);
         }
-        .gate-card--bts .gate-card-icon { background: rgba(255,255,255,0.2); color: ${C.white}; }
-        .gate-card--bts .gate-card-cta { color: rgba(255,255,255,0.85); }
-        .gate-card--bts:hover { border-color: rgba(255,255,255,0.5); background: linear-gradient(135deg, ${C.btsFrom}, ${C.btsTo}); }
-        .gate-card--bts:hover .gate-card-icon { background: rgba(255,255,255,0.3); color: ${C.white}; }
-        .gate-card--bts:hover .gate-card-cta { color: ${C.white}; }
-        .gate-card--bts .gate-badge {
+        .gate-card--promo .gate-card-icon { background: rgba(255,255,255,0.2); color: ${C.white}; }
+        .gate-card--promo .gate-card-desc { color: rgba(255,255,255,0.88); }
+        .gate-card--promo .gate-card-cta { color: rgba(255,255,255,0.85); }
+        .gate-card--promo:hover { border-color: rgba(255,255,255,0.5); background: linear-gradient(135deg, ${C.promoFrom}, ${C.promoTo}); }
+        .gate-card--promo:hover .gate-card-icon { background: rgba(255,255,255,0.3); }
+        .gate-card--promo:hover .gate-card-cta { color: ${C.white}; }
+        .gate-badge {
           position: absolute; top: 18px; right: 18px;
           background: rgba(255,255,255,0.22); color: ${C.white};
-          font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+          font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
           padding: 5px 10px; border-radius: 999px;
         }
 
-        .gate-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; width: 100%; max-width: 1280px; }
-        @media (max-width: 1100px) {
-          .gate-grid { grid-template-columns: repeat(2, 1fr); max-width: 680px; }
+        .gate-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+          width: 100%;
+          max-width: 580px;
         }
+        /* Sur téléphone la tuile carrée n'a pas la place d'un descriptif :
+           on garde icône + titre + action, qui suffisent à choisir. */
         @media (max-width: 560px) {
-          .gate-grid { grid-template-columns: 1fr; max-width: 480px; }
+          .gate-card { padding: 16px; border-radius: 18px; }
+          .gate-card-icon { width: 40px; height: 40px; border-radius: 12px; }
+          .gate-card-title { font-size: 0.98rem; margin-bottom: 0; }
+          .gate-card-desc { display: none; }
+          .gate-card-cta { font-size: 0.66rem; margin-top: 8px; }
+          .gate-badge { top: 12px; right: 12px; font-size: 0.58rem; padding: 4px 8px; }
+          .gate-grid { gap: 12px; }
         }
+
+        .gate-skip {
+          margin-top: 30px; background: none; border: none; cursor: pointer;
+          font: inherit; font-size: 0.86rem; font-weight: 600; color: ${C.grayDark};
+          display: inline-flex; align-items: center; gap: 6px;
+          transition: color 0.25s ease, gap 0.25s ease;
+        }
+        .gate-skip:hover { color: ${C.white}; gap: 10px; }
       `}} />
 
-      <div className="gate-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '36px' }}>
+      {/* `margin: auto` centre verticalement sans rogner le haut quand ça déborde,
+          contrairement à un justify-content: center sur le conteneur scrollable. */}
+      <div style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      <div className="gate-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '26px' }}>
         <Logo />
         <span style={{ fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>Caractère</span>
       </div>
@@ -197,7 +228,7 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
         className="gate-anim"
         style={{
           textAlign: 'center', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.12,
-          fontSize: 'clamp(1.7rem, 5vw, 2.6rem)', margin: '0 0 12px', animationDelay: '0.05s',
+          fontSize: 'clamp(1.6rem, 5vw, 2.4rem)', margin: '0 0 10px', animationDelay: '0.05s',
         }}
       >
         Qu&rsquo;est-ce qui vous amène ?
@@ -205,58 +236,55 @@ export default function EntryGate({ onDismiss }: { onDismiss: () => void }) {
       <p
         className="gate-anim"
         style={{
-          textAlign: 'center', color: C.gray, fontWeight: 600, fontSize: '1.02rem',
-          maxWidth: '480px', margin: '0 0 40px', animationDelay: '0.1s',
+          textAlign: 'center', color: C.gray, fontWeight: 600, fontSize: '0.98rem',
+          maxWidth: '460px', margin: '0 0 32px', animationDelay: '0.1s',
         }}
       >
         Choisissez votre parcours pour aller droit à l&rsquo;essentiel.
       </p>
 
       <div className="gate-anim gate-grid" style={{ animationDelay: '0.15s' }}>
-        <Link href="/back-to-school" onClick={remember} className="gate-card gate-card--bts">
-          <span className="gate-badge">Nouveau</span>
-          <span className="gate-card-icon"><IconBackpack /></span>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Back to School</div>
-            <div style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
-              Tepyach pour la rentrée, pack et promotion.
-            </div>
-          </div>
-          <span className="gate-card-cta">Voir l&rsquo;offre <IconArrow /></span>
-        </Link>
-
         <Link href="/entreprises" onClick={remember} className="gate-card gate-card--entreprises">
           <span className="gate-card-icon"><IconBriefcase /></span>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Entreprises</div>
-            <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
-              Uniformes, broderie, DTF — configurez la commande de votre équipe.
-            </div>
+            <div className="gate-card-title">Uniformes entreprise</div>
+            <div className="gate-card-desc">Habillez votre équipe — broderie, DTF, devis immédiat.</div>
+            <span className="gate-card-cta">Configurer <IconArrow /></span>
           </div>
-          <span className="gate-card-cta">Configurer ma commande <IconArrow /></span>
         </Link>
 
         <Link href="/print-on-demand" onClick={remember} className="gate-card gate-card--pod">
           <span className="gate-card-icon"><IconPrinter /></span>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Print on Demand</div>
-            <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
-              Lancez votre marque de vêtements, sans stock, sans risque.
-            </div>
+            <div className="gate-card-title">Print on Demand</div>
+            <div className="gate-card-desc">Lancez votre marque, sans stock et dès 1 pièce.</div>
+            <span className="gate-card-cta">Découvrir <IconArrow /></span>
           </div>
-          <span className="gate-card-cta">Découvrir <IconArrow /></span>
         </Link>
 
-        <button type="button" onClick={handleContinue} className="gate-card gate-card--continue">
-          <span className="gate-card-icon"><IconCompass /></span>
+        <Link href="/back-to-school" onClick={remember} className="gate-card gate-card--promo">
+          <span className="gate-badge">En cours</span>
+          <span className="gate-card-icon"><IconTag /></span>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.01em', marginBottom: '8px' }}>Explorer le site</div>
-            <div style={{ color: C.gray, fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.5 }}>
-              Produits, designer, configurateur — tout voir avant de choisir.
-            </div>
+            <div className="gate-card-title">Promo</div>
+            <div className="gate-card-desc">Packs rentrée à prix cassé, jusqu&rsquo;à −35%.</div>
+            <span className="gate-card-cta">Voir l&rsquo;offre <IconArrow /></span>
           </div>
-          <span className="gate-card-cta">Continuer <IconArrow /></span>
-        </button>
+        </Link>
+
+        <Link href="/produits" onClick={remember} className="gate-card gate-card--produits">
+          <span className="gate-card-icon"><IconShirt /></span>
+          <div>
+            <div className="gate-card-title">Produits</div>
+            <div className="gate-card-desc">T-shirts, polos, hoodies, casquettes et accessoires.</div>
+            <span className="gate-card-cta">Parcourir <IconArrow /></span>
+          </div>
+        </Link>
+      </div>
+
+      <button type="button" onClick={handleContinue} className="gate-anim gate-skip" style={{ animationDelay: '0.2s' }}>
+        Explorer le site <IconArrow size={13} />
+      </button>
       </div>
     </div>
   )
