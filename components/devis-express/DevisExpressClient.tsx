@@ -366,7 +366,7 @@ export default function DevisExpressClient() {
         <footer className="dvx-foot">
           <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">WhatsApp 0557 44 05 22</a>
           <span>·</span>
-          <Link href="/">caracterestore.com</Link>
+          <Link href="/">caracteredz.com</Link>
         </footer>
       </main>
     </div>

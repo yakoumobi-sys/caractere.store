@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const SITE_URL = 'https://www.caracterestore.com'
+const SITE_URL = 'https://www.caracteredz.com'
 
 // Uniquement les pages de contenu public destinées à être indexées — pas
 // /auth/*, /admin/*, /dashboard, /suivi/[reference] (pages par utilisateur/

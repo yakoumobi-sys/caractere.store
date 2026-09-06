@@ -37,7 +37,7 @@ export default function MentionsLegalesPage() {
             <p><strong>Activité :</strong> Personnalisation textile — broderie, impression DTF, uniformes professionnels et print-on-demand.</p>
             <p><strong>Localisation :</strong> Alger, Algérie</p>
             <p><strong>Contact :</strong> WhatsApp <a href="https://wa.me/213557440522" className="underline">+213 557 440 522</a> · Email <a href="mailto:yakoumobi@gmail.com" className="underline">yakoumobi@gmail.com</a></p>
-            <p><strong>Site web :</strong> caracterestore.com</p>
+            <p><strong>Site web :</strong> caracteredz.com</p>
             <div className="rounded-xl px-4 py-3 mt-2" style={{ background: '#FFFBEB', border: '1px solid #FDE68A' }}>
               <p className="text-[13px]" style={{ color: '#92400E' }}>
                 <strong>À compléter :</strong> numéro de registre de commerce (RC), numéro d'identification

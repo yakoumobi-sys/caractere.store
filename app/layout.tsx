@@ -4,7 +4,7 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap', weight: ['300','400','500','600','700'] })
 
-const SITE_URL = 'https://www.caracterestore.com'
+const SITE_URL = 'https://www.caracteredz.com'
 const DEFAULT_DESCRIPTION = 'Vêtements personnalisés, DTF, broderie — de 1 à 10 000 pièces. Simulation et devis gratuits. Alger, Algérie.'
 const OG_IMAGE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo.jpg'
 
