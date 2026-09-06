@@ -10,6 +10,7 @@ const routes: { path: string; priority: number; changeFrequency: MetadataRoute.S
   { path: '/entreprises', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/particuliers', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/print-on-demand', priority: 0.8, changeFrequency: 'weekly' },
+  { path: '/devis-express', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/produits', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/collection', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/comment-ca-marche', priority: 0.7, changeFrequency: 'monthly' },
