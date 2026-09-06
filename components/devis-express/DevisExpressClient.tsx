@@ -33,6 +33,23 @@ const DOMAINES = [
 const ACCEPTED = '.png,.jpg,.jpeg,.webp,.pdf,.ai,.eps'
 const MAX_FILE_MB = 10
 
+const T = {
+  badge: { ar: 'خدمة سريعة — تصميم وطباعة مضمونة', fr: 'Service rapide — Design et impression garantis' },
+  h1: { ar: 'احصل على عرض سعر في دقائق', fr: 'Obtenez votre devis en quelques minutes' },
+  sub1: { ar: 'أدخل معلوماتك وسنتواصل معك لتأكيد السعر والتفاصيل.', fr: 'Entrez vos informations et nous vous recontacterons pour confirmer le prix et les détails.' },
+  sub2: { ar: 'Recevez votre devis personnalisé en quelques minutes.', fr: 'Recevez votre devis personnalisé en quelques minutes.' },
+  trust1: { ar: 'توصيل متاح', fr: 'Livraison disponible' },
+  trust2: { ar: 'جودة عالية', fr: 'Qualité supérieure' },
+  trust3: { ar: 'رد سريع', fr: 'Réponse rapide' },
+  submit: { ar: 'احصل على السعر', fr: 'Obtenir mon prix' },
+  submitSending: { ar: 'Envoi…', fr: 'Envoi…' },
+  successTitle: { ar: 'تم إرسال طلبك بنجاح', fr: 'Demande envoyée avec succès' },
+  successSub: { ar: 'Demande envoyée — nous vous répondons sous 24 h.', fr: 'Demande envoyée — nous vous répondons sous 24 h.' },
+  successWA: { ar: 'تواصل الآن على واتساب', fr: 'Discuter sur WhatsApp' },
+  again: { ar: 'إرسال طلب آخر — Nouvelle demande', fr: 'Nouvelle demande' },
+  secure: { ar: 'معلوماتك آمنة ولن يتم مشاركتها', fr: 'Vos informations sont sécurisées et ne seront pas partagées' },
+}
+
 /* Icônes inline : pas de dépendance externe, elles héritent de la couleur du parent. */
 const Icon = {
   user: (
@@ -121,6 +138,7 @@ export default function DevisExpressClient() {
   const [dragging, setDragging] = useState(false)
   const [status, setStatus] = useState<Status>('idle')
   const [logoBroken, setLogoBroken] = useState(false)
+  const [lang, setLang] = useState<'ar' | 'fr'>('ar')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -193,35 +211,44 @@ export default function DevisExpressClient() {
       <main className="dvx-shell">
         {/* ── En-tête ───────────────────────────────────────────────── */}
         <header className="dvx-head">
-          <Link href="/" aria-label="Caractère Store — accueil">
-            {logoBroken ? (
-              <span className="dvx-wordmark">CARACTÈRE</span>
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={LOGO}
-                alt="Caractère Store"
-                className="dvx-logo"
-                onError={() => setLogoBroken(true)}
-              />
-            )}
-          </Link>
+          <div className="dvx-head-top">
+            <Link href="/" aria-label="Caractère Store — accueil">
+              {logoBroken ? (
+                <span className="dvx-wordmark">CARACTÈRE</span>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={LOGO}
+                  alt="Caractère Store"
+                  className="dvx-logo"
+                  onError={() => setLogoBroken(true)}
+                />
+              )}
+            </Link>
+            <button
+              className="dvx-lang-toggle"
+              onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
+              aria-label="Basculer la langue"
+            >
+              {lang === 'ar' ? 'FR' : 'ع'}
+            </button>
+          </div>
 
           <span className="dvx-badge">
             <i className="dvx-bolt">{Icon.bolt}</i>
-            خدمة سريعة — تصميم وطباعة مضمونة
+            {T.badge[lang]}
           </span>
 
-          <h1 className="dvx-h1">احصل على عرض سعر في دقائق</h1>
+          <h1 className="dvx-h1">{T.h1[lang]}</h1>
           <p className="dvx-sub">
-            أدخل معلوماتك وسنتواصل معك لتأكيد السعر والتفاصيل.
-            <span className="dvx-sub-fr">Recevez votre devis personnalisé en quelques minutes.</span>
+            {lang === 'ar' ? T.sub1.ar : T.sub1.fr}
+            <span className="dvx-sub-fr">{T.sub2.fr}</span>
           </p>
 
           <ul className="dvx-trust">
-            <li><i>{Icon.truck}</i> توصيل متاح</li>
-            <li><i>{Icon.badge}</i> جودة عالية</li>
-            <li><i>{Icon.chat}</i> رد سريع</li>
+            <li><i>{Icon.truck}</i> {T.trust1[lang]}</li>
+            <li><i>{Icon.badge}</i> {T.trust2[lang]}</li>
+            <li><i>{Icon.chat}</i> {T.trust3[lang]}</li>
           </ul>
         </header>
 
@@ -232,18 +259,18 @@ export default function DevisExpressClient() {
           {status === 'done' ? (
             <div className="dvx-success" role="status">
               <div className="dvx-check">✓</div>
-              <p className="dvx-success-ar">تم إرسال طلبك بنجاح</p>
-              <p className="dvx-success-fr">Demande envoyée — nous vous répondons sous 24 h.</p>
+              <p className={`dvx-success-${lang}`}>{T.successTitle[lang]}</p>
+              <p className="dvx-success-fr">{T.successSub.fr}</p>
               <a className="dvx-wa" href={WHATSAPP} target="_blank" rel="noopener noreferrer">
-                تواصل الآن على واتساب
-                <small dir="ltr">Discuter sur WhatsApp</small>
+                {T.successWA[lang]}
+                <small dir="ltr">{lang === 'ar' ? 'Discuter sur WhatsApp' : 'Hablar en WhatsApp'}</small>
               </a>
               <button
                 type="button"
                 className="dvx-again"
                 onClick={() => { setStatus('idle'); setFile(null); formRef.current?.reset() }}
               >
-                إرسال طلب آخر — Nouvelle demande
+                {T.again[lang]}
               </button>
             </div>
           ) : (
@@ -331,11 +358,11 @@ export default function DevisExpressClient() {
 
               <button type="submit" className="dvx-submit" disabled={status === 'sending'}>
                 {status === 'sending' ? (
-                  <><span className="dvx-spinner" aria-hidden="true" /><span dir="ltr">Envoi…</span></>
+                  <><span className="dvx-spinner" aria-hidden="true" /><span dir="ltr">{T.submitSending[lang]}</span></>
                 ) : (
                   <span className="dvx-submit-labels">
-                    احصل على السعر
-                    <small dir="ltr">Obtenir mon prix</small>
+                    {T.submit[lang]}
+                    <small dir="ltr">{lang === 'ar' ? 'Obtenir mon prix' : 'Obtener mi precio'}</small>
                   </span>
                 )}
               </button>
@@ -345,7 +372,7 @@ export default function DevisExpressClient() {
               )}
 
               <p className="dvx-secure">
-                <i>{Icon.shield}</i> معلوماتك آمنة ولن يتم مشاركتها
+                <i>{Icon.shield}</i> {T.secure[lang]}
               </p>
             </form>
           )}
@@ -406,7 +433,18 @@ const CSS = `
 
 /* ---------- En-tête ---------- */
 .dvx-head { text-align: center; }
-.dvx-logo { height: 62px; width: auto; margin: 0 auto 26px; display: block; }
+.dvx-head-top { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 10px; position: relative; }
+.dvx-logo { height: 62px; width: auto; display: block; }
+.dvx-lang-toggle {
+  position: absolute; right: 0;
+  width: 44px; height: 44px;
+  background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.35);
+  border-radius: 10px; color: var(--sky); font-weight: 900; font-size: 14px;
+  cursor: pointer; transition: all .2s;
+}
+.dvx-lang-toggle:hover {
+  background: rgba(56,189,248,.22); border-color: rgba(56,189,248,.55);
+}
 .dvx-wordmark {
   display: block; direction: ltr; margin-bottom: 26px;
   font-size: 26px; font-weight: 900; letter-spacing: 6px; color: var(--white);
