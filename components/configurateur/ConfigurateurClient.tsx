@@ -117,6 +117,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
   const [tailles, setTailles] = useState<Taille[]>(FALLBACK_TAILLES)
   const [refCode, setRefCode] = useState('')
   const [loading, setLoading] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [fromDesigner, setFromDesigner] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -233,25 +234,38 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
   }
 
   const handleSubmit = async () => {
-    if (!order.nom || !order.telephone) return alert('Nom et téléphone requis.')
+    if (loading) return
+    if (!order.nom.trim() || !order.telephone.trim()) {
+      setSubmitError('Renseignez votre nom et votre téléphone pour continuer.')
+      return
+    }
+    setSubmitError(null)
     setLoading(true)
     const ref = 'CAR-' + Date.now().toString(36).toUpperCase()
     const { unit, total } = calcPrice()
-    await fetch('/api/commandes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        reference: ref, produit: order.produit?.nom, quantite: order.quantite,
-        couleur: order.couleur, tailles: order.tailles, position: order.position,
-        technique: order.technique, urgent: order.urgent, nom_client: order.nom,
-        entreprise: order.entreprise, telephone: order.telephone, email: order.email,
-        notes: order.notes, logo_url: order.logoUploadUrl, prix_unitaire: unit, prix_total: total,
+    try {
+      const response = await fetch('/api/commandes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: ref, produit: order.produit?.nom, quantite: order.quantite,
+          couleur: order.couleur, tailles: order.tailles, position: order.position,
+          technique: order.technique, urgent: order.urgent, nom_client: order.nom,
+          entreprise: order.entreprise, telephone: order.telephone, email: order.email,
+          notes: order.notes, logo_url: order.logoUploadUrl, prix_unitaire: unit, prix_total: total,
+        })
       })
-    })
-    setRefCode(ref)
-    setLoading(false)
-    up({ step: 6, whatsappMsg: buildWhatsAppMsg(ref) })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+      if (!response.ok) throw new Error('Enregistrement refusé')
+      const result = await response.json()
+      if (result.success !== true) throw new Error('Confirmation absente')
+      setRefCode(ref)
+      up({ step: 6, whatsappMsg: buildWhatsAppMsg(ref) })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {
+      setSubmitError('Nous ne pouvons pas confirmer l’enregistrement. Vos informations sont conservées sur cette page. Réessayez ou contactez-nous sur WhatsApp.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const { unit, total, remise } = calcPrice()
@@ -748,6 +762,8 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                       />
                     </div>
                   </div>
+
+                  {submitError && <div role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900"><p>{submitError}</p><a href={`${WA}?text=${encodeURIComponent(buildWhatsAppMsg('demande à vérifier'))}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block underline">Transmettre ma demande sur WhatsApp</a></div>}
 
                   <div className="flex gap-3 mt-8">
                     <button onClick={() => { up({ step: 3 }); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="px-6 py-3 rounded-full border-2 border-black/15 text-[14px] font-medium hover:border-black/30 transition-all">

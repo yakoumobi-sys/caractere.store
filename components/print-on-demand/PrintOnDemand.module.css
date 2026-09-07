@@ -34,7 +34,8 @@
 .page :global(.btn-invert:hover) { background: #e0ff86; }
 .page :global(.hero) { display: grid; grid-template-columns: 1.12fr 1fr; gap: 64px; align-items: center; padding-block: 64px 72px; }
 .page :global(.eyebrow), .page :global(.section-label) { display: block; font-size: .75rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 24px; }
-.page :global(.hero h1) { font-size: clamp(3.25rem, 6.6vw, 6.1rem); font-weight: 600; line-height: 1.03; letter-spacing: -.065em; margin: 0 0 28px; }
+.page :global(.hero > *) { min-width: 0; }
+.page :global(.hero h1) { font-size: clamp(3.25rem, 6.6vw, 6.1rem); font-weight: 600; line-height: 1.03; letter-spacing: -.065em; margin: 0 0 28px; overflow-wrap: break-word; }
 .page :global(.hero h1 > span) { background: var(--lime); box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 0 .09em .05em; margin-left: -.09em; }
 .page :global(.hero .sub) { color: var(--muted); font-size: 1.0625rem; max-width: 450px; margin: 0 0 30px; }
 .page :global(.cta-row) { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -46,7 +47,7 @@
 .page :global(.visual-caption) { position: absolute; bottom: 20px; inset-inline: 20px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 4px; background: white; font-size: .875rem; line-height: 1.5; }
 .page :global(.visual-tag) { background: var(--lime); padding: 10px 14px; border-radius: 3px; font-size: .8125rem; font-weight: 600; }
 .page :global(.facts) { display: grid; grid-template-columns: repeat(4, 1fr); border-block: 1px solid var(--line); padding-block: 32px; }
-.page :global(.fact) { padding-inline: 28px; border-left: 1px solid var(--line); }
+.page :global(.fact) { padding-inline: 28px; border-left: 1px solid var(--line); min-width: 0; overflow-wrap: break-word; }
 .page :global(.fact:first-child) { padding-left: 0; border: 0; }
 .page :global(.fact .k) { font-size: 2.4rem; line-height: 1.15; letter-spacing: -.055em; font-weight: 600; }
 .page :global(.fact .v) { color: var(--muted); font-size: .875rem; margin-top: 8px; }
