@@ -23,18 +23,53 @@ const STEPS = [
   { n: '3', title: 'On livre ton client', desc: 'Expédition dans les 58 wilayas, à ton nom. Paiement à la livraison possible.' },
 ]
 
-// Prix à la pièce, impression comprise. « Sur devis » quand le tarif dépend
-// encore de la finition — on ne l'invente pas sur la page.
-const PRODUITS = [
-  { nom: 'T-shirt', detail: '100% coton', prix: '1 950 DA', img: '/produits-photos/tshirt.jpg' },
-  { nom: 'T-shirt oversized', detail: 'Coupe large, 220g', prix: 'Sur devis', img: '/produits-photos/tshirt-oversized.jpg' },
-  { nom: 'Polo', detail: 'Piqué coton premium', prix: '2 300 DA', img: '/produits-photos/polo.jpg' },
-  { nom: 'Hoodie', detail: 'Molleton gratté', prix: 'Sur devis', img: '/produits-photos/hoodie.jpg' },
-  { nom: 'Casquette', detail: 'Broderie structurée', prix: '1 200 DA', img: '/produits-photos/casquette.jpg' },
-  { nom: 'Totebag', detail: 'Coton canvas', prix: '950 DA', img: '/produits-photos/totebag.jpg' },
-  { nom: 'Tablier', detail: 'Restauration, café', prix: 'Sur devis', img: '/produits-photos/tablier.jpg' },
-  { nom: 'Gilet de travail', detail: 'Chantier, logistique', prix: 'Sur devis', img: '/produits-photos/gilet.jpg' },
-  { nom: 'T-shirt + Baggy Jogger', detail: 'Ensemble coton premium', prix: '4 000 DA', img: '/back-to-school/jogger-gallery-2.jpg' },
+// Vitrine de pièces imprimées à la commande. Pas de prix ici : la grille tarifaire
+// sémantique juste en dessous fait foi. Les descriptions ne disent que ce que la
+// photo montre — aucune promesse de matière ou de technique ajoutée.
+type Realisation = {
+  img: string
+  alt: string
+  nom: string
+  detail: string
+  vues?: { img: string; alt: string }[]
+}
+
+const REALISATIONS: Realisation[] = [
+  {
+    img: '/pod/higher-than-yesterday-tshirt.jpg',
+    alt: 'T-shirt blanc oversized imprimé « Higher Than Yesterday », porté de face, de dos et vu en détail',
+    nom: 'T-shirt oversized',
+    detail: 'Recto, dos et détail d’impression',
+  },
+  {
+    img: '/pod/higher-thinking-sweat.jpg',
+    alt: 'Sweat-shirt gris anthracite à col rond, imprimé « Higher Thinking » sur l’avant',
+    nom: 'Sweat col rond',
+    detail: 'Impression grand format sur l’avant',
+  },
+  {
+    img: '/pod/higher-than-yesterday-hoodie.jpg',
+    alt: 'Hoodie sable imprimé « Higher Than Yesterday » sur la poitrine',
+    nom: 'Hoodie',
+    detail: 'Impression poitrine, coloris sable',
+  },
+  {
+    img: '/pod/higher-perspective-tshirt.jpg',
+    alt: 'T-shirt noir imprimé « Higher Perspective », porté de face et de dos',
+    nom: 'T-shirt',
+    detail: 'Petit motif devant, grand motif au dos',
+  },
+  {
+    img: '/pod/essentiel-tshirt-jogger-gris.jpg',
+    alt: 'Ensemble t-shirt noir et jogger gris chiné, porté de face',
+    nom: 'Ensemble T-shirt + Jogger',
+    detail: 'Jogger gris et noir, de face et de dos',
+    vues: [
+      { img: '/pod/essentiel-tshirt-jogger-noir.jpg', alt: 'Le même ensemble avec un jogger noir, porté de face' },
+      { img: '/pod/essentiel-tshirt-jogger-noir-dos.jpg', alt: 'L’ensemble avec un jogger noir, porté de dos' },
+      { img: '/pod/essentiel-tshirt-jogger-gris-dos.jpg', alt: 'L’ensemble avec un jogger gris chiné, porté de dos' },
+    ],
+  },
 ]
 
 const TARIFS = [
@@ -66,7 +101,7 @@ export default function PrintOnDemandClient() {
           <Link href="/" aria-label="Caractère Store"><img src={LOGO} alt="Caractère" /></Link>
           <nav className="pod-nav" aria-label="Navigation Print on Demand">
             <a href="#comment">Le concept</a>
-            <a href="#produits">Produits</a>
+            <a href="#produits">Réalisations</a>
             <a href="#tarifs">Tarifs</a>
             <a href="#faq">Questions</a>
           </nav>
@@ -125,20 +160,26 @@ export default function PrintOnDemandClient() {
 
         <section className="section" id="produits">
           <div className="pod-wrap">
-            <span className="section-label">02 / LES SUPPORTS</span><h2>La base de ta prochaine collection.</h2>
-            <p className="lead">Prix à la pièce, impression comprise.</p>
+            <span className="section-label">02 / NOS RÉALISATIONS</span><h2>La base de ta prochaine collection.</h2>
+            <p className="lead">Un aperçu de pièces imprimées à la commande. Les tarifs sont détaillés juste en dessous.</p>
             <div className="products">
-              {PRODUITS.map(p => (
-                <Link key={p.nom} href={`/configurateur?produit=${encodeURIComponent(p.nom)}`} className="product">
-                  <div className={`media${p.nom === 'T-shirt + Baggy Jogger' ? ' media-duo' : ''}`}>
-                    {p.nom === 'T-shirt + Baggy Jogger' && <img src="/produits-photos/tshirt.jpg" alt="T-shirt de l’ensemble" loading="lazy" width={590} height={830} />}
-                    <img src={p.img} alt={p.nom === 'T-shirt + Baggy Jogger' ? 'Baggy jogger de l’ensemble' : p.nom} loading="lazy" width={600} height={750} />
-                    <span className="product-action" aria-hidden="true">↗</span>
+              {REALISATIONS.map(r => (
+                <figure key={r.nom} className="product">
+                  <div className="media">
+                    <img src={r.img} alt={r.alt} loading="lazy" width={1122} height={1402} />
                   </div>
-                  <p className="name">{p.nom}</p>
-                  <p className="detail">{p.detail}</p>
-                  <p className="price">{p.prix}</p>
-                </Link>
+                  {r.vues && (
+                    <div className="views">
+                      {r.vues.map(v => (
+                        <img key={v.img} src={v.img} alt={v.alt} loading="lazy" width={1122} height={1402} />
+                      ))}
+                    </div>
+                  )}
+                  <figcaption>
+                    <p className="name">{r.nom}</p>
+                    <p className="detail">{r.detail}</p>
+                  </figcaption>
+                </figure>
               ))}
             </div>
           </div>
