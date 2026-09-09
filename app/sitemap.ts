@@ -1,13 +1,22 @@
 import type { MetadataRoute } from 'next'
+import { SECTEURS } from '@/lib/entreprises-data'
 
 const SITE_URL = 'https://www.caracteredz.com'
 
 // Uniquement les pages de contenu public destinées à être indexées — pas
 // /auth/*, /admin/*, /dashboard, /suivi/[reference] (pages par utilisateur/
-// commande, pas de contenu générique) ni /api/*.
+// commande, pas de contenu générique), /entreprises/commande (outil en
+// noindex) ni /api/*.
 const routes: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] }[] = [
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/entreprises', priority: 0.9, changeFrequency: 'weekly' },
+  // Pages secteur : une entrée par métier équipé, générée depuis la même
+  // source que les pages elles-mêmes pour qu'aucune URL ne puisse manquer.
+  ...SECTEURS.map(s => ({
+    path: `/entreprises/${s.slug}`,
+    priority: 0.85,
+    changeFrequency: 'monthly' as const,
+  })),
   { path: '/particuliers', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/print-on-demand', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/devis-express', priority: 0.8, changeFrequency: 'monthly' },

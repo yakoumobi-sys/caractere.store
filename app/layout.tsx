@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { JsonLd, jsonLdGraph, organizationLd, localBusinessLd, SITE_URL, LOGO_URL } from '@/lib/seo'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap', weight: ['300','400','500','600','700'] })
 
-const SITE_URL = 'https://www.caracteredz.com'
 const DEFAULT_DESCRIPTION = 'Vêtements personnalisés, DTF, broderie — de 1 à 10 000 pièces. Simulation et devis gratuits. Alger, Algérie.'
-const OG_IMAGE = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo.jpg'
+const OG_IMAGE = LOGO_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -17,6 +17,18 @@ export const metadata: Metadata = {
     template: '%s • Caractère Store',
   },
   description: DEFAULT_DESCRIPTION,
+  applicationName: 'Caractère Store',
+  // Canonique par défaut : chaque page qui a sa propre URL la surcharge via
+  // `alternates.canonical`. Évite que www/non-www et les paramètres de
+  // campagne créent des doublons aux yeux de Google.
+  alternates: { canonical: '/' },
+  // Autorise les extraits longs et les grandes vignettes : c'est ce qui
+  // alimente les résultats enrichis et les citations des moteurs IA.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large', 'max-video-preview': -1 },
+  },
   icons: {
     icon: OG_IMAGE,
     apple: OG_IMAGE,
@@ -40,6 +52,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={inter.variable}>
+      <head>
+        {/* Identité de l'entreprise sur toutes les pages : c'est ce bloc que
+            Google et les assistants IA lisent pour savoir qui publie le site. */}
+        <JsonLd data={jsonLdGraph(organizationLd, localBusinessLd)} />
+      </head>
       <body className="font-sans bg-[#0C4A6E]">{children}</body>
     </html>
   )

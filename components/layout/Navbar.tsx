@@ -24,6 +24,7 @@ function LogoMini({ size = 34 }: { size?: number }) {
 }
 
 const links = [
+  { href: '/entreprises', label: 'Entreprises' },
   { href: '/outils', label: 'Outils' },
   { href: '/designer', label: 'Designer' },
   { href: '/studio-3d', label: 'Studio 3D' },

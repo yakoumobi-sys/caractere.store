@@ -1,17 +1,39 @@
+import Link from 'next/link'
+import { SECTEURS } from '@/lib/entreprises-data'
+
 export default function Footer() {
   return (
     <footer className="bg-brand-dark text-white py-16 px-6">
       <div className="max-w-[980px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b border-white/10">
           <div>
             <div className="text-[15px] font-bold tracking-tight mb-3">Caractère Store</div>
-            <p className="text-[13px] text-white/45 leading-relaxed">Impression & Broderie Professionnelle — Alger, Algérie</p>
+            <p className="text-[13px] text-white/45 leading-relaxed">Impression &amp; Broderie Professionnelle — Alger, Algérie</p>
           </div>
           <div>
             <div className="text-[11px] font-bold tracking-widest uppercase text-white/45 mb-4">Services</div>
             <ul className="flex flex-col gap-2.5 list-none">
               {['Broderie machine','Impression DTF','Uniformes B2B','Sérigraphie'].map(s => (
                 <li key={s}><a href="/#services" className="text-[13px] text-white/60 hover:text-white no-underline">{s}</a></li>
+              ))}
+            </ul>
+          </div>
+          {/* Maillage interne vers l'univers B2B : chaque page du site transmet
+              de l'autorité aux pages secteur, qui sont les plus concurrentielles. */}
+          <div>
+            <div className="text-[11px] font-bold tracking-widest uppercase text-white/45 mb-4">Entreprises</div>
+            <ul className="flex flex-col gap-2.5 list-none">
+              <li>
+                <Link href="/entreprises" className="text-[13px] text-white/60 hover:text-white no-underline">
+                  Uniformes personnalisés
+                </Link>
+              </li>
+              {SECTEURS.slice(0, 4).map(s => (
+                <li key={s.slug}>
+                  <Link href={`/entreprises/${s.slug}`} className="text-[13px] text-white/60 hover:text-white no-underline">
+                    {s.nom}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>
