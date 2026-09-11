@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Oswald } from 'next/font/google'
 import './globals.css'
 import { JsonLd, jsonLdGraph, organizationLd, localBusinessLd, SITE_URL, LOGO_URL } from '@/lib/seo'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap', weight: ['300','400','500','600','700'] })
+
+// Titres condensés. `latin-ext` est obligatoire ici : sans lui, le È de
+// CARACTÈRE retombe sur une police de secours et casse le mot dans le hero.
+const display = Oswald({ subsets: ['latin', 'latin-ext'], variable: '--font-display', display: 'swap', weight: ['400','500','600','700'] })
 
 const DEFAULT_DESCRIPTION = 'Vêtements personnalisés, DTF, broderie — de 1 à 10 000 pièces. Simulation et devis gratuits. Alger, Algérie.'
 const OG_IMAGE = LOGO_URL
@@ -51,13 +55,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={inter.variable}>
+    <html lang="fr" className={`${inter.variable} ${display.variable}`}>
       <head>
         {/* Identité de l'entreprise sur toutes les pages : c'est ce bloc que
             Google et les assistants IA lisent pour savoir qui publie le site. */}
         <JsonLd data={jsonLdGraph(organizationLd, localBusinessLd)} />
       </head>
-      <body className="font-sans bg-[#0C4A6E]">{children}</body>
+      <body className="font-sans">{children}</body>
     </html>
   )
 }

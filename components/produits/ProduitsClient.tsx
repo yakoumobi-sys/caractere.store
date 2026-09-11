@@ -1,6 +1,10 @@
 'use client'
 
 import { useState } from "react"
+import Link from "next/link"
+import Navbar from "@/components/layout/Navbar"
+import Footer from "@/components/layout/Footer"
+import styles from "./ProduitsClient.module.css"
 
 type Produit = {
   id: string
@@ -311,78 +315,79 @@ const PRODUITS: Produit[] = [
 
 const CATEGORIES = ["Tous", "Streetwear", "Ensembles", "B2B"]
 
-const BADGE_COLORS: Record<string, string> = {
-  "Premium": "bg-yellow-400 text-black",
-  "Nouveau": "bg-blue-500 text-white",
-  "Exclusif": "bg-purple-600 text-white",
-  "Devis gratuit": "bg-green-600 text-white",
-  "Pack B2B": "bg-sky-600 text-white",
-  "Clé en main": "bg-orange-500 text-white",
+// Seuls « Exclusif » et « Premium » prennent l'accent ; les autres badges
+// restent neutres pour ne pas transformer la grille en sapin de Noël.
+const BADGES_ACCENT = new Set(["Exclusif", "Premium"])
+
+function PhotoProduit({ p }: { p: Produit }) {
+  const [absente, setAbsente] = useState(false)
+
+  if (absente) {
+    return (
+      <div className={styles.mediaVide}>
+        <strong>Photo indisponible</strong>
+        <span>Le support existe, son visuel ne charge pas.</span>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={p.image}
+      alt={p.nom}
+      loading="lazy"
+      width={600}
+      height={600}
+      onError={() => setAbsente(true)}
+    />
+  )
 }
 
 function CarteProduct({ p }: { p: Produit }) {
   const waMsg = encodeURIComponent(
     `Bonjour Caractère Store 👋\n\nJe suis intéressé(e) par une commande en gros :\n\n🛍️ Produit : ${p.nom}\n📦 Quantité : (à préciser)\n📏 Tailles : (à préciser)\n\nPouvez-vous me faire un devis ?`
   )
+  const afficherTailles =
+    p.tailles.length > 0 &&
+    !["Disponible", "Sur mesure", "Unique"].includes(p.tailles[0])
 
   return (
-    <div className="group rounded-2xl overflow-hidden border border-[#e5e5ea] bg-white flex flex-col">
-      {/* IMAGE */}
-      <div className="relative aspect-square overflow-hidden bg-[#f2f2f7]">
-        <img
-          src={p.image}
-          alt={p.nom}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          loading="lazy"
-        />
+    <article className={styles.carte}>
+      <div className={styles.media}>
         {p.badge && (
-          <span className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${BADGE_COLORS[p.badge] ?? "bg-black text-white"}`}>
+          <span className={`${styles.badge} ${BADGES_ACCENT.has(p.badge) ? styles.badgeAccent : ""}`}>
             {p.badge}
           </span>
         )}
+        <PhotoProduit p={p} />
       </div>
 
-      {/* INFOS */}
-      <div className="p-3 flex flex-col flex-1">
-        <h3 className="text-xs font-bold text-[#0a0a0a] leading-tight mb-1 line-clamp-2">
-          {p.nom}
-        </h3>
-        <p className="text-xs text-[#636366] mb-2 line-clamp-2">{p.description}</p>
+      <h3 className={styles.nom}>{p.nom}</h3>
+      <p className={styles.desc}>{p.description}</p>
+      {p.prix && <p className={styles.prix}>{p.prix}</p>}
 
-        {p.prix && (
-          <p className="text-sm font-bold text-[#0a0a0a] mb-2">{p.prix}</p>
-        )}
-
-        {/* TAILLES */}
-        {p.tailles.length > 0 && p.tailles[0] !== "Disponible" && p.tailles[0] !== "Sur mesure" && p.tailles[0] !== "Unique" && (
-          <div className="flex gap-1 flex-wrap mb-3">
-            {p.tailles.map((t) => (
-              <span key={t} className="text-xs border border-[#e5e5ea] rounded px-1.5 py-0.5 text-[#636366]">
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* BOUTONS */}
-        <div className="flex flex-col gap-2 mt-auto">
-          <a
-            href={`/configurateur?produit=${encodeURIComponent(p.nom)}`}
-            className="w-full text-center bg-[#0a0a0a] text-white text-xs font-semibold py-2 rounded-full no-underline hover:bg-[#333] transition-colors"
-          >
-            Configurer ma commande
-          </a>
-          <a
-            href={`https://wa.me/213557440522?text=${waMsg}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full text-center bg-[#25D366] text-white text-xs font-semibold py-2 rounded-full no-underline hover:bg-[#1ebe5d] transition-colors"
-          >
-            Commander en gros
-          </a>
+      {afficherTailles && (
+        <div className={styles.tailles}>
+          {p.tailles.map((t) => (
+            <span key={t} className={styles.taille}>{t}</span>
+          ))}
         </div>
+      )}
+
+      <div className={styles.actions}>
+        <Link href={`/configurateur?produit=${encodeURIComponent(p.nom)}`} className="c-btn c-btn-primary">
+          Configurer ma commande
+        </Link>
+        <a
+          href={`https://wa.me/213557440522?text=${waMsg}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="c-btn c-btn-ghost"
+        >
+          Commander en gros
+        </a>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -392,89 +397,116 @@ export default function ProduitsClient() {
 
   const filtres = PRODUITS.filter((p) => {
     const matchCat = categorie === "Tous" || p.categorie === categorie
+    const q = recherche.trim().toLowerCase()
     const matchSearch =
-      recherche === "" ||
-      p.nom.toLowerCase().includes(recherche.toLowerCase()) ||
-      p.description.toLowerCase().includes(recherche.toLowerCase())
+      q === "" ||
+      p.nom.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q)
     return matchCat && matchSearch
   })
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* HEADER */}
-      <div
-        className="relative px-6 py-16 text-center text-white"
-        style={{ background: "linear-gradient(165deg, #0C4A6E 0%, #38BDF8 100%)" }}
-      >
-        <h1 className="text-4xl font-extrabold mb-3 tracking-tight">Nos Produits</h1>
-        <p className="text-sm opacity-75 max-w-md mx-auto">
-          {PRODUITS.length} produits — T-shirts, ensembles, uniformes B2B
-        </p>
-        <div className="mt-6 max-w-md mx-auto">
-          <input
-            type="text"
-            placeholder="Rechercher un produit..."
-            value={recherche}
-            onChange={(e) => setRecherche(e.target.value)}
-            className="w-full px-5 py-3 rounded-full text-sm text-[#0a0a0a] outline-none shadow-lg"
-          />
-        </div>
-      </div>
+    <div className={`c-scope ${styles.page}`}>
+      <a className={styles.skip} href="#contenu">Aller au contenu</a>
+      <Navbar />
 
-      {/* FILTRES */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#e5e5ea] px-4 py-3">
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategorie(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                categorie === cat
-                  ? "bg-[#0a0a0a] text-white"
-                  : "bg-[#f2f2f7] text-[#636366] hover:bg-[#e5e5ea]"
-              }`}
-            >
-              {cat}
-              {cat !== "Tous" && (
-                <span className="ml-1 text-xs opacity-60">
-                  ({PRODUITS.filter((p) => p.categorie === cat).length})
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+      <main id="contenu">
+        <section className={`c-wrap ${styles.hero}`}>
+          <p className="c-eyebrow">Le catalogue</p>
+          <h1 className={styles.titre}>Les supports</h1>
+          <p className={styles.chapo}>
+            {PRODUITS.length} pièces à personnaliser : streetwear, ensembles et
+            vêtements d&apos;entreprise. Chaque support peut recevoir votre visuel
+            en impression DTF ou en broderie.
+          </p>
 
-      {/* GRILLE */}
-      <div className="px-4 py-6">
-        {filtres.length === 0 ? (
-          <div className="text-center py-20 text-[#636366]">
-            <p>Aucun produit trouvé</p>
+          <div className={styles.recherche}>
+            <label className={styles.rechercheLabel} htmlFor="recherche-produit">
+              Rechercher un support
+            </label>
+            <input
+              id="recherche-produit"
+              type="search"
+              className={styles.rechercheInput}
+              placeholder="T-shirt, polo, hoodie…"
+              value={recherche}
+              onChange={(e) => setRecherche(e.target.value)}
+            />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filtres.map((p) => (
-              <CarteProduct key={p.id} p={p} />
-            ))}
-          </div>
-        )}
-      </div>
+        </section>
 
-      {/* CTA B2B */}
-      <div className="bg-[#0a0a0a] text-white text-center py-14 px-6">
-        <h2 className="text-2xl font-bold mb-3">Commande personnalisée ?</h2>
-        <p className="text-sm opacity-60 mb-6 max-w-sm mx-auto">
-          Broderie, DTF, uniformes B2B. Devis gratuit en moins de 2h.
-        </p>
-        <a
-          href="https://wa.me/213557440522"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-[#25D366] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#1ebe5d] transition-colors no-underline"
-        >
-          Contacter sur WhatsApp →
-        </a>
-      </div>
-    </main>
+        <div className={styles.filtres}>
+          <div className="c-wrap">
+            <div className={styles.filtresPiste} role="group" aria-label="Filtrer par catégorie">
+              {CATEGORIES.map((cat) => {
+                const actif = categorie === cat
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategorie(cat)}
+                    aria-pressed={actif}
+                    className={`${styles.filtre} ${actif ? styles.filtreActif : ""}`}
+                  >
+                    {cat}
+                    {cat !== "Tous" && (
+                      <span className={styles.filtreCompte}>
+                        {PRODUITS.filter((p) => p.categorie === cat).length}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        <section className={`c-wrap ${styles.resultats}`} aria-label="Résultats">
+          <p className={styles.compte} aria-live="polite">
+            {filtres.length === 0
+              ? "Aucun support ne correspond."
+              : `${filtres.length} support${filtres.length > 1 ? "s" : ""} affiché${filtres.length > 1 ? "s" : ""}`}
+          </p>
+
+          {filtres.length === 0 ? (
+            <div className={styles.vide}>
+              <p>Essayez un autre mot, ou revenez à la catégorie « Tous ».</p>
+            </div>
+          ) : (
+            <div className={styles.grille}>
+              {filtres.map((p) => (
+                <CarteProduct key={p.id} p={p} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className={styles.final}>
+          <div className="c-wrap">
+            <p className={styles.finalEyebrow}>Une demande particulière</p>
+            <h2 className={styles.finalTitre}>Un support qui n&apos;est pas dans la liste ?</h2>
+            <p className={styles.finalTexte}>
+              Dites-nous le vêtement, la quantité et la technique souhaitée. On
+              revient vers vous avec la simulation et le devis.
+            </p>
+            <div className={styles.finalActions}>
+              <a
+                href="https://wa.me/213557440522"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`c-btn ${styles.btnSombre}`}
+              >
+                Écrire sur WhatsApp
+              </a>
+              <Link href="/devis-express" className={`c-btn ${styles.btnClair}`}>
+                Demander un devis
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
   )
 }

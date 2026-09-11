@@ -1,50 +1,209 @@
 import Link from 'next/link'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 import styles from './HomeChooser.module.css'
 
-const WA = 'https://wa.me/213557440522?text=' + encodeURIComponent('Bonjour Caractère, je souhaite une simulation pour des vêtements personnalisés.')
+const WHATSAPP =
+  'https://wa.me/213557440522?text=' +
+  encodeURIComponent('Bonjour Caractère, je souhaite personnaliser des vêtements.')
+
+// Pièces issues de lib/collection-products.ts : mêmes noms, mêmes prix, mêmes
+// photos locales, et le lien mène au parcours de commande existant.
+// Les trois produits dont la photo manque dans public/collection ne sont pas
+// repris ici — on ne met pas la photo d'une pièce à la place d'une autre.
+const SELECTION = [
+  { nom: 'BMW M Power', theme: 'Automotive', prix: '3 200 DA', img: '/collection/IMG_7474.jpeg' },
+  { nom: 'Pure Form', theme: 'Minimalist', prix: '3 200 DA', img: '/collection/IMG_7467.jpeg' },
+  { nom: 'Urban Canvas', theme: 'Graphic & Art', prix: '3 200 DA', img: '/collection/IMG_7464.jpeg' },
+  { nom: 'Monaco Grand Prix', theme: 'Limited Edition', prix: '3 200 DA', img: '/collection/IMG_7460.jpeg' },
+]
 
 export default function HomeChooser() {
   return (
-    <div className={styles.home}>
+    <div className={`c-scope ${styles.home}`}>
       <a className={styles.skip} href="#contenu">Aller au contenu</a>
-      <header className={styles.header}>
-        <Link href="/" aria-label="Caractère — accueil"><img src="/logo.jpg" alt="Caractère" width={120} height={48} /></Link>
-        <nav aria-label="Navigation principale"><Link href="/produits">Produits</Link><Link href="/print-on-demand">Créer ma marque</Link><Link href="/entreprises">Mon équipe</Link></nav>
-        <a href={WA} className={styles.button} target="_blank" rel="noopener noreferrer">Parlons de ton projet</a>
-      </header>
+      <Navbar />
+
       <main id="contenu">
+        {/* ── Hero ───────────────────────────────────────────────── */}
         <section className={styles.hero}>
-          <div>
-            <p className={styles.label}>PERSONNALISATION TEXTILE · ALGER</p>
-            <h1>Des vêtements<br />qui portent<br /><span>ta marque.</span></h1>
-            <p className={styles.intro}>Pour lancer ta collection ou habiller ton équipe. T-shirts, polos, sweats et accessoires personnalisés, dès une pièce.</p>
-            <div className={styles.actions}><a href={WA} className={styles.button} target="_blank" rel="noopener noreferrer">Demander une simulation ↗</a><Link href="/produits" className={styles.secondary}>Voir les produits</Link></div>
-            <p className={styles.note}>DTF & broderie · Production à Alger · Livraison nationale</p>
+          <div className={styles.heroMot} aria-hidden="true">CARACTÈRE</div>
+          <div className={`c-wrap ${styles.heroGrille}`}>
+            <div>
+              <p className="c-eyebrow">Personnalisation textile · Alger</p>
+              <h1 className={styles.heroTitre}>
+                Porte ton<br /><em>caractère.</em>
+              </h1>
+              <p className={styles.heroSous}>
+                Des pièces à porter. Une identité à créer. Notre atelier imprime et brode
+                à la pièce comme à la série, et livre dans les 58 wilayas.
+              </p>
+              <div className={styles.heroActions}>
+                <Link href="/configurateur" className="c-btn c-btn-accent">Personnaliser une pièce</Link>
+                <Link href="/collection" className="c-btn c-btn-ghost">Voir la collection</Link>
+              </div>
+              <p className={styles.heroMicro}>Dès 1 pièce · Sans avance sur le stock</p>
+            </div>
+
+            <div className={styles.heroVisuel}>
+              <img
+                src="/pod/higher-thinking-sweat.jpg"
+                alt="Sweat-shirt Caractère gris anthracite imprimé « Higher Thinking », porté devant un mur de béton"
+                width={1122}
+                height={1402}
+                fetchPriority="high"
+              />
+              <div className={styles.heroEncart}>
+                <span><strong>Imprimé à Alger</strong>DTF, broderie et sérigraphie</span>
+                <span>58 wilayas</span>
+              </div>
+            </div>
           </div>
-          <figure className={styles.visual}><img src="/collection/IMG_7471.jpeg" alt="T-shirts imprimés avec des motifs automobiles sur un portant" width={900} height={1200} fetchPriority="high" /><figcaption>Une idée. Une impression. Ta collection.</figcaption></figure>
         </section>
-        <section className={styles.paths} aria-labelledby="besoin">
-          <p className={styles.label}>À CHAQUE PROJET, SON POINT DE DÉPART</p>
-          <h2 id="besoin">Qu’est-ce que tu veux créer ?</h2>
-          <div className={styles.grid}>
-            <Link href="/print-on-demand" className={styles.card}><span className={styles.number}>01 / CRÉATEURS</span><h3>Lancer ma marque</h3><p>Tu crées tes designs. Nous imprimons à la commande, sans stock à constituer.</p><span className={styles.link}>Découvrir l’impression à la demande ↗</span></Link>
-            <Link href="/entreprises" className={styles.card}><span className={styles.number}>02 / ENTREPRISES & ÉQUIPES</span><h3>Habiller mon équipe</h3><p>Des vêtements avec ton logo pour ton restaurant, ton entreprise, ton école ou ton événement.</p><span className={styles.link}>Préparer ma commande ↗</span></Link>
-            <Link href="/collection" className={styles.card}><span className={styles.number}>03 / COLLECTION</span><h3>Trouver mon style</h3><p>Découvre nos designs et choisis une pièce de la collection Caractère.</p><span className={styles.link}>Voir la collection ↗</span></Link>
+
+        {/* ── Sélection de pièces ────────────────────────────────── */}
+        <section className={`c-wrap ${styles.section}`} aria-labelledby="t-selection">
+          <div className={styles.entete}>
+            <div>
+              <p className="c-eyebrow">La collection</p>
+              <h2 id="t-selection" className={styles.titre}>Des pièces déjà prêtes.</h2>
+            </div>
+            <Link href="/collection" className={styles.lien}>Toute la collection →</Link>
           </div>
-          <Link href="/back-to-school" className={styles.promo}>Les packs et offres du moment <span aria-hidden="true">↗</span></Link>
+
+          <div className={styles.pieces}>
+            {SELECTION.map(p => (
+              <Link key={p.nom} href="/collection" className={styles.piece}>
+                <div className={styles.pieceMedia}>
+                  <img src={p.img} alt={`${p.nom} — pièce de la collection Caractère`} loading="lazy" width={900} height={1125} />
+                </div>
+                <div>
+                  <p className={styles.pieceNom}>{p.nom}</p>
+                  <div className={styles.pieceMeta}>
+                    <span className={styles.pieceTheme}>{p.theme}</span>
+                    <span className={styles.piecePrix}>{p.prix}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
-        <section className={styles.products} aria-labelledby="supports">
-          <div className={styles.sectionHead}><h2 id="supports">Ton logo, sur la bonne pièce.</h2><Link href="/produits" className={styles.secondary}>Tout le catalogue ↗</Link></div>
-          <div className={styles.productGrid}>{[
-            {name:'T-shirt',img:'tshirt.jpg'}, {name:'Polo',img:'polo.jpg'}, {name:'Hoodie',img:'hoodie.jpg'}, {name:'Casquette',img:'casquette.jpg'},
-          ].map(p=><Link key={p.name} href={`/configurateur?produit=${encodeURIComponent(p.name)}`}><img src={`/produits-photos/${p.img}`} alt={`${p.name} personnalisable`} width={600} height={750} loading="lazy" /><span>{p.name}<span aria-hidden="true">↗</span></span></Link>)}</div>
+
+        {/* ── Deux parcours ──────────────────────────────────────── */}
+        <section className={`c-wrap ${styles.section}`} aria-labelledby="t-parcours">
+          <div className={styles.entete}>
+            <div>
+              <p className="c-eyebrow">Deux façons de travailler avec nous</p>
+              <h2 id="t-parcours" className={styles.titre}>Ta marque, ou ton équipe.</h2>
+            </div>
+          </div>
+
+          <div className={styles.parcours}>
+            <Link href="/print-on-demand" className={styles.voie}>
+              <img
+                src="/pod/higher-than-yesterday-hoodie.jpg"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width={1122}
+                height={1402}
+              />
+              <div className={styles.voieContenu}>
+                <p className="c-eyebrow">Créateurs</p>
+                <h3 className={styles.voieTitre}>Créer ma marque</h3>
+                <p className={styles.voieTexte}>
+                  Tu dessines, on imprime à la commande et on expédie à ton client.
+                  Aucun stock à constituer.
+                </p>
+                <span className={styles.voieAction}>Découvrir le print on demand →</span>
+              </div>
+            </Link>
+
+            <Link href="/entreprises" className={styles.voie}>
+              <img
+                src="/produits-photos/polo.jpg"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width={900}
+                height={1125}
+              />
+              <div className={styles.voieContenu}>
+                <p className="c-eyebrow">Entreprises &amp; équipes</p>
+                <h3 className={styles.voieTitre}>Habiller mon équipe</h3>
+                <p className={styles.voieTexte}>
+                  Polos, t-shirts et vêtements de travail à ton logo, pour ton restaurant,
+                  ton chantier, ton école ou ton événement.
+                </p>
+                <span className={styles.voieAction}>Préparer ma commande →</span>
+              </div>
+            </Link>
+          </div>
         </section>
-        <section className={styles.contact}>
-          <div><p className={styles.label}>ON COMMENCE AVEC TON IDÉE</p><h2>Tu as déjà un logo ?<br />Envoie-le-nous.</h2><p>Précise le vêtement et la quantité souhaités. Nous préparons ta simulation et ton devis.</p></div>
-          <div className={styles.contactActions}><a href={WA} className={styles.button} target="_blank" rel="noopener noreferrer">Envoyer mon logo sur WhatsApp ↗</a><Link href="/devis-express">Je préfère remplir un formulaire</Link><Link href="/designer">Créer mon design moi-même</Link></div>
+
+        {/* ── Plateau clair : la personnalisation ────────────────── */}
+        <section className={styles.plateau} aria-labelledby="t-perso">
+          <div className={`c-wrap ${styles.plateauGrille}`}>
+            <div>
+              <p className={styles.plateauEyebrow}>La personnalisation</p>
+              <h2 id="t-perso" className={styles.plateauTitre}>Ton logo, ton dessin, ta pièce.</h2>
+              <p className={styles.plateauTexte}>
+                Deux techniques dans notre atelier, choisies selon le vêtement et le rendu
+                recherché. Envoie ton fichier, ou compose ton visuel directement en ligne.
+              </p>
+              <ul className={styles.techniques}>
+                <li>
+                  <span className={styles.puce} aria-hidden="true" />
+                  <span><b>Impression DTF</b> — visuels en couleurs, dégradés et photos, sur coton comme sur mélange.</span>
+                </li>
+                <li>
+                  <span className={styles.puce} aria-hidden="true" />
+                  <span><b>Broderie machine</b> — logos et monogrammes sur polos, casquettes et vêtements de travail.</span>
+                </li>
+              </ul>
+              <div className={styles.plateauActions}>
+                <Link href="/designer" className={`c-btn ${styles.btnSombre}`}>Créer mon design</Link>
+                <Link href="/devis-express" className={`c-btn ${styles.btnClair}`}>Demander un devis</Link>
+              </div>
+            </div>
+
+            <div className={styles.plateauVues}>
+              <figure>
+                <img src="/pod/essentiel-tshirt-jogger-noir.jpg" alt="Ensemble t-shirt et jogger noirs, porté de face en studio" loading="lazy" width={1122} height={1402} />
+              </figure>
+              <figure>
+                <img src="/pod/essentiel-tshirt-jogger-gris-dos.jpg" alt="Ensemble t-shirt noir et jogger gris chiné, porté de dos en studio" loading="lazy" width={1122} height={1402} />
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Contact ────────────────────────────────────────────── */}
+        <section className={`c-wrap ${styles.section}`} aria-labelledby="t-contact">
+          <div className={styles.contact}>
+            <div>
+              <p className="c-eyebrow">On commence avec ton idée</p>
+              <h2 id="t-contact" className={styles.contactTitre}>Parle-nous de ta pièce.</h2>
+              <p className={styles.contactTexte}>
+                Dis-nous le vêtement, la quantité et ce que tu veux dessus. On revient
+                vers toi avec la simulation et le devis.
+              </p>
+            </div>
+            <div className={styles.contactActions}>
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="c-btn c-btn-accent">
+                Écrire sur WhatsApp
+              </a>
+              <Link href="/devis-express" className="c-btn c-btn-ghost">Remplir le formulaire</Link>
+              <p className={styles.contactNote}>
+                Ouvrir WhatsApp prépare le message : la commande n&apos;est enregistrée
+                qu&apos;une fois l&apos;échange confirmé avec l&apos;atelier.
+              </p>
+            </div>
+          </div>
         </section>
       </main>
-      <footer className={styles.footer}><p>Caractère · Vêtements personnalisés à Alger</p><nav aria-label="Informations"><Link href="/avis">Avis clients</Link><Link href="/comment-ca-marche">Comment ça marche</Link><Link href="/mentions-legales">Mentions légales</Link><a href="tel:+213557440522">+213 557 440 522</a></nav></footer>
+
+      <Footer />
     </div>
   )
 }

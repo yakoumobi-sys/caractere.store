@@ -2,7 +2,7 @@
 export const collectionProducts = {
   automotive: {
     title: "Automotive",
-    description: "Speed, precision, passion. Our automotive collection celebrates iconic cars and motorsport culture.",
+    description: "Vitesse, précision, passion. Des pièces qui célèbrent les voitures de caractère et la culture du sport auto.",
     products: [
       {
         id: "auto-1",
@@ -50,7 +50,7 @@ export const collectionProducts = {
   },
   minimalist: {
     title: "Minimalist",
-    description: "Less is more. Clean designs, bold statements, timeless aesthetics.",
+    description: "Le moins possible, mais bien placé. Des visuels nets, des typographies franches, rien de superflu.",
     products: [
       {
         id: "min-1",
@@ -84,7 +84,7 @@ export const collectionProducts = {
   },
   graphicart: {
     title: "Graphic & Art",
-    description: "Bold creativity. Artistic expressions that make a statement.",
+    description: "L'illustration au premier plan. Des compositions graphiques pensées pour se voir de loin.",
     products: [
       {
         id: "art-1",
@@ -118,7 +118,7 @@ export const collectionProducts = {
   },
   limitededition: {
     title: "Limited Edition",
-    description: "Exclusive drops. Once it's gone, it's gone forever.",
+    description: "Des séries courtes, imprimées ponctuellement. Écrivez-nous pour connaître la disponibilité du moment.",
     products: [
       {
         id: "limited-1",
