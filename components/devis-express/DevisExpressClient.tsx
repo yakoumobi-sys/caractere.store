@@ -35,7 +35,7 @@ const MAX_FILE_MB = 10
 
 const T = {
   badge: { ar: 'خدمة سريعة — تصميم وطباعة مضمونة', fr: 'Service rapide — Design et impression garantis' },
-  h1: { ar: 'احصل على عرض سعر في دقائق', fr: 'Obtenez votre devis en quelques minutes' },
+  h1: { ar: 'اطلب عرض سعر لمشروعك', fr: 'Demandez un devis pour votre projet' },
   sub1: { ar: 'أدخل معلوماتك وسنتواصل معك لتأكيد السعر والتفاصيل.', fr: 'Entrez vos informations et nous vous recontacterons pour confirmer le prix et les détails.' },
   sub2: { ar: 'Recevez votre devis personnalisé en quelques minutes.', fr: 'Recevez votre devis personnalisé en quelques minutes.' },
   trust1: { ar: 'توصيل متاح', fr: 'Livraison disponible' },
@@ -205,7 +205,7 @@ export default function DevisExpressClient() {
   }
 
   return (
-    <div className="dvx" dir="rtl">
+    <div className="dvx" dir={lang === 'ar' ? 'rtl' : 'ltr'} lang={lang}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       <main className="dvx-shell">
@@ -263,7 +263,7 @@ export default function DevisExpressClient() {
               <p className="dvx-success-fr">{T.successSub.fr}</p>
               <a className="dvx-wa" href={WHATSAPP} target="_blank" rel="noopener noreferrer">
                 {T.successWA[lang]}
-                <small dir="ltr">{lang === 'ar' ? 'Discuter sur WhatsApp' : 'Hablar en WhatsApp'}</small>
+                <small dir={lang === 'ar' ? 'ltr' : 'rtl'}>{lang === 'ar' ? 'Discuter sur WhatsApp' : 'التواصل عبر واتساب'}</small>
               </a>
               <button
                 type="button"
@@ -362,7 +362,7 @@ export default function DevisExpressClient() {
                 ) : (
                   <span className="dvx-submit-labels">
                     {T.submit[lang]}
-                    <small dir="ltr">{lang === 'ar' ? 'Obtenir mon prix' : 'Obtener mi precio'}</small>
+                    <small dir={lang === 'ar' ? 'ltr' : 'rtl'}>{lang === 'ar' ? 'Obtenir mon prix' : 'احصل على السعر'}</small>
                   </span>
                 )}
               </button>
