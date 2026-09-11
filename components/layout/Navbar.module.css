@@ -1,0 +1,52 @@
+/* En-tête partagé — reprend les tokens de app/globals.css.
+   Ces règles vivaient dans un <style> en ligne : React sérialisait son
+   contenu différemment côté serveur et côté client, ce qui provoquait une
+   erreur d'hydratation et basculait toute la page en rendu client. */
+
+.root {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(11, 11, 13, .82);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--c-line);
+}
+.inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; min-height: 68px; padding-block: 10px; }
+
+.brand { display: inline-flex; align-items: center; min-height: 44px; gap: 10px; text-decoration: none; color: var(--c-text); flex-shrink: 0; }
+.brand img { width: 34px; height: 34px; object-fit: contain; border-radius: 6px; }
+.brand span {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 1.05rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+}
+
+.links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; min-width: 0; }
+.links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text-dim); text-decoration: none; font-size: .875rem; font-weight: 500; white-space: nowrap; transition: color .2s ease; }
+.links a:hover { color: var(--c-text); }
+
+.right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; }
+.compte { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text-dim); text-decoration: none; font-size: .875rem; font-weight: 500; padding: 10px 8px; white-space: nowrap; }
+.compte:hover { color: var(--c-text); }
+.cta { min-height: 42px; padding: 10px 20px; font-size: .875rem; }
+
+.burger {
+  display: none; align-items: center; justify-content: center;
+  width: 44px; height: 44px;
+  background: none; border: 1px solid var(--c-line-strong); border-radius: 10px;
+  color: var(--c-text); cursor: pointer;
+}
+.burger svg { width: 18px; height: 18px; }
+
+.panneau { border-top: 1px solid var(--c-line); background: var(--c-bg); }
+.panneauGrille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; padding-block: 18px 26px; }
+.panneau a { display: block; padding: 13px 4px; color: var(--c-text-dim); text-decoration: none; font-size: .9375rem; font-weight: 500; border-bottom: 1px solid var(--c-line); }
+.panneau a:hover { color: var(--c-text); }
+.fort { color: var(--c-text); font-weight: 600; }
+.panneauCta { grid-column: 1 / -1; margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+.panneauCta a { border-bottom: none; padding: 13px 26px; }
+
+@media (max-width: 62.5em) {
+  .root .links, .root .compte, .root .cta { display: none; }
+  .root .burger { display: inline-flex; }
+}
+@media (min-width: 62.5625em) {
+  .panneau { display: none; }
+}

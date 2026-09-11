@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import styles from './Navbar.module.css'
 
 const WHATSAPP = 'https://wa.me/213557440522'
 
@@ -63,58 +64,26 @@ export default function Navbar() {
   const prenom = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0]
 
   return (
-    <header className="c-scope cn-root">
-      <style>{`
-        .cn-root { position: sticky; top: 0; z-index: 60; background: rgba(11,11,13,.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--c-line); }
-        .cn-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 68px; }
-        .cn-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--c-text); flex-shrink: 0; }
-        .cn-brand img { width: 34px; height: 34px; object-fit: contain; border-radius: 6px; }
-        .cn-brand span { font-family: var(--font-display), 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-        .cn-links { display: flex; align-items: center; gap: 28px; }
-        .cn-links a { color: var(--c-text-dim); text-decoration: none; font-size: .875rem; font-weight: 500; white-space: nowrap; transition: color .2s ease; }
-        .cn-links a:hover { color: var(--c-text); }
-        .cn-right { display: flex; align-items: center; gap: 10px; }
-        .cn-compte { color: var(--c-text-dim); text-decoration: none; font-size: .875rem; font-weight: 500; padding: 10px 4px; white-space: nowrap; }
-        .cn-compte:hover { color: var(--c-text); }
-        .cn-cta { min-height: 42px; padding: 10px 20px; font-size: .875rem; }
-        .cn-burger { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: 1px solid var(--c-line-strong); border-radius: 10px; color: var(--c-text); cursor: pointer; }
-        .cn-burger svg { width: 18px; height: 18px; }
-
-        .cn-panneau { border-top: 1px solid var(--c-line); background: var(--c-bg); }
-        .cn-panneau-grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; padding-block: 18px 26px; }
-        .cn-panneau a { display: block; padding: 13px 4px; color: var(--c-text-dim); text-decoration: none; font-size: .9375rem; font-weight: 500; border-bottom: 1px solid var(--c-line); }
-        .cn-panneau a:hover { color: var(--c-text); }
-        .cn-panneau .cn-p-fort { color: var(--c-text); font-weight: 600; }
-        .cn-panneau-cta { grid-column: 1 / -1; margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
-
-        @media (max-width: 1000px) {
-          .cn-links, .cn-right .cn-compte, .cn-right .cn-cta { display: none; }
-          .cn-burger { display: inline-flex; }
-        }
-        @media (min-width: 1001px) {
-          .cn-panneau { display: none; }
-        }
-      `}</style>
-
-      <div className="c-wrap cn-inner">
-        <Link href="/" className="cn-brand" aria-label="Caractère — accueil">
+    <header className={`c-scope ${styles.root}`}>
+      <div className={`c-wrap ${styles.inner}`}>
+        <Link href="/" className={styles.brand} aria-label="Caractère — accueil">
           <img src="/logo.jpg" alt="" width={34} height={34} />
           <span>Caractère</span>
         </Link>
 
-        <nav className="cn-links" aria-label="Navigation principale">
+        <nav className={styles.links} aria-label="Navigation principale">
           {PRIMAIRE.map(l => <Link key={l.href} href={l.href}>{l.label}</Link>)}
         </nav>
 
-        <div className="cn-right">
-          <Link href={user ? '/dashboard' : '/auth/login'} className="cn-compte">
+        <div className={styles.right}>
+          <Link href={user ? '/dashboard' : '/auth/login'} className={styles.compte}>
             {user ? prenom : 'Se connecter'}
           </Link>
-          <Link href="/configurateur" className="c-btn c-btn-accent cn-cta">Personnaliser</Link>
+          <Link href="/configurateur" className={`c-btn c-btn-accent ${styles.cta}`}>Personnaliser</Link>
           <button
             ref={boutonRef}
             type="button"
-            className="cn-burger"
+            className={styles.burger}
             aria-expanded={menuOpen}
             aria-controls="cn-panneau"
             aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
@@ -129,15 +98,15 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="cn-panneau" id="cn-panneau" ref={panneauRef} hidden={!menuOpen}>
-        <nav className="c-wrap cn-panneau-grille" aria-label="Tous les parcours">
+      <div className={styles.panneau} id="cn-panneau" ref={panneauRef} hidden={!menuOpen}>
+        <nav className={`c-wrap ${styles.panneauGrille}`} aria-label="Tous les parcours">
           {PRIMAIRE.map(l => (
-            <Link key={l.href} href={l.href} className="cn-p-fort" onClick={fermer}>{l.label}</Link>
+            <Link key={l.href} href={l.href} className={styles.fort} onClick={fermer}>{l.label}</Link>
           ))}
           {SECONDAIRE.map(l => (
             <Link key={l.href} href={l.href} onClick={fermer}>{l.label}</Link>
           ))}
-          <div className="cn-panneau-cta">
+          <div className={styles.panneauCta}>
             <Link href="/configurateur" className="c-btn c-btn-accent" onClick={fermer}>Personnaliser une pièce</Link>
             <Link href={user ? '/dashboard' : '/auth/login'} className="c-btn c-btn-ghost" onClick={fermer}>
               {user ? 'Mon compte' : 'Se connecter'}

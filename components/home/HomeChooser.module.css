@@ -87,7 +87,7 @@
   font-size: clamp(1.9rem, 4vw, 3.2rem); line-height: 0.98; letter-spacing: -0.01em;
   margin-top: 14px;
 }
-.lien { color: var(--c-text); font-size: .875rem; font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--c-line-strong); padding-bottom: 4px; white-space: nowrap; }
+.lien { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text); font-size: .875rem; font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--c-line-strong); white-space: nowrap; }
 .lien:hover { border-color: var(--c-accent); color: var(--c-accent); }
 
 /* ── Sélection de pièces ──────────────────────────────────────────── */
@@ -97,9 +97,9 @@
 .pieceMedia img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.22,1,.36,1); }
 .piece:hover .pieceMedia img { transform: scale(1.04); }
 .pieceNom { font-size: .9375rem; font-weight: 600; }
-.pieceMeta { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-top: 3px; }
+.pieceMeta { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 4px 12px; margin-top: 3px; }
 .pieceTheme { color: var(--c-text-dim); font-size: .8125rem; }
-.piecePrix { font-size: .9375rem; font-weight: 600; white-space: nowrap; }
+.piecePrix { font-size: .9375rem; font-weight: 600; }
 
 /* ── Deux parcours ────────────────────────────────────────────────── */
 .parcours { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }

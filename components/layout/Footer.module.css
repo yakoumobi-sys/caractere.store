@@ -1,0 +1,23 @@
+/* Pied de page partagé — tokens de app/globals.css.
+   Même raison que la Navbar : plus de <style> en ligne, qui provoquait
+   une divergence d'hydratation entre le HTML serveur et le client. */
+
+.root { background: var(--c-bg); color: var(--c-text); border-top: 1px solid var(--c-line); padding-block: 64px 40px; }
+.grille { display: grid; grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr)); gap: 40px; padding-bottom: 44px; border-bottom: 1px solid var(--c-line); }
+.grille > * { min-width: 0; }
+.marque { font-family: var(--font-display), 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+.baseline { color: var(--c-text-dim); font-size: .875rem; line-height: 1.6; max-width: 320px; }
+.titre { font-size: .6875rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-text-dim); margin-bottom: 16px; }
+.liste { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.liste a, .liste span { display: inline-block; min-height: 26px; padding-block: 4px; color: var(--c-text-dim); font-size: .875rem; text-decoration: none; overflow-wrap: break-word; }
+.liste a:hover { color: var(--c-text); }
+.bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 26px; }
+.bas p, .bas a { color: var(--c-text-dim); font-size: .8125rem; text-decoration: none; overflow-wrap: break-word; }
+.bas a { display: inline-block; min-height: 26px; padding-block: 4px; }
+.bas a:hover { color: var(--c-text); }
+.bas nav { display: flex; flex-wrap: wrap; gap: 20px; }
+
+@media (max-width: 900px) {
+  .grille { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
+  .marqueBloc { grid-column: 1 / -1; }
+}
