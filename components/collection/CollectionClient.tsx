@@ -1,286 +1,288 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { collectionProducts, themes } from '@/lib/collection-products';
+import { useState, useRef, useEffect, useCallback, useId } from 'react'
+import Image from 'next/image'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
+import { collectionProducts, themes } from '@/lib/collection-products'
+import styles from './CollectionClient.module.css'
 
 interface Product {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  theme: string;
+  id: string
+  name: string
+  image: string
+  price: number
+  theme: string
 }
 
-interface OrderModalProps {
-  product: Product | null;
-  isOpen: boolean;
-  onClose: () => void;
-}
+const daFormat = (n: number) => `${n.toLocaleString('fr-DZ')} DA`
 
-// Modal de Commande
-const OrderModal = ({ product, isOpen, onClose }: OrderModalProps) => {
-  const [quantity, setQuantity] = useState(1);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [city, setCity] = useState('');
+/* ── Photo produit ──────────────────────────────────────────────────
+   Trois fichiers référencés par lib/collection-products.ts sont absents
+   de public/collection. Plutôt qu'une image cassée — ou, pire, la photo
+   d'une autre pièce — la carte annonce que la photo manque. */
+function PhotoProduit({ product }: { product: Product }) {
+  const [absente, setAbsente] = useState(false)
 
-  const handleOrder = async () => {
-    if (!name || !phone || !city) {
-      alert('Veuillez remplir tous les champs');
-      return;
-    }
-
-    if (!product) return;
-
-    const totalPrice = product.price * quantity;
-    const message = `
-👕 *NOUVELLE COMMANDE - The Collection*
-
-*Produit:* ${product.name}
-*Quantité:* ${quantity}
-*Prix unitaire:* ${product.price.toLocaleString('fr-DZ')} DA
-*Total:* ${totalPrice.toLocaleString('fr-DZ')} DA
-
-*Client:*
-Nom: ${name}
-Téléphone: ${phone}
-Ville: ${city}
-
-_Message automatique depuis The Collection_
-    `;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/213557440522?text=${encodedMessage}`, '_blank');
-
-    // Reset form
-    setName('');
-    setPhone('');
-    setCity('');
-    setQuantity(1);
-    onClose();
-  };
-
-  if (!isOpen || !product) return null;
+  if (absente) {
+    return (
+      <div className={styles.mediaVide}>
+        <strong>Photo à venir</strong>
+        <span>La pièce existe, son visuel n&apos;est pas encore en ligne.</span>
+      </div>
+    )
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
-        <div className="flex justify-between items-start">
-          <h2 className="text-xl font-bold text-black">{product.name}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-black text-2xl"
-          >
-            ✕
-          </button>
-        </div>
+    <Image
+      src={product.image}
+      alt={`${product.name} — pièce de la collection Caractère`}
+      fill
+      sizes="(max-width: 700px) 50vw, (max-width: 980px) 45vw, 30vw"
+      onError={() => setAbsente(true)}
+    />
+  )
+}
 
-        <div className="border-b pb-3">
-          <p className="text-lg font-semibold text-red-600">
-            {product.price.toLocaleString('fr-DZ')} DA
-          </p>
-        </div>
+/* ── Modale de commande ─────────────────────────────────────────────
+   Elle prépare un message WhatsApp. Elle n'enregistre rien : le texte
+   de l'interface le dit explicitement. */
+function ModaleCommande({
+  product,
+  onClose,
+}: {
+  product: Product
+  onClose: () => void
+}) {
+  const [quantite, setQuantite] = useState(1)
+  const [nom, setNom] = useState('')
+  const [telephone, setTelephone] = useState('')
+  const [ville, setVille] = useState('')
+  const [erreurs, setErreurs] = useState<Record<string, string>>({})
 
-        {/* Quantité */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quantité
-          </label>
-          <div className="flex items-center gap-3">
+  const modaleRef = useRef<HTMLDivElement>(null)
+  const titreId = useId()
+
+  // Échap ferme la modale, et le focus entre dedans à l'ouverture.
+  // Le retour du focus sur le déclencheur est géré par le parent, qui
+  // seul sait quel bouton a ouvert la modale.
+  useEffect(() => {
+    const surTouche = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', surTouche)
+    modaleRef.current?.querySelector<HTMLElement>('input, button')?.focus()
+
+    // Le fond ne doit pas défiler sous la modale sur mobile.
+    const overflowInitial = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', surTouche)
+      document.body.style.overflow = overflowInitial
+    }
+  }, [onClose])
+
+  // Après un échec de validation, le focus part sur le premier champ fautif.
+  // Il faut attendre le rendu : aria-invalid n'existe pas encore au moment
+  // où setErreurs est appelé.
+  useEffect(() => {
+    if (Object.keys(erreurs).length === 0) return
+    modaleRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus()
+  }, [erreurs])
+
+  const total = product.price * quantite
+
+  const valider = () => {
+    const e: Record<string, string> = {}
+    if (!nom.trim()) e.nom = 'Indiquez votre nom.'
+    if (!telephone.trim()) e.telephone = 'Indiquez un numéro pour vous joindre.'
+    if (!ville.trim()) e.ville = 'Indiquez votre ville de livraison.'
+    setErreurs(e)
+    if (Object.keys(e).length > 0) return
+
+    const message = [
+      'Bonjour Caractère, je souhaite commander une pièce de la collection.',
+      '',
+      `Pièce : ${product.name}`,
+      `Quantité : ${quantite}`,
+      `Prix unitaire : ${daFormat(product.price)}`,
+      `Total : ${daFormat(total)}`,
+      '',
+      `Nom : ${nom.trim()}`,
+      `Téléphone : ${telephone.trim()}`,
+      `Ville : ${ville.trim()}`,
+    ].join('\n')
+
+    window.open(`https://wa.me/213557440522?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+    onClose()
+  }
+
+  return (
+    <div className={styles.voile} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div
+        ref={modaleRef}
+        className={styles.modale}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titreId}
+      >
+        <div className={styles.modaleEntete}>
+          <h2 id={titreId} className={styles.modaleTitre}>{product.name}</h2>
+          <button type="button" className={styles.modaleFermer} onClick={onClose} aria-label="Fermer">✕</button>
+        </div>
+        <p className={styles.modalePrix}>{daFormat(product.price)} la pièce</p>
+
+        <div className={styles.champ}>
+          <span className={styles.label} id={`${titreId}-q`}>Quantité</span>
+          <div className={styles.quantite}>
             <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
-            >
-              −
-            </button>
-            <span className="w-8 text-center font-medium">{quantity}</span>
+              type="button"
+              className={styles.qteBtn}
+              onClick={() => setQuantite(q => Math.max(1, q - 1))}
+              disabled={quantite <= 1}
+              aria-label="Retirer une pièce"
+            >−</button>
+            <output className={styles.qteValeur} aria-live="polite" aria-labelledby={`${titreId}-q`}>{quantite}</output>
             <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
-            >
-              +
-            </button>
+              type="button"
+              className={styles.qteBtn}
+              onClick={() => setQuantite(q => Math.min(999, q + 1))}
+              disabled={quantite >= 999}
+              aria-label="Ajouter une pièce"
+            >+</button>
           </div>
         </div>
 
-        {/* Total */}
-        <div className="bg-gray-50 p-3 rounded text-center">
-          <p className="text-sm text-gray-600">Total</p>
-          <p className="text-2xl font-bold text-black">
-            {(product.price * quantity).toLocaleString('fr-DZ')} DA
-          </p>
+        <div className={styles.champ}>
+          <label className={styles.label} htmlFor={`${titreId}-nom`}>Votre nom</label>
+          <input
+            id={`${titreId}-nom`}
+            className={`${styles.input} ${erreurs.nom ? styles.inputErreur : ''}`}
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+            aria-invalid={!!erreurs.nom}
+            aria-describedby={erreurs.nom ? `${titreId}-nom-err` : undefined}
+            autoComplete="name"
+          />
+          {erreurs.nom && <span className={styles.erreur} id={`${titreId}-nom-err`} role="alert">{erreurs.nom}</span>}
         </div>
 
-        {/* Form */}
-        <div className="space-y-3">
+        <div className={styles.champ}>
+          <label className={styles.label} htmlFor={`${titreId}-tel`}>Téléphone (WhatsApp)</label>
           <input
-            type="text"
-            placeholder="Votre nom"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
-          />
-          <input
+            id={`${titreId}-tel`}
             type="tel"
-            placeholder="Téléphone (WhatsApp)"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
+            inputMode="tel"
+            className={`${styles.input} ${erreurs.telephone ? styles.inputErreur : ''}`}
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            placeholder="+213 6XX XXX XXX"
+            aria-invalid={!!erreurs.telephone}
+            aria-describedby={erreurs.telephone ? `${titreId}-tel-err` : undefined}
+            autoComplete="tel"
           />
+          {erreurs.telephone && <span className={styles.erreur} id={`${titreId}-tel-err`} role="alert">{erreurs.telephone}</span>}
+        </div>
+
+        <div className={styles.champ}>
+          <label className={styles.label} htmlFor={`${titreId}-ville`}>Ville de livraison</label>
           <input
-            type="text"
-            placeholder="Ville"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
+            id={`${titreId}-ville`}
+            className={`${styles.input} ${erreurs.ville ? styles.inputErreur : ''}`}
+            value={ville}
+            onChange={(e) => setVille(e.target.value)}
+            aria-invalid={!!erreurs.ville}
+            aria-describedby={erreurs.ville ? `${titreId}-ville-err` : undefined}
+            autoComplete="address-level2"
           />
+          {erreurs.ville && <span className={styles.erreur} id={`${titreId}-ville-err`} role="alert">{erreurs.ville}</span>}
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-2 pt-4">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Annuler
-          </button>
-          <button
-            onClick={handleOrder}
-            className="flex-1 px-4 py-2 bg-black text-white rounded font-medium hover:bg-gray-800"
-          >
-            Commander via WhatsApp
-          </button>
+        <div className={styles.total}>
+          <span className={styles.totalLabel}>Total</span>
+          <span className={styles.totalValeur}>{daFormat(total)}</span>
         </div>
+
+        <div className={styles.modaleActions}>
+          <button type="button" className="c-btn c-btn-ghost" onClick={onClose}>Annuler</button>
+          <button type="button" className="c-btn c-btn-accent" onClick={valider}>Préparer sur WhatsApp</button>
+        </div>
+        <p className={styles.avertissement}>
+          Ce bouton ouvre WhatsApp avec le récapitulatif déjà rédigé. Votre commande
+          n&apos;est enregistrée qu&apos;une fois l&apos;atelier vous ayant répondu.
+        </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-// Composant Produit
-const ProductCard = ({
-  product,
-  onOrder,
-}: {
-  product: Product;
-  onOrder: (product: Product) => void;
-}) => {
-  return (
-    <div className="group">
-      <div className="relative overflow-hidden rounded-lg bg-gray-100 h-64">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-      </div>
-      <div className="mt-4 space-y-2">
-        <h3 className="font-medium text-black text-sm md:text-base">
-          {product.name}
-        </h3>
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-black">
-            {product.price.toLocaleString('fr-DZ')} DA
-          </span>
-        </div>
-        <button
-          onClick={() => onOrder(product)}
-          className="w-full mt-3 px-4 py-2 bg-black text-white rounded text-sm font-medium hover:bg-gray-800 transition"
-        >
-          Commander
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// Section Thème
-const ThemeSection = ({
-  themeKey,
-  themeName,
-  products,
-  onOrder,
-}: {
-  themeKey: string;
-  themeName: string;
-  products: Product[];
-  onOrder: (product: Product) => void;
-}) => {
-  const themeData =
-    collectionProducts[themeKey as keyof typeof collectionProducts];
-
-  return (
-    <section className="mb-16 md:mb-20">
-      <div className="mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-black mb-2">
-          {themeName}
-        </h2>
-        <p className="text-gray-600 max-w-2xl">{themeData.description}</p>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onOrder={onOrder}
-          />
-        ))}
-      </div>
-    </section>
-  );
-};
-
-// Page Principale
 export default function CollectionClient() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selection, setSelection] = useState<Product | null>(null)
+  // Élément qui a ouvert la modale : le focus y revient à la fermeture.
+  const declencheurRef = useRef<HTMLElement | null>(null)
 
-  const handleOrder = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
+  const ouvrir = (product: Product, e: React.MouseEvent<HTMLButtonElement>) => {
+    declencheurRef.current = e.currentTarget
+    setSelection(product)
+  }
+
+  const fermer = useCallback(() => {
+    setSelection(null)
+    declencheurRef.current?.focus()
+  }, [])
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="mb-16 md:mb-20 py-12 md:py-16 border-b">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-4">
-            The Collection
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl">
-            Découvrez notre sélection de prints exclusifs, classés par thème.
-            Chaque design raconte une histoire. Commandez directement depuis ici.
+    <div className={`c-scope ${styles.page}`}>
+      <a className={styles.skip} href="#contenu">Aller au contenu</a>
+      <Navbar />
+
+      <main id="contenu">
+        <section className={`c-wrap ${styles.hero}`}>
+          <p className="c-eyebrow">Pièces prêtes à porter</p>
+          <h1 className={styles.titre}>La collection</h1>
+          <p className={styles.chapo}>
+            Nos prints, classés par univers. Chaque pièce est imprimée dans notre
+            atelier à Alger et livrée dans les 58 wilayas.
           </p>
-        </div>
-      </div>
+          <nav className={styles.sommaire} aria-label="Univers de la collection">
+            {themes.map(t => <a key={t.key} href={`#${t.key}`}>{t.label}</a>)}
+          </nav>
+        </section>
 
-      {/* Contenu */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
-        {themes.map((theme) => (
-          <ThemeSection
-            key={theme.key}
-            themeKey={theme.key}
-            themeName={theme.label}
-            products={
-              collectionProducts[theme.key as keyof typeof collectionProducts]
-                .products
-            }
-            onOrder={handleOrder}
-          />
-        ))}
-      </div>
+        {themes.map(theme => {
+          const data = collectionProducts[theme.key as keyof typeof collectionProducts]
+          return (
+            <section key={theme.key} id={theme.key} className={`c-wrap ${styles.theme}`} aria-labelledby={`t-${theme.key}`}>
+              <p className="c-eyebrow">Univers</p>
+              <h2 id={`t-${theme.key}`} className={styles.themeTitre}>{theme.label}</h2>
+              <p className={styles.themeTexte}>{data.description}</p>
 
-      {/* Modal */}
-      <OrderModal
-        product={selectedProduct}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedProduct(null);
-        }}
-      />
+              <div className={styles.grille}>
+                {data.products.map(product => (
+                  <article key={product.id} className={styles.carte}>
+                    <div className={styles.media}>
+                      <PhotoProduit product={product} />
+                    </div>
+                    <h3 className={styles.nom}>{product.name}</h3>
+                    <div className={styles.ligne}>
+                      <span className={styles.prix}>{daFormat(product.price)}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className={`c-btn c-btn-primary ${styles.commander}`}
+                      onClick={(e) => ouvrir(product, e)}
+                    >
+                      Commander
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )
+        })}
+      </main>
+
+      <Footer />
+
+      {selection && <ModaleCommande product={selection} onClose={fermer} />}
     </div>
-  );
+  )
 }

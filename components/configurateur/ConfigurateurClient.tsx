@@ -394,9 +394,10 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
 
       {/* ── Barre de progression sticky ── */}
       <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-md border-b border-black/[0.07]">
-        <div className="max-w-[1080px] mx-auto px-6 py-3 flex items-center justify-between">
-          {/* Steps */}
-          <div className="flex items-center gap-1">
+        <div className="max-w-[1080px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
+          {/* Steps — zone défilante : au zoom texte, la frise dépassait de
+              l'écran sans moyen de l'atteindre. */}
+          <div className="flex items-center gap-1 overflow-x-auto min-w-0">
             {STEPS.map((s, i) => {
               const done = stepIndex > i
               const active = stepIndex === i

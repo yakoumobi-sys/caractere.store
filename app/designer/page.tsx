@@ -372,6 +372,10 @@ function DesignerInner() {
     <main className="min-h-screen bg-[#F4F4F2]" onPointerMove={onPointerMove} onPointerUp={() => { action.current = null }}>
       <Navbar />
       <div className="pt-14 max-w-[1100px] mx-auto px-3 pb-10">
+        {/* La page n'avait aucun H1 : rien n'annonçait son sujet aux
+            lecteurs d'écran ni aux moteurs. Il reste hors écran pour ne
+            pas modifier l'atelier de création. */}
+        <h1 className="sr-only">Designer — composez votre visuel sur le vêtement</h1>
 
         {/* ── CANVAS ── */}
         <div className="relative pt-4">

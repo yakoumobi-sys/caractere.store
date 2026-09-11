@@ -1,41 +1,37 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import styles from './Navbar.module.css'
 
-const C = {
-  black: '#0A0A0A',
-  white: '#FAFAFA',
-  gray: '#A3A3A3',
-  line: 'rgba(255,255,255,0.08)',
-}
+const WHATSAPP = 'https://wa.me/213557440522'
 
-function LogoMini({ size = 34 }: { size?: number }) {
-  return (
-    <img 
-      src="https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png" 
-      alt="Caractère" 
-      width={size} 
-      height={size}
-      style={{ objectFit: 'contain' }}
-    />
-  )
-}
-
-const links = [
+// Barre principale : les quatre destinations qui font l'offre. Le reste des
+// parcours vit dans le panneau, pour ne pas surcharger l'en-tête.
+const PRIMAIRE = [
+  { href: '/produits', label: 'Produits' },
+  { href: '/collection', label: 'Collection' },
   { href: '/entreprises', label: 'Entreprises' },
-  { href: '/outils', label: 'Outils' },
+  { href: '/print-on-demand', label: 'Print on demand' },
+]
+
+// Parcours secondaires, visibles uniquement dans le panneau déroulant.
+// `/outils` a été retiré : la route n'existe pas, le lien renvoyait un 404
+// depuis chaque page qui affiche cette barre.
+const SECONDAIRE = [
   { href: '/designer', label: 'Designer' },
   { href: '/studio-3d', label: 'Studio 3D' },
-  { href: '/collection', label: 'Collection' },
-  { href: '/produits', label: 'Produits' },
+  { href: '/devis-express', label: 'Devis express' },
+  { href: '/comment-ca-marche', label: 'Comment ça marche' },
   { href: '/avis', label: 'Avis clients' },
 ]
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string } } | null>(null)
+  const boutonRef = useRef<HTMLButtonElement>(null)
+  const panneauRef = useRef<HTMLDivElement>(null)
 
   // Reflète l'état de connexion (persisté via cookie/localStorage par
   // lib/supabase.ts) — même pattern que app/admin/layout.tsx.
@@ -43,87 +39,84 @@ export default function Navbar() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
-
     return () => subscription?.unsubscribe()
   }, [])
+
+  const fermer = useCallback(() => {
+    setMenuOpen(false)
+    // Le focus revient sur le bouton qui a ouvert le panneau, sinon il
+    // retombe sur <body> et la navigation au clavier repart du début.
+    boutonRef.current?.focus()
+  }, [])
+
+  // Échap ferme, et le focus entre dans le panneau à l'ouverture.
+  useEffect(() => {
+    if (!menuOpen) return
+    const surTouche = (e: KeyboardEvent) => { if (e.key === 'Escape') fermer() }
+    document.addEventListener('keydown', surTouche)
+    panneauRef.current?.querySelector<HTMLElement>('a, button')?.focus()
+    return () => document.removeEventListener('keydown', surTouche)
+  }, [menuOpen, fermer])
 
   const prenom = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0]
 
   return (
-    <nav style={{
-      position: 'sticky', top: 0, zIndex: 50,
-      background: 'rgba(10,10,10,0.95)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      borderBottom: `1px solid ${C.line}`,
-    }}>
-      <style>{`
-        .nav-link { color: ${C.gray}; text-decoration: none; font-weight: 700; font-size: 0.92rem; transition: color 0.2s ease; white-space: nowrap; }
-        .nav-link:hover { color: ${C.white}; }
-        .nav-inner { max-width: 1100px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .nav-left { display: flex; align-items: center; gap: 10px; }
-        .nav-right { display: flex; align-items: center; gap: 14px; }
-        .nav-login { color: ${C.white} !important; background: transparent; border: 1px solid ${C.line}; padding: 8px 16px; border-radius: 8px; font-weight: 700 !important; font-size: 0.9rem; transition: all 0.2s ease; text-decoration: none; }
-        .nav-login:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
-        .hamburger { background: none; border: none; color: ${C.white}; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; }
-        .menu-dropdown { position: absolute; top: 100%; right: 0; background: rgba(10,10,10,0.98); backdrop-filter: blur(12px); border: 1px solid ${C.line}; border-top: none; border-radius: 0 0 12px 12px; min-width: 240px; padding: 12px 0; }
-        .menu-item { display: block; padding: 12px 20px; color: ${C.gray}; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; border-left: 2px solid transparent; }
-        .menu-item:hover { color: ${C.white}; background: rgba(255,255,255,0.05); border-left-color: ${C.white}; }
-        .menu-divider { height: 1px; background: ${C.line}; margin: 8px 0; }
-      `}</style>
-
-      <div className="nav-inner">
-        {/* GAUCHE : Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: C.white, flexShrink: 0 }}>
-          <LogoMini />
-          <span style={{ fontWeight: 900, fontSize: '1.05rem', letterSpacing: '-0.02em' }}>Caractère</span>
+    <header className={`c-scope ${styles.root}`}>
+      <div className={`c-wrap ${styles.inner}`}>
+        <Link href="/" className={styles.brand} aria-label="Caractère — accueil">
+          <img src="/logo.jpg" alt="" width={34} height={34} />
+          <span>Caractère</span>
         </Link>
 
-        {/* DROITE : Hamburger + Se connecter */}
-        <div className="nav-right" style={{ position: 'relative' }}>
-          <Link href={user ? '/dashboard' : '/auth/login'} className="nav-login">
+        <nav className={styles.links} aria-label="Navigation principale">
+          {PRIMAIRE.map(l => <Link key={l.href} href={l.href}>{l.label}</Link>)}
+        </nav>
+
+        <div className={styles.right}>
+          <Link href={user ? '/dashboard' : '/auth/login'} className={styles.compte}>
             {user ? prenom : 'Se connecter'}
           </Link>
-          
-          <button 
-            className="hamburger"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Menu"
+          <Link href="/configurateur" className={`c-btn c-btn-accent ${styles.cta}`}>Personnaliser</Link>
+          <button
+            ref={boutonRef}
+            type="button"
+            className={styles.burger}
+            aria-expanded={menuOpen}
+            aria-controls="cn-panneau"
+            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            onClick={() => (menuOpen ? fermer() : setMenuOpen(true))}
           >
-            ☰
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              {menuOpen
+                ? <><path d="M5 5l14 14" /><path d="M19 5L5 19" /></>
+                : <><path d="M3 6h18" /><path d="M3 12h18" /><path d="M3 18h18" /></>}
+            </svg>
           </button>
-
-          {/* MENU DROPDOWN */}
-          {menuOpen && (
-            <div className="menu-dropdown">
-              {links.map((l, idx) => (
-                <div key={l.href}>
-                  <Link 
-                    href={l.href} 
-                    className="menu-item"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {l.label}
-                  </Link>
-                  {idx === 2 && <div className="menu-divider" />}
-                </div>
-              ))}
-              <div className="menu-divider" />
-              <a 
-                href="https://wa.me/213557440522" 
-                className="menu-item"
-                onClick={() => setMenuOpen(false)}
-              >
-                💬 WhatsApp
-              </a>
-            </div>
-          )}
         </div>
       </div>
-    </nav>
+
+      <div className={styles.panneau} id="cn-panneau" ref={panneauRef} hidden={!menuOpen}>
+        <nav className={`c-wrap ${styles.panneauGrille}`} aria-label="Tous les parcours">
+          {PRIMAIRE.map(l => (
+            <Link key={l.href} href={l.href} className={styles.fort} onClick={fermer}>{l.label}</Link>
+          ))}
+          {SECONDAIRE.map(l => (
+            <Link key={l.href} href={l.href} onClick={fermer}>{l.label}</Link>
+          ))}
+          <div className={styles.panneauCta}>
+            <Link href="/configurateur" className="c-btn c-btn-accent" onClick={fermer}>Personnaliser une pièce</Link>
+            <Link href={user ? '/dashboard' : '/auth/login'} className="c-btn c-btn-ghost" onClick={fermer}>
+              {user ? 'Mon compte' : 'Se connecter'}
+            </Link>
+            <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="c-btn c-btn-ghost" onClick={fermer}>
+              WhatsApp
+            </a>
+          </div>
+        </nav>
+      </div>
+    </header>
   )
 }

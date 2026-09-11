@@ -2,9 +2,120 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ───────────────────────────────────────────────────────────────
+   Tokens Caractère — source unique de la direction artistique.
+   Toute surface publique lit ces variables plutôt que de redéclarer
+   sa propre palette : c'est ce qui évite les divergences entre pages.
+   Les pages internes (admin, dashboard, auth) peignent leur propre
+   fond et ne sont pas concernées.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  /* Base sombre */
+  --c-bg: #0B0B0D;
+  --c-surface: #151518;
+  --c-surface-2: #1C1C21;
+
+  /* Plateau clair gris froid : casse la succession de cartes sombres */
+  --c-plateau: #C8CCD3;
+  --c-plateau-ink: #17171A;
+  --c-plateau-dim: #4A4E55;
+
+  /* Texte — contrastes mesurés sur --c-bg :
+     texte 18,1:1 · texte atténué 9,4:1 · accent 5,6:1 (AA atteint) */
+  --c-text: #F5F5F7;
+  --c-text-dim: #B3B3BD;
+
+  /* Accent violet électrique, employé avec parcimonie */
+  --c-accent: #9D6CFF;
+  --c-accent-deep: #6E3FD1;
+
+  --c-line: rgba(245, 245, 247, 0.10);
+  --c-line-strong: rgba(245, 245, 247, 0.22);
+
+  --c-radius: 14px;
+  --c-radius-sm: 8px;
+  --c-radius-lg: 22px;
+
+  /* Gouttière et largeur de grille partagées par toutes les pages refondues */
+  --c-maxw: 1320px;
+  --c-gutter: clamp(20px, 5vw, 56px);
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { -webkit-font-smoothing: antialiased; overflow-x: hidden; color: #1d1d1f; background: #fff; }
+body {
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  color: var(--c-text);
+  background: var(--c-bg);
+}
+
+/* ── Primitives partagées ──────────────────────────────────────── */
+
+/* Largeur de contenu commune à l'accueil, au catalogue et à la collection. */
+.c-wrap { width: 100%; max-width: var(--c-maxw); margin-inline: auto; padding-inline: var(--c-gutter); }
+
+/* Titres condensés. La police porte les accents français (latin-ext),
+   indispensable pour « CARACTÈRE ». */
+.c-display {
+  font-family: var(--font-display), 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Surtitre de section : petit, espacé, discret. */
+.c-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+/* Boutons — cible tactile d'au moins 44 px de haut. */
+.c-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 13px 26px;
+  border: 1px solid transparent; border-radius: 999px;
+  font-size: 0.9375rem; font-weight: 600; line-height: 1.2;
+  text-decoration: none; cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+.c-btn-primary { background: var(--c-text); color: var(--c-bg); }
+.c-btn-primary:hover { background: #ffffff; }
+.c-btn-accent { background: var(--c-accent); color: #120A22; }
+.c-btn-accent:hover { background: #B18CFF; }
+.c-btn-ghost { background: transparent; color: var(--c-text); border-color: var(--c-line-strong); }
+.c-btn-ghost:hover { border-color: var(--c-text); background: rgba(245, 245, 247, 0.06); }
+
+/* Focus visible uniforme sur toutes les surfaces refondues. */
+.c-scope a:focus-visible,
+.c-scope button:focus-visible,
+.c-scope input:focus-visible,
+.c-scope select:focus-visible,
+.c-scope textarea:focus-visible,
+.c-scope [tabindex]:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Le survol n'existe pas au doigt : on le neutralise sur écran tactile
+   pour éviter les états collants après un tap. */
+@media (hover: none) {
+  .c-scope *:hover { transform: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .c-scope *, .c-scope *::before, .c-scope *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 
 @keyframes marquee {
   from { transform: translateX(0); }
