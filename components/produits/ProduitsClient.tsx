@@ -2,7 +2,19 @@
 
 import { useState } from "react"
 
-const PRODUITS = [
+type Produit = {
+  id: string
+  nom: string
+  image: string
+  categorie: string
+  tailles: string[]
+  description: string
+  badge?: string
+  /** Affiché seulement si renseigné — on n'invente pas de tarif pour les autres pièces. */
+  prix?: string
+}
+
+const PRODUITS: Produit[] = [
   // ── CHROME ONE EN PREMIER ──
   {
     id: "chrome-one",
@@ -176,6 +188,7 @@ const PRODUITS = [
     categorie: "Ensembles",
     tailles: ["S","M","L","XL"],
     description: "Ensemble 3 pièces complet.",
+    prix: "5 000 DA",
     badge: "Premium",
   },
   // ── B2B ──
@@ -307,7 +320,7 @@ const BADGE_COLORS: Record<string, string> = {
   "Clé en main": "bg-orange-500 text-white",
 }
 
-function CarteProduct({ p }: { p: typeof PRODUITS[0] }) {
+function CarteProduct({ p }: { p: Produit }) {
   const waMsg = encodeURIComponent(
     `Bonjour Caractère Store 👋\n\nJe suis intéressé(e) par une commande en gros :\n\n🛍️ Produit : ${p.nom}\n📦 Quantité : (à préciser)\n📏 Tailles : (à préciser)\n\nPouvez-vous me faire un devis ?`
   )
@@ -335,6 +348,10 @@ function CarteProduct({ p }: { p: typeof PRODUITS[0] }) {
           {p.nom}
         </h3>
         <p className="text-xs text-[#636366] mb-2 line-clamp-2">{p.description}</p>
+
+        {p.prix && (
+          <p className="text-sm font-bold text-[#0a0a0a] mb-2">{p.prix}</p>
+        )}
 
         {/* TAILLES */}
         {p.tailles.length > 0 && p.tailles[0] !== "Disponible" && p.tailles[0] !== "Sur mesure" && p.tailles[0] !== "Unique" && (
