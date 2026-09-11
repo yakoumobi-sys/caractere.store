@@ -90,6 +90,24 @@
 .actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 16px; }
 .actions .c-btn { min-height: 44px; padding: 11px 16px; font-size: .8125rem; width: 100%; }
 
+/* ── Planche catalogue ────────────────────────────────────────────── */
+.planche { padding-block: 0 72px; }
+.plancheCarte {
+  display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: center;
+  padding: 30px; border: 1px solid var(--c-line); border-radius: var(--c-radius-lg);
+  background: var(--c-surface);
+}
+.plancheVue { display: block; margin: 0; border-radius: var(--c-radius); overflow: hidden; background: var(--c-surface-2); }
+.plancheVue img { display: block; width: 100%; height: auto; }
+.plancheTitre { font-family: var(--font-display), 'Inter', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(1.4rem, 2.6vw, 2rem); line-height: 1.05; margin-block: 12px 12px; }
+.plancheTexte { color: var(--c-text-dim); font-size: .9375rem; line-height: 1.6; max-width: 46ch; margin-bottom: 22px; }
+.plancheActions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 780px) {
+  .plancheCarte { grid-template-columns: 1fr; gap: 24px; padding: 20px; }
+  .plancheVue { max-width: 260px; }
+}
+
 /* ── Bandeau final ────────────────────────────────────────────────── */
 .final { background: var(--c-plateau); color: var(--c-plateau-ink); padding-block: 72px; text-align: center; }
 .finalTitre { font-family: var(--font-display), 'Inter', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1; margin-block: 14px 14px; }

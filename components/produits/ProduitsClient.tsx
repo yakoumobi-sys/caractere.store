@@ -172,7 +172,9 @@ const PRODUITS: Produit[] = [
   {
     id: "ensemble-zipper-baggy",
     nom: "ENSEMBLE ZIPPER + BAGGY",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/1C56C89E-1127-4FA1-8A27-7AF7C757619C.jpg",
+    // Photo de l'atelier, hébergée avec le site : ce visuel ne dépend plus
+    // d'un CDN externe, contrairement au reste du catalogue.
+    image: "/ensembles/ensemble-zipper-baggy-noir.jpg",
     categorie: "Ensembles",
     tailles: ["S","M","L","XL","XXL"],
     description: "Ensemble veste zippée + pantalon ample.",
@@ -479,6 +481,47 @@ export default function ProduitsClient() {
               ))}
             </div>
           )}
+        </section>
+
+        {/* Planche récapitulative fournie par l'atelier : consultable en ligne
+            et téléchargeable pour être envoyée à un client ou imprimée. */}
+        <section className={`c-wrap ${styles.planche}`} aria-labelledby="t-planche">
+          <div className={styles.plancheCarte}>
+            <figure className={styles.plancheVue}>
+              <img
+                src="/catalogue/caractere-nos-produits-uniformes.jpg"
+                alt="Planche Caractère « Nos produits & uniformes » : vingt-deux supports photographiés avec leur nom et leur grammage"
+                loading="lazy"
+                width={1024}
+                height={1536}
+              />
+            </figure>
+            <div>
+              <p className="c-eyebrow">La planche</p>
+              <h2 id="t-planche" className={styles.plancheTitre}>Nos produits &amp; uniformes, sur une page.</h2>
+              <p className={styles.plancheTexte}>
+                Tous nos supports photographiés avec leur nom et leur grammage. À
+                garder sous la main, à imprimer ou à transmettre à votre équipe.
+              </p>
+              <div className={styles.plancheActions}>
+                <a
+                  href="/catalogue/caractere-nos-produits-uniformes.jpg"
+                  download="caractere-nos-produits-uniformes.jpg"
+                  className="c-btn c-btn-primary"
+                >
+                  Télécharger la planche
+                </a>
+                <a
+                  href="/catalogue/caractere-nos-produits-uniformes.jpg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="c-btn c-btn-ghost"
+                >
+                  Voir en grand
+                </a>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className={styles.final}>
