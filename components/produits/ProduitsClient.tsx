@@ -187,6 +187,55 @@ const PRODUITS: Produit[] = [
     tailles: ["S","M","L","XL"],
     description: "Ensemble veste + baggy élastique.",
   },
+  // ── Ensembles imprimés ──
+  // Photos de l'atelier, hébergées avec le site. Les descriptions ne disent
+  // que ce que la photo montre ; aucun prix n'est renseigné tant que l'atelier
+  // ne les a pas communiqués — la fiche n'en affichera donc aucun.
+  {
+    id: "ensemble-racing-07",
+    nom: "ENSEMBLE RACING DIVISION 07",
+    image: "/ensembles/ensemble-racing-07.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, impression racing rouge et noire, damier sur la manche.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-dragon",
+    nom: "ENSEMBLE DRAGON",
+    image: "/ensembles/ensemble-dragon.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, dragon japonais et nuages d'encre, soleil rouge.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-koi",
+    nom: "ENSEMBLE KOÏ",
+    image: "/ensembles/ensemble-koi.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, carpes koï et vagues bleues.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-athletic-club",
+    nom: "ENSEMBLE ATHLETIC CLUB 1996",
+    image: "/ensembles/ensemble-athletic-club.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, lettrage varsity marine et initiale sur la jambe.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-create-your-way",
+    nom: "ENSEMBLE CREATE YOUR WAY",
+    image: "/ensembles/ensemble-create-your-way.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, graffiti bleu, jaune et noir.",
+    badge: "Nouveau",
+  },
   {
     id: "ensemble-3-pieces",
     nom: "ENSEMBLE 3 PIÈCES",
