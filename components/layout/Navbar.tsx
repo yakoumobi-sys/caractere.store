@@ -5,13 +5,15 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import styles from './Navbar.module.css'
 
-const WHATSAPP = 'https://wa.me/213557440522'
+import { WHATSAPP_URL as WHATSAPP } from '@/lib/contact'
 
-// Barre principale : les quatre destinations qui font l'offre. Le reste des
-// parcours vit dans le panneau, pour ne pas surcharger l'en-tête.
+// Barre principale : les destinations qui font l'offre. « Revendre » y figure
+// désormais — le parcours revendeur n'avait aucune entrée visible. Le reste
+// des parcours vit dans le panneau, pour ne pas surcharger l'en-tête.
 const PRIMAIRE = [
   { href: '/produits', label: 'Produits' },
   { href: '/collection', label: 'Collection' },
+  { href: '/revente', label: 'Revendre' },
   { href: '/entreprises', label: 'Entreprises' },
   { href: '/print-on-demand', label: 'Print on demand' },
 ]

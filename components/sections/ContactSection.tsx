@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { TELEPHONE, TELEPHONE_LOCAL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '@/lib/contact'
 
 export default function ContactSection({ config }: { config: Record<string,string> }) {
   const [sent, setSent] = useState(false)
@@ -19,9 +20,9 @@ export default function ContactSection({ config }: { config: Record<string,strin
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[72px] items-start mt-14">
           <div className="flex flex-col">
             {[
-              {icon:'📱',label:'WhatsApp / Telephone',value:'0557440522',href:'tel:+213557440522'},
+              {icon:'📱',label:'WhatsApp / Telephone',value:TELEPHONE_LOCAL,href:`tel:${TELEPHONE}`},
               {icon:'📍',label:'Atelier',value:'Alger, Algerie',href:null},
-              {icon:'📸',label:'Instagram',value:'@caractere.store',href:'https://instagram.com/caractere.store'},
+              {icon:'📸',label:'Instagram',value:INSTAGRAM_HANDLE,href:INSTAGRAM_URL},
               {icon:'⏱',label:'Reponse devis',value:'Sous 24 heures',href:null},
             ].map((item,i) => (
               <div key={i} className="flex gap-3.5 items-start py-[22px] border-b border-black/[0.07] first:border-t first:border-black/[0.07]">

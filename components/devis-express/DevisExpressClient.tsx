@@ -17,7 +17,8 @@ const C = {
 }
 
 const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png'
-const WHATSAPP = 'https://wa.me/213557440522'
+import { WHATSAPP_URL as WHATSAPP } from '@/lib/contact'
+import { FournisseurLangue, useLangue } from '@/lib/i18n'
 
 const DOMAINES = [
   { value: 'entreprise', label: 'Entreprise / شركة' },
@@ -133,12 +134,23 @@ const AVANTAGES = [
 type Status = 'idle' | 'sending' | 'done' | 'error'
 
 export default function DevisExpressClient() {
+  // Le choix de langue est partagé avec le reste du parcours (configurateur,
+  // collection) : il était auparavant local à cette page, et repartait en
+  // arabe à chaque visite quel que soit le choix fait ailleurs.
+  return (
+    <FournisseurLangue>
+      <DevisExpress />
+    </FournisseurLangue>
+  )
+}
+
+function DevisExpress() {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
   const [status, setStatus] = useState<Status>('idle')
   const [logoBroken, setLogoBroken] = useState(false)
-  const [lang, setLang] = useState<'ar' | 'fr'>('ar')
+  const { langue: lang, definirLangue } = useLangue()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -227,7 +239,7 @@ export default function DevisExpressClient() {
             </Link>
             <button
               className="dvx-lang-toggle"
-              onClick={() => setLang(lang === 'ar' ? 'fr' : 'ar')}
+              onClick={() => definirLangue(lang === 'ar' ? 'fr' : 'ar')}
               aria-label="Basculer la langue"
             >
               {lang === 'ar' ? 'FR' : 'ع'}

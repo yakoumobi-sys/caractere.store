@@ -1,21 +1,61 @@
 import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { CATALOGUE, lienConfigurateur, resoudreProduit } from '@/lib/catalogue'
+import { lienWhatsApp } from '@/lib/contact'
 import styles from './HomeChooser.module.css'
 
-const WHATSAPP =
-  'https://wa.me/213557440522?text=' +
-  encodeURIComponent('Bonjour Caractère, je souhaite personnaliser des vêtements.')
+const WHATSAPP = lienWhatsApp('Bonjour Caractère, je souhaite personnaliser des vêtements.')
 
-// Pièces issues de lib/collection-products.ts : mêmes noms, mêmes prix, mêmes
-// photos locales, et le lien mène au parcours de commande existant.
-// Les trois produits dont la photo manque dans public/collection ne sont pas
-// repris ici — on ne met pas la photo d'une pièce à la place d'une autre.
-const SELECTION = [
-  { nom: 'BMW M Power', theme: 'Automotive', prix: '3 200 DA', img: '/collection/IMG_7474.jpeg' },
-  { nom: 'Pure Form', theme: 'Minimalist', prix: '3 200 DA', img: '/collection/IMG_7467.jpeg' },
-  { nom: 'Urban Canvas', theme: 'Graphic & Art', prix: '3 200 DA', img: '/collection/IMG_7464.jpeg' },
-  { nom: 'Monaco Grand Prix', theme: 'Limited Edition', prix: '3 200 DA', img: '/collection/IMG_7460.jpeg' },
+// Pièces mises en avant : ensembles, hoodies et joggers, les plus demandés.
+// Elles viennent de lib/catalogue.ts — mêmes noms, mêmes photos et mêmes prix
+// que le catalogue —, et chaque carte ouvre la configuration de la pièce
+// qu'elle montre, pas une page de liste.
+const MISES_EN_AVANT = [
+  'ensemble-3-pieces',
+  'ensemble-racing-07',
+  'ensemble-dragon',
+  'hoodie-premium-500gsm',
+  'zipper-hoodie',
+  'premium-baggy-joggers',
+].flatMap(id => {
+  const produit = resoudreProduit(id)
+  return produit ? [produit] : []
+})
+
+const daFormat = (n: number) => `${n.toLocaleString('fr-DZ')} DA`
+
+// Trois intentions d'achat, visibles dès l'accueil : avant, seuls « créer ma
+// marque » et « habiller mon équipe » existaient, et un revendeur n'avait
+// aucune porte d'entrée.
+const INTENTIONS = [
+  {
+    eyebrow: 'Pour moi',
+    titre: 'Personnaliser pour moi',
+    texte:
+      'Une pièce, votre visuel. Choisissez le vêtement, la couleur et la taille, envoyez votre logo ou votre dessin.',
+    action: 'Configurer ma pièce →',
+    href: '/configurateur',
+    img: '/pod/higher-than-yesterday-tshirt.jpg',
+  },
+  {
+    eyebrow: 'Revendeurs & boutiques',
+    titre: 'Commander pour revendre',
+    texte:
+      'Composez votre série : plusieurs pièces, une quantité par taille, et un devis chiffré par l’atelier.',
+    action: 'Composer ma série →',
+    href: '/revente',
+    img: '/ensembles/ensemble-racing-07.jpg',
+  },
+  {
+    eyebrow: 'Entreprises & équipes',
+    titre: 'Habiller mon équipe',
+    texte:
+      'Polos, t-shirts et vêtements de travail à votre logo, pour votre restaurant, votre chantier ou votre événement.',
+    action: 'Préparer ma commande →',
+    href: '/entreprises',
+    img: '/produits-photos/polo.jpg',
+  },
 ]
 
 export default function HomeChooser() {
@@ -40,6 +80,7 @@ export default function HomeChooser() {
               </p>
               <div className={styles.heroActions}>
                 <Link href="/configurateur" className="c-btn c-btn-accent">Personnaliser une pièce</Link>
+                <Link href="/revente" className="c-btn c-btn-ghost">Commander pour revendre</Link>
                 <Link href="/collection" className="c-btn c-btn-ghost">Voir la collection</Link>
               </div>
               <p className={styles.heroMicro}>Dès 1 pièce · Sans avance sur le stock</p>
@@ -61,44 +102,104 @@ export default function HomeChooser() {
           </div>
         </section>
 
-        {/* ── Sélection de pièces ────────────────────────────────── */}
-        <section className={`c-wrap ${styles.section}`} aria-labelledby="t-selection">
+        {/* ── Trois intentions ───────────────────────────────────── */}
+        <section className={`c-wrap ${styles.section}`} aria-labelledby="t-intentions">
           <div className={styles.entete}>
             <div>
-              <p className="c-eyebrow">La collection</p>
-              <h2 id="t-selection" className={styles.titre}>Des pièces déjà prêtes.</h2>
+              <p className="c-eyebrow">Par où commencer</p>
+              <h2 id="t-intentions" className={styles.titre}>Qu&apos;est-ce que tu veux faire ?</h2>
             </div>
-            <Link href="/collection" className={styles.lien}>Toute la collection →</Link>
           </div>
 
-          <div className={styles.pieces}>
-            {SELECTION.map(p => (
-              <Link key={p.nom} href="/collection" className={styles.piece}>
-                <div className={styles.pieceMedia}>
-                  <img src={p.img} alt={`${p.nom} — pièce de la collection Caractère`} loading="lazy" width={900} height={1125} />
+          <div className={styles.intentions}>
+            {INTENTIONS.map(i => (
+              <Link key={i.href} href={i.href} className={styles.intention}>
+                <div className={styles.intentionMedia}>
+                  <img src={i.img} alt="" aria-hidden="true" loading="lazy" width={900} height={900} />
                 </div>
-                <div>
-                  <p className={styles.pieceNom}>{p.nom}</p>
-                  <div className={styles.pieceMeta}>
-                    <span className={styles.pieceTheme}>{p.theme}</span>
-                    <span className={styles.piecePrix}>{p.prix}</span>
-                  </div>
+                <div className={styles.intentionCorps}>
+                  <p className="c-eyebrow">{i.eyebrow}</p>
+                  <h3 className={styles.intentionTitre}>{i.titre}</h3>
+                  <p className={styles.intentionTexte}>{i.texte}</p>
+                  <span className={styles.intentionAction}>{i.action}</span>
                 </div>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* ── Deux parcours ──────────────────────────────────────── */}
+        {/* ── Pièces les plus demandées ──────────────────────────── */}
+        <section className={`c-wrap ${styles.section}`} aria-labelledby="t-selection">
+          <div className={styles.entete}>
+            <div>
+              <p className="c-eyebrow">Ensembles, hoodies &amp; joggers</p>
+              <h2 id="t-selection" className={styles.titre}>Les pièces les plus demandées.</h2>
+            </div>
+            <Link href="/produits" className={styles.lien}>Tout le catalogue →</Link>
+          </div>
+
+          <div className={styles.pieces}>
+            {MISES_EN_AVANT.map(p => (
+              /* Le lien ouvre la configuration de cette pièce précise, et non
+                 une page de liste où il faudrait la retrouver. */
+              <Link key={p.id} href={lienConfigurateur(p)} className={styles.piece}>
+                <div className={styles.pieceMedia}>
+                  <img
+                    src={p.image}
+                    alt={`${p.nom} — ${p.description}`}
+                    loading="lazy"
+                    width={900}
+                    height={900}
+                  />
+                </div>
+                <div>
+                  <p className={styles.pieceNom}>{p.nom}</p>
+                  <div className={styles.pieceMeta}>
+                    <span className={styles.pieceTheme}>{p.categorie}</span>
+                    <span className={styles.piecePrix}>
+                      {typeof p.prix === 'number' ? daFormat(p.prix) : 'Sur devis'}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <p className={styles.piecesNote}>
+            {CATALOGUE.length} supports au catalogue. Les pièces sans tarif affiché sont
+            chiffrées sur devis : l&apos;atelier ne publie que les prix qu&apos;il a confirmés.
+          </p>
+        </section>
+
+        {/* ── Collection et print on demand ──────────────────────── */}
         <section className={`c-wrap ${styles.section}`} aria-labelledby="t-parcours">
           <div className={styles.entete}>
             <div>
-              <p className="c-eyebrow">Deux façons de travailler avec nous</p>
-              <h2 id="t-parcours" className={styles.titre}>Ta marque, ou ton équipe.</h2>
+              <p className="c-eyebrow">Déjà imprimé, ou à créer</p>
+              <h2 id="t-parcours" className={styles.titre}>Prêt à porter, ou ta marque.</h2>
             </div>
           </div>
 
           <div className={styles.parcours}>
+            <Link href="/collection" className={styles.voie}>
+              <img
+                src="/collection/IMG_7474.jpeg"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width={900}
+                height={1125}
+              />
+              <div className={styles.voieContenu}>
+                <p className="c-eyebrow">Prêt à porter</p>
+                <h3 className={styles.voieTitre}>La collection</h3>
+                <p className={styles.voieTexte}>
+                  Nos prints déjà dessinés, classés par univers. Commandez la taille et la
+                  quantité qu&apos;il vous faut.
+                </p>
+                <span className={styles.voieAction}>Voir la collection →</span>
+              </div>
+            </Link>
+
             <Link href="/print-on-demand" className={styles.voie}>
               <img
                 src="/pod/higher-than-yesterday-hoodie.jpg"
@@ -116,26 +217,6 @@ export default function HomeChooser() {
                   Aucun stock à constituer.
                 </p>
                 <span className={styles.voieAction}>Découvrir le print on demand →</span>
-              </div>
-            </Link>
-
-            <Link href="/entreprises" className={styles.voie}>
-              <img
-                src="/produits-photos/polo.jpg"
-                alt=""
-                aria-hidden="true"
-                loading="lazy"
-                width={900}
-                height={1125}
-              />
-              <div className={styles.voieContenu}>
-                <p className="c-eyebrow">Entreprises &amp; équipes</p>
-                <h3 className={styles.voieTitre}>Habiller mon équipe</h3>
-                <p className={styles.voieTexte}>
-                  Polos, t-shirts et vêtements de travail à ton logo, pour ton restaurant,
-                  ton chantier, ton école ou ton événement.
-                </p>
-                <span className={styles.voieAction}>Préparer ma commande →</span>
               </div>
             </Link>
           </div>

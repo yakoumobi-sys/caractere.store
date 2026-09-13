@@ -91,9 +91,9 @@
 .lien:hover { border-color: var(--c-accent); color: var(--c-accent); }
 
 /* ── Sélection de pièces ──────────────────────────────────────────── */
-.pieces { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.pieces { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 20px; }
 .piece { display: flex; flex-direction: column; gap: 12px; min-width: 0; text-decoration: none; color: var(--c-text); }
-.pieceMedia { position: relative; overflow: hidden; border-radius: var(--c-radius); background: var(--c-surface); aspect-ratio: 4 / 5; }
+.pieceMedia { position: relative; overflow: hidden; border-radius: var(--c-radius); background: var(--c-surface); aspect-ratio: 1; }
 .pieceMedia img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.22,1,.36,1); }
 .piece:hover .pieceMedia img { transform: scale(1.04); }
 .pieceNom { font-size: .9375rem; font-weight: 600; }
@@ -169,4 +169,39 @@
 @media (max-width: 380px) {
   .heroActions .c-btn, .plateauActions .c-btn { width: 100%; }
   .pieces { gap: 20px 12px; }
+}
+
+/* ── Trois intentions ──────────────────────────────────────────────
+   « Personnaliser pour moi », « Commander pour revendre » et
+   « Habiller mon équipe » : les trois entrées sont visibles au même
+   niveau, sans qu'aucune ne se devine par un lien de bas de page. */
+
+.intentions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+
+.intention {
+  display: flex; flex-direction: column; min-width: 0;
+  text-decoration: none; color: var(--c-text);
+  border: 1px solid var(--c-line-strong); border-radius: var(--c-radius);
+  overflow: hidden; background: var(--c-surface);
+  transition: border-color .22s ease, transform .22s ease;
+}
+.intention:hover { border-color: var(--c-accent); transform: translateY(-3px); }
+
+.intentionMedia { aspect-ratio: 16 / 10; overflow: hidden; background: var(--c-surface-2); }
+.intentionMedia img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.intention:hover .intentionMedia img { transform: scale(1.05); }
+
+.intentionCorps { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.intentionTitre {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 1.3rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.15;
+}
+.intentionTexte { color: var(--c-text-dim); font-size: .875rem; line-height: 1.6; flex: 1; }
+.intentionAction { color: var(--c-accent); font-size: .875rem; font-weight: 600; margin-top: 4px; }
+
+.piecesNote { color: var(--c-text-dim); font-size: .8125rem; line-height: 1.65; margin-top: 22px; max-width: 62ch; }
+
+@media (max-width: 980px) {
+  .intentions { grid-template-columns: minmax(0, 1fr); }
+  .intentionMedia { aspect-ratio: 21 / 9; }
 }

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Produit } from '@/types'
+import { WHATSAPP_URL, TELEPHONE_LOCAL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '@/lib/contact'
 
 const BLUE_DARK = '#0C4A6E'
 const BLUE_MID = '#1E6FA8'
@@ -387,7 +388,7 @@ export function CtaDarkSection() {
             style={{ backgroundColor: '#fff', color: BLUE_DARK }}>
             Configurer ma commande
           </Link>
-          <a href="https://wa.me/213557440522"
+          <a href={WHATSAPP_URL}
             className="rounded-full px-7 py-3.5 text-[15px] font-semibold no-underline border-2 transition-all"
             style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' }}
             target="_blank" rel="noopener noreferrer">
@@ -415,9 +416,11 @@ export function ContactSection() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { icon: '📱', title: 'WhatsApp', desc: 'Reponse sous 2h', link: 'https://wa.me/213557440522', cta: '0557 44 05 22' },
+            { icon: '📱', title: 'WhatsApp', desc: 'Reponse sous 2h', link: WHATSAPP_URL, cta: TELEPHONE_LOCAL },
             { icon: '📍', title: 'Atelier', desc: 'Alger, Algerie', link: '#', cta: 'Voir sur la carte' },
-            { icon: '📸', title: 'Instagram', desc: '297K abonnes', link: 'https://instagram.com/caractere.store', cta: '@caractere.store' },
+            // Le nombre d'abonnes affiche ici n'etait pas verifiable : on annonce
+            // ce que le compte est, pas une audience qu'on ne peut pas prouver.
+            { icon: '📸', title: 'Instagram', desc: 'Nos dernieres pieces', link: INSTAGRAM_URL, cta: INSTAGRAM_HANDLE },
           ].map((c, i) => (
             <a key={i} href={c.link} target="_blank" rel="noopener noreferrer"
               className="rounded-2xl p-6 border no-underline transition-all hover:shadow-md hover:-translate-y-0.5 block"

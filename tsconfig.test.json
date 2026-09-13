@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "outDir": ".test-build",
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["lib/catalogue.ts", "lib/commande-validation.ts", "lib/data/*.json", "tests/**/*.ts"]
+}

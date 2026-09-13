@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+// Cette page construisait son propre client avec les variables brutes :
+// `createClient` lève quand l'URL est absente, ce qui faisait échouer le
+// rendu de la page entière (et le build). On passe par lib/supabase.ts, qui
+// dégrade proprement — même garde-fou que le reste du site.
+import { supabaseClient as supabase } from "@/lib/supabase";
 
 const STATUS_CONFIG = {
   nouveau:  { label: "Nouveau",  color: "#3B82F6", bg: "#EFF6FF" },

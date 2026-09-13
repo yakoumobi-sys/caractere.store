@@ -2,8 +2,7 @@ import Link from 'next/link'
 import { SECTEURS } from '@/lib/entreprises-data'
 import styles from './Footer.module.css'
 
-const WHATSAPP = 'https://wa.me/213557440522'
-const INSTAGRAM = 'https://instagram.com/caractere.store'
+import { WHATSAPP_URL as WHATSAPP, INSTAGRAM_URL as INSTAGRAM, INSTAGRAM_HANDLE } from '@/lib/contact'
 
 // Les anciennes entrées « Services » et « Produits » pointaient vers /#services
 // et /#produits, deux ancres qui n'existent sur aucune page. Elles mènent
@@ -19,6 +18,7 @@ const PIECES = [
   { label: 'Tous les supports', href: '/produits' },
   { label: 'La collection', href: '/collection' },
   { label: 'Personnaliser une pièce', href: '/configurateur' },
+  { label: 'Commander pour revendre', href: '/revente' },
   { label: 'Créer un design', href: '/designer' },
 ]
 
@@ -63,7 +63,7 @@ export default function Footer() {
                 <li key={p.label}><Link href={p.href}>{p.label}</Link></li>
               ))}
               <li><a href={WHATSAPP} target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
-              <li><a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">@caractere.store</a></li>
+              <li><a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">{INSTAGRAM_HANDLE}</a></li>
               <li><span>Alger, Algérie</span></li>
             </ul>
           </div>

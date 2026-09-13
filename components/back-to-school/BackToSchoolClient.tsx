@@ -16,8 +16,7 @@ const C = {
 }
 
 const LOGO = 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo-white-transparent.png'
-const WA_NUMBER = '213557440522'
-const WA = `https://wa.me/${WA_NUMBER}`
+import { WHATSAPP_NUMERO as WA_NUMBER, WHATSAPP_URL as WA } from '@/lib/contact'
 
 const PRODUCTS = [
   {

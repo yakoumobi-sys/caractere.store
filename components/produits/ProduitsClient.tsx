@@ -4,367 +4,28 @@ import { useState } from "react"
 import Link from "next/link"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
+import {
+  CATALOGUE,
+  CATEGORIES,
+  lienConfigurateur,
+  estTailleVestimentaire,
+  type CatalogueProduit,
+} from "@/lib/catalogue"
+import { WHATSAPP_NUMERO } from "@/lib/contact"
+import InfosCommerciales from "@/components/commun/InfosCommerciales"
 import styles from "./ProduitsClient.module.css"
 
-type Produit = {
-  id: string
-  nom: string
-  image: string
-  categorie: string
-  tailles: string[]
-  description: string
-  badge?: string
-  /** Affiché seulement si renseigné — on n'invente pas de tarif pour les autres pièces. */
-  prix?: string
-}
+// Les fiches produits viennent de lib/catalogue.ts, la source partagée avec le
+// configurateur. Le bouton « Configurer ma commande » transporte l'identifiant
+// stable de la pièce : c'est ce qui garantit que le configurateur ouvre bien le
+// produit cliqué, et non un produit vide.
+type Produit = CatalogueProduit
 
-const PRODUITS: Produit[] = [
-  // ── CHROME ONE EN PREMIER ──
-  {
-    id: "chrome-one",
-    nom: "CHROME ONE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/1621F031-176E-4755-B2A4-A7585A2F9031.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Tissu bouclette (serbita). Pièce signature.",
-    badge: "Exclusif",
-  },
-  // ── STREETWEAR ──
-  {
-    id: "black-regular-tee",
-    nom: "BLACK REGULAR TEE 210GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/CFE2A2DA-BA00-4B18-B6F9-9975D4FBC581.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt coton premium 210gsm. Coupe Regular.",
-  },
-  {
-    id: "white-regular-tee",
-    nom: "WHITE REGULAR TEE 250GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/4FC9A90A-56B6-4321-861C-8A25489163D6.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt coton premium 250gsm. Coupe Regular.",
-  },
-  {
-    id: "white-oversized-tee",
-    nom: "WHITE OVERSIZED TEE 250GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/76CA8FA6-887F-4184-A691-1A188FF315A9.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt oversized coton épais 250gsm.",
-  },
-  {
-    id: "black-oversized-tee",
-    nom: "BLACK OVERSIZED TEE 250GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/3D8BCF35-BF82-47A6-9A20-1E64D94EABEE.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirt oversized coton épais 250gsm.",
-  },
-  {
-    id: "short-caractere",
-    nom: "SHORT CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-8887.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Short premium. Coupe moderne, tissu respirant.",
-  },
-  {
-    id: "baggy-jogger",
-    nom: "BAGGY JOGGER",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/D0319F16-6189-4EC1-8F32-A0C9EF3BA832.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Jogger baggy confort ultime. Coupe ample.",
-  },
-  {
-    id: "oversized-jogger",
-    nom: "OVERSIZED JOGGER",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/7027F65B-78FA-4D0E-8B0D-0C50240AACA0.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Jogger surdimensionné tissu doux et extensible.",
-  },
-  {
-    id: "premium-baggy-joggers",
-    nom: "PREMIUM BAGGY JOGGERS",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/B08118E1-A004-4F3A-B2E3-676CE6E75870.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Baggy jogger premium.",
-  },
-  {
-    id: "hoodie-medium",
-    nom: "HOODIE MEDIUM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/7668ABF0-890B-48D4-A05D-22D3E8090A7A.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Hoodie polyvalent et confortable.",
-  },
-  {
-    id: "premium-hoodie",
-    nom: "PREMIUM HOODIE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/0D2EF14B-6EF7-4CCF-AFAF-0A7B02A3B304.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Sweat-shirt premium confort incomparable.",
-  },
-  {
-    id: "hoodie-premium-500gsm",
-    nom: "HOODIE PREMIUM 500GSM",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/058ECD43-1772-45BA-AE92-6DAF6F6CCCB2.jpg",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Le hoodie ultime 500gsm. Tissu lourd, coupe parfaite.",
-    badge: "Premium",
-  },
-  {
-    id: "zipper-hoodie",
-    nom: "ZIPPER HOODIE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/610D63C2-C065-4AEE-9444-6E9929D307D1.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Sweat à capuche zippé. Design pratique et élégant.",
-  },
-  {
-    id: "pull-caractere",
-    nom: "PULL CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-1210.png",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Pull incontournable. Tissu doux, idéal saison froide.",
-  },
-  {
-    id: "veste-ninja",
-    nom: "VESTE NINJA CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-1535.webp",
-    categorie: "Streetwear",
-    tailles: ["S","M","L","XL"],
-    description: "Veste technique au style unique. Coupe ninja ajustée.",
-    badge: "Nouveau",
-  },
-  // ── ENSEMBLES ──
-  {
-    id: "ensemble-blanc",
-    nom: "ENSEMBLE BLANC (HOODIE + JOGGER)",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/8FA331B2-CB03-421D-B7A6-C71A77EB48A3.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble hoodie + jogger assorti.",
-  },
-  {
-    id: "ensemble-noir",
-    nom: "ENSEMBLE HOODIE + JOGGER – NOIR",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/DC846844-3B4B-4123-BF75-707B645CCF84.png",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble hoodie + jogger noir.",
-  },
-  {
-    id: "ensemble-gris",
-    nom: "ENSEMBLE HOODIE + JOGGER – GRIS",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/A221C04C-1598-4ACD-BD22-51B4D9351944.png",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble hoodie + jogger gris.",
-  },
-  {
-    id: "ensemble-zipper-baggy",
-    nom: "ENSEMBLE ZIPPER + BAGGY",
-    // Photo de l'atelier, hébergée avec le site : ce visuel ne dépend plus
-    // d'un CDN externe, contrairement au reste du catalogue.
-    image: "/ensembles/ensemble-zipper-baggy-noir.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble veste zippée + pantalon ample.",
-  },
-  {
-    id: "ensemble-veste-baggy",
-    nom: "VESTE + BAGGY ELASTIQUE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/38B475A2-3673-4DFD-9980-EBF27E2FE871.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL"],
-    description: "Ensemble veste + baggy élastique.",
-  },
-  // ── Ensembles imprimés ──
-  // Photos de l'atelier, hébergées avec le site. Les descriptions ne disent
-  // que ce que la photo montre ; aucun prix n'est renseigné tant que l'atelier
-  // ne les a pas communiqués — la fiche n'en affichera donc aucun.
-  {
-    id: "ensemble-racing-07",
-    nom: "ENSEMBLE RACING DIVISION 07",
-    image: "/ensembles/ensemble-racing-07.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble zippé + jogger gris, impression racing rouge et noire, damier sur la manche.",
-    badge: "Nouveau",
-  },
-  {
-    id: "ensemble-dragon",
-    nom: "ENSEMBLE DRAGON",
-    image: "/ensembles/ensemble-dragon.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble zippé + jogger gris, dragon japonais et nuages d'encre, soleil rouge.",
-    badge: "Nouveau",
-  },
-  {
-    id: "ensemble-koi",
-    nom: "ENSEMBLE KOÏ",
-    image: "/ensembles/ensemble-koi.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble zippé + jogger gris, carpes koï et vagues bleues.",
-    badge: "Nouveau",
-  },
-  {
-    id: "ensemble-athletic-club",
-    nom: "ENSEMBLE ATHLETIC CLUB 1996",
-    image: "/ensembles/ensemble-athletic-club.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble zippé + jogger gris, lettrage varsity marine et initiale sur la jambe.",
-    badge: "Nouveau",
-  },
-  {
-    id: "ensemble-create-your-way",
-    nom: "ENSEMBLE CREATE YOUR WAY",
-    image: "/ensembles/ensemble-create-your-way.jpg",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Ensemble zippé + jogger gris, graffiti bleu, jaune et noir.",
-    badge: "Nouveau",
-  },
-  {
-    id: "ensemble-3-pieces",
-    nom: "ENSEMBLE 3 PIÈCES",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/BF32F9EB-46BA-42AD-AC98-D86BA988FB4A.png",
-    categorie: "Ensembles",
-    tailles: ["S","M","L","XL"],
-    description: "Ensemble 3 pièces complet.",
-    prix: "5 000 DA",
-    badge: "Premium",
-  },
-  // ── B2B ──
-  {
-    id: "polo-personnalise",
-    nom: "POLO PERSONNALISÉ",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/506E8F49-8A75-4785-AA5C-B15E9BDD4667.webp",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Polo personnalisé DTF ou broderie pour entreprises.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "polo-pro",
-    nom: "POLO CARACTERE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/30D38768-C5B4-475D-8387-B77C07BE3EC6.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Polo demi-manche professionnel. Confort et élégance.",
-  },
-  {
-    id: "tshirt-personnalise",
-    nom: "T-SHIRTS PERSONNALISÉS",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/3D3096AD-C813-4B16-B8C8-AFE451835942.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "T-shirts personnalisés +15 couleurs. DTF ou broderie.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "gilet-travail",
-    nom: "GILET DE TRAVAIL",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/F096140F-DEDA-4418-81D7-B3C688C02B4F.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Gilet de travail sans manches. Liberté de mouvement.",
-  },
-  {
-    id: "gilet-col-haut",
-    nom: "GILET COL HAUT + POCHE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/5717612A-4250-4225-B79E-72B0941C4DCA.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Gilet col haut multipoches. Fonctionnel et confortable.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "gilet-personnalise",
-    nom: "GILET PERSONNALISÉ COL ROND",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/2ABA5114-8B2D-481B-800C-B24FA51CD855.webp",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL","XXL"],
-    description: "Gilet col rond personnalisé. Simulation gratuite.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "tote-bag",
-    nom: "TOTE BAG PERSONNALISÉ",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-3828.webp",
-    categorie: "B2B",
-    tailles: ["Unique"],
-    description: "Tote bag coton naturel + impression DTF.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "tablier",
-    nom: "TABLIER DE CUISINE PERSONNALISÉ",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/IMG-3999.jpg",
-    categorie: "B2B",
-    tailles: ["Unique"],
-    description: "Tablier personnalisé durable. Idéal restauration.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "casquette",
-    nom: "CASQUETTE PERSONNALISÉE",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/FFFDE421-D0F4-4B34-9096-BF52C840793D.webp",
-    categorie: "B2B",
-    tailles: ["Unique"],
-    description: "Casquette personnalisée broderie ou DTF.",
-    badge: "Devis gratuit",
-  },
-  {
-    id: "pack-tshirt-b2b",
-    nom: "T-SHIRT ENTREPRISE – PACK B2B",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/3D3096AD-C813-4B16-B8C8-AFE451835942.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Pack 10 t-shirts entreprise personnalisés DTF.",
-    badge: "Pack B2B",
-  },
-  {
-    id: "pack-polo-b2b",
-    nom: "POLO PROFESSIONNEL BRODÉ – PACK B2B",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/506E8F49-8A75-4785-AA5C-B15E9BDD4667.webp",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Pack polo professionnel brodé pour entreprises.",
-    badge: "Pack B2B",
-  },
-  {
-    id: "pack-veste-b2b",
-    nom: "VESTE DE TRAVAIL – PACK B2B",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/F096140F-DEDA-4418-81D7-B3C688C02B4F.jpg",
-    categorie: "B2B",
-    tailles: ["S","M","L","XL"],
-    description: "Pack veste de travail personnalisée BTP/logistique.",
-    badge: "Pack B2B",
-  },
-  {
-    id: "pack-uniforme-complet",
-    nom: "PACK UNIFORME COMPLET – CLÉ EN MAIN",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/30D38768-C5B4-475D-8387-B77C07BE3EC6.jpg",
-    categorie: "B2B",
-    tailles: ["Sur mesure"],
-    description: "Solution clé en main. Polo, T-shirt, Veste ou formule sur mesure.",
-    badge: "Clé en main",
-  },
-]
+const PRODUITS = CATALOGUE
 
-const CATEGORIES = ["Tous", "Streetwear", "Ensembles", "B2B"]
+const FILTRES = ["Tous", ...CATEGORIES] as const
+
+const daFormat = (n: number) => `${n.toLocaleString("fr-DZ")} DA`
 
 // Seuls « Exclusif » et « Premium » prennent l'accent ; les autres badges
 // restent neutres pour ne pas transformer la grille en sapin de Noël.
@@ -398,9 +59,7 @@ function CarteProduct({ p }: { p: Produit }) {
   const waMsg = encodeURIComponent(
     `Bonjour Caractère Store 👋\n\nJe suis intéressé(e) par une commande en gros :\n\n🛍️ Produit : ${p.nom}\n📦 Quantité : (à préciser)\n📏 Tailles : (à préciser)\n\nPouvez-vous me faire un devis ?`
   )
-  const afficherTailles =
-    p.tailles.length > 0 &&
-    !["Disponible", "Sur mesure", "Unique"].includes(p.tailles[0])
+  const afficherTailles = p.tailles.some(estTailleVestimentaire)
 
   return (
     <article className={styles.carte}>
@@ -415,7 +74,9 @@ function CarteProduct({ p }: { p: Produit }) {
 
       <h3 className={styles.nom}>{p.nom}</h3>
       <p className={styles.desc}>{p.description}</p>
-      {p.prix && <p className={styles.prix}>{p.prix}</p>}
+      {typeof p.prix === "number"
+        ? <p className={styles.prix}>{daFormat(p.prix)}</p>
+        : <p className={styles.prixDevis}>Prix sur devis</p>}
 
       {afficherTailles && (
         <div className={styles.tailles}>
@@ -426,11 +87,11 @@ function CarteProduct({ p }: { p: Produit }) {
       )}
 
       <div className={styles.actions}>
-        <Link href={`/configurateur?produit=${encodeURIComponent(p.nom)}`} className="c-btn c-btn-primary">
+        <Link href={lienConfigurateur(p)} className="c-btn c-btn-primary">
           Configurer ma commande
         </Link>
         <a
-          href={`https://wa.me/213557440522?text=${waMsg}`}
+          href={`https://wa.me/${WHATSAPP_NUMERO}?text=${waMsg}`}
           target="_blank"
           rel="noopener noreferrer"
           className="c-btn c-btn-ghost"
@@ -489,7 +150,7 @@ export default function ProduitsClient() {
         <div className={styles.filtres}>
           <div className="c-wrap">
             <div className={styles.filtresPiste} role="group" aria-label="Filtrer par catégorie">
-              {CATEGORIES.map((cat) => {
+              {FILTRES.map((cat) => {
                 const actif = categorie === cat
                 return (
                   <button
@@ -573,6 +234,10 @@ export default function ProduitsClient() {
           </div>
         </section>
 
+        <div className="c-wrap">
+          <InfosCommerciales />
+        </div>
+
         <section className={styles.final}>
           <div className="c-wrap">
             <p className={styles.finalEyebrow}>Une demande particulière</p>
@@ -583,7 +248,7 @@ export default function ProduitsClient() {
             </p>
             <div className={styles.finalActions}>
               <a
-                href="https://wa.me/213557440522"
+                href={`https://wa.me/${WHATSAPP_NUMERO}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`c-btn ${styles.btnSombre}`}

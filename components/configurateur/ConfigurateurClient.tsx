@@ -1,888 +1,1464 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import { supabaseClient as supabase } from '@/lib/supabase'
-import type { Produit, Couleur, Taille } from '@/types'
-import Navbar from '@/components/layout/Navbar'
 
-interface OrderState {
-  step: number
-  produit: Produit | null
-  quantite: number
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import Link from 'next/link'
+import { supabaseClient as supabase } from '@/lib/supabase'
+import type { Produit as ProduitBase } from '@/types'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
+import SelecteurLangue from '@/components/layout/SelecteurLangue'
+import { FournisseurLangue, useLangue, formaterDA } from '@/lib/i18n'
+import { WHATSAPP_URL, lienWhatsApp } from '@/lib/contact'
+import {
+  CATALOGUE,
+  PALETTE_ATELIER,
+  PALIERS_REMISE,
+  resoudreProduit,
+  calculerTarif,
+  couleursPourProduit,
+  dedupliquerCouleurs,
+  estTailleVestimentaire,
+  normaliser,
+  type CatalogueProduit,
+  type Coloris,
+} from '@/lib/catalogue'
+import wilayas from '@/lib/data/wilayas.json'
+import InfosCommerciales from '@/components/commun/InfosCommerciales'
+import styles from './ConfigurateurClient.module.css'
+
+// Le configurateur sert deux entrées : /configurateur (tout public) et
+// /entreprises (commandes B2B). Seul le contexte éditorial change — la
+// logique de commande, elle, reste unique.
+export type ConfigurateurVariant = 'default' | 'b2b'
+
+const TECHNIQUES = ['DTF', 'Broderie', 'Conseil équipe'] as const
+const POSITIONS = [
+  'Logo petit — côté cœur',
+  'Grand visuel — devant',
+  'Grand visuel — dos',
+  'Manche',
+  'À définir avec l’atelier',
+] as const
+
+/** Clé utilisée pour les supports qui n'ont pas de taille (casquette, tote bag). */
+const SANS_TAILLE = '__unique__'
+
+/**
+ * Délai au-delà duquel on cesse d'attendre Supabase pour résoudre le lien
+ * entrant. Le catalogue statique suffit à ouvrir la bonne pièce ; laisser le
+ * client devant une étape 1 vide le temps d'un délai réseau serait pire.
+ */
+const ATTENTE_CATALOGUE_MS = 2500
+
+type Etape = 1 | 2 | 3 | 4
+
+type Etat = {
+  produitId: string | null
   couleur: string
   couleurHex: string
-  tailles: string[]
-  logoFile: File | null
-  logoUrl: string | null
-  logoUploadUrl: string | null
-  position: string
+  /** taille → nombre de pièces. La somme fait la quantité commandée. */
+  quantites: Record<string, number>
   technique: string
-  urgent: boolean
+  position: string
+  logoNom: string | null
+  logoTaille: number
+  logoApercu: string | null
+  logoUrlEnvoyee: string | null
   nom: string
   entreprise: string
   telephone: string
   email: string
   notes: string
-  whatsappMsg: string
+  wilaya: string
+  commune: string
+  adresse: string
+  urgent: boolean
 }
 
-const DEFAULT: OrderState = {
-  step: 1, produit: null, quantite: 1,
-  couleur: 'Blanc', couleurHex: '#FFFFFF', tailles: ['M'],
-  logoFile: null, logoUrl: null, logoUploadUrl: null,
-  position: 'Logo petit — côté coeur', technique: 'DTF',
-  urgent: false, nom: '', entreprise: '', telephone: '', email: '', notes: '',
-  whatsappMsg: ''
+const ETAT_INITIAL: Etat = {
+  produitId: null,
+  couleur: '',
+  couleurHex: '',
+  quantites: {},
+  technique: 'DTF',
+  position: POSITIONS[0],
+  logoNom: null,
+  logoTaille: 0,
+  logoApercu: null,
+  logoUrlEnvoyee: null,
+  nom: '',
+  entreprise: '',
+  telephone: '',
+  email: '',
+  notes: '',
+  wilaya: '',
+  commune: '',
+  adresse: '',
+  urgent: false,
 }
 
-const TECHNIQUES = ['Broderie', 'DTF', 'Conseil équipe']
+/**
+ * Fusionne le catalogue statique avec la table `produits` de Supabase.
+ * Le catalogue reste la base — la page s'affiche donc immédiatement, même si
+ * Supabase tarde ou échoue. Les lignes de la base ne font qu'ajuster le prix
+ * des pièces qu'elles reconnaissent, ou ajouter un support absent du fichier.
+ */
+function fusionnerCatalogue(lignes: ProduitBase[] | null): CatalogueProduit[] {
+  if (!lignes || lignes.length === 0) return CATALOGUE
 
-const WA = 'https://wa.me/213557440522'
+  const fusionne = CATALOGUE.map(p => ({ ...p }))
+  const parId = new Map(fusionne.map(p => [p.id, p]))
 
-// Le configurateur sert deux entrées : /configurateur (tout public) et /entreprises
-// (commandes B2B). Seuls le contexte éditorial et la quantité de départ changent —
-// la logique de commande, elle, reste unique.
-export type ConfigurateurVariant = 'default' | 'b2b'
-
-const COPY = {
-  default: {
-    quantiteDepart: 1,
-    step1Title: 'Quel produit personnaliser ?',
-    step1Sub: 'Choisissez le textile sur lequel on va imprimer votre logo.',
-    entrepriseLabel: 'Entreprise',
-    entreprisePlaceholder: 'Nom entreprise (optionnel)',
-  },
-  b2b: {
-    quantiteDepart: 20,
-    step1Title: 'Quel textile pour votre équipe ?',
-    step1Sub: 'Uniformes, workwear ou goodies — sélectionnez le support à personnaliser.',
-    entrepriseLabel: 'Entreprise',
-    entreprisePlaceholder: 'Raison sociale',
-  },
-} as const
-
-const FALLBACK_PRODUITS: Produit[] = [
-  { id: '1', nom: 'T-shirt', emoji: '', description: '100% coton, broderie ou DTF', prix_base: 1950, actif: true, ordre: 1 },
-  { id: '2', nom: 'Polo', emoji: '', description: 'Piqué coton premium', prix_base: 2300, actif: true, ordre: 2 },
-  { id: '3', nom: 'Gilet de travail', emoji: '', description: 'Gilet multipoches personnalisé', prix_base: 2500, actif: true, ordre: 3 },
-  { id: '4', nom: 'Gilet de securite', emoji: '', description: 'Haute visibilité', prix_base: 1600, actif: true, ordre: 4 },
-  { id: '5', nom: 'Casquette', emoji: '', description: 'Broderie structurée', prix_base: 1200, actif: true, ordre: 5 },
-  { id: '6', nom: 'Totebag', emoji: '', description: 'Coton canvas DTF', prix_base: 950, actif: true, ordre: 6 },
-  { id: '7', nom: 'Tablier', emoji: '', description: 'Cuisine ou commerce', prix_base: 1500, actif: true, ordre: 7 },
-  { id: '8', nom: 'Combinaison de travail', emoji: '🦺', description: 'Combinaison professionnelle multipoches', prix_base: 5900, actif: true, ordre: 8 },
-]
-
-const FALLBACK_COULEURS: Couleur[] = [
-  { id: '1', nom: 'Noir', hex: '#1A1A1A', actif: true, ordre: 1, produits: [] },
-  { id: '2', nom: 'Blanc', hex: '#FFFFFF', actif: true, ordre: 2, produits: [] },
-  { id: '3', nom: 'Rouge', hex: '#CC1111', actif: true, ordre: 3, produits: [] },
-  { id: '4', nom: 'Bleu Nuit', hex: '#1B2A4A', actif: true, ordre: 5, produits: [] },
-  { id: '5', nom: 'Bleu Roi', hex: '#1A5DC8', actif: true, ordre: 6, produits: [] },
-  { id: '6', nom: 'Vert', hex: '#1A9A3C', actif: true, ordre: 8, produits: [] },
-  { id: '7', nom: 'Bordeaux', hex: '#6B1A2A', actif: true, ordre: 9, produits: [] },
-  { id: '8', nom: 'Gris', hex: '#888888', actif: true, ordre: 13, produits: [] },
-  { id: '9', nom: 'Beige', hex: '#E8D5B0', actif: true, ordre: 12, produits: [] },
-]
-
-const FALLBACK_TAILLES: Taille[] = [
-  { id: '1', nom: 'XS', actif: true, ordre: 1 },
-  { id: '2', nom: 'S', actif: true, ordre: 2 },
-  { id: '3', nom: 'M', actif: true, ordre: 3 },
-  { id: '4', nom: 'L', actif: true, ordre: 4 },
-  { id: '5', nom: 'XL', actif: true, ordre: 5 },
-  { id: '6', nom: 'XXL', actif: true, ordre: 6 },
-]
-
-const PRODUCT_IMAGES: Record<string, string> = {
-  'T-shirt': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5850.jpeg',
-  'T-shirt Oversized 250GSM': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/tshirt-oversized.jpeg',
-  'Polo': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5851.jpeg',
-  'Casquette': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5853.jpeg',
-  'Totebag': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5854.jpeg',
-  'Gilet de travail': 'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/IMG_5852.jpeg',
-  'Gilet de securite': '/produits-photos/gilet-securite.jpg',
-  'Tablier': '/produits-photos/tablier.jpg',
-  'Combinaison de travail': '/produits-photos/combinaison-travail.jpg',
+  for (const ligne of lignes) {
+    const cible = resoudreProduit(ligne.nom)
+    const existant = cible ? parId.get(cible.id) : undefined
+    if (existant) {
+      if (typeof ligne.prix_base === 'number' && ligne.prix_base > 0) {
+        existant.prix = ligne.prix_base
+      }
+      continue
+    }
+    // Support créé dans l'admin et absent du fichier : on l'ajoute tel quel,
+    // sans lui inventer de couleurs ni de tailles qu'on ne connaît pas.
+    fusionne.push({
+      id: `supabase-${normaliser(ligne.nom)}`,
+      nom: ligne.nom,
+      image: '',
+      categorie: 'B2B',
+      tailles: ['S', 'M', 'L', 'XL'],
+      couleurs: null,
+      description: ligne.description ?? '',
+      prix: typeof ligne.prix_base === 'number' && ligne.prix_base > 0 ? ligne.prix_base : undefined,
+    })
+  }
+  return fusionne
 }
-// Ancien lien (IMG_5509.png) cassé — remplacé par une vraie photo produit.
-const FALLBACK_IMG = '/produits-photos/tshirt.jpg'
+
+/* ────────────────────────────────────────────────────────────────────── */
 
 export default function ConfigurateurClient({ variant = 'default' }: { variant?: ConfigurateurVariant }) {
-  const copy = COPY[variant]
-  const [order, setOrder] = useState<OrderState>({ ...DEFAULT, quantite: copy.quantiteDepart })
-  // Catalogue de repli affiché immédiatement : le configurateur est la page
-  // d'entrée de /entreprises, il ne doit jamais rester vide si Supabase tarde
-  // ou échoue. Les données de la base écrasent ce repli dès qu'elles arrivent.
-  const [produits, setProduits] = useState<Produit[]>(FALLBACK_PRODUITS)
-  const [couleurs, setCouleurs] = useState<Couleur[]>(FALLBACK_COULEURS)
-  const [tailles, setTailles] = useState<Taille[]>(FALLBACK_TAILLES)
-  const [refCode, setRefCode] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [fromDesigner, setFromDesigner] = useState(false)
-  const [uploadingLogo, setUploadingLogo] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
-  // Le préremplissage par ?produit=... ne doit jouer qu'une fois : le catalogue
-  // change de référence quand Supabase répond, sans devoir renvoyer l'utilisateur
-  // à l'étape 2 s'il a déjà avancé.
-  const prefilled = useRef(false)
-  // Certaines photos produits sont hébergées hors du dépôt : si l'une d'elles ne
-  // répond pas, on affiche une tuile neutre plutôt qu'une image cassée.
-  const [imgErrors, setImgErrors] = useState<string[]>([])
-  const markImgError = (key: string) =>
-    setImgErrors(prev => (prev.includes(key) ? prev : [...prev, key]))
+  return (
+    <FournisseurLangue>
+      <Configurateur variant={variant} />
+    </FournisseurLangue>
+  )
+}
 
+function Configurateur({ variant }: { variant: ConfigurateurVariant }) {
+  const { t, langue } = useLangue()
+
+  const [etape, setEtape] = useState<Etape>(1)
+  const [etat, setEtat] = useState<Etat>(ETAT_INITIAL)
+
+  const [catalogue, setCatalogue] = useState<CatalogueProduit[]>(CATALOGUE)
+  const [palette, setPalette] = useState<Coloris[]>(PALETTE_ATELIER)
+  // Tant que le chargement n'est pas terminé, on ne résout aucun lien entrant :
+  // c'est exactement ce qui manquait avant, et qui faisait avancer le
+  // configurateur avec un produit vide.
+  const [donneesChargees, setDonneesChargees] = useState(false)
+
+  /** Référence produit reçue dans l'URL mais introuvable au catalogue. */
+  const [produitIntrouvable, setProduitIntrouvable] = useState<string | null>(null)
+  /** Vrai uniquement après un import de logo effectivement réussi. */
+  const [logoImporteDuDesigner, setLogoImporteDuDesigner] = useState(false)
+
+  const [envoiLogo, setEnvoiLogo] = useState(false)
+  const [erreurLogo, setErreurLogo] = useState<string | null>(null)
+  const [enregistrement, setEnregistrement] = useState(false)
+  const [erreurEnvoi, setErreurEnvoi] = useState<string | null>(null)
+  const [reference, setReference] = useState('')
+  const [afficherManquants, setAfficherManquants] = useState(false)
+  const [imagesCassees, setImagesCassees] = useState<string[]>([])
+
+  const champFichier = useRef<HTMLInputElement>(null)
+  const prefillFait = useRef(false)
+
+  const marquerImageCassee = (id: string) =>
+    setImagesCassees(prev => (prev.includes(id) ? prev : [...prev, id]))
+
+  // ── Chargement du catalogue ────────────────────────────────────────
+  // Le préremplissage attend la fin de ce chargement — sinon il résout le
+  // lien entrant contre une liste incomplète. Mais l'attente est bornée :
+  // si Supabase ne répond pas, le client reste sinon bloqué le temps du
+  // délai réseau sur la pièce qu'il vient de cliquer. Passé ce délai, on
+  // continue avec le catalogue statique, qui contient déjà tout le
+  // catalogue public ; les données de la base s'appliquent si elles
+  // arrivent plus tard.
   useEffect(() => {
+    let annule = false
+
+    const relache = setTimeout(() => {
+      if (!annule) setDonneesChargees(true)
+    }, ATTENTE_CATALOGUE_MS)
+
     Promise.all([
       supabase.from('produits').select('*').eq('actif', true).order('ordre'),
       supabase.from('couleurs').select('*').eq('actif', true).order('ordre'),
-      supabase.from('tailles').select('*').eq('actif', true).order('ordre'),
-    ]).then(([p, c, t]) => {
-      setProduits(p.data && p.data.length > 0 ? p.data : FALLBACK_PRODUITS)
-      setCouleurs(c.data && c.data.length > 0 ? c.data : FALLBACK_COULEURS)
-      setTailles(t.data && t.data.length > 0 ? t.data : FALLBACK_TAILLES)
-    }).catch(() => {
-      setProduits(FALLBACK_PRODUITS)
-      setCouleurs(FALLBACK_COULEURS)
-      setTailles(FALLBACK_TAILLES)
-    })
+    ])
+      .then(([p, c]) => {
+        if (annule) return
+        setCatalogue(fusionnerCatalogue(p.data as ProduitBase[] | null))
+        const couleursBase = (c.data ?? []) as Coloris[]
+        setPalette(couleursBase.length > 0 ? dedupliquerCouleurs(couleursBase) : PALETTE_ATELIER)
+      })
+      .catch(() => {
+        /* le catalogue statique reste affiché : la page n'est jamais vide */
+      })
+      .finally(() => {
+        if (annule) return
+        clearTimeout(relache)
+        setDonneesChargees(true)
+      })
+
+    return () => {
+      annule = true
+      clearTimeout(relache)
+    }
   }, [])
 
-  useEffect(() => {
-    if (prefilled.current || produits.length === 0 || couleurs.length === 0) return
-    const params = new URLSearchParams(window.location.search)
-    const produitNom = params.get('produit')
-    const couleurNom = params.get('couleur')
-    if (!produitNom) return
-    prefilled.current = true
-    const matchProduit = produits.find(p => p.nom === produitNom)
-    const matchCouleur = couleurs.find(c => c.nom === couleurNom)
-    setOrder(prev => ({
-      ...prev,
-      produit: matchProduit ?? prev.produit,
-      couleur: couleurNom ?? prev.couleur,
-      couleurHex: matchCouleur?.hex ?? prev.couleurHex,
-      step: 2,
-    }))
-    try {
-      const raw = sessionStorage.getItem('designer_layers')
-      if (raw) {
-        const layers = JSON.parse(raw)
-        if (Array.isArray(layers) && layers.length > 0) {
-          const first = layers[0]
-          fetch(first.src).then(res => res.blob()).then(blob => {
-            const file = new File([blob], first.name || 'logo-designer.png', { type: blob.type })
-            setOrder(prev => ({ ...prev, logoFile: file, logoUrl: first.src }))
-          }).catch(() => { })
+  const produit = useMemo(
+    () => catalogue.find(p => p.id === etat.produitId) ?? null,
+    [catalogue, etat.produitId],
+  )
+
+  const couleurs = useMemo(() => couleursPourProduit(produit, palette), [produit, palette])
+  const tailles = useMemo(() => produit?.tailles ?? [], [produit])
+  const aDesTailles = tailles.some(estTailleVestimentaire)
+
+  /**
+   * Applique un produit à l'état : couleur par défaut compatible, et
+   * quantités par taille conservées quand la taille existe encore sur la
+   * nouvelle pièce (retour arrière sans perdre la saisie).
+   */
+  const choisirProduit = useCallback(
+    (cible: CatalogueProduit, quantiteDepart?: number) => {
+      setProduitIntrouvable(null)
+      setEtat(prev => {
+        const dispo = couleursPourProduit(cible, palette)
+        const couleurConservee = dispo.find(c => normaliser(c.nom) === normaliser(prev.couleur))
+        const couleur = couleurConservee ?? dispo[0] ?? { nom: '', hex: '' }
+
+        const taillesCible = cible.tailles
+        const porteDesTailles = taillesCible.some(estTailleVestimentaire)
+        const quantites: Record<string, number> = {}
+        if (porteDesTailles) {
+          for (const taille of taillesCible) {
+            const conservee = prev.quantites[taille]
+            if (conservee && conservee > 0) quantites[taille] = conservee
+          }
+        } else {
+          const total =
+            Object.values(prev.quantites).reduce((s, n) => s + n, 0) || quantiteDepart || 1
+          quantites[SANS_TAILLE] = total
         }
-        sessionStorage.removeItem('designer_layers')
-      }
-    } catch (e) { }
-    setFromDesigner(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [produits, couleurs])
+        // Aucune taille encore saisie : on amorce la première taille avec la
+        // quantité de départ de la variante (1 en B2C, 20 en B2B).
+        if (porteDesTailles && Object.keys(quantites).length === 0) {
+          const premiere = taillesCible.find(estTailleVestimentaire)
+          if (premiere) quantites[premiere] = quantiteDepart ?? (variant === 'b2b' ? 20 : 1)
+        }
 
-  const up = (patch: Partial<OrderState>) => setOrder(prev => ({ ...prev, ...patch }))
+        return { ...prev, produitId: cible.id, couleur: couleur.nom, couleurHex: couleur.hex, quantites }
+      })
+    },
+    [palette, variant],
+  )
 
-  const calcPrice = () => {
-    if (!order.produit) return { unit: 0, total: 0, remise: 0 }
-    const r = order.quantite >= 100 ? 0.10 : order.quantite >= 50 ? 0.05 : 0
-    const unit = Math.round(order.produit.prix_base * (1 - r))
-    return { unit, total: unit * order.quantite, remise: r }
-  }
-
-  const next = () => { up({ step: order.step + 1 }); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  const prev = () => { up({ step: order.step - 1 }); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-
-  const handleFile = async (file: File) => {
-    if (file.type.startsWith('image/')) {
-      const r = new FileReader()
-      r.onload = e => up({ logoFile: file, logoUrl: e.target?.result as string })
-      r.readAsDataURL(file)
-    } else {
-      up({ logoFile: file, logoUrl: null })
-    }
-    setUploadingLogo(true)
+  // ── Envoi du logo ──────────────────────────────────────────────────
+  const televerser = useCallback(async (fichier: File) => {
+    setEnvoiLogo(true)
+    setErreurLogo(null)
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/upload-logo', { method: 'POST', body: fd })
+      const donnees = new FormData()
+      donnees.append('file', fichier)
+      const res = await fetch('/api/upload-logo', { method: 'POST', body: donnees })
+      if (!res.ok) throw new Error('upload')
       const data = await res.json()
-      if (data.url) up({ logoUploadUrl: data.url })
-    } catch (e) { }
-    setUploadingLogo(false)
-  }
+      if (!data?.url) throw new Error('upload')
+      setEtat(prev => ({ ...prev, logoUrlEnvoyee: data.url }))
+    } catch {
+      // On le dit franchement plutôt que d'afficher « Fichier prêt » à tort.
+      setErreurLogo(t('logo.echec'))
+      setEtat(prev => ({ ...prev, logoUrlEnvoyee: null }))
+    } finally {
+      setEnvoiLogo(false)
+    }
+  }, [t])
 
-  const buildWhatsAppMsg = (ref: string) => {
-    const { unit, total } = calcPrice()
-    return `Bonjour Caractère Store 👋
+  // ── Préremplissage depuis /produits, /designer ou un ancien lien ────
+  //
+  // En deux temps, pour ne jamais faire attendre le client sur une pièce
+  // qu'il vient de cliquer, ni annoncer « introuvable » trop tôt :
+  //
+  //  1. Le catalogue statique contient déjà tout le catalogue public : s'il
+  //     reconnaît la référence, on ouvre la pièce immédiatement.
+  //  2. Sinon seulement, on attend la fin du chargement (borné) avant de
+  //     chercher dans le catalogue fusionné, et de conclure à l'introuvable.
+  //
+  // Dans tous les cas la sélection n'est jamais vide : ou bien un produit est
+  // retenu, ou bien on reste à l'étape 1 avec une explication.
 
-*Nouvelle commande — ${ref}*
+  /** Applique la pièce trouvée, plus la couleur de l'URL si elle est valide. */
+  const appliquerPrefill = useCallback(
+    (trouve: CatalogueProduit, refCouleur: string | null) => {
+      choisirProduit(trouve)
+      if (refCouleur) {
+        const dispo = couleursPourProduit(trouve, palette)
+        const couleur = dispo.find(c => normaliser(c.nom) === normaliser(refCouleur))
+        if (couleur) setEtat(prev => ({ ...prev, couleur: couleur.nom, couleurHex: couleur.hex }))
+      }
+      setEtape(2)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    [choisirProduit, palette],
+  )
 
-🛍️ Produit : ${order.produit?.nom}
-🎨 Couleur : ${order.couleur}
-📏 Tailles : ${order.tailles.join(', ')}
-📦 Quantité : ${order.quantite} pièce${order.quantite > 1 ? 's' : ''}
-🖨️ Technique : ${order.technique}
-📍 Position : ${order.position}${order.urgent ? '\n⚡ COMMANDE URGENTE' : ''}
+  /**
+   * Import éventuel d'un visuel préparé dans le Designer. La confirmation
+   * n'est affichée qu'une fois le fichier réellement reconstitué — pas
+   * avant, et pas quand il n'y a rien à importer.
+   */
+  const importerDepuisDesigner = useCallback(() => {
+    try {
+      const brut = sessionStorage.getItem('designer_layers')
+      if (!brut) return
+      sessionStorage.removeItem('designer_layers')
+      const calques = JSON.parse(brut)
+      if (!Array.isArray(calques) || calques.length === 0) return
+      const premier = calques[0]
+      if (!premier?.src) return
+      fetch(premier.src)
+        .then(res => (res.ok ? res.blob() : Promise.reject(new Error('import'))))
+        .then(blob => {
+          const fichier = new File([blob], premier.name || 'logo-designer.png', { type: blob.type })
+          setEtat(prev => ({
+            ...prev,
+            logoNom: fichier.name,
+            logoTaille: fichier.size,
+            logoApercu: premier.src,
+          }))
+          setLogoImporteDuDesigner(true)
+          return televerser(fichier)
+        })
+        .catch(() => {
+          // Import raté : aucune confirmation affichée, l'étape Logo propose
+          // simplement d'envoyer le fichier à la main.
+          setLogoImporteDuDesigner(false)
+        })
+    } catch {
+      setLogoImporteDuDesigner(false)
+    }
+  }, [televerser])
 
-👤 Nom : ${order.nom}
-🏢 Entreprise : ${order.entreprise || 'Particulier'}
-📞 Téléphone : ${order.telephone}
-📧 Email : ${order.email || '-'}${order.notes ? `\n📝 Notes : ${order.notes}` : ''}
-
-💰 Total estimé : ${total.toLocaleString('fr-FR')} DA`
-  }
-
-  const handleSubmit = async () => {
-    if (loading) return
-    if (!order.nom.trim() || !order.telephone.trim()) {
-      setSubmitError('Renseignez votre nom et votre téléphone pour continuer.')
+  // 1 — Résolution immédiate contre le catalogue statique.
+  useEffect(() => {
+    if (prefillFait.current) return
+    const params = new URLSearchParams(window.location.search)
+    const refProduit = params.get('produit')
+    if (!refProduit) {
+      prefillFait.current = true
       return
     }
-    setSubmitError(null)
-    setLoading(true)
-    const ref = 'CAR-' + Date.now().toString(36).toUpperCase()
-    const { unit, total } = calcPrice()
+    const trouve = resoudreProduit(refProduit)
+    if (!trouve) return // on laissera le second temps trancher
+
+    prefillFait.current = true
+    appliquerPrefill(trouve, params.get('couleur'))
+    importerDepuisDesigner()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 2 — Référence non reconnue par le fichier : on attend la fin du
+  //     chargement avant de chercher plus loin, puis de conclure.
+  useEffect(() => {
+    if (!donneesChargees || prefillFait.current) return
+    prefillFait.current = true
+
+    const params = new URLSearchParams(window.location.search)
+    const refProduit = params.get('produit')
+    if (!refProduit) return
+
+    const trouve =
+      catalogue.find(p => normaliser(p.id) === normaliser(refProduit)) ??
+      catalogue.find(p => normaliser(p.nom) === normaliser(refProduit)) ??
+      null
+
+    if (!trouve) {
+      // On reste à l'étape 1 et on explique. Jamais d'étape 2 sans produit.
+      setProduitIntrouvable(refProduit)
+      setEtape(1)
+      return
+    }
+
+    appliquerPrefill(trouve, params.get('couleur'))
+    importerDepuisDesigner()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [donneesChargees])
+
+  // ── Quantités ──────────────────────────────────────────────────────
+  const quantiteTotale = useMemo(
+    () => Object.values(etat.quantites).reduce((somme, n) => somme + (n > 0 ? n : 0), 0),
+    [etat.quantites],
+  )
+
+  const taillesCommandees = useMemo(
+    () =>
+      Object.entries(etat.quantites)
+        .filter(([, n]) => n > 0)
+        .map(([taille, n]) => ({ taille, quantite: n })),
+    [etat.quantites],
+  )
+
+  const definirQuantite = (taille: string, valeur: number) => {
+    const n = Number.isFinite(valeur) ? Math.max(0, Math.min(9999, Math.floor(valeur))) : 0
+    setEtat(prev => {
+      const quantites = { ...prev.quantites }
+      if (n === 0) delete quantites[taille]
+      else quantites[taille] = n
+      return { ...prev, quantites }
+    })
+  }
+
+  const tarif = useMemo(() => calculerTarif(produit, quantiteTotale), [produit, quantiteTotale])
+
+  // ── Champs manquants ───────────────────────────────────────────────
+  type Manque = { cle: string; libelle: string; etape: Etape }
+  const manquants = useMemo<Manque[]>(() => {
+    const liste: Manque[] = []
+    if (!produit) liste.push({ cle: 'produit', libelle: t('manquants.produit'), etape: 1 })
+    if (quantiteTotale < 1) liste.push({ cle: 'quantite', libelle: t('manquants.quantite'), etape: 2 })
+    if (!etat.nom.trim()) liste.push({ cle: 'nom', libelle: t('manquants.nom'), etape: 4 })
+    if (!etat.telephone.trim()) liste.push({ cle: 'telephone', libelle: t('manquants.telephone'), etape: 4 })
+    if (!etat.wilaya) liste.push({ cle: 'wilaya', libelle: t('manquants.wilaya'), etape: 4 })
+    return liste
+  }, [produit, quantiteTotale, etat.nom, etat.telephone, etat.wilaya, t])
+
+  const manqueSurEtape = (cle: string) => afficherManquants && manquants.some(m => m.cle === cle)
+
+  const recevoirFichier = (fichier: File) => {
+    setLogoImporteDuDesigner(false)
+    setEtat(prev => ({
+      ...prev,
+      logoNom: fichier.name,
+      logoTaille: fichier.size,
+      logoApercu: null,
+      logoUrlEnvoyee: null,
+    }))
+    if (fichier.type.startsWith('image/')) {
+      const lecteur = new FileReader()
+      lecteur.onload = e =>
+        setEtat(prev => ({ ...prev, logoApercu: (e.target?.result as string) ?? null }))
+      lecteur.readAsDataURL(fichier)
+    }
+    void televerser(fichier)
+  }
+
+  // ── Message WhatsApp : reprend exactement ce que la page affiche ────
+  const construireMessage = (ref?: string) => {
+    const lignes: string[] = ['Bonjour Caractère 👋', '']
+    lignes.push(ref ? `*Commande ${ref}*` : '*Demande de commande*', '')
+    lignes.push(`Produit : ${produit?.nom ?? '—'}`)
+    if (etat.couleur) lignes.push(`Couleur : ${etat.couleur}`)
+    lignes.push(`Technique : ${etat.technique}`)
+    lignes.push(`Position : ${etat.position}`)
+    if (aDesTailles) {
+      lignes.push(
+        `Tailles : ${taillesCommandees.map(l => `${l.taille} × ${l.quantite}`).join(', ') || '—'}`,
+      )
+    }
+    lignes.push(`Quantité totale : ${quantiteTotale}`)
+    if (etat.urgent) lignes.push('Commande urgente')
+    lignes.push('')
+    lignes.push(`Nom : ${etat.nom || '—'}`)
+    if (etat.entreprise) lignes.push(`Entreprise : ${etat.entreprise}`)
+    lignes.push(`Téléphone : ${etat.telephone || '—'}`)
+    if (etat.email) lignes.push(`Email : ${etat.email}`)
+    lignes.push(`Livraison : ${[etat.wilaya, etat.commune, etat.adresse].filter(Boolean).join(' — ') || '—'}`)
+    if (etat.notes) lignes.push(`Notes : ${etat.notes}`)
+    lignes.push('')
+    // Les montants repris sont ceux affichés à l'écran, pas un autre calcul.
+    if (tarif.chiffre) {
+      lignes.push(`Sous-total vêtements : ${formaterDA(tarif.total, langue)}`)
+      if (tarif.remise > 0) lignes.push(`Remise volume appliquée : −${Math.round(tarif.remise * 100)} %`)
+      lignes.push('Livraison : à confirmer avec l’atelier')
+    } else {
+      lignes.push('Montant : sur devis (tarif non communiqué pour cette pièce)')
+    }
+    return lignes.join('\n')
+  }
+
+  // ── Enregistrement ─────────────────────────────────────────────────
+  const enregistrer = async () => {
+    if (enregistrement) return
+    if (manquants.length > 0) {
+      setAfficherManquants(true)
+      const premier = manquants[0]
+      setEtape(premier.etape)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    setAfficherManquants(false)
+    setErreurEnvoi(null)
+    setEnregistrement(true)
     try {
-      const response = await fetch('/api/commandes', {
+      const res = await fetch('/api/commandes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          reference: ref, produit: order.produit?.nom, quantite: order.quantite,
-          couleur: order.couleur, tailles: order.tailles, position: order.position,
-          technique: order.technique, urgent: order.urgent, nom_client: order.nom,
-          entreprise: order.entreprise, telephone: order.telephone, email: order.email,
-          notes: order.notes, logo_url: order.logoUploadUrl, prix_unitaire: unit, prix_total: total,
-        })
+          // Le serveur revalide tout et recalcule les prix : il ne reçoit ici
+          // que le choix du client, jamais un montant.
+          produit_id: produit!.id,
+          couleur: etat.couleur,
+          quantites: etat.quantites,
+          technique: etat.technique,
+          position: etat.position,
+          urgent: etat.urgent,
+          nom_client: etat.nom,
+          entreprise: etat.entreprise,
+          telephone: etat.telephone,
+          email: etat.email,
+          notes: etat.notes,
+          wilaya: etat.wilaya,
+          commune: etat.commune,
+          adresse: etat.adresse,
+          logo_url: etat.logoUrlEnvoyee,
+          canal: variant === 'b2b' ? 'entreprises' : 'configurateur',
+        }),
       })
-      if (!response.ok) throw new Error('Enregistrement refusé')
-      const result = await response.json()
-      if (result.success !== true) throw new Error('Confirmation absente')
-      setRefCode(ref)
-      up({ step: 6, whatsappMsg: buildWhatsAppMsg(ref) })
+      const resultat = await res.json().catch(() => null)
+      // Aucune confirmation tant que le serveur n'a pas renvoyé une référence.
+      if (!res.ok || resultat?.success !== true || !resultat?.reference) {
+        throw new Error(resultat?.error ?? 'enregistrement')
+      }
+      setReference(resultat.reference)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch {
-      setSubmitError('Nous ne pouvons pas confirmer l’enregistrement. Vos informations sont conservées sur cette page. Réessayez ou contactez-nous sur WhatsApp.')
+      setErreurEnvoi(t('erreur.enregistrement'))
     } finally {
-      setLoading(false)
+      setEnregistrement(false)
     }
   }
 
-  const { unit, total, remise } = calcPrice()
+  const allerA = (cible: Etape) => {
+    setEtape(cible)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
-  // ─── STEP LABELS ──────────────────────────────────────────────────────────
-  const STEPS = [
-    { n: 1, label: 'Produit' },
-    { n: 2, label: 'Options' },
-    { n: 3, label: 'Logo' },
-    { n: 5, label: 'Contact' },
-  ]
-  const stepIndex = [1, 2, 3, 5].indexOf(order.step)
+  const continuer = () => {
+    if (etape === 1) {
+      if (!produit) {
+        setAfficherManquants(true)
+        return
+      }
+      allerA(2)
+      return
+    }
+    if (etape === 2) {
+      if (quantiteTotale < 1) {
+        setAfficherManquants(true)
+        return
+      }
+      allerA(3)
+      return
+    }
+    if (etape === 3) {
+      allerA(4)
+      return
+    }
+    void enregistrer()
+  }
 
-  // ─── COULEURS FILTRÉES ────────────────────────────────────────────────────
-  const couleursFiltrees = couleurs.filter(c =>
-    !order.produit || !c.produits || c.produits.length === 0 || c.produits.includes(order.produit.nom)
-  )
-
-  // ─── PREVIEW IMAGE ────────────────────────────────────────────────────────
-  const previewImg = order.produit ? (PRODUCT_IMAGES[order.produit.nom] || FALLBACK_IMG) : null
-
-  // ─── CONFIRMATION (STEP 6) ────────────────────────────────────────────────
-  if (order.step === 6) {
+  // ── Écran de confirmation ──────────────────────────────────────────
+  if (reference) {
     return (
-      <>
+      <div className={`c-scope ${styles.page}`}>
         <Navbar />
-        <main className="pt-14 min-h-screen bg-white">
-          <div className="max-w-[480px] mx-auto px-6 py-20 text-center">
-            {/* Icon */}
-            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <h2 className="text-[28px] font-bold tracking-tight mb-2">Commande confirmée ✓</h2>
-            <p className="text-[14px] text-brand-gray mb-8">Un commercial va vous appeler pour confirmer les détails et les modalités de paiement.</p>
+        <main className={`c-wrap ${styles.confirmation}`}>
+          <div className={styles.confirmationIcone} aria-hidden="true">✓</div>
+          <h1 className={styles.confirmationTitre}>{t('confirmation.titre')}</h1>
+          <p className={styles.confirmationTexte}>{t('confirmation.texte')}</p>
 
-            {/* Ref */}
-            <div className="bg-brand-light rounded-2xl px-6 py-4 inline-block mb-8">
-              <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-1">Référence de commande</p>
-              <p className="text-[22px] font-bold font-mono tracking-widest text-brand-dark">{refCode}</p>
-            </div>
-
-            {/* Récap */}
-            <div className="bg-brand-light rounded-2xl p-5 text-left mb-8">
-              <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-4">Résumé de votre commande</p>
-              {[
-                ['Produit', order.produit?.nom ?? '-'],
-                ['Couleur', order.couleur],
-                ['Tailles', order.tailles.join(', ')],
-                ['Quantité', `${order.quantite} pièce${order.quantite > 1 ? 's' : ''}`],
-                ['Technique', order.technique],
-                ['Total estimé', `${total.toLocaleString('fr-FR')} DA`],
-              ].map(([label, val]) => (
-                <div key={label} className="flex justify-between py-2 border-b border-black/[0.06] last:border-0">
-                  <span className="text-[13px] text-brand-gray">{label}</span>
-                  <span className="text-[13px] font-semibold text-brand-dark">{val}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Info prochaines étapes */}
-            <div className="bg-blue-50 rounded-2xl p-4 mb-8 text-left">
-              <p className="text-[13px] font-semibold text-blue-900 mb-2">📞 Prochaines étapes :</p>
-              <ul className="text-[12px] text-blue-800 space-y-1 leading-relaxed">
-                <li>• Un commercial vous appellera sous 2 heures</li>
-                <li>• Confirmation des modalités de paiement</li>
-                <li>• Démarrage de la production après versement</li>
-              </ul>
-            </div>
-
-            {/* Actions */}
-            <a href={`/suivi/${refCode}`} className="block text-[14px] font-semibold text-brand-dark underline mb-4 hover:text-brand-dark/70">
-              Suivre ma commande
-            </a>
-            <button 
-              onClick={() => { setOrder({ ...DEFAULT, quantite: copy.quantiteDepart }); setRefCode('') }} 
-              className="text-[13px] text-brand-gray bg-transparent border-none cursor-pointer underline hover:text-brand-dark"
-            >
-              Nouvelle commande
-            </button>
+          <div className={styles.reference}>
+            <div className={styles.referenceCle}>{t('confirmation.reference')}</div>
+            <div className={styles.referenceVal}>{reference}</div>
           </div>
+
+          <div className={styles.confirmationBloc}>
+            <Recapitulatif
+              produit={produit}
+              etat={etat}
+              tarif={tarif}
+              quantiteTotale={quantiteTotale}
+              taillesCommandees={taillesCommandees}
+              aDesTailles={aDesTailles}
+              t={t}
+              langue={langue}
+              sansTitre
+            />
+          </div>
+
+          <div className={styles.confirmationActions}>
+            <a
+              href={lienWhatsApp(construireMessage(reference))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="c-btn c-btn-accent"
+            >
+              {t('confirmation.whatsapp')}
+            </a>
+            <Link href={`/suivi/${encodeURIComponent(reference)}`} className="c-btn c-btn-ghost">
+              {t('confirmation.suivre')}
+            </Link>
+          </div>
+          <p style={{ marginTop: 18 }}>
+            <button
+              type="button"
+              className={styles.lienSobre}
+              onClick={() => {
+                setEtat(ETAT_INITIAL)
+                setReference('')
+                setEtape(1)
+                setAfficherManquants(false)
+                setLogoImporteDuDesigner(false)
+              }}
+            >
+              {t('confirmation.nouvelle')}
+            </button>
+          </p>
         </main>
-      </>
+        <Footer />
+      </div>
     )
   }
 
-  // ─── MAIN LAYOUT ──────────────────────────────────────────────────────────
+  const libellesEtapes: { n: Etape; label: string }[] = [
+    { n: 1, label: t('etape.produit') },
+    { n: 2, label: t('etape.options') },
+    { n: 3, label: t('etape.logo') },
+    { n: 4, label: t('etape.contact') },
+  ]
+
+  const texteBouton =
+    etape === 4 ? (enregistrement ? t('nav.envoi') : t('nav.confirmer')) : t('nav.continuer')
+
   return (
-    <>
+    <div className={`c-scope ${styles.page}`}>
+      <a className={styles.skip} href="#contenu">Aller au contenu</a>
       <Navbar />
 
-      {/* ── Bandeau B2B (uniquement sur /entreprises) ── */}
       {variant === 'b2b' && (
-        <section className="bg-brand-dark text-white">
-          <div className="max-w-[1080px] mx-auto px-6 py-7 flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+        <section className={styles.bandeau}>
+          <div className={`c-wrap ${styles.bandeauGrille}`}>
             <div>
-              <p className="text-[11px] font-bold tracking-widest uppercase text-white/50 mb-2">Espace entreprises</p>
-              {/* Le <h1> de la page reste le titre de l'étape en cours (plus bas) :
-                  ce bandeau n'est qu'un chapeau de contexte. */}
-              <p className="text-[24px] md:text-[28px] font-bold tracking-tight leading-tight">
-                Configurez la commande de votre équipe
-              </p>
-              <p className="text-[14px] text-white/65 mt-1.5 max-w-[520px]">
-                Uniformes, workwear et goodies personnalisés. Devis en 2h, production 48h, livraison 58 wilayas.
+              <p className="c-eyebrow">Espace entreprises</p>
+              <p className={styles.bandeauTitre}>Configurez la commande de votre équipe</p>
+              <p className={styles.bandeauTexte}>
+                Uniformes, workwear et goodies personnalisés. Devis chiffré après étude de votre
+                logo et de vos quantités.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {['Maquette gratuite', 'Tarifs dégressifs dès 50 pièces', 'Vectorisation offerte'].map(chip => (
-                <span key={chip} className="text-[11px] font-medium text-white/80 border border-white/15 rounded-full px-3 py-1.5">
-                  {chip}
-                </span>
+            <div className={styles.puces}>
+              {['Maquette avant production', 'Tarifs dégressifs dès 50 pièces', 'Vectorisation incluse'].map(p => (
+                <span key={p} className={styles.puce}>{p}</span>
               ))}
-              <a
-                href={WA}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-semibold text-brand-dark bg-white rounded-full px-3 py-1.5 hover:bg-white/85 transition-colors"
-              >
-                💬 Devis sur WhatsApp
-              </a>
             </div>
           </div>
         </section>
       )}
 
-      {/* ── Barre de progression sticky ── */}
-      <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-md border-b border-black/[0.07]">
-        <div className="max-w-[1080px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
-          {/* Steps — zone défilante : au zoom texte, la frise dépassait de
-              l'écran sans moyen de l'atteindre. */}
-          <div className="flex items-center gap-1 overflow-x-auto min-w-0">
-            {STEPS.map((s, i) => {
-              const done = stepIndex > i
-              const active = stepIndex === i
+      {/* ── Frise d'étapes 1 → 2 → 3 → 4 ── */}
+      <div className={styles.frise}>
+        <div className={`c-wrap ${styles.friseGrille}`}>
+          <nav className={styles.frisePiste} aria-label="Étapes de la commande">
+            {libellesEtapes.map((s, i) => {
+              const faite = etape > s.n
+              const active = etape === s.n
+              // On ne laisse revenir que sur les étapes déjà franchies : la
+              // saisie en cours n'est jamais perdue par un clic en avant.
+              const accessible = s.n <= etape
               return (
-                <div key={s.n} className="flex items-center">
-                  {i > 0 && <div className={`w-8 h-px mx-1 ${done ? 'bg-brand-dark' : 'bg-black/12'}`} />}
-                  <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all flex-shrink-0
-                      ${done ? 'bg-brand-dark text-white' : active ? 'bg-brand-dark text-white ring-4 ring-brand-dark/15' : 'bg-black/[0.06] text-brand-gray'}`}>
-                      {done
-                        ? <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
-                        : s.n
-                      }
-                    </div>
-                    <span className={`text-[12px] font-medium hidden sm:block ${active ? 'text-brand-dark' : done ? 'text-brand-dark/60' : 'text-brand-gray'}`}>{s.label}</span>
-                  </div>
+                <div key={s.n} className={styles.etapeBloc}>
+                  {i > 0 && <span className={`${styles.etapeTrait} ${faite || active ? styles.etapeTraitFait : ''}`} />}
+                  <button
+                    type="button"
+                    className={`${styles.etape} ${faite ? styles.etapeFaite : ''} ${active ? styles.etapeActive : ''}`}
+                    onClick={() => accessible && allerA(s.n)}
+                    disabled={!accessible}
+                    aria-current={active ? 'step' : undefined}
+                  >
+                    <span className={styles.etapeNum}>{faite ? '✓' : s.n}</span>
+                    <span className={styles.etapeLabel}>{s.label}</span>
+                  </button>
                 </div>
               )
             })}
-          </div>
+          </nav>
 
-          {/* Prix résumé rapide */}
-          {order.produit && (
-            <div className="text-right">
-              <p className="text-[11px] text-brand-gray leading-none mb-0.5">Total estimé</p>
-              <p className="text-[16px] font-bold text-brand-dark leading-none">{total.toLocaleString('fr-FR')} DA</p>
-            </div>
-          )}
+          <div className={styles.friseTotal}>
+            <SelecteurLangue />
+          </div>
         </div>
       </div>
 
-      <main className="pt-6 min-h-screen bg-white">
-        <div className="max-w-[1080px] mx-auto px-6 pb-20">
+      <main id="contenu" className={`c-wrap ${styles.corps}`}>
+        <div className={styles.grille}>
+          <div>
+            {/* ═══ ÉTAPE 1 — Produit ═══ */}
+            {etape === 1 && (
+              <section>
+                <p className={styles.etiquette}>{t('etape.numero')} 1 / 4</p>
+                <h1 className={styles.titre}>
+                  {variant === 'b2b' ? t('produit.b2bTitre') : t('produit.titre')}
+                </h1>
+                <p className={styles.sous}>
+                  {variant === 'b2b' ? t('produit.b2bSous') : t('produit.sous')}
+                </p>
 
-          {/* ─────── LAYOUT 2 colonnes ─────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-10 items-start">
-
-            {/* ── Colonne gauche : formulaire ── */}
-            <div>
-
-              {/* Banner "depuis Designer" */}
-              {fromDesigner && order.step === 2 && (
-                <div className="mb-6 flex items-center gap-3 bg-green-50 border border-green-100 rounded-2xl px-4 py-3">
-                  <span className="text-green-600 text-[18px]">✓</span>
-                  <p className="text-[13px] text-green-800">
-                    <strong>{order.produit?.nom}</strong> · {order.couleur} · Logo importé depuis le Designer
-                  </p>
-                </div>
-              )}
-
-              {/* ═══ ÉTAPE 1 : Produit ═══ */}
-              {order.step === 1 && (
-                <div>
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-2">Étape 1</p>
-                  <h1 className="text-[26px] font-bold tracking-tight mb-1">{copy.step1Title}</h1>
-                  <p className="text-[14px] text-brand-gray mb-8">{copy.step1Sub}</p>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {produits.map(p => {
-                      const imgUrl = PRODUCT_IMAGES[p.nom] || FALLBACK_IMG
-                      const selected = order.produit?.id === p.id
-                      return (
-                        <button
-                          key={p.id}
-                          onClick={() => up({ produit: p, step: 2 })}
-                          className={`text-left rounded-2xl border-2 transition-all bg-white overflow-hidden group
-                            ${selected ? 'border-brand-dark shadow-md' : 'border-black/10 hover:border-black/30 hover:shadow-sm'}`}
-                        >
-                          {/* Image */}
-                          <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#F5F5F3]">
-                            {imgErrors.includes(p.nom) ? (
-                              <div className="w-full h-full flex items-center justify-center text-[12px] font-semibold text-brand-gray px-3 text-center">
-                                {p.nom}
-                              </div>
-                            ) : (
-                              <img
-                                src={imgUrl} alt={p.nom}
-                                onError={() => markImgError(p.nom)}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            )}
-                            {selected && (
-                              <div className="absolute top-2 right-2 w-6 h-6 bg-brand-dark rounded-full flex items-center justify-center">
-                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                                  <polyline points="2 6 5 9 10 3" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-                          {/* Infos */}
-                          <div className="p-3.5">
-                            <p className="text-[14px] font-semibold tracking-tight leading-tight">{p.nom}</p>
-                            <p className="text-[11px] text-brand-gray mt-0.5 leading-snug">{p.description}</p>
-                            <p className="text-[13px] font-bold mt-2 text-brand-dark">dès {p.prix_base.toLocaleString('fr-FR')} DA</p>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* ═══ ÉTAPE 2 : Couleur + Tailles + Quantité ═══ */}
-              {order.step === 2 && (
-                <div>
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-2">Étape 2</p>
-                  <h1 className="text-[26px] font-bold tracking-tight mb-1">Options de personnalisation</h1>
-                  <p className="text-[14px] text-brand-gray mb-8">Couleur du textile, tailles et quantité.</p>
-
-                  {/* Technique */}
-                  <div className="mb-8">
-                    <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">Technique d'impression</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {TECHNIQUES.map(t => (
-                        <button
-                          key={t}
-                          onClick={() => up({ technique: t })}
-                          className={`px-5 py-2.5 rounded-xl text-[13px] font-medium border-2 transition-all
-                            ${order.technique === t ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-brand-dark border-black/15 hover:border-black/30'}`}
-                        >
-                          {t === 'DTF' ? '🖨️' : t === 'Broderie' ? '🪡' : '💬'} {t}
-                        </button>
-                      ))}
-                    </div>
-                    {order.technique === 'DTF' && (
-                      <p className="text-[12px] text-brand-gray mt-2">Impression haute définition, tous supports, couleurs illimitées.</p>
-                    )}
-                    {order.technique === 'Broderie' && (
-                      <p className="text-[12px] text-brand-gray mt-2">Finition textile premium, relief et durabilité maximale.</p>
-                    )}
-                  </div>
-
-                  {/* Couleur */}
-                  <div className="mb-8">
-                    <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">
-                      Couleur du textile — <span className="normal-case font-semibold text-brand-dark">{order.couleur}</span>
-                    </p>
-                    <div className="flex flex-wrap gap-2.5">
-                      {couleursFiltrees.map(c => (
-                        <button
-                          key={c.id}
-                          title={c.nom}
-                          onClick={() => up({ couleur: c.nom, couleurHex: c.hex })}
-                          className={`w-9 h-9 rounded-full border-2 transition-all ${order.couleur === c.nom ? 'border-brand-dark scale-110 shadow-md' : 'border-transparent hover:border-black/20'}`}
-                          style={{ background: c.hex, boxShadow: c.hex === '#FFFFFF' ? 'inset 0 0 0 1px rgba(0,0,0,0.12)' : undefined }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tailles */}
-                  <div className="mb-8">
-                    <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">
-                      Tailles <span className="normal-case font-normal text-brand-gray/70">(sélection multiple)</span>
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {tailles.map(t => {
-                        const sel = order.tailles.includes(t.nom)
-                        return (
-                          <button
-                            key={t.id}
-                            onClick={() => {
-                              const s = sel ? order.tailles.filter(x => x !== t.nom) : [...order.tailles, t.nom]
-                              up({ tailles: s })
-                            }}
-                            className={`w-14 py-2.5 rounded-xl text-[13px] font-semibold border-2 transition-all
-                              ${sel ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-brand-dark border-black/15 hover:border-black/30'}`}
-                          >
-                            {t.nom}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Quantité */}
-                  <div className="mb-8">
-                    <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">Quantité</p>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => up({ quantite: Math.max(1, order.quantite - 1) })}
-                        className="w-11 h-11 rounded-full border-2 border-black/15 flex items-center justify-center text-[20px] bg-white hover:border-black/30 transition-all font-light"
-                      >−</button>
-                      <input
-                        type="number" min={1} value={order.quantite}
-                        onChange={e => up({ quantite: Math.max(1, parseInt(e.target.value) || 1) })}
-                        className="w-20 text-center text-[20px] font-bold border-2 border-black/15 rounded-xl py-2 focus:outline-none focus:border-brand-dark"
-                      />
-                      <button
-                        onClick={() => up({ quantite: order.quantite + 1 })}
-                        className="w-11 h-11 rounded-full border-2 border-black/15 flex items-center justify-center text-[20px] bg-white hover:border-black/30 transition-all font-light"
-                      >+</button>
-                      <span className="text-[13px] text-brand-gray">pièces</span>
-                    </div>
-
-                    {/* Paliers remise */}
-                    <div className="flex gap-2 mt-4 flex-wrap">
-                      {[
-                        { label: '1–49 pcs', info: 'Prix normal', active: order.quantite < 50 },
-                        { label: '50–99 pcs', info: '−5%', active: order.quantite >= 50 && order.quantite < 100 },
-                        { label: '100+ pcs', info: '−10%', active: order.quantite >= 100 },
-                      ].map(tier => (
-                        <div key={tier.label} className={`px-3 py-2 rounded-xl border text-[12px] transition-all
-                          ${tier.active ? 'border-green-400 bg-green-50 text-green-800' : 'border-black/10 bg-white text-brand-gray'}`}>
-                          <span className="font-semibold">{tier.label}</span>
-                          <span className="ml-1 opacity-70">{tier.info}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button onClick={prev} className="px-6 py-3 rounded-full border-2 border-black/15 text-[14px] font-medium hover:border-black/30 transition-all">
-                      ← Retour
-                    </button>
-                    <button onClick={next} className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-semibold hover:bg-neutral-800 transition-colors flex-1 md:flex-none">
-                      Continuer →
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* ═══ ÉTAPE 3 : Logo ═══ */}
-              {order.step === 3 && (
-                <div>
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-2">Étape 3</p>
-                  <h1 className="text-[26px] font-bold tracking-tight mb-1">Votre logo ou design</h1>
-                  <p className="text-[14px] text-brand-gray mb-8">
-                    {fromDesigner ? 'Logo importé depuis le Designer.' : 'Uploadez le fichier de votre logo ou design.'}
-                  </p>
-
-                  {/* Zone drop */}
-                  {!order.logoFile ? (
-                    <div
-                      className="border-2 border-dashed border-black/20 rounded-2xl p-14 text-center cursor-pointer hover:border-brand-dark hover:bg-brand-light/30 transition-all group"
-                      onClick={() => fileRef.current?.click()}
-                      onDragOver={e => e.preventDefault()}
-                      onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
-                    >
-                      <div className="w-14 h-14 bg-brand-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-dark/10 transition-colors">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                      </div>
-                      <p className="text-[15px] font-semibold mb-1">Glissez votre fichier ici</p>
-                      <p className="text-[13px] text-brand-gray mb-3">ou cliquez pour parcourir</p>
-                      <p className="text-[11px] text-brand-gray/60 bg-brand-light rounded-lg px-3 py-1.5 inline-block">
-                        AI · EPS · SVG · PDF · PNG · JPG
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-green-200 bg-green-50/50 rounded-2xl p-5 flex items-center gap-4 mb-4">
-                      {order.logoUrl && (
-                        <img src={order.logoUrl} alt="Logo" className="w-16 h-16 object-contain rounded-xl bg-white border border-black/10" />
-                      )}
-                      <div className="flex-1">
-                        <p className="text-[14px] font-semibold">{order.logoFile.name}</p>
-                        <p className="text-[12px] text-brand-gray">{(order.logoFile.size / 1024).toFixed(0)} Ko</p>
-                        {uploadingLogo && <p className="text-[12px] text-brand-gray mt-1">Upload en cours…</p>}
-                        {order.logoUploadUrl && !uploadingLogo && <p className="text-[12px] text-green-600 font-medium mt-1">✓ Fichier prêt</p>}
-                      </div>
-                      <button onClick={() => up({ logoFile: null, logoUrl: null, logoUploadUrl: null })} className="text-[12px] text-red-500 font-medium hover:text-red-700">
-                        Supprimer
-                      </button>
-                    </div>
-                  )}
-
-                  <input ref={fileRef} type="file" className="hidden" accept=".ai,.eps,.svg,.pdf,.png,.jpg,.jpeg" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
-
-                  {/* Info vectorisation */}
-                  <div className="mt-6 flex items-start gap-3 bg-[#F0F7FF] rounded-2xl p-4">
-                    <span className="text-[20px]">💡</span>
-                    <div>
-                      <p className="text-[13px] font-semibold text-[#1A3A5C] mb-0.5">Pas de logo vectoriel ?</p>
-                      <p className="text-[12px] text-[#2A5080] leading-relaxed">
-                        Envoyez ce que vous avez — même une photo ou un croquis. Notre équipe vectorise gratuitement pour toute commande.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 mt-8">
-                    <button onClick={prev} className="px-6 py-3 rounded-full border-2 border-black/15 text-[14px] font-medium hover:border-black/30 transition-all">
-                      ← Retour
-                    </button>
-                    <button
-                      onClick={() => { up({ step: 5 }); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                      className="bg-brand-dark text-white px-8 py-3.5 rounded-full text-[15px] font-semibold hover:bg-neutral-800 transition-colors flex-1 md:flex-none"
-                    >
-                      {order.logoFile ? 'Continuer →' : 'Passer cette étape →'}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* ═══ ÉTAPE 5 : Contact ═══ */}
-              {order.step === 5 && (
-                <div>
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-2">Étape 4</p>
-                  <h1 className="text-[26px] font-bold tracking-tight mb-1">Vos coordonnées</h1>
-                  <p className="text-[14px] text-brand-gray mb-8">Dernière étape — on vous contacte sous 2h.</p>
-
-                  <div className="flex flex-col gap-4 max-w-[500px]">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[12px] font-semibold text-brand-dark">Nom complet *</label>
-                        <input
-                          type="text" value={order.nom} placeholder="Votre nom"
-                          onChange={e => up({ nom: e.target.value })}
-                          className="border-2 border-black/[0.10] focus:border-brand-dark rounded-xl px-4 py-2.5 text-[14px] outline-none transition-colors"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[12px] font-semibold text-brand-dark">{copy.entrepriseLabel}</label>
-                        <input
-                          type="text" value={order.entreprise} placeholder={copy.entreprisePlaceholder}
-                          onChange={e => up({ entreprise: e.target.value })}
-                          className="border-2 border-black/[0.10] focus:border-brand-dark rounded-xl px-4 py-2.5 text-[14px] outline-none transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[12px] font-semibold text-brand-dark">Téléphone *</label>
-                        <input
-                          type="tel" value={order.telephone} placeholder="+213 6XX XXX XXX"
-                          onChange={e => up({ telephone: e.target.value })}
-                          className="border-2 border-black/[0.10] focus:border-brand-dark rounded-xl px-4 py-2.5 text-[14px] outline-none transition-colors"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[12px] font-semibold text-brand-dark">Email</label>
-                        <input
-                          type="email" value={order.email} placeholder="votre@email.com"
-                          onChange={e => up({ email: e.target.value })}
-                          className="border-2 border-black/[0.10] focus:border-brand-dark rounded-xl px-4 py-2.5 text-[14px] outline-none transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Commande urgente */}
-                    <div
-                      className={`flex items-center justify-between rounded-2xl px-4 py-4 border-2 cursor-pointer transition-all
-                        ${order.urgent ? 'bg-orange-50 border-orange-300' : 'bg-brand-light border-transparent'}`}
-                      onClick={() => up({ urgent: !order.urgent })}
-                    >
-                      <div>
-                        <p className="text-[14px] font-semibold">⚡ Commande urgente</p>
-                        <p className="text-[12px] text-brand-gray">Livraison express prioritaire</p>
-                      </div>
-                      <div className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ${order.urgent ? 'bg-orange-500' : 'bg-black/20'}`}>
-                        <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all shadow ${order.urgent ? 'left-6' : 'left-0.5'}`} />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[12px] font-semibold text-brand-dark">Notes complémentaires</label>
-                      <textarea
-                        value={order.notes} rows={3}
-                        placeholder="Position du logo, détails couleur, délai souhaité…"
-                        onChange={e => up({ notes: e.target.value })}
-                        className="border-2 border-black/[0.10] focus:border-brand-dark rounded-xl px-4 py-2.5 text-[14px] outline-none resize-none transition-colors leading-relaxed placeholder:text-gray-400"
-                      />
-                    </div>
-                  </div>
-
-                  {submitError && <div role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900"><p>{submitError}</p><a href={`${WA}?text=${encodeURIComponent(buildWhatsAppMsg('demande à vérifier'))}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block underline">Transmettre ma demande sur WhatsApp</a></div>}
-
-                  <div className="flex gap-3 mt-8">
-                    <button onClick={() => { up({ step: 3 }); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="px-6 py-3 rounded-full border-2 border-black/15 text-[14px] font-medium hover:border-black/30 transition-all">
-                      ← Retour
-                    </button>
-                    <button
-                      onClick={handleSubmit}
-                      disabled={loading || !order.nom || !order.telephone}
-                      className="flex items-center gap-2 bg-brand-dark hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3.5 rounded-full text-[15px] font-bold transition-all flex-1 md:flex-none justify-center"
-                    >
-                      {loading ? (
-                        <span>Enregistrement…</span>
-                      ) : (
-                        <>
-                          Confirmer la commande →
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <p className="text-[12px] text-brand-gray mt-4">
-                    En confirmant, votre commande sera enregistrée et un commercial vous appellera sous 2 heures.
-                  </p>
-                </div>
-              )}
-
-            </div>
-
-            {/* ── Colonne droite : résumé sticky ── */}
-            <div className="hidden lg:block">
-              <div className="sticky top-28 space-y-4">
-
-                {/* Aperçu produit */}
-                {order.produit && previewImg && !imgErrors.includes(order.produit.nom) && (
-                  <div className="rounded-2xl overflow-hidden bg-[#F5F5F3] aspect-square">
-                    <img
-                      src={previewImg}
-                      alt={order.produit.nom}
-                      onError={() => markImgError(order.produit!.nom)}
-                      className="w-full h-full object-cover"
-                    />
+                {produitIntrouvable && (
+                  <div className={styles.alerte} role="alert">
+                    <p className={styles.alerteTitre}>{t('introuvable.titre')}</p>
+                    <p className={styles.alerteTexte}>{t('introuvable.texte')}</p>
                   </div>
                 )}
 
-                {/* Récap */}
-                <div className="bg-brand-light rounded-2xl p-5">
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-4">Récapitulatif</p>
+                {!donneesChargees && <p className={styles.sous}>{t('produit.chargement')}</p>}
 
-                  <div className="space-y-0">
-                    {[
-                      { label: 'Produit', value: order.produit?.nom ?? '—', empty: !order.produit },
-                      { label: 'Technique', value: order.technique },
-                      { label: 'Quantité', value: `${order.quantite} pièce${order.quantite > 1 ? 's' : ''}` },
-                      { label: 'Couleur', value: order.couleur, color: order.couleurHex },
-                      { label: 'Tailles', value: order.tailles.length ? order.tailles.join(', ') : '—', empty: !order.tailles.length },
-                      { label: 'Logo', value: order.logoFile ? order.logoFile.name : 'Non uploadé', empty: !order.logoFile },
-                    ].map(row => (
-                      <div key={row.label} className="flex justify-between items-center py-2.5 border-b border-black/[0.06] last:border-0 gap-2">
-                        <span className="text-[12px] text-brand-gray flex-shrink-0">{row.label}</span>
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          {row.color && (
-                            <span
-                              className="w-3.5 h-3.5 rounded-full flex-shrink-0 border border-black/10"
-                              style={{ backgroundColor: row.color }}
+                <div className={styles.produits}>
+                  {catalogue.map(p => {
+                    const choisi = etat.produitId === p.id
+                    const cassee = imagesCassees.includes(p.id) || !p.image
+                    return (
+                      <button
+                        type="button"
+                        key={p.id}
+                        onClick={() => {
+                          choisirProduit(p)
+                          setAfficherManquants(false)
+                          allerA(2)
+                        }}
+                        className={`${styles.produitCarte} ${choisi ? styles.produitCarteActive : ''}`}
+                        aria-pressed={choisi}
+                      >
+                        <div className={styles.produitMedia}>
+                          {cassee ? (
+                            <span className={styles.produitMediaVide}>{p.nom}</span>
+                          ) : (
+                            <img
+                              src={p.image}
+                              alt={p.nom}
+                              loading="lazy"
+                              width={600}
+                              height={600}
+                              onError={() => marquerImageCassee(p.id)}
                             />
                           )}
-                          <span className={`text-[12px] font-medium text-right truncate ${row.empty ? 'text-brand-gray/50' : 'text-brand-dark'}`}>
-                            {row.value}
-                          </span>
+                          {choisi && <span className={styles.produitCoche} aria-hidden="true">✓</span>}
                         </div>
-                      </div>
+                        <div className={styles.produitCorps}>
+                          <span className={styles.produitNom}>{p.nom}</span>
+                          {p.description && <span className={styles.produitDesc}>{p.description}</span>}
+                          {typeof p.prix === 'number' ? (
+                            <span className={styles.produitPrix}>
+                              {t('produit.des')} {formaterDA(p.prix, langue)}
+                            </span>
+                          ) : (
+                            <span className={styles.produitDevis}>{t('produit.devis')}</span>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* ═══ ÉTAPE 2 — Options ═══ */}
+            {etape === 2 && produit && (
+              <section>
+                <p className={styles.etiquette}>{t('etape.numero')} 2 / 4</p>
+                <h1 className={styles.titre}>{t('options.titre')}</h1>
+                <p className={styles.sous}>{t('options.sous')}</p>
+
+                {logoImporteDuDesigner && (
+                  <div className={styles.importOk} role="status">
+                    <span aria-hidden="true">✓</span>
+                    <span>
+                      <strong>{produit.nom}</strong> · {etat.couleur} — {t('logo.importe')}
+                    </span>
+                  </div>
+                )}
+
+                {/* Technique */}
+                <div className={styles.bloc}>
+                  <p className={styles.blocTitre}>{t('options.technique')}</p>
+                  <div className={styles.choix}>
+                    {TECHNIQUES.map(tech => (
+                      <button
+                        key={tech}
+                        type="button"
+                        onClick={() => setEtat(prev => ({ ...prev, technique: tech }))}
+                        className={`${styles.choixBtn} ${etat.technique === tech ? styles.choixActif : ''}`}
+                        aria-pressed={etat.technique === tech}
+                      >
+                        {tech}
+                      </button>
                     ))}
                   </div>
+                  {etat.technique === 'DTF' && (
+                    <p className={styles.aide}>
+                      Impression haute définition, couleurs et dégradés, sur coton comme sur mélange.
+                    </p>
+                  )}
+                  {etat.technique === 'Broderie' && (
+                    <p className={styles.aide}>
+                      Fil cousu dans le textile : relief et tenue au lavage. Idéale pour les logos
+                      sur polos, casquettes et vêtements de travail.
+                    </p>
+                  )}
+                </div>
 
-                  {/* Prix */}
-                  {order.produit && (
-                    <div className="mt-4 pt-4 border-t border-black/[0.08]">
-                      {remise > 0 && (
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-[12px] text-green-700">Remise volume</span>
-                          <span className="text-[12px] font-semibold text-green-700">−{Math.round(remise * 100)}%</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[12px] text-brand-gray">Prix unitaire</span>
-                        <span className="text-[14px] font-semibold text-brand-dark">{unit.toLocaleString('fr-FR')} DA</span>
-                      </div>
-                      <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-black/[0.06]">
-                        <span className="text-[13px] font-semibold text-brand-dark">Total estimé</span>
-                        <span className="text-[22px] font-bold tracking-tight text-brand-dark">{total.toLocaleString('fr-FR')} DA</span>
-                      </div>
+                {/* Position */}
+                <div className={styles.bloc}>
+                  <p className={styles.blocTitre}>Emplacement du visuel</p>
+                  <div className={styles.choix}>
+                    {POSITIONS.map(pos => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => setEtat(prev => ({ ...prev, position: pos }))}
+                        className={`${styles.choixBtn} ${etat.position === pos ? styles.choixActif : ''}`}
+                        aria-pressed={etat.position === pos}
+                      >
+                        {pos}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Couleur — uniquement les coloris où la pièce existe */}
+                <div className={styles.bloc}>
+                  <p className={styles.blocTitre}>
+                    {t('options.couleur')} — <em>{etat.couleur || '—'}</em>
+                  </p>
+                  {couleurs.length <= 1 ? (
+                    <p className={styles.couleurUnique}>{t('options.couleurUnique')}</p>
+                  ) : (
+                    <div className={styles.pastilles}>
+                      {couleurs.map(c => (
+                        <button
+                          key={`${c.nom}-${c.hex}`}
+                          type="button"
+                          title={c.nom}
+                          aria-label={c.nom}
+                          aria-pressed={normaliser(etat.couleur) === normaliser(c.nom)}
+                          onClick={() => setEtat(prev => ({ ...prev, couleur: c.nom, couleurHex: c.hex }))}
+                          className={`${styles.pastille} ${normaliser(etat.couleur) === normaliser(c.nom) ? styles.pastilleActive : ''}`}
+                          style={{ background: c.hex }}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
 
-                {/* Garanties */}
-                <div className="rounded-2xl border border-black/[0.07] p-4 space-y-3">
-                  {[
-                    { icon: '🚚', title: 'Livraison nationale', sub: '3–5 jours ouvrés' },
-                    { icon: '💳', title: 'Paiement à la livraison', sub: 'BaridiMob · CCP' },
-                    { icon: '🎨', title: 'Vectorisation offerte', sub: 'Pour toute commande' },
-                  ].map(g => (
-                    <div key={g.title} className="flex items-center gap-3">
-                      <span className="text-[18px]">{g.icon}</span>
-                      <div>
-                        <p className="text-[12px] font-semibold text-brand-dark leading-tight">{g.title}</p>
-                        <p className="text-[11px] text-brand-gray">{g.sub}</p>
+                {/* Tailles et quantités */}
+                <div className={styles.bloc}>
+                  <p className={styles.blocTitre}>
+                    {aDesTailles ? t('options.tailles') : t('options.sansTaille')}
+                  </p>
+                  {aDesTailles && <p className={styles.aide} style={{ marginTop: 0, marginBottom: 12 }}>{t('options.taillesAide')}</p>}
+
+                  <div className={styles.tailles}>
+                    {(aDesTailles ? tailles.filter(estTailleVestimentaire) : [SANS_TAILLE]).map(taille => {
+                      const valeur = etat.quantites[taille] ?? 0
+                      return (
+                        <div
+                          key={taille}
+                          className={`${styles.ligneTaille} ${valeur > 0 ? styles.ligneTailleActive : ''}`}
+                        >
+                          <span className={styles.ligneTailleNom}>
+                            {taille === SANS_TAILLE ? 'Pièces' : taille}
+                          </span>
+                          <div className={styles.compteur}>
+                            <button
+                              type="button"
+                              className={styles.compteurBtn}
+                              onClick={() => definirQuantite(taille, valeur - 1)}
+                              disabled={valeur <= 0}
+                              aria-label={`Retirer une pièce en ${taille === SANS_TAILLE ? 'taille unique' : taille}`}
+                            >−</button>
+                            <input
+                              type="number"
+                              min={0}
+                              max={9999}
+                              inputMode="numeric"
+                              className={styles.compteurChamp}
+                              value={valeur}
+                              onChange={e => definirQuantite(taille, parseInt(e.target.value, 10))}
+                              aria-label={`Quantité en ${taille === SANS_TAILLE ? 'taille unique' : taille}`}
+                            />
+                            <button
+                              type="button"
+                              className={styles.compteurBtn}
+                              onClick={() => definirQuantite(taille, valeur + 1)}
+                              aria-label={`Ajouter une pièce en ${taille === SANS_TAILLE ? 'taille unique' : taille}`}
+                            >+</button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <p className={styles.totalPieces}>
+                    <span>{t('options.total')}</span>
+                    <span className={styles.totalPiecesValeur} aria-live="polite">{quantiteTotale}</span>
+                  </p>
+                  {manqueSurEtape('quantite') && (
+                    <p className={styles.erreur} role="alert">{t('manquants.quantite')}</p>
+                  )}
+
+                  {aDesTailles && <GuideTailles tailles={tailles} produit={produit} />}
+
+                  {/* Paliers de remise — seulement si la pièce a un tarif connu */}
+                  {typeof produit.prix === 'number' && (
+                    <>
+                      <p className={styles.blocTitre} style={{ marginTop: 22 }}>{t('options.paliers')}</p>
+                      <div className={styles.paliers}>
+                        {[...PALIERS_REMISE].reverse().map(palier => {
+                          const actif =
+                            quantiteTotale >= palier.min &&
+                            !PALIERS_REMISE.some(p => p.min > palier.min && quantiteTotale >= p.min)
+                          return (
+                            <span key={palier.min} className={`${styles.palier} ${actif ? styles.palierActif : ''}`}>
+                              <span className={styles.palierNom}>{palier.label}</span> · {palier.info}
+                            </span>
+                          )
+                        })}
                       </div>
+                    </>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* Garde-fou : impossible d'être à l'étape 2+ sans produit. */}
+            {etape > 1 && !produit && (
+              <section>
+                <div className={styles.alerte} role="alert">
+                  <p className={styles.alerteTitre}>{t('introuvable.titre')}</p>
+                  <p className={styles.alerteTexte}>{t('introuvable.texte')}</p>
+                </div>
+                <button type="button" className="c-btn c-btn-primary" onClick={() => allerA(1)}>
+                  {t('manquants.produit')}
+                </button>
+              </section>
+            )}
+
+            {/* ═══ ÉTAPE 3 — Logo ═══ */}
+            {etape === 3 && produit && (
+              <section>
+                <p className={styles.etiquette}>{t('etape.numero')} 3 / 4</p>
+                <h1 className={styles.titre}>{t('logo.titre')}</h1>
+                <p className={styles.sous}>{t('logo.sous')}</p>
+
+                {!etat.logoNom ? (
+                  <div
+                    className={styles.depot}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => champFichier.current?.click()}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        champFichier.current?.click()
+                      }
+                    }}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => {
+                      e.preventDefault()
+                      const f = e.dataTransfer.files[0]
+                      if (f) recevoirFichier(f)
+                    }}
+                  >
+                    <p className={styles.depotTitre}>{t('logo.depot')}</p>
+                    <p className={styles.depotSous}>{t('logo.parcourir')}</p>
+                    <span className={styles.depotFormats}>AI · EPS · SVG · PDF · PNG · JPG</span>
+                  </div>
+                ) : (
+                  <div className={styles.fichier}>
+                    {etat.logoApercu && (
+                      <img src={etat.logoApercu} alt="" className={styles.fichierVignette} />
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p className={styles.fichierNom}>{etat.logoNom}</p>
+                      <p className={styles.fichierMeta}>{Math.max(1, Math.round(etat.logoTaille / 1024))} Ko</p>
+                      {envoiLogo && <p className={styles.fichierMeta}>{t('logo.envoi')}</p>}
+                      {/* La mention n'apparaît qu'après un envoi réellement abouti. */}
+                      {!envoiLogo && etat.logoUrlEnvoyee && <p className={styles.fichierPret}>{t('logo.pret')}</p>}
+                      {!envoiLogo && erreurLogo && <p className={styles.erreur} role="alert">{erreurLogo}</p>}
                     </div>
-                  ))}
+                    <button
+                      type="button"
+                      className={styles.fichierRetirer}
+                      onClick={() => {
+                        setEtat(prev => ({
+                          ...prev,
+                          logoNom: null,
+                          logoTaille: 0,
+                          logoApercu: null,
+                          logoUrlEnvoyee: null,
+                        }))
+                        setErreurLogo(null)
+                        setLogoImporteDuDesigner(false)
+                      }}
+                    >
+                      {t('logo.retirer')}
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  ref={champFichier}
+                  type="file"
+                  hidden
+                  accept=".ai,.eps,.svg,.pdf,.png,.jpg,.jpeg"
+                  onChange={e => {
+                    const f = e.target.files?.[0]
+                    if (f) recevoirFichier(f)
+                  }}
+                />
+
+                <p className={styles.aide}>
+                  Pas de fichier vectoriel ? Envoyez ce que vous avez — photo ou croquis. La
+                  vectorisation est réalisée par l’atelier avant production.
+                </p>
+              </section>
+            )}
+
+            {/* ═══ ÉTAPE 4 — Coordonnées ═══ */}
+            {etape === 4 && produit && (
+              <section>
+                <p className={styles.etiquette}>{t('etape.numero')} 4 / 4</p>
+                <h1 className={styles.titre}>{t('contact.titre')}</h1>
+                <p className={styles.sous}>{t('contact.sous')}</p>
+
+                <div className={styles.champs}>
+                  <Champ
+                    id="nom"
+                    label={t('contact.nom')}
+                    requis
+                    valeur={etat.nom}
+                    onChange={v => setEtat(p => ({ ...p, nom: v }))}
+                    erreur={manqueSurEtape('nom') ? t('manquants.nom') : null}
+                    autoComplete="name"
+                    t={t}
+                  />
+                  <Champ
+                    id="entreprise"
+                    label={t('contact.entreprise')}
+                    valeur={etat.entreprise}
+                    onChange={v => setEtat(p => ({ ...p, entreprise: v }))}
+                    autoComplete="organization"
+                    t={t}
+                  />
+                  <Champ
+                    id="telephone"
+                    label={t('contact.telephone')}
+                    requis
+                    type="tel"
+                    placeholder="+213 6XX XXX XXX"
+                    valeur={etat.telephone}
+                    onChange={v => setEtat(p => ({ ...p, telephone: v }))}
+                    erreur={manqueSurEtape('telephone') ? t('manquants.telephone') : null}
+                    autoComplete="tel"
+                    t={t}
+                  />
+                  <Champ
+                    id="email"
+                    label={t('contact.email')}
+                    type="email"
+                    placeholder="vous@exemple.com"
+                    valeur={etat.email}
+                    onChange={v => setEtat(p => ({ ...p, email: v }))}
+                    autoComplete="email"
+                    t={t}
+                  />
+
+                  <div className={styles.champ}>
+                    <label className={styles.label} htmlFor="wilaya">
+                      {t('contact.wilaya')} <span className={styles.labelOption}>({t('contact.obligatoire')})</span>
+                    </label>
+                    <select
+                      id="wilaya"
+                      className={`${styles.input} ${manqueSurEtape('wilaya') ? styles.inputErreur : ''}`}
+                      value={etat.wilaya}
+                      onChange={e => setEtat(p => ({ ...p, wilaya: e.target.value }))}
+                      aria-invalid={manqueSurEtape('wilaya')}
+                    >
+                      <option value="">—</option>
+                      {(wilayas as { code: number; name: string }[]).map(w => (
+                        <option key={w.code} value={w.name}>
+                          {String(w.code).padStart(2, '0')} · {w.name}
+                        </option>
+                      ))}
+                    </select>
+                    {manqueSurEtape('wilaya') && (
+                      <span className={styles.erreur} role="alert">{t('manquants.wilaya')}</span>
+                    )}
+                  </div>
+
+                  <Champ
+                    id="commune"
+                    label={t('contact.commune')}
+                    valeur={etat.commune}
+                    onChange={v => setEtat(p => ({ ...p, commune: v }))}
+                    autoComplete="address-level2"
+                    t={t}
+                  />
+                  <div className={styles.champLarge}>
+                    <Champ
+                      id="adresse"
+                      label={t('contact.adresse')}
+                      valeur={etat.adresse}
+                      onChange={v => setEtat(p => ({ ...p, adresse: v }))}
+                      autoComplete="street-address"
+                      t={t}
+                    />
+                  </div>
+
+                  <div className={styles.champLarge}>
+                    <button
+                      type="button"
+                      className={`${styles.bascule} ${etat.urgent ? styles.basculeActive : ''}`}
+                      onClick={() => setEtat(p => ({ ...p, urgent: !p.urgent }))}
+                      aria-pressed={etat.urgent}
+                    >
+                      <span>
+                        <span className={styles.basculeTitre}>{t('contact.urgent')}</span>
+                        <span className={styles.basculeSous}>{t('contact.urgentSous')}</span>
+                      </span>
+                      <span className={styles.basculeVoyant} aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  <div className={`${styles.champ} ${styles.champLarge}`}>
+                    <label className={styles.label} htmlFor="notes">
+                      {t('contact.notes')} <span className={styles.labelOption}>({t('contact.facultatif')})</span>
+                    </label>
+                    <textarea
+                      id="notes"
+                      className={styles.zone}
+                      rows={3}
+                      value={etat.notes}
+                      placeholder="Précisions sur le visuel, les couleurs, le délai souhaité…"
+                      onChange={e => setEtat(p => ({ ...p, notes: e.target.value }))}
+                    />
+                  </div>
                 </div>
 
+                {afficherManquants && manquants.length > 0 && (
+                  <div className={styles.manquants} role="alert">
+                    <p className={styles.manquantsTitre}>{t('manquants.titre')}</p>
+                    <ul className={styles.manquantsListe}>
+                      {manquants.map(m => (
+                        <li key={m.cle}>
+                          <button type="button" onClick={() => allerA(m.etape)}>{m.libelle}</button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {erreurEnvoi && (
+                  <div className={styles.manquants} role="alert">
+                    <p className={styles.manquantsTitre}>{erreurEnvoi}</p>
+                    <a
+                      href={lienWhatsApp(construireMessage())}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="c-btn c-btn-ghost"
+                      style={{ marginTop: 12 }}
+                    >
+                      {t('erreur.whatsapp')}
+                    </a>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Navigation (écrans larges) */}
+            <div className={styles.nav}>
+              {etape > 1 && (
+                <button type="button" className="c-btn c-btn-ghost" onClick={() => allerA((etape - 1) as Etape)}>
+                  {t('nav.retour')}
+                </button>
+              )}
+              {(etape > 1 || produit) && (
+                <button
+                  type="button"
+                  className="c-btn c-btn-accent"
+                  onClick={continuer}
+                  disabled={enregistrement}
+                >
+                  {etape === 3 && !etat.logoNom ? t('nav.passer') : texteBouton}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ── Colonne résumé ── */}
+          <aside className={styles.aside}>
+            {produit?.image && !imagesCassees.includes(produit.id) && (
+              <div className={styles.apercu}>
+                <img
+                  src={produit.image}
+                  alt={produit.nom}
+                  width={600}
+                  height={600}
+                  onError={() => marquerImageCassee(produit.id)}
+                />
               </div>
+            )}
+
+            <div className={styles.resume}>
+              <Recapitulatif
+                produit={produit}
+                etat={etat}
+                tarif={tarif}
+                quantiteTotale={quantiteTotale}
+                taillesCommandees={taillesCommandees}
+                aDesTailles={aDesTailles}
+                t={t}
+                langue={langue}
+              />
             </div>
 
-          </div>
+            <div className={styles.garanties}>
+              {[
+                { titre: 'Atelier à Alger', sous: 'DTF, broderie et sérigraphie sur place' },
+                { titre: 'Livraison 58 wilayas', sous: 'Frais et délai confirmés avec l’atelier' },
+                { titre: 'Maquette avant production', sous: 'Validation de votre visuel avant lancement' },
+              ].map(g => (
+                <div key={g.titre} className={styles.garantie}>
+                  <span aria-hidden="true">•</span>
+                  <span>
+                    <span className={styles.garantieTitre}>{g.titre}</span>
+                    <span className={styles.garantieSous} style={{ display: 'block' }}>{g.sous}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </aside>
         </div>
+        <InfosCommerciales produit={produit ?? undefined} compact />
       </main>
+
+      {/* ── Barre d'action mobile ──
+          Elle ne recouvre pas le formulaire : le corps de page réserve sa
+          hauteur, et le bouton reste à portée de pouce. */}
+      {(etape > 1 || produit) && (
+        <div className={styles.barreMobile}>
+          {etape > 1 && (
+            <button
+              type="button"
+              className="c-btn c-btn-ghost"
+              onClick={() => allerA((etape - 1) as Etape)}
+              aria-label={t('nav.retour')}
+            >
+              ←
+            </button>
+          )}
+          <div className={styles.barreMobileTotal}>
+            <span className={styles.barreMobileCle}>{t('resume.total')}</span>
+            <span className={styles.barreMobileVal}>
+              {tarif.chiffre ? formaterDA(tarif.total, langue) : t('produit.devis')}
+            </span>
+          </div>
+          <button
+            type="button"
+            className={`c-btn c-btn-accent ${styles.barreMobileBtn}`}
+            onClick={continuer}
+            disabled={enregistrement}
+          >
+            {etape === 3 && !etat.logoNom ? t('nav.passer') : texteBouton}
+          </button>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  )
+}
+
+/* ── Sous-composants ───────────────────────────────────────────────── */
+
+function Champ({
+  id, label, valeur, onChange, requis, type = 'text', placeholder, erreur, autoComplete, t,
+}: {
+  id: string
+  label: string
+  valeur: string
+  onChange: (v: string) => void
+  requis?: boolean
+  type?: string
+  placeholder?: string
+  erreur?: string | null
+  autoComplete?: string
+  t: (c: string) => string
+}) {
+  return (
+    <div className={styles.champ}>
+      <label className={styles.label} htmlFor={id}>
+        {label}{' '}
+        <span className={styles.labelOption}>
+          ({requis ? t('contact.obligatoire') : t('contact.facultatif')})
+        </span>
+      </label>
+      <input
+        id={id}
+        type={type}
+        className={`${styles.input} ${erreur ? styles.inputErreur : ''}`}
+        value={valeur}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        onChange={e => onChange(e.target.value)}
+        aria-invalid={!!erreur}
+        aria-describedby={erreur ? `${id}-err` : undefined}
+      />
+      {erreur && <span className={styles.erreur} id={`${id}-err`} role="alert">{erreur}</span>}
+    </div>
+  )
+}
+
+/**
+ * Guide des tailles.
+ * L'atelier ne nous a pas communiqué de tableau de mensurations : on n'en
+ * invente pas. Le guide dit ce qui est connu — les tailles réellement
+ * produites pour cette pièce et sa coupe — et renvoie vers l'atelier pour
+ * les mesures exactes.
+ */
+function GuideTailles({ tailles, produit }: { tailles: string[]; produit: CatalogueProduit }) {
+  const vestimentaires = tailles.filter(estTailleVestimentaire)
+  const coupe = /oversized/i.test(produit.nom)
+    ? 'Coupe oversized — prévoir une taille en dessous pour un porté ajusté.'
+    : /regular/i.test(produit.nom)
+      ? 'Coupe regular — taille normale.'
+      : null
+
+  return (
+    <details className={styles.guide}>
+      <summary className={styles.guideResume}>Guide des tailles</summary>
+      <div className={styles.guideCorps}>
+        <table className={styles.guideTable}>
+          <thead>
+            <tr>
+              <th scope="col">Taille</th>
+              <th scope="col">Disponible sur cette pièce</th>
+            </tr>
+          </thead>
+          <tbody>
+            {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(taille => (
+              <tr key={taille}>
+                <th scope="row">{taille}</th>
+                <td>{vestimentaires.includes(taille) ? 'Oui' : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {coupe && <p className={styles.guideNote}>{coupe}</p>}
+        {produit.matiere && <p className={styles.guideNote}>Matière : {produit.matiere}.</p>}
+        {produit.grammage && <p className={styles.guideNote}>Grammage : {produit.grammage}.</p>}
+        <p className={styles.guideNote}>
+          Les mensurations détaillées (largeur de poitrine, longueur) ne sont pas encore
+          publiées. Demandez-les à l’atelier sur{' '}
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">WhatsApp</a> avant de
+          commander en série.
+        </p>
+      </div>
+    </details>
+  )
+}
+
+function Recapitulatif({
+  produit, etat, tarif, quantiteTotale, taillesCommandees, aDesTailles, t, langue, sansTitre,
+}: {
+  produit: CatalogueProduit | null
+  etat: Etat
+  tarif: ReturnType<typeof calculerTarif>
+  quantiteTotale: number
+  taillesCommandees: { taille: string; quantite: number }[]
+  aDesTailles: boolean
+  t: (c: string) => string
+  langue: 'fr' | 'ar'
+  sansTitre?: boolean
+}) {
+  const lignes: { cle: string; valeur: string; vide?: boolean; couleur?: string }[] = [
+    { cle: t('resume.produit'), valeur: produit?.nom ?? t('resume.vide'), vide: !produit },
+    { cle: t('resume.technique'), valeur: etat.technique },
+    { cle: t('resume.couleur'), valeur: etat.couleur || t('resume.vide'), vide: !etat.couleur, couleur: etat.couleurHex },
+  ]
+  if (aDesTailles) {
+    lignes.push({
+      cle: t('resume.tailles'),
+      valeur: taillesCommandees.length
+        ? taillesCommandees.map(l => `${l.taille} × ${l.quantite}`).join(', ')
+        : t('resume.vide'),
+      vide: taillesCommandees.length === 0,
+    })
+  }
+  lignes.push({ cle: t('resume.quantite'), valeur: String(quantiteTotale), vide: quantiteTotale === 0 })
+  lignes.push({
+    cle: t('resume.logo'),
+    valeur: etat.logoNom ?? t('resume.aucunLogo'),
+    vide: !etat.logoNom,
+  })
+
+  return (
+    <>
+      {!sansTitre && <p className={styles.resumeTitre}>{t('resume.titre')}</p>}
+      {lignes.map(l => (
+        <div key={l.cle} className={styles.resumeLigne}>
+          <span className={styles.resumeCle}>{l.cle}</span>
+          <span className={`${styles.resumeVal} ${l.vide ? styles.resumeVide : ''}`}>
+            {l.couleur && !l.vide && (
+              <span className={styles.resumePastille} style={{ background: l.couleur }} aria-hidden="true" />
+            )}
+            {l.valeur}
+          </span>
+        </div>
+      ))}
+
+      <div className={styles.resumeTotaux}>
+        {tarif.chiffre ? (
+          <>
+            <div className={styles.resumeLigne}>
+              <span className={styles.resumeCle}>{t('resume.sousTotal')}</span>
+              <span className={styles.resumeVal}>{formaterDA(tarif.total, langue)}</span>
+            </div>
+            {tarif.remise > 0 && (
+              <div className={styles.resumeLigne}>
+                <span className={styles.resumeCle}>{t('resume.remise')}</span>
+                <span className={`${styles.resumeVal} ${styles.resumeRemise}`}>
+                  −{Math.round(tarif.remise * 100)} %
+                </span>
+              </div>
+            )}
+            {/* Les frais de livraison ne sont pas connus à ce stade : on le dit,
+                on n'invente pas de tarif et on ne l'additionne pas. */}
+            <div className={styles.resumeLigne}>
+              <span className={styles.resumeCle}>{t('resume.livraison')}</span>
+              <span className={`${styles.resumeVal} ${styles.resumeVide}`}>
+                {t('resume.livraisonAConfirmer')}
+              </span>
+            </div>
+            <div className={styles.resumeTotal}>
+              <span className={styles.resumeTotalCle}>{t('resume.sousTotal')}</span>
+              <span className={styles.resumeTotalVal}>{formaterDA(tarif.total, langue)}</span>
+            </div>
+          </>
+        ) : (
+          <p className={styles.resumeDevis}>{t('resume.devis')}</p>
+        )}
+      </div>
     </>
   )
 }

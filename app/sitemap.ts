@@ -22,6 +22,7 @@ const routes: { path: string; priority: number; changeFrequency: MetadataRoute.S
   { path: '/devis-express', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/produits', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/collection', priority: 0.7, changeFrequency: 'weekly' },
+  { path: '/revente', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/comment-ca-marche', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/designer', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/studio-3d', priority: 0.6, changeFrequency: 'monthly' },

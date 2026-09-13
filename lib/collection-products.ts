@@ -158,3 +158,31 @@ export const themes = [
   { key: "graphicart", label: "Graphic & Art" },
   { key: "limitededition", label: "Limited Edition" }
 ];
+
+/* ────────────────────────────────────────────────────────────────────
+   Informations de commande communes aux pièces de la collection.
+
+   Les pièces de la collection sont des t-shirts imprimés. On ne consigne
+   ici que ce qui est vérifié :
+
+   – les tailles sont celles des t-shirts du catalogue (lib/catalogue.ts) ;
+   – le coloris n'est pas documenté pièce par pièce : la fiche renvoie donc
+     à la photo, et propose de demander un autre fond à l'atelier plutôt que
+     d'afficher un nuancier qui laisserait croire que tout est disponible ;
+   – les frais de livraison ne nous ont pas été communiqués : ils sont
+     annoncés « à confirmer », jamais estimés.
+   ──────────────────────────────────────────────────────────────────── */
+
+/** Tailles proposées sur les t-shirts imprimés de la collection. */
+export const TAILLES_COLLECTION = ['S', 'M', 'L', 'XL', 'XXL'] as const
+
+/**
+ * Coloris : non documenté pièce par pièce. La commande part sur le coloris
+ * photographié ; toute autre demande passe par l'atelier.
+ */
+export const NOTE_COLORIS_COLLECTION =
+  'Chaque pièce est imprimée sur le coloris présenté en photo. Pour un autre fond, indiquez-le dans votre message : l’atelier confirme la faisabilité avant production.'
+
+/** Ce que couvre — et ne couvre pas — le prix affiché. */
+export const NOTE_PRIX_COLLECTION =
+  'Prix par pièce, impression comprise. Les frais de livraison sont ajoutés après confirmation de votre wilaya.'

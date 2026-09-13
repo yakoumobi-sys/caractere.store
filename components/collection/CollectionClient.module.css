@@ -96,7 +96,7 @@
 .inputErreur { border-color: #FF8A8A; }
 .erreur { display: block; margin-top: 6px; color: #FF9A9A; font-size: .8125rem; }
 
-.quantite { display: flex; align-items: center; gap: 12px; }
+.quantite { display: flex; align-items: center; gap: 3px; }
 .qteBtn {
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
   background: var(--c-bg); color: var(--c-text);
@@ -107,7 +107,7 @@
 .qteBtn:disabled { opacity: .4; cursor: not-allowed; }
 .qteValeur { min-width: 44px; text-align: center; font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-.total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 22px; padding: 16px 18px; background: var(--c-bg); border-radius: var(--c-radius-sm); }
+.total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 16px 18px; background: var(--c-bg); border-radius: var(--c-radius-sm); }
 .totalLabel { color: var(--c-text-dim); font-size: .875rem; }
 .totalValeur { font-size: 1.375rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 
@@ -123,3 +123,49 @@
   .nom { font-size: .875rem; }
 }
 @media (max-width: 360px) { .grille { grid-template-columns: 1fr; } }
+
+/* ── Modale de commande : tailles, quantités et montants ──────────── */
+
+.mention { font-size: .75rem; color: var(--c-text-dim); line-height: 1.6; margin-top: 8px; }
+.facultatif { font-weight: 400; color: var(--c-text-dim); }
+
+.tailles { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 8px; }
+.ligneTaille {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--c-surface-2); border: 1px solid var(--c-line-strong);
+  border-radius: var(--c-radius-sm); padding: 6px 6px 6px 13px;
+}
+.ligneTailleActive { border-color: var(--c-accent); }
+.ligneTailleNom { font-size: .9375rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.qteChamp {
+  width: 48px; height: 34px; text-align: center;
+  background: var(--c-bg); color: var(--c-text);
+  border: 1px solid var(--c-line-strong); border-radius: 8px;
+  font: inherit; font-size: .875rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.qteChamp::-webkit-outer-spin-button,
+.qteChamp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.guide { margin-top: 12px; border: 1px solid var(--c-line); border-radius: var(--c-radius-sm); }
+.guideResume {
+  cursor: pointer; padding: 11px 14px; font-size: .8125rem; font-weight: 600;
+  list-style: none; min-height: 44px; display: flex; align-items: center;
+}
+.guideResume::-webkit-details-marker { display: none; }
+.guideResume::before { content: '▸'; margin-inline-end: 8px; color: var(--c-accent); }
+.guide[open] .guideResume::before { content: '▾'; }
+.guideCorps { padding: 0 14px 14px; font-size: .8125rem; color: var(--c-text-dim); line-height: 1.65; }
+.guideCorps a { color: var(--c-accent); }
+
+.montants {
+  margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--c-line-strong);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.montantLigne {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  padding-block: 6px; font-size: .875rem; color: var(--c-text-dim);
+}
+.montantLigne span:last-child { color: var(--c-text); font-weight: 600; text-align: end; }
+.aConfirmer { color: var(--c-text-dim) !important; font-weight: 500 !important; }

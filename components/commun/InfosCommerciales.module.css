@@ -1,0 +1,48 @@
+/* Bloc d'informations commerciales — identique sur les quatre pages
+   du parcours, pour qu'aucune ne raconte autre chose que les autres. */
+
+.bloc {
+  border-top: 1px solid var(--c-line-strong);
+  padding-block: 42px 10px;
+}
+.compact { padding-block: 30px 6px; }
+
+.titre {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin-bottom: 22px;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 26px 28px;
+}
+
+.rubrique { min-width: 0; }
+
+.rubriqueTitre {
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  margin-bottom: 10px;
+}
+
+.liste {
+  margin: 0;
+  padding-inline-start: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: .8125rem;
+  line-height: 1.6;
+  color: var(--c-text-dim);
+}
+.liste li::marker { color: var(--c-accent); }
+
+.lien { color: var(--c-accent); }
+.lien:hover { text-decoration: underline; }

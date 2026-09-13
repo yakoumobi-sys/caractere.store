@@ -1,0 +1,367 @@
+/* Configurateur — mêmes tokens que le catalogue et la collection.
+   La page était auparavant en Tailwind clair alors que le reste du site est
+   passé au noir/violet : elle rejoint ici la direction visuelle commune. */
+
+.page { background: var(--c-bg); color: var(--c-text); min-height: 100vh; }
+
+.skip {
+  position: fixed; top: 10px; left: 12px; z-index: 100;
+  background: var(--c-accent); color: #120A22;
+  padding: 12px 18px; border-radius: 8px; font-weight: 600; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip:focus { transform: none; }
+
+/* ── Bandeau de contexte (variante entreprises) ── */
+.bandeau { border-bottom: 1px solid var(--c-line); background: var(--c-surface); }
+.bandeauGrille { display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end; padding-block: 26px; }
+.bandeauTitre { font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 700; letter-spacing: -.01em; line-height: 1.2; }
+.bandeauTexte { color: var(--c-text-dim); font-size: .9375rem; line-height: 1.6; max-width: 52ch; margin-top: 6px; }
+.puces { display: flex; flex-wrap: wrap; gap: 8px; }
+.puce {
+  font-size: .75rem; font-weight: 500; color: var(--c-text-dim);
+  border: 1px solid var(--c-line-strong); border-radius: 999px; padding: 7px 13px;
+}
+
+/* ── Frise d'étapes ── */
+.frise {
+  position: sticky; top: 68px; z-index: 20;
+  background: rgba(11, 11, 13, .94);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--c-line);
+}
+.friseGrille { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.frisePiste { display: flex; align-items: center; gap: 4px; overflow-x: auto; min-width: 0; scrollbar-width: none; }
+.frisePiste::-webkit-scrollbar { display: none; }
+.etapeBloc { display: flex; align-items: center; flex-shrink: 0; }
+.etapeTrait { width: 26px; height: 1px; margin-inline: 6px; background: var(--c-line-strong); }
+.etapeTraitFait { background: var(--c-accent); }
+.etape {
+  display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+  min-height: 44px; padding: 6px 12px 6px 6px;
+  background: transparent; border: 0; border-radius: 999px;
+  font: inherit; color: var(--c-text-dim); cursor: pointer;
+}
+.etape:disabled { cursor: default; }
+.etapeNum {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700;
+  background: var(--c-surface-2); color: var(--c-text-dim);
+  border: 1px solid var(--c-line-strong);
+}
+.etapeFaite .etapeNum { background: var(--c-accent); color: #120A22; border-color: var(--c-accent); }
+.etapeActive .etapeNum { background: var(--c-text); color: var(--c-bg); border-color: var(--c-text); }
+.etapeActive { color: var(--c-text); }
+.etapeFaite { color: var(--c-text); }
+.etapeLabel { font-size: .8125rem; font-weight: 500; white-space: nowrap; }
+@media (max-width: 640px) { .etapeLabel { display: none; } }
+
+.friseTotal { text-align: right; flex-shrink: 0; }
+.friseTotalLabel { display: block; font-size: .6875rem; color: var(--c-text-dim); line-height: 1.2; }
+.friseTotalValeur { display: block; font-size: 1rem; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; }
+
+/* ── Corps ── */
+.corps { padding-block: 34px 120px; }
+.grille { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; align-items: start; }
+
+.etiquette { font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-dim); }
+.titre {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.25rem); font-weight: 700; line-height: 1.1;
+  letter-spacing: -.01em; margin-block: 10px 8px;
+}
+.sous { color: var(--c-text-dim); font-size: .9375rem; line-height: 1.6; max-width: 56ch; margin-bottom: 30px; }
+
+.bloc { margin-bottom: 34px; }
+.blocTitre { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-dim); margin-bottom: 12px; }
+.blocTitre em { font-style: normal; text-transform: none; letter-spacing: 0; color: var(--c-text); font-weight: 600; }
+.aide { color: var(--c-text-dim); font-size: .8125rem; line-height: 1.6; margin-top: 10px; }
+
+/* ── Grille produits (étape 1) ── */
+.produits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.produitCarte {
+  display: flex; flex-direction: column; text-align: start; min-width: 0;
+  background: var(--c-surface); color: inherit;
+  border: 1px solid var(--c-line-strong); border-radius: var(--c-radius);
+  overflow: hidden; cursor: pointer; font: inherit;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.produitCarte:hover { border-color: var(--c-text); }
+.produitCarteActive { border-color: var(--c-accent); box-shadow: 0 0 0 1px var(--c-accent); }
+.produitMedia { position: relative; aspect-ratio: 1; background: var(--c-surface-2); overflow: hidden; }
+.produitMedia img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.produitMediaVide {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: 14px; text-align: center; font-size: .75rem; color: var(--c-text-dim);
+}
+.produitCoche {
+  position: absolute; top: 10px; inset-inline-end: 10px; width: 24px; height: 24px; border-radius: 999px;
+  background: var(--c-accent); color: #120A22;
+  display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700;
+}
+.produitCorps { padding: 13px 14px 15px; display: flex; flex-direction: column; gap: 4px; }
+.produitNom { font-size: .875rem; font-weight: 600; line-height: 1.3; }
+.produitDesc { font-size: .75rem; color: var(--c-text-dim); line-height: 1.45; }
+.produitPrix { font-size: .8125rem; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.produitDevis { font-size: .8125rem; font-weight: 600; margin-top: 4px; color: var(--c-text-dim); }
+
+/* ── Alerte produit introuvable ── */
+.alerte {
+  border: 1px solid rgba(255, 176, 92, .4); background: rgba(255, 176, 92, .08);
+  border-radius: var(--c-radius); padding: 18px 20px; margin-bottom: 28px;
+}
+.alerteTitre { font-size: .9375rem; font-weight: 700; margin-bottom: 6px; }
+.alerteTexte { font-size: .875rem; color: var(--c-text-dim); line-height: 1.6; }
+
+/* ── Confirmation d'import Designer ── */
+.importOk {
+  display: flex; gap: 12px; align-items: flex-start;
+  border: 1px solid rgba(120, 220, 150, .35); background: rgba(120, 220, 150, .08);
+  border-radius: var(--c-radius); padding: 14px 16px; margin-bottom: 26px;
+  font-size: .875rem; line-height: 1.55;
+}
+
+/* ── Choix (techniques, positions) ── */
+.choix { display: flex; flex-wrap: wrap; gap: 10px; }
+.choixBtn {
+  min-height: 44px; padding: 11px 18px;
+  background: transparent; color: var(--c-text-dim);
+  border: 1px solid var(--c-line-strong); border-radius: 999px;
+  font: inherit; font-size: .875rem; font-weight: 500; cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.choixBtn:hover { color: var(--c-text); border-color: var(--c-text); }
+.choixActif { background: var(--c-text); color: var(--c-bg); border-color: var(--c-text); font-weight: 600; }
+
+/* ── Couleurs ── */
+.pastilles { display: flex; flex-wrap: wrap; gap: 10px; }
+.pastille {
+  width: 44px; height: 44px; border-radius: 999px; cursor: pointer; padding: 0;
+  border: 2px solid transparent; box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  transition: transform .18s ease, border-color .18s ease;
+}
+.pastille:hover { transform: scale(1.06); }
+.pastilleActive { border-color: var(--c-accent); transform: scale(1.06); }
+.couleurUnique { color: var(--c-text-dim); font-size: .875rem; line-height: 1.6; }
+
+/* ── Tailles et quantités ── */
+.tailles { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+.ligneTaille {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--c-surface); border: 1px solid var(--c-line-strong);
+  border-radius: var(--c-radius-sm); padding: 8px 8px 8px 14px;
+}
+.ligneTailleActive { border-color: var(--c-accent); }
+.ligneTailleNom { font-size: .9375rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.compteur { display: flex; align-items: center; gap: 2px; }
+.compteurBtn {
+  width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px;
+  background: var(--c-surface-2); color: var(--c-text);
+  border: 1px solid var(--c-line-strong); font: inherit; font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.compteurBtn:hover:not(:disabled) { border-color: var(--c-text); }
+.compteurBtn:disabled { opacity: .35; cursor: default; }
+.compteurChamp {
+  width: 52px; height: 36px; text-align: center;
+  background: var(--c-bg); color: var(--c-text);
+  border: 1px solid var(--c-line-strong); border-radius: 8px;
+  font: inherit; font-size: .9375rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.compteurChamp::-webkit-outer-spin-button,
+.compteurChamp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.totalPieces {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--c-line);
+  font-size: .9375rem;
+}
+.totalPiecesValeur { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ── Guide des tailles ── */
+.guide { margin-top: 16px; border: 1px solid var(--c-line-strong); border-radius: var(--c-radius-sm); background: var(--c-surface); }
+.guideResume {
+  cursor: pointer; padding: 13px 16px; font-size: .875rem; font-weight: 600;
+  list-style: none; min-height: 44px; display: flex; align-items: center;
+}
+.guideResume::-webkit-details-marker { display: none; }
+.guideResume::before { content: '▸'; margin-inline-end: 8px; color: var(--c-accent); }
+.guide[open] .guideResume::before { content: '▾'; }
+.guideCorps { padding: 0 16px 16px; overflow-x: auto; }
+.guideTable { width: 100%; border-collapse: collapse; font-size: .8125rem; min-width: 340px; }
+.guideTable th, .guideTable td { padding: 9px 10px; text-align: start; border-bottom: 1px solid var(--c-line); font-variant-numeric: tabular-nums; }
+.guideTable th { color: var(--c-text-dim); font-weight: 600; white-space: nowrap; }
+.guideNote { font-size: .75rem; color: var(--c-text-dim); line-height: 1.6; margin-top: 10px; }
+
+/* ── Paliers de remise ── */
+.paliers { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.palier {
+  border: 1px solid var(--c-line-strong); border-radius: var(--c-radius-sm);
+  padding: 9px 13px; font-size: .75rem; color: var(--c-text-dim);
+}
+.palierActif { border-color: var(--c-accent); color: var(--c-text); background: rgba(157, 108, 255, .1); }
+.palierNom { font-weight: 600; }
+
+/* ── Dépôt de logo ── */
+.depot {
+  border: 1px dashed var(--c-line-strong); border-radius: var(--c-radius);
+  padding: 46px 24px; text-align: center; cursor: pointer; background: var(--c-surface);
+  transition: border-color .2s ease;
+}
+.depot:hover { border-color: var(--c-accent); }
+.depotTitre { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+.depotSous { color: var(--c-text-dim); font-size: .875rem; }
+.depotFormats { display: inline-block; margin-top: 14px; font-size: .6875rem; color: var(--c-text-dim); border: 1px solid var(--c-line); border-radius: 999px; padding: 6px 12px; }
+.fichier {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--c-surface); border: 1px solid var(--c-line-strong);
+  border-radius: var(--c-radius); padding: 14px 16px;
+}
+.fichierVignette { width: 56px; height: 56px; flex-shrink: 0; object-fit: contain; background: var(--c-surface-2); border-radius: 8px; }
+.fichierNom { font-size: .875rem; font-weight: 600; word-break: break-all; }
+.fichierMeta { font-size: .75rem; color: var(--c-text-dim); margin-top: 2px; }
+.fichierPret { font-size: .75rem; color: #7EDCA0; margin-top: 2px; font-weight: 600; }
+.fichierRetirer { background: none; border: 0; color: #FF8A8A; font: inherit; font-size: .8125rem; cursor: pointer; text-decoration: underline; min-height: 44px; padding-inline: 6px; }
+
+/* ── Champs ── */
+.champs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 560px; }
+.champLarge { grid-column: 1 / -1; }
+.champ { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.label { font-size: .8125rem; font-weight: 600; }
+.labelOption { font-weight: 400; color: var(--c-text-dim); }
+.input, .zone {
+  width: 100%; min-height: 48px; padding: 12px 14px;
+  background: var(--c-surface); color: var(--c-text);
+  border: 1px solid var(--c-line-strong); border-radius: var(--c-radius-sm);
+  font: inherit; font-size: .9375rem;
+}
+.zone { min-height: 96px; resize: vertical; line-height: 1.6; }
+.input::placeholder, .zone::placeholder { color: #6E6E78; }
+.inputErreur { border-color: #FF8A8A; }
+.erreur { font-size: .8125rem; color: #FF8A8A; }
+
+.bascule {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  background: var(--c-surface); border: 1px solid var(--c-line-strong);
+  border-radius: var(--c-radius); padding: 14px 16px; cursor: pointer; width: 100%;
+  font: inherit; color: inherit; text-align: start;
+}
+.basculeActive { border-color: var(--c-accent); background: rgba(157, 108, 255, .1); }
+.basculeTitre { font-size: .9375rem; font-weight: 600; }
+.basculeSous { font-size: .8125rem; color: var(--c-text-dim); margin-top: 2px; }
+.basculeVoyant { width: 46px; height: 26px; border-radius: 999px; background: var(--c-line-strong); position: relative; flex-shrink: 0; }
+.basculeActive .basculeVoyant { background: var(--c-accent); }
+.basculeVoyant::after {
+  content: ''; position: absolute; top: 3px; inset-inline-start: 3px;
+  width: 20px; height: 20px; border-radius: 999px; background: #fff; transition: inset-inline-start .18s ease;
+}
+.basculeActive .basculeVoyant::after { inset-inline-start: 23px; }
+
+/* ── Récapitulatif des champs manquants ── */
+.manquants {
+  border: 1px solid #FF8A8A; background: rgba(255, 138, 138, .08);
+  border-radius: var(--c-radius); padding: 16px 18px; margin-top: 24px;
+}
+.manquantsTitre { font-size: .9375rem; font-weight: 700; margin-bottom: 8px; }
+.manquantsListe { margin: 0; padding-inline-start: 20px; font-size: .875rem; line-height: 1.7; color: var(--c-text-dim); }
+.manquantsListe button {
+  background: none; border: 0; color: var(--c-accent); font: inherit; cursor: pointer;
+  text-decoration: underline; padding: 0;
+}
+
+/* ── Navigation entre étapes ── */
+.nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+
+/* ── Colonne résumé ── */
+.aside { position: sticky; top: 130px; display: flex; flex-direction: column; gap: 16px; }
+.apercu { border-radius: var(--c-radius); overflow: hidden; background: var(--c-surface); aspect-ratio: 1; }
+.apercu img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.resume { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--c-radius); padding: 18px; }
+.resumeTitre { font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-dim); margin-bottom: 14px; }
+.resumeLigne { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 9px; border-bottom: 1px solid var(--c-line); }
+.resumeLigne:last-of-type { border-bottom: 0; }
+.resumeCle { font-size: .8125rem; color: var(--c-text-dim); flex-shrink: 0; }
+.resumeVal { font-size: .8125rem; font-weight: 600; text-align: end; min-width: 0; overflow-wrap: anywhere; }
+.resumeVide { color: var(--c-text-dim); font-weight: 400; }
+.resumePastille { width: 14px; height: 14px; border-radius: 999px; display: inline-block; vertical-align: -2px; margin-inline-end: 6px; box-shadow: inset 0 0 0 1px var(--c-line-strong); }
+
+.resumeTotaux { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--c-line-strong); }
+.resumeTotal { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 8px; }
+.resumeTotalCle { font-size: .875rem; font-weight: 600; }
+.resumeTotalVal { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.resumeRemise { color: #7EDCA0; }
+.resumeDevis { font-size: .875rem; color: var(--c-text-dim); line-height: 1.6; }
+
+.garanties { border: 1px solid var(--c-line); border-radius: var(--c-radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 13px; }
+.garantie { display: flex; gap: 11px; align-items: flex-start; }
+.garantieTitre { font-size: .8125rem; font-weight: 600; line-height: 1.35; }
+.garantieSous { font-size: .75rem; color: var(--c-text-dim); margin-top: 1px; }
+
+/* ── Barre d'action mobile ──
+   L'action principale reste atteignable sans recouvrir le formulaire :
+   la barre est dans le flux sur grand écran, collée en bas sur mobile, et le
+   corps de page réserve la hauteur correspondante (padding-bottom de .corps). */
+.barreMobile { display: none; }
+
+/* ── Confirmation ── */
+.confirmation { max-width: 560px; margin-inline: auto; padding-block: 70px 90px; text-align: center; }
+.confirmationIcone {
+  width: 68px; height: 68px; border-radius: 999px; margin-inline: auto; margin-bottom: 22px;
+  background: rgba(120, 220, 150, .14); color: #7EDCA0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+}
+.confirmationTitre { font-family: var(--font-display), 'Inter', sans-serif; font-size: clamp(1.7rem, 5vw, 2.3rem); font-weight: 700; line-height: 1.15; }
+.confirmationTexte { color: var(--c-text-dim); font-size: .9375rem; line-height: 1.65; margin-top: 10px; }
+.reference { display: inline-block; margin-block: 26px; background: var(--c-surface); border: 1px solid var(--c-line-strong); border-radius: var(--c-radius); padding: 14px 26px; }
+.referenceCle { font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-dim); }
+.referenceVal { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.3rem; font-weight: 700; letter-spacing: .1em; margin-top: 5px; }
+.confirmationBloc { text-align: start; background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--c-radius); padding: 18px; margin-bottom: 18px; }
+.confirmationActions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 22px; }
+.lienSobre { background: none; border: 0; color: var(--c-text-dim); font: inherit; font-size: .875rem; cursor: pointer; text-decoration: underline; min-height: 44px; }
+
+/* ── Adaptations écran ── */
+@media (max-width: 1100px) {
+  .grille { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+  /* Le résumé cesse d'être collant — collé, il mangeait la moitié de l'écran —
+     et passe SOUS le formulaire : l'écran sert d'abord à choisir, et le total
+     courant reste visible dans la barre d'action. */
+  .aside { position: static; }
+  .apercu { max-width: 260px; }
+}
+
+@media (max-width: 860px) {
+  .produits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .champs { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+  /* Action principale toujours accessible, sans masquer le formulaire :
+     .corps réserve déjà l'espace en bas de page. */
+  .barreMobile {
+    display: flex; gap: 10px; align-items: center;
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 30;
+    padding: 12px var(--c-gutter) calc(12px + env(safe-area-inset-bottom));
+    background: rgba(11, 11, 13, .96);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--c-line-strong);
+  }
+  .barreMobileTotal { flex-shrink: 0; }
+  .barreMobileCle { display: block; font-size: .6875rem; color: var(--c-text-dim); line-height: 1.2; }
+  .barreMobileVal { display: block; font-size: .9375rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .barreMobileBtn { flex: 1; justify-content: center; }
+  .nav { display: none; }
+  .navRetour { display: flex; }
+  .corps { padding-bottom: 104px; }
+  .frise { top: 60px; }
+}
+
+@media (max-width: 460px) {
+  .produits { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .tailles { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); }
+  /* Les quatre étapes doivent tenir à côté du sélecteur de langue : sans
+     cela la dernière sortait de l'écran et paraissait manquante. */
+  .etapeTrait { width: 12px; margin-inline: 3px; }
+  .etape { padding: 6px 4px; }
+  .friseGrille { gap: 8px; }
+}

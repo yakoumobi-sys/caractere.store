@@ -8,14 +8,26 @@ export const SITE_NAME = 'Caractère Store'
 export const LOGO_URL =
   'https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo.jpg'
 
-export const PHONE = '+213557440522'
-export const PHONE_DISPLAY = '+213 557 440 522'
-export const WHATSAPP = 'https://wa.me/213557440522'
-export const EMAIL = 'yakoumobi@gmail.com'
-export const INSTAGRAM = 'https://instagram.com/caractere.store'
+// Les coordonnées viennent de lib/contact.ts : un seul endroit à corriger,
+// et les données structurées ne peuvent plus diverger de ce qu'affiche le site.
+import {
+  TELEPHONE,
+  TELEPHONE_AFFICHE,
+  WHATSAPP_URL,
+  EMAIL as CONTACT_EMAIL,
+  INSTAGRAM_URL,
+  VILLE,
+  PAYS_CODE,
+} from './contact'
 
-export const CITY = 'Alger'
-export const COUNTRY = 'DZ'
+export const PHONE = TELEPHONE
+export const PHONE_DISPLAY = TELEPHONE_AFFICHE
+export const WHATSAPP = WHATSAPP_URL
+export const EMAIL = CONTACT_EMAIL
+export const INSTAGRAM = INSTAGRAM_URL
+
+export const CITY = VILLE
+export const COUNTRY = PAYS_CODE
 
 /** Identité de l'organisation — réutilisée par toutes les pages. */
 export const organizationLd = {

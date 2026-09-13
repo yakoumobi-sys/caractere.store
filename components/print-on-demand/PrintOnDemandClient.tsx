@@ -6,7 +6,7 @@ import Link from 'next/link'
 import styles from './PrintOnDemand.module.css'
 
 const LOGO = '/logo.jpg'
-const WA = 'https://wa.me/213557440522'
+import { WHATSAPP_URL as WA, TELEPHONE_AFFICHE } from '@/lib/contact'
 
 // Chiffres affichés sous le hero : ce sont les objections qu'on nous oppose
 // en premier (minimum, délai, zone, paiement), répondues avant d'être posées.
@@ -245,7 +245,7 @@ export default function PrintOnDemandClient() {
           <Link href="/produits">Produits</Link>
           <Link href="/configurateur">Configurateur</Link>
           <Link href="/collection">Collection</Link>
-          <a href={WA} target="_blank" rel="noopener noreferrer">+213 557 440 522</a>
+          <a href={WA} target="_blank" rel="noopener noreferrer">{TELEPHONE_AFFICHE}</a>
         </nav>
       </footer>
     </div>

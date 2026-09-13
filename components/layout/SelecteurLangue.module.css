@@ -1,0 +1,30 @@
+.groupe {
+  display: inline-flex;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.bouton {
+  min-width: 44px;
+  min-height: 38px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--c-text-dim);
+  border: 0;
+  font: inherit;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+
+.bouton:hover { color: var(--c-text); }
+.actif { background: var(--c-text); color: var(--c-bg); }
+
+/* Sur les petits écrans le sélecteur laisse la place à la frise d'étapes. */
+@media (max-width: 460px) {
+  .bouton { min-width: 36px; padding: 8px 8px; }
+}

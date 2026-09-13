@@ -12,6 +12,21 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; 
   annule:   { label: 'Annule',       color: '#B91C1C', bg: '#FEF2F2', dot: '#EF4444' },
 }
 
+/**
+ * Repartition par taille : « S x 3, M x 5 » quand la commande la porte,
+ * sinon la simple liste des tailles des anciennes commandes.
+ */
+function formatRepartition(commande: Commande & { quantites_tailles?: Record<string, number> | null }): string {
+  const repartition = commande.quantites_tailles
+  if (repartition && typeof repartition === 'object' && Object.keys(repartition).length > 0) {
+    return Object.entries(repartition)
+      .filter(([, n]) => Number(n) > 0)
+      .map(([taille, n]) => `${taille} x ${n}`)
+      .join(', ')
+  }
+  return commande.tailles?.join(', ') ?? ''
+}
+
 export default function CommandesAdmin() {
   const [commandes, setCommandes] = useState<Commande[]>([])
   const [selected, setSelected] = useState<Commande | null>(null)
@@ -267,7 +282,9 @@ export default function CommandesAdmin() {
                   ['Produit', selected.produit],
                   ['Quantite', `${selected.quantite} pieces`],
                   ['Couleur', selected.couleur],
-                  ['Tailles', selected.tailles?.join(', ') || '-'],
+                  // La repartition par taille evite a l'atelier de rappeler le
+                  // client pour savoir combien de pieces produire dans chaque taille.
+                  ['Tailles', formatRepartition(selected) || '-'],
                   ['Emplacement', selected.position],
                   ['Technique', selected.technique],
                   ['Urgent', selected.urgent ? 'Oui ⚡' : 'Non'],

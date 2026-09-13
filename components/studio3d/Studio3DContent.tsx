@@ -10,7 +10,7 @@ import * as THREE from "three";
 // évite de dépendre du CDN gstatic.com par défaut de drei pour ce fetch critique.
 useGLTF.setDecoderPath("/draco/");
 
-const WHATSAPP = "213557440522";
+import { WHATSAPP_NUMERO as WHATSAPP } from "@/lib/contact";
 const MAX_REC = 30;
 
 const MODELS: Record<string, string> = {

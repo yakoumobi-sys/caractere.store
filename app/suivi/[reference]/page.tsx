@@ -38,11 +38,24 @@ function RibCopyButton({ rib }: { rib: string }) {
   )
 }
 
+/**
+ * Vue publique d'une commande.
+ *
+ * L'API ne renvoie plus que le suivi quand on présente une simple référence :
+ * le nom, le téléphone, l'email et l'adresse du client ne sortent qu'avec une
+ * authentification admin, ou pour le client qui confirme son numéro. Cette
+ * page n'affiche donc que des champs non personnels.
+ */
+type CommandeSuivi = Pick<
+  Commande,
+  'reference' | 'statut' | 'produit' | 'quantite' | 'couleur' | 'technique' | 'prix_total'
+>
+
 export default function SuiviPage() {
   const params = useParams()
   const reference = params?.reference as string
 
-  const [commande, setCommande] = useState<Commande | null>(null)
+  const [commande, setCommande] = useState<CommandeSuivi | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -136,10 +149,16 @@ export default function SuiviPage() {
                   <span className="font-medium text-brand-dark">{commande.technique}</span>
                 </div>
                 <div className="h-px bg-black/10 my-2" />
+                <div className="flex justify-between text-[14px]">
+                  <span className="text-brand-gray">Livraison</span>
+                  <span className="font-medium text-brand-dark">À confirmer</span>
+                </div>
                 <div className="flex justify-between text-[16px]">
-                  <span className="font-semibold text-brand-dark">Total</span>
+                  <span className="font-semibold text-brand-dark">Sous-total vêtements</span>
                   <span className="font-bold text-brand-dark">
-                    {commande.prix_total?.toLocaleString('fr-FR')} DA
+                    {commande.prix_total
+                      ? `${commande.prix_total.toLocaleString('fr-FR')} DA`
+                      : 'Sur devis'}
                   </span>
                 </div>
               </div>
@@ -151,8 +170,8 @@ export default function SuiviPage() {
                     Paiement
                   </p>
                   <p className="text-[13px] text-brand-gray">
-                    Notre équipe vous contacte par WhatsApp au {commande.telephone} pour finaliser
-                    le paiement.
+                    Notre équipe vous contacte par WhatsApp, au numéro indiqué lors de la
+                    commande, pour confirmer les frais de livraison et le paiement.
                   </p>
 
                   {RIB && (
