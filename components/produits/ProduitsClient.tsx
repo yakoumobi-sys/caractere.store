@@ -172,7 +172,9 @@ const PRODUITS: Produit[] = [
   {
     id: "ensemble-zipper-baggy",
     nom: "ENSEMBLE ZIPPER + BAGGY",
-    image: "https://cdn.shopify.com/s/files/1/0668/1418/1491/files/1C56C89E-1127-4FA1-8A27-7AF7C757619C.jpg",
+    // Photo de l'atelier, hébergée avec le site : ce visuel ne dépend plus
+    // d'un CDN externe, contrairement au reste du catalogue.
+    image: "/ensembles/ensemble-zipper-baggy-noir.jpg",
     categorie: "Ensembles",
     tailles: ["S","M","L","XL","XXL"],
     description: "Ensemble veste zippée + pantalon ample.",
@@ -184,6 +186,55 @@ const PRODUITS: Produit[] = [
     categorie: "Ensembles",
     tailles: ["S","M","L","XL"],
     description: "Ensemble veste + baggy élastique.",
+  },
+  // ── Ensembles imprimés ──
+  // Photos de l'atelier, hébergées avec le site. Les descriptions ne disent
+  // que ce que la photo montre ; aucun prix n'est renseigné tant que l'atelier
+  // ne les a pas communiqués — la fiche n'en affichera donc aucun.
+  {
+    id: "ensemble-racing-07",
+    nom: "ENSEMBLE RACING DIVISION 07",
+    image: "/ensembles/ensemble-racing-07.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, impression racing rouge et noire, damier sur la manche.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-dragon",
+    nom: "ENSEMBLE DRAGON",
+    image: "/ensembles/ensemble-dragon.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, dragon japonais et nuages d'encre, soleil rouge.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-koi",
+    nom: "ENSEMBLE KOÏ",
+    image: "/ensembles/ensemble-koi.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, carpes koï et vagues bleues.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-athletic-club",
+    nom: "ENSEMBLE ATHLETIC CLUB 1996",
+    image: "/ensembles/ensemble-athletic-club.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, lettrage varsity marine et initiale sur la jambe.",
+    badge: "Nouveau",
+  },
+  {
+    id: "ensemble-create-your-way",
+    nom: "ENSEMBLE CREATE YOUR WAY",
+    image: "/ensembles/ensemble-create-your-way.jpg",
+    categorie: "Ensembles",
+    tailles: ["S","M","L","XL","XXL"],
+    description: "Ensemble zippé + jogger gris, graffiti bleu, jaune et noir.",
+    badge: "Nouveau",
   },
   {
     id: "ensemble-3-pieces",
@@ -479,6 +530,47 @@ export default function ProduitsClient() {
               ))}
             </div>
           )}
+        </section>
+
+        {/* Planche récapitulative fournie par l'atelier : consultable en ligne
+            et téléchargeable pour être envoyée à un client ou imprimée. */}
+        <section className={`c-wrap ${styles.planche}`} aria-labelledby="t-planche">
+          <div className={styles.plancheCarte}>
+            <figure className={styles.plancheVue}>
+              <img
+                src="/catalogue/caractere-nos-produits-uniformes.jpg"
+                alt="Planche Caractère « Nos produits & uniformes » : vingt-deux supports photographiés avec leur nom et leur grammage"
+                loading="lazy"
+                width={1024}
+                height={1536}
+              />
+            </figure>
+            <div>
+              <p className="c-eyebrow">La planche</p>
+              <h2 id="t-planche" className={styles.plancheTitre}>Nos produits &amp; uniformes, sur une page.</h2>
+              <p className={styles.plancheTexte}>
+                Tous nos supports photographiés avec leur nom et leur grammage. À
+                garder sous la main, à imprimer ou à transmettre à votre équipe.
+              </p>
+              <div className={styles.plancheActions}>
+                <a
+                  href="/catalogue/caractere-nos-produits-uniformes.jpg"
+                  download="caractere-nos-produits-uniformes.jpg"
+                  className="c-btn c-btn-primary"
+                >
+                  Télécharger la planche
+                </a>
+                <a
+                  href="/catalogue/caractere-nos-produits-uniformes.jpg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="c-btn c-btn-ghost"
+                >
+                  Voir en grand
+                </a>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className={styles.final}>
