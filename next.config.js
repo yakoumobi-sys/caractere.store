@@ -8,7 +8,7 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: '/catalogue', destination: '/catalogue/index.html', permanent: false },
+      { source: '/catalogue', destination: '/catalogue/catalogue-caractere.pdf', permanent: false },
     ]
   },
   // Headers de sécurité
