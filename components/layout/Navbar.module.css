@@ -5,7 +5,7 @@
 
 .root {
   position: sticky; top: 0; z-index: 60;
-  background: rgba(11, 11, 13, .82);
+  background: rgba(21, 24, 19, .94);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--c-line);
 }
@@ -15,20 +15,20 @@
 .brand img { width: 34px; height: 34px; object-fit: contain; border-radius: 6px; }
 .brand span {
   font-family: var(--font-display), 'Inter', sans-serif;
-  font-size: 1.05rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  font-size: 1.4rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
 }
 
-.links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; min-width: 0; }
-.links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text-dim); text-decoration: none; font-size: .875rem; font-weight: 500; white-space: nowrap; transition: color .2s ease; }
+.links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; min-width: 0; }
+.links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text-dim); text-decoration: none; font-size: .75rem; font-weight: 500; white-space: nowrap; transition: color .2s ease; }
 .links a:hover { color: var(--c-text); }
 
 .right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; }
-.compte { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text-dim); text-decoration: none; font-size: .875rem; font-weight: 500; padding: 10px 8px; white-space: nowrap; }
+.compte { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-text-dim); text-decoration: none; font-size: .75rem; font-weight: 500; padding: 10px 8px; white-space: nowrap; }
 .compte:hover { color: var(--c-text); }
-.cta { min-height: 42px; padding: 10px 20px; font-size: .875rem; }
+.cta { min-height: 42px; padding: 10px 20px; font-size: .75rem; }
 
 .burger {
-  display: none; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center;
   width: 44px; height: 44px;
   background: none; border: 1px solid var(--c-line-strong); border-radius: 10px;
   color: var(--c-text); cursor: pointer;
@@ -47,6 +47,8 @@
   .root .links, .root .compte, .root .cta { display: none; }
   .root .burger { display: inline-flex; }
 }
-@media (min-width: 62.5625em) {
-  .panneau { display: none; }
-}
+
+
+.links a[aria-current="page"] { color: var(--c-accent); }
+.panneau[hidden] { display:none; }
+@media(max-width:760px) { .brand span {font-size:1.25rem} }

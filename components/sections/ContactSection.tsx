@@ -2,13 +2,21 @@
 import { useState } from 'react'
 
 export default function ContactSection({ config }: { config: Record<string,string> }) {
+  const [error, setError] = useState('')
+  const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const fd = new FormData(e.currentTarget)
-    await fetch('/api/contact', { method: 'POST', body: JSON.stringify(Object.fromEntries(fd)), headers: {'Content-Type':'application/json'} })
-    setSent(true)
+    if (sending) return
+    setSending(true); setError('')
+    try {
+      const fd = new FormData(e.currentTarget)
+      const res = await fetch('/api/contact', { method: 'POST', body: JSON.stringify(Object.fromEntries(fd)), headers: {'Content-Type':'application/json'} })
+      if (!res.ok) throw new Error()
+      setSent(true)
+    } catch { setError('Envoi impossible. Réessayez ou contactez-nous sur WhatsApp.') }
+    finally { setSending(false) }
   }
 
   return (
@@ -40,8 +48,8 @@ export default function ContactSection({ config }: { config: Record<string,strin
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Nom complet</label><input name="nom" type="text" placeholder="Votre nom" className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] bg-white focus:outline-none" /></div>
-                  <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Telephone</label><input name="telephone" type="tel" placeholder="0557440522" className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] bg-white focus:outline-none" /></div>
+                  <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Nom complet</label><input name="nom" required minLength={2} maxLength={100} type="text" placeholder="Votre nom" className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] bg-white focus:outline-none" /></div>
+                  <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Telephone</label><input name="telephone" required minLength={8} maxLength={20} type="tel" placeholder="0557440522" className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] bg-white focus:outline-none" /></div>
                 </div>
                 <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Entreprise</label><input name="entreprise" type="text" placeholder="Nom entreprise" className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] bg-white focus:outline-none" /></div>
                 <div className="grid grid-cols-2 gap-4">
@@ -57,7 +65,8 @@ export default function ContactSection({ config }: { config: Record<string,strin
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5"><label className="text-[12px] font-medium">Details</label><textarea name="details" rows={4} placeholder="Technique, couleurs, delai..." className="border border-black/[0.12] rounded-xl px-4 py-2.5 text-[14px] bg-white focus:outline-none resize-none" /></div>
-                <button type="submit" className="bg-brand-dark text-white py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Envoyer la demande</button>
+                {error && <p role="alert" className="text-red-700 text-sm">{error}</p>}
+                <button disabled={sending} type="submit" className="bg-brand-dark text-white py-3.5 rounded-full text-[15px] font-medium hover:bg-neutral-800 transition-colors">Envoyer la demande</button>
               </form>
             )}
           </div>
