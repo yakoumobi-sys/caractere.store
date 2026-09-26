@@ -645,7 +645,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                       <p className="text-[15px] font-semibold mb-1">Glissez votre fichier ici</p>
                       <p className="text-[13px] text-brand-gray mb-3">ou cliquez pour parcourir</p>
                       <p className="text-[11px] text-brand-gray/60 bg-brand-light rounded-lg px-3 py-1.5 inline-block">
-                        AI · EPS · SVG · PDF · PNG · JPG
+                        PDF · PNG · JPG · WEBP — 4 Mo maximum
                       </p>
                     </div>
                   ) : (
@@ -665,7 +665,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                     </div>
                   )}
 
-                  <input ref={fileRef} type="file" className="hidden" accept=".ai,.eps,.svg,.pdf,.png,.jpg,.jpeg" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+                  <input ref={fileRef} type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
 
                   {/* Info vectorisation */}
                   <div className="mt-6 flex items-start gap-3 bg-[#F0F7FF] rounded-2xl p-4">

@@ -6,8 +6,8 @@ import HomeChooser from '@/components/home/HomeChooser'
 export const metadata: Metadata = {
   // Titre absolu (pas de suffixe du template racine) — le template ne
   // s'applique pas à la page du même segment que le layout qui le définit.
-  title: 'Caractère Store — Vêtements personnalisés à Alger',
-  description: 'Uniformes d\'entreprise, print on demand, promos et catalogue. DTF et broderie, de 1 à 10 000 pièces, livraison dans les 58 wilayas.',
+  title: 'Caractère — Portez votre identité. Textile personnalisé à Alger',
+  description: 'Votre marque, votre équipe, votre identité. T-shirts, polos et vêtements de travail personnalisés à Alger. DTF et broderie dès 1 pièce. Devis gratuit.',
 }
 
 export default function Home() {

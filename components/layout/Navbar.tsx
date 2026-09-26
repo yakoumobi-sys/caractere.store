@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import styles from './Navbar.module.css'
 
@@ -10,10 +11,10 @@ const WHATSAPP = 'https://wa.me/213557440522'
 // Barre principale : les quatre destinations qui font l'offre. Le reste des
 // parcours vit dans le panneau, pour ne pas surcharger l'en-tête.
 const PRIMAIRE = [
-  { href: '/produits', label: 'Produits' },
-  { href: '/collection', label: 'Collection' },
   { href: '/entreprises', label: 'Entreprises' },
-  { href: '/print-on-demand', label: 'Print on demand' },
+  { href: '/print-on-demand', label: 'Créer sa marque' },
+  { href: '/produits', label: 'Catalogue' },
+  { href: '/collection', label: 'Collection' },
 ]
 
 // Parcours secondaires, visibles uniquement dans le panneau déroulant.
@@ -28,6 +29,7 @@ const SECONDAIRE = [
 ]
 
 export default function Navbar() {
+  const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string } } | null>(null)
   const boutonRef = useRef<HTMLButtonElement>(null)
@@ -72,14 +74,14 @@ export default function Navbar() {
         </Link>
 
         <nav className={styles.links} aria-label="Navigation principale">
-          {PRIMAIRE.map(l => <Link key={l.href} href={l.href}>{l.label}</Link>)}
+          {PRIMAIRE.map(l => <Link key={l.href} href={l.href} aria-current={pathname === l.href ? "page" : undefined}>{l.label}</Link>)}
         </nav>
 
         <div className={styles.right}>
           <Link href={user ? '/dashboard' : '/auth/login'} className={styles.compte}>
             {user ? prenom : 'Se connecter'}
           </Link>
-          <Link href="/configurateur" className={`c-btn c-btn-accent ${styles.cta}`}>Personnaliser</Link>
+          <Link href="/devis-express" className={`c-btn c-btn-accent ${styles.cta}`}>Devis gratuit ↗</Link>
           <button
             ref={boutonRef}
             type="button"

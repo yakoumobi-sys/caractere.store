@@ -11,23 +11,23 @@
    ─────────────────────────────────────────────────────────────── */
 :root {
   /* Base sombre */
-  --c-bg: #0B0B0D;
-  --c-surface: #151518;
-  --c-surface-2: #1C1C21;
+  --c-bg: #151813;
+  --c-surface: #1e221c;
+  --c-surface-2: #282e24;
 
   /* Plateau clair gris froid : casse la succession de cartes sombres */
-  --c-plateau: #C8CCD3;
+  --c-plateau: #f0f0e9;
   --c-plateau-ink: #17171A;
   --c-plateau-dim: #4A4E55;
 
   /* Texte — contrastes mesurés sur --c-bg :
      texte 18,1:1 · texte atténué 9,4:1 · accent 5,6:1 (AA atteint) */
-  --c-text: #F5F5F7;
-  --c-text-dim: #B3B3BD;
+  --c-text: #f3f4ed;
+  --c-text-dim: #adb3a5;
 
   /* Accent violet électrique, employé avec parcimonie */
-  --c-accent: #9D6CFF;
-  --c-accent-deep: #6E3FD1;
+  --c-accent: #d3ee97;
+  --c-accent-deep: #8aa755;
 
   --c-line: rgba(245, 245, 247, 0.10);
   --c-line-strong: rgba(245, 245, 247, 0.22);
@@ -78,7 +78,7 @@ body {
 .c-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   min-height: 48px; padding: 13px 26px;
-  border: 1px solid transparent; border-radius: 999px;
+  border: 1px solid transparent; border-radius: 4px;
   font-size: 0.9375rem; font-weight: 600; line-height: 1.2;
   text-decoration: none; cursor: pointer;
   transition: background .2s ease, border-color .2s ease, color .2s ease;
@@ -86,7 +86,7 @@ body {
 .c-btn-primary { background: var(--c-text); color: var(--c-bg); }
 .c-btn-primary:hover { background: #ffffff; }
 .c-btn-accent { background: var(--c-accent); color: #120A22; }
-.c-btn-accent:hover { background: #B18CFF; }
+.c-btn-accent:hover { background: #e1f6b7; }
 .c-btn-ghost { background: transparent; color: var(--c-text); border-color: var(--c-line-strong); }
 .c-btn-ghost:hover { border-color: var(--c-text); background: rgba(245, 245, 247, 0.06); }
 
@@ -184,3 +184,7 @@ body {
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .liquid-glass-card::before { display: none; }
 }
+
+/* Anchor and keyboard navigation clear the sticky header. */
+[id] { scroll-margin-top: 90px; }
+summary:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 4px; }
