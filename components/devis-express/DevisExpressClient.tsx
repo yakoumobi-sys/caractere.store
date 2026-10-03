@@ -136,7 +136,7 @@ export default function DevisExpressClient() {
   }
 
   return (
-    <div className="c-scope">
+    <div className={`c-scope ${styles.page}`}>
       <Navbar />
       <main
         className={`c-wrap ${styles.layout}`}

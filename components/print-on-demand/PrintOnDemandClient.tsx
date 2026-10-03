@@ -1,111 +1,153 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState } from "react";
+import Link from "next/link";
 
-import styles from './PrintOnDemand.module.css'
+import styles from "./PrintOnDemand.module.css";
 
-const LOGO = '/logo.jpg'
-const WA = 'https://wa.me/213557440522'
+const LOGO = "/logo.jpg";
+const WA = "https://wa.me/213557440522";
 
 // Chiffres affichés sous le hero : ce sont les objections qu'on nous oppose
 // en premier (minimum, délai, zone, paiement), répondues avant d'être posées.
 const FACTS = [
-  { k: 'Dès 1', v: 'pièce, sans minimum' },
-  { k: '48h', v: 'de production en atelier' },
-  { k: '58', v: 'wilayas livrées' },
-  { k: '0 DA', v: "d'avance sur le stock" },
-]
+  { k: "Dès 1", v: "pièce, sans minimum" },
+  { k: "48h", v: "de production en atelier" },
+  { k: "58", v: "wilayas livrées" },
+  { k: "0 DA", v: "d'avance sur le stock" },
+];
 
 const STEPS = [
-  { n: '1', title: 'Tu crées ton design', desc: 'Dans le Designer en ligne, gratuitement. Ou tu nous envoies ton fichier.' },
-  { n: '2', title: 'On imprime en 48h', desc: 'Impression DTF dans notre atelier à Alger, à la pièce. Aucun minimum.' },
-  { n: '3', title: 'On livre ton client', desc: 'Expédition dans les 58 wilayas, à ton nom. Paiement à la livraison possible.' },
-]
+  {
+    n: "1",
+    title: "Tu crées ton design",
+    desc: "Dans le Designer en ligne, gratuitement. Ou tu nous envoies ton fichier.",
+  },
+  {
+    n: "2",
+    title: "On imprime en 48h",
+    desc: "Impression DTF dans notre atelier à Alger, à la pièce. Aucun minimum.",
+  },
+  {
+    n: "3",
+    title: "On livre ton client",
+    desc: "Expédition dans les 58 wilayas, à ton nom. Paiement à la livraison possible.",
+  },
+];
 
 // Vitrine de pièces imprimées à la commande. Pas de prix ici : la grille tarifaire
 // sémantique juste en dessous fait foi. Les descriptions ne disent que ce que la
 // photo montre — aucune promesse de matière ou de technique ajoutée.
 type Realisation = {
-  img: string
-  alt: string
-  nom: string
-  detail: string
-  vues?: { img: string; alt: string }[]
-}
+  img: string;
+  alt: string;
+  nom: string;
+  detail: string;
+  vues?: { img: string; alt: string }[];
+};
 
 const REALISATIONS: Realisation[] = [
   {
-    img: '/pod/higher-than-yesterday-tshirt.jpg',
-    alt: 'T-shirt blanc oversized imprimé « Higher Than Yesterday », porté de face, de dos et vu en détail',
-    nom: 'T-shirt oversized',
-    detail: 'Recto, dos et détail d’impression',
+    img: "/pod/higher-than-yesterday-tshirt.jpg",
+    alt: "T-shirt blanc oversized imprimé « Higher Than Yesterday », porté de face, de dos et vu en détail",
+    nom: "T-shirt oversized",
+    detail: "Recto, dos et détail d’impression",
   },
   {
-    img: '/pod/higher-thinking-sweat.jpg',
-    alt: 'Sweat-shirt gris anthracite à col rond, imprimé « Higher Thinking » sur l’avant',
-    nom: 'Sweat col rond',
-    detail: 'Impression grand format sur l’avant',
+    img: "/pod/higher-thinking-sweat.jpg",
+    alt: "Sweat-shirt gris anthracite à col rond, imprimé « Higher Thinking » sur l’avant",
+    nom: "Sweat col rond",
+    detail: "Impression grand format sur l’avant",
   },
   {
-    img: '/pod/higher-than-yesterday-hoodie.jpg',
-    alt: 'Hoodie sable imprimé « Higher Than Yesterday » sur la poitrine',
-    nom: 'Hoodie',
-    detail: 'Impression poitrine, coloris sable',
+    img: "/pod/higher-than-yesterday-hoodie.jpg",
+    alt: "Hoodie sable imprimé « Higher Than Yesterday » sur la poitrine",
+    nom: "Hoodie",
+    detail: "Impression poitrine, coloris sable",
   },
   {
-    img: '/pod/higher-perspective-tshirt.jpg',
-    alt: 'T-shirt noir imprimé « Higher Perspective », porté de face et de dos',
-    nom: 'T-shirt',
-    detail: 'Petit motif devant, grand motif au dos',
+    img: "/pod/higher-perspective-tshirt.jpg",
+    alt: "T-shirt noir imprimé « Higher Perspective », porté de face et de dos",
+    nom: "T-shirt",
+    detail: "Petit motif devant, grand motif au dos",
   },
   {
-    img: '/pod/essentiel-tshirt-jogger-gris.jpg',
-    alt: 'Ensemble t-shirt noir et jogger gris chiné, porté de face',
-    nom: 'Ensemble T-shirt + Jogger',
-    detail: 'Jogger gris et noir, de face et de dos',
+    img: "/pod/essentiel-tshirt-jogger-gris.jpg",
+    alt: "Ensemble t-shirt noir et jogger gris chiné, porté de face",
+    nom: "Ensemble T-shirt + Jogger",
+    detail: "Jogger gris et noir, de face et de dos",
     vues: [
-      { img: '/pod/essentiel-tshirt-jogger-noir.jpg', alt: 'Le même ensemble avec un jogger noir, porté de face' },
-      { img: '/pod/essentiel-tshirt-jogger-noir-dos.jpg', alt: 'L’ensemble avec un jogger noir, porté de dos' },
-      { img: '/pod/essentiel-tshirt-jogger-gris-dos.jpg', alt: 'L’ensemble avec un jogger gris chiné, porté de dos' },
+      {
+        img: "/pod/essentiel-tshirt-jogger-noir.jpg",
+        alt: "Le même ensemble avec un jogger noir, porté de face",
+      },
+      {
+        img: "/pod/essentiel-tshirt-jogger-noir-dos.jpg",
+        alt: "L’ensemble avec un jogger noir, porté de dos",
+      },
+      {
+        img: "/pod/essentiel-tshirt-jogger-gris-dos.jpg",
+        alt: "L’ensemble avec un jogger gris chiné, porté de dos",
+      },
     ],
   },
-]
+];
 
 const TARIFS = [
-  { qte: '1 – 9 pièces', prix: '1 950 DA', remise: '—' },
-  { qte: '10 – 49 pièces', prix: '1 650 DA', remise: '−15%' },
-  { qte: '50 – 99 pièces', prix: '1 465 DA', remise: '−25%' },
-  { qte: '100 – 249 pièces', prix: '1 365 DA', remise: '−30%' },
-  { qte: '250 – 499 pièces', prix: '1 270 DA', remise: '−35%' },
-  { qte: '500 pièces et +', prix: 'Sur devis', remise: '—' },
-]
+  { qte: "1 – 9 pièces", prix: "1 950 DA", remise: "—" },
+  { qte: "10 – 49 pièces", prix: "1 650 DA", remise: "−15%" },
+  { qte: "50 – 99 pièces", prix: "1 465 DA", remise: "−25%" },
+  { qte: "100 – 249 pièces", prix: "1 365 DA", remise: "−30%" },
+  { qte: "250 – 499 pièces", prix: "1 270 DA", remise: "−35%" },
+  { qte: "500 pièces et +", prix: "Sur devis", remise: "—" },
+];
 
 const FAQS = [
-  { q: 'Y a-t-il un minimum de commande ?', a: "Non. On produit à partir d'une seule pièce, au même délai que les grosses séries. Le prix baisse automatiquement dès 10 pièces." },
-  { q: 'Combien de temps pour produire ?', a: '48h ouvrées en atelier à Alger, puis 1 à 5 jours de livraison selon la wilaya.' },
-  { q: 'Je ne sais pas créer un design, vous aidez ?', a: "Oui. Le Designer en ligne suffit pour un texte ou un logo. Si vous bloquez, envoyez votre idée sur WhatsApp : on prépare le fichier d'impression avec vous." },
-  { q: 'Qui livre le client final ?', a: 'Au choix : on expédie directement à votre client dans les 58 wilayas, ou on vous livre le lot et vous gérez votre propre expédition.' },
-  { q: 'Et si le rendu ne me convient pas ?', a: "Commandez une pièce test avant de lancer votre marque dessus. Si l'impression est défectueuse, on la refait ou on rembourse." },
-]
+  {
+    q: "Y a-t-il un minimum de commande ?",
+    a: "Non. On produit à partir d'une seule pièce, au même délai que les grosses séries. Le prix baisse automatiquement dès 10 pièces.",
+  },
+  {
+    q: "Combien de temps pour produire ?",
+    a: "48h ouvrées en atelier à Alger, puis 1 à 5 jours de livraison selon la wilaya.",
+  },
+  {
+    q: "Je ne sais pas créer un design, vous aidez ?",
+    a: "Oui. Le Designer en ligne suffit pour un texte ou un logo. Si vous bloquez, envoyez votre idée sur WhatsApp : on prépare le fichier d'impression avec vous.",
+  },
+  {
+    q: "Qui livre le client final ?",
+    a: "Au choix : on expédie directement à votre client dans les 58 wilayas, ou on vous livre le lot et vous gérez votre propre expédition.",
+  },
+  {
+    q: "Et si le rendu ne me convient pas ?",
+    a: "Commandez une pièce test avant de lancer votre marque dessus. Si l'impression est défectueuse, on la refait ou on rembourse.",
+  },
+];
 
 export default function PrintOnDemandClient() {
-  const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   return (
     <div className={styles.page}>
-      <a className="skip-link" href="#contenu">Aller au contenu</a>
+      <a className="skip-link" href="#contenu">
+        Aller au contenu
+      </a>
 
       <header className="pod-header">
         <div className="pod-wrap inner">
-          <Link href="/" aria-label="Caractère Store"><img src={LOGO} alt="Caractère" /></Link>
+          <Link href="/" aria-label="Caractère Store">
+            <img src={LOGO} alt="Caractère" />
+          </Link>
           <nav className="pod-nav" aria-label="Navigation Print on Demand">
             <a href="#comment">Le concept</a>
             <a href="#produits">Réalisations</a>
             <a href="#tarifs">Tarifs</a>
             <a href="#faq">Questions</a>
           </nav>
-          <Link href="/designer" className="btn btn-dark btn-sm">Créer mon design</Link>
+          <Link href="/designer" className="btn btn-dark btn-sm">
+            Créer mon design
+          </Link>
         </div>
       </header>
 
@@ -113,27 +155,61 @@ export default function PrintOnDemandClient() {
         <section className="pod-wrap hero">
           <div>
             <span className="eyebrow">Caractère / Print on demand</span>
-            <h1>Tes idées.<br />Ta marque.<br /><span>Notre atelier.</span></h1>
+            <h1>
+              Tes idées.
+              <br />
+              Ta marque.
+              <br />
+              <span>Notre atelier.</span>
+            </h1>
             <p className="sub">
-              Lance tes vêtements, sans gérer de stock. Tu crées, on imprime en 48h et on livre ton client
-              dans les 58 wilayas.
+              Lance tes vêtements, sans gérer de stock. Tu crées, on imprime en
+              48h et on livre ton client dans les 58 wilayas.
             </p>
             <div className="cta-row">
-              <Link href="/designer" className="btn btn-dark">Créer mon design <span aria-hidden="true">↗</span></Link>
-              <a href={WA} target="_blank" rel="noopener noreferrer" className="btn btn-light">Parler à l&apos;atelier</a>
+              <Link href="/designer" className="btn btn-dark">
+                Créer mon design <span aria-hidden="true">↗</span>
+              </Link>
+              <a
+                href={WA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-light"
+              >
+                Parler à l&apos;atelier
+              </a>
             </div>
-            <p className="micro">Dès 1 pièce <span aria-hidden="true">/</span> Sans avance sur le stock</p>
+            <p className="micro">
+              Dès 1 pièce <span aria-hidden="true">/</span> Sans avance sur le
+              stock
+            </p>
           </div>
           <div className="hero-visual">
-            <div className="visual-top"><span>IMAGINÉ PAR TOI.</span><span>FABRIQUÉ À ALGER.</span></div>
-            <img src="/collection/IMG_7471.jpeg" alt="T-shirts avec un motif automobile imprimé, présentés sur un portant" fetchPriority="high" width={900} height={1200} />
-            <div className="visual-caption"><span>Une idée devient<br /><strong>une vraie pièce.</strong></span><span className="visual-tag">À toi de créer ↗</span></div>
+            <div className="visual-top">
+              <span>IMAGINÉ PAR TOI.</span>
+              <span>FABRIQUÉ À ALGER.</span>
+            </div>
+            <img
+              src="/images/campaign/streetwear.webp"
+              alt="Hoodie noir oversize avec grand design imprimé ivoire et bleu au dos"
+              fetchPriority="high"
+              width={1536}
+              height={1024}
+            />
+            <div className="visual-caption">
+              <span>
+                Une idée devient
+                <br />
+                <strong>une vraie pièce.</strong>
+              </span>
+              <span className="visual-tag">À toi de créer ↗</span>
+            </div>
           </div>
         </section>
 
         <div className="pod-wrap">
           <div className="facts">
-            {FACTS.map(f => (
+            {FACTS.map((f) => (
               <div key={f.k} className="fact">
                 <div className="k">{f.k}</div>
                 <div className="v">{f.v}</div>
@@ -144,10 +220,11 @@ export default function PrintOnDemandClient() {
 
         <section className="section process-section" id="comment">
           <div className="pod-wrap">
-            <span className="section-label">01 / LE CONCEPT</span><h2>Tu crées. On prend le relais.</h2>
+            <span className="section-label">01 / LE CONCEPT</span>
+            <h2>Tu crées. On prend le relais.</h2>
             <p className="lead">Trois étapes, aucune avance de stock.</p>
             <div className="steps">
-              {STEPS.map(s => (
+              {STEPS.map((s) => (
                 <div key={s.n} className="step">
                   <div className="n">{s.n}</div>
                   <h3>{s.title}</h3>
@@ -160,18 +237,35 @@ export default function PrintOnDemandClient() {
 
         <section className="section" id="produits">
           <div className="pod-wrap">
-            <span className="section-label">02 / NOS RÉALISATIONS</span><h2>La base de ta prochaine collection.</h2>
-            <p className="lead">Un aperçu de pièces imprimées à la commande. Les tarifs sont détaillés juste en dessous.</p>
+            <span className="section-label">02 / NOS RÉALISATIONS</span>
+            <h2>La base de ta prochaine collection.</h2>
+            <p className="lead">
+              Un aperçu de pièces imprimées à la commande. Les tarifs sont
+              détaillés juste en dessous.
+            </p>
             <div className="products">
-              {REALISATIONS.map(r => (
+              {REALISATIONS.map((r) => (
                 <figure key={r.nom} className="product">
                   <div className="media">
-                    <img src={r.img} alt={r.alt} loading="lazy" width={1122} height={1402} />
+                    <img
+                      src={r.img}
+                      alt={r.alt}
+                      loading="lazy"
+                      width={1122}
+                      height={1402}
+                    />
                   </div>
                   {r.vues && (
                     <div className="views">
-                      {r.vues.map(v => (
-                        <img key={v.img} src={v.img} alt={v.alt} loading="lazy" width={1122} height={1402} />
+                      {r.vues.map((v) => (
+                        <img
+                          key={v.img}
+                          src={v.img}
+                          alt={v.alt}
+                          loading="lazy"
+                          width={1122}
+                          height={1402}
+                        />
                       ))}
                     </div>
                   )}
@@ -188,36 +282,82 @@ export default function PrintOnDemandClient() {
         <section className="section pricing-section" id="tarifs">
           <div className="pod-wrap pricing-layout">
             <div>
-            <span className="section-label">03 / LES TARIFS</span>
-            <h2>Commence petit.<br />Vois plus grand.</h2>
-            <p className="lead">Prix d&apos;un t-shirt DTF selon la quantité. La remise s&apos;applique automatiquement.</p>
-            <a href={WA} target="_blank" rel="noopener noreferrer" className="text-link">Parlons de ton projet ↗</a>
+              <span className="section-label">03 / LES TARIFS</span>
+              <h2>
+                Commence petit.
+                <br />
+                Vois plus grand.
+              </h2>
+              <p className="lead">
+                Prix d&apos;un t-shirt DTF selon la quantité. La remise
+                s&apos;applique automatiquement.
+              </p>
+              <a
+                href={WA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-link"
+              >
+                Parlons de ton projet ↗
+              </a>
             </div>
-            <div className="table-scroll" role="region" aria-label="Tableau des tarifs" tabIndex={0}>
-            <table className="table">
-              <caption className="sr-only">Tarifs des t-shirts DTF, impression comprise, selon la quantité</caption>
-              <thead>
-              <tr><th scope="col">Quantité</th><th scope="col">Prix / pièce</th><th scope="col">Remise</th></tr>
-              </thead><tbody>
-              {TARIFS.map(t => (
-                <tr key={t.qte}><th scope="row">{t.qte}</th><td className="prix">{t.prix}</td><td className="remise">{t.remise}</td></tr>
-              ))}
-              </tbody>
-            </table>
+            <div
+              className="table-scroll"
+              role="region"
+              aria-label="Tableau des tarifs"
+              tabIndex={0}
+            >
+              <table className="table">
+                <caption className="sr-only">
+                  Tarifs des t-shirts DTF, impression comprise, selon la
+                  quantité
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Quantité</th>
+                    <th scope="col">Prix / pièce</th>
+                    <th scope="col">Remise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TARIFS.map((t) => (
+                    <tr key={t.qte}>
+                      <th scope="row">{t.qte}</th>
+                      <td className="prix">{t.prix}</td>
+                      <td className="remise">{t.remise}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
 
         <section className="section" id="faq">
           <div className="pod-wrap">
-            <span className="section-label">04 / LES RÉPONSES</span><h2>Avant de te lancer.</h2>
+            <span className="section-label">04 / LES RÉPONSES</span>
+            <h2>Avant de te lancer.</h2>
             <div className="faq">
               {FAQS.map((f, i) => (
                 <div key={f.q} className="faq-item">
-                  <button type="button" onClick={() => setOpenFaq(openFaq === i ? null : i)} id={`faq-question-${i}`} aria-controls={`faq-answer-${i}`} aria-expanded={openFaq === i}>
-                    {f.q}<span className="sign">{openFaq === i ? '−' : '+'}</span>
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    id={`faq-question-${i}`}
+                    aria-controls={`faq-answer-${i}`}
+                    aria-expanded={openFaq === i}
+                  >
+                    {f.q}
+                    <span className="sign">{openFaq === i ? "−" : "+"}</span>
                   </button>
-                  <div id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`} hidden={openFaq !== i}><p>{f.a}</p></div>
+                  <div
+                    id={`faq-answer-${i}`}
+                    role="region"
+                    aria-labelledby={`faq-question-${i}`}
+                    hidden={openFaq !== i}
+                  >
+                    <p>{f.a}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -226,15 +366,34 @@ export default function PrintOnDemandClient() {
 
         <div className="pod-wrap">
           <section className="final">
-            <span className="section-label">LA SUITE T’APPARTIENT</span><h2>Fais porter<br />tes idées.</h2>
+            <span className="section-label">LA SUITE T’APPARTIENT</span>
+            <h2>
+              Fais porter
+              <br />
+              tes idées.
+            </h2>
             <p>Teste avec une seule pièce avant de lancer ta marque dessus.</p>
             <div className="cta-row">
-              <Link href="/designer" className="btn btn-invert">Créer mon design</Link>
-              <a href={WA} target="_blank" rel="noopener noreferrer" className="btn" style={{ border: '1px solid rgba(255,255,255,.4)', color: 'white' }}>
+              <Link href="/designer" className="btn btn-invert">
+                Créer mon design
+              </Link>
+              <a
+                href={WA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn"
+                style={{
+                  border: "1px solid rgba(255,255,255,.4)",
+                  color: "white",
+                }}
+              >
                 Écrire sur WhatsApp
               </a>
             </div>
-            <p className="micro">Dès 1 pièce <span aria-hidden="true">/</span> Sans avance sur le stock</p>
+            <p className="micro">
+              Dès 1 pièce <span aria-hidden="true">/</span> Sans avance sur le
+              stock
+            </p>
           </section>
         </div>
       </main>
@@ -245,9 +404,11 @@ export default function PrintOnDemandClient() {
           <Link href="/produits">Produits</Link>
           <Link href="/configurateur">Configurateur</Link>
           <Link href="/collection">Collection</Link>
-          <a href={WA} target="_blank" rel="noopener noreferrer">+213 557 440 522</a>
+          <a href={WA} target="_blank" rel="noopener noreferrer">
+            +213 557 440 522
+          </a>
         </nav>
       </footer>
     </div>
-  )
+  );
 }

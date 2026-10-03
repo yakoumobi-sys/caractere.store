@@ -4,31 +4,21 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import styles from "./HomeChooser.module.css";
 
+const simulation =
+  "https://wa.me/213557440522?text=" +
+  encodeURIComponent(
+    "Bonjour Caractère, je souhaite obtenir ma simulation gratuite. Je vous envoie mon logo et les détails de mon projet.",
+  );
+const studio =
+  "https://wa.me/213557440522?text=" +
+  encodeURIComponent(
+    "Bonjour Caractère Media, je souhaite réserver le studio pour un podcast ou un tournage. Quelles sont les disponibilités ?",
+  );
 const products = [
-  {
-    name: "T-shirt",
-    label: "Le point de départ.",
-    image: "tshirt",
-    category: "L’essentiel",
-  },
-  {
-    name: "Polo",
-    label: "L’esprit d’équipe.",
-    image: "polo",
-    category: "Entreprise",
-  },
-  {
-    name: "Gilet de travail",
-    label: "Sur tous les terrains.",
-    image: "gilet",
-    category: "Workwear",
-  },
-  {
-    name: "Casquette",
-    label: "Le détail qui signe.",
-    image: "casquette",
-    category: "Accessoire",
-  },
+  { name: "T-shirt", detail: "Le point de départ.", image: "tshirt" },
+  { name: "Polo", detail: "L’esprit d’équipe.", image: "polo" },
+  { name: "Hoodie", detail: "Une pièce. Votre signature.", image: "hoodie" },
+  { name: "Tote bag", detail: "Vos idées vous suivent.", image: "totebag" },
 ];
 const questions = [
   [
@@ -36,8 +26,8 @@ const questions = [
     "Oui. La personnalisation commence dès une pièce. Pour une équipe ou une collection, indiquez votre quantité : nous vous proposons un devis adapté à votre projet.",
   ],
   [
-    "Je n’ai pas de fichier prêt pour l’impression. Que faire ?",
-    "Envoyez-nous votre logo ou expliquez votre idée. Notre équipe vous accompagne pour préparer le visuel et vous présenter une simulation avant validation.",
+    "Comment obtenir ma simulation gratuite ?",
+    "Envoyez votre logo à notre équipe sur WhatsApp, avec le support et la quantité souhaités. Nous préparons votre simulation et votre devis avant toute mise en production.",
   ],
   [
     "Broderie ou impression DTF ?",
@@ -48,11 +38,6 @@ const questions = [
     "Le délai est confirmé avec votre devis, selon le stock, la quantité et la technique. Le retrait à l’atelier d’Alger et la livraison dans les 58 wilayas sont possibles. Précisez votre date si le projet est urgent.",
   ],
 ];
-const whatsapp =
-  "https://wa.me/213557440522?text=" +
-  encodeURIComponent(
-    "Bonjour Caractère, j’aimerais parler de mon projet de personnalisation textile.",
-  );
 
 export default function HomeChooser() {
   return (
@@ -60,386 +45,278 @@ export default function HomeChooser() {
       <a className={styles.skip} href="#contenu">
         Aller au contenu
       </a>
-      <div className={styles.announcement}>
-        <span>De votre idée à la pièce. Fabriqué avec Caractère.</span>
-        <span>Alger · Livraison 58 wilayas</span>
-      </div>
       <Navbar />
       <main id="contenu">
-        <section className={`c-wrap ${styles.hero}`}>
+        <div className={styles.announcement}>
+          Une pièce ou toute une équipe.{" "}
+          <span>Votre logo, notre savoir-faire.</span>{" "}
+          <a href={simulation} target="_blank" rel="noopener noreferrer">
+            Simulation offerte.
+          </a>
+        </div>
+        <section className={styles.hero} aria-labelledby="hero-title">
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>
-              <span className={styles.dot} /> ATELIER DE PERSONNALISATION
-              TEXTILE
-            </p>
-            <h1>
-              Ne passez pas
+            <p className={styles.eyebrow}>CARACTÈRE</p>
+            <h1 id="hero-title">
+              Vos idées.
               <br />
-              inaperçu.
-              <br />
-              <span>
-                Portez votre
-                <br />
-                caractère.
-              </span>
+              <span>À porter.</span>
             </h1>
             <p className={styles.intro}>
-              Votre marque. Votre équipe. Votre identité.
-              <br />
-              Nous donnons vie à vos idées sur textile, de la première pièce à
-              la grande série.
+              Le textile personnalisé. Avec du caractère.
             </p>
             <div className={styles.actions}>
-              <Link href="/configurateur" className="c-btn c-btn-accent">
-                Créer ma pièce <span aria-hidden="true">↗</span>
+              <a
+                href={simulation}
+                className={styles.primary}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Obtenir ma simulation gratuite
+              </a>
+              <Link href="/produits" className={styles.textLink}>
+                Découvrir les produits <span aria-hidden="true">›</span>
               </Link>
-              <Link href="/entreprises" className={styles.textLink}>
-                Habiller mon équipe <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-            <div className={styles.heroProof}>
-              <span>01 pièce minimum</span>
-              <span>Simulation gratuite</span>
-              <span>DTF & broderie</span>
             </div>
           </div>
           <div className={styles.heroImage}>
             <Image
-              src="/pod/higher-thinking-sweat.jpg"
-              alt="Sweat anthracite personnalisé, illustration et typographie imprimées sur la poitrine"
+              src="/images/campaign/hero.webp"
+              alt="T-shirt blanc, polo marine, tote bag et casquette personnalisés Caractère"
               fill
               priority
-              sizes="(max-width: 760px) 100vw, 48vw"
+              sizes="(max-width: 760px) 100vw, 1100px"
             />
-            <div className={styles.imageTop}>
-              <span>CARACTÈRE®</span>
-              <span>DES IDÉES À PORTER.</span>
-            </div>
-            <div className={styles.imageBottom}>
-              <span>
-                Votre prochain projet
-                <br />
-                <b>commence ici.</b>
-              </span>
-              <Link href="/designer" aria-label="Ouvrir le studio de création">
-                ↗
-              </Link>
-            </div>
           </div>
+          <p className={styles.caption}>
+            Imaginé par vous. Personnalisé à Alger.
+          </p>
         </section>
-        <div className={styles.ribbon}>
-          <span>IMAGINÉ PAR VOUS</span>
-          <i aria-hidden="true">✳</i>
-          <span>PERSONNALISÉ PAR NOUS</span>
-          <i aria-hidden="true">✳</i>
-          <span>PORTÉ AVEC FIERTÉ</span>
-          <i aria-hidden="true">✳</i>
+        <div className={styles.benefits}>
+          <p>
+            <strong>Dès 1 pièce.</strong>
+            <span>La liberté de commencer.</span>
+          </p>
+          <p>
+            <strong>Simulation gratuite.</strong>
+            <span>Voyez avant de commander.</span>
+          </p>
+          <p>
+            <strong>Livraison 58 wilayas.</strong>
+            <span>De notre atelier à chez vous.</span>
+          </p>
         </div>
-
-        <section
-          className={`c-wrap ${styles.section}`}
-          id="projets"
-          aria-labelledby="projects-title"
-        >
-          <div className={styles.heading}>
-            <div>
-              <p className={styles.eyebrow}>01 / À CHACUN SON CARACTÈRE</p>
-              <h2 id="projects-title">
-                Une idée en tête ?<br />
-                <span>On a le bon point de départ.</span>
-              </h2>
-            </div>
-            <p>
-              Choisissez votre projet.
+        <section className={styles.business} aria-labelledby="business-title">
+          <div className={styles.panelCopy}>
+            <p className={styles.eyebrow}>CARACTÈRE PRO</p>
+            <h2 id="business-title">
+              L’esprit d’équipe.
               <br />
-              On s’occupe de la suite, ensemble.
-            </p>
-          </div>
-          <div className={styles.pathways}>
-            <Link href="/entreprises" className={styles.pathCard}>
-              <div className={styles.pathImage}>
-                <Image
-                  src="/produits-photos/polo.jpg"
-                  alt="Polo blanc avec emplacement de logo côté cœur"
-                  fill
-                  sizes="(max-width: 760px) 100vw, 33vw"
-                />
-              </div>
-              <div className={styles.pathBody}>
-                <span className={styles.eyebrow}>POUR LES ENTREPRISES</span>
-                <h3>
-                  Une équipe.
-                  <br />
-                  Une identité.
-                </h3>
-                <p>
-                  Uniformes, polos et vêtements de travail qui représentent
-                  votre entreprise.
-                </p>
-                <span className={styles.pathAction}>
-                  Équiper mon entreprise <b>↗</b>
-                </span>
-              </div>
-            </Link>
-            <Link href="/print-on-demand" className={styles.pathCard}>
-              <div className={styles.pathImage}>
-                <Image
-                  src="/pod/higher-than-yesterday-hoodie.jpg"
-                  alt="Hoodie imprimé pour une collection de marque"
-                  fill
-                  sizes="(max-width: 760px) 100vw, 33vw"
-                />
-              </div>
-              <div className={styles.pathBody}>
-                <span className={styles.eyebrow}>POUR LES CRÉATEURS</span>
-                <h3>
-                  Votre marque.
-                  <br />
-                  Votre prochain chapitre.
-                </h3>
-                <p>
-                  Lancez vos designs avec le print on demand et produisez à la
-                  commande.
-                </p>
-                <span className={styles.pathAction}>
-                  Lancer ma marque <b>↗</b>
-                </span>
-              </div>
-            </Link>
-            <Link href="/configurateur" className={styles.pathCard}>
-              <div className={styles.pathImage}>
-                <Image
-                  src="/pod/higher-perspective-tshirt.jpg"
-                  alt="T-shirt avec illustration personnalisée"
-                  fill
-                  sizes="(max-width: 760px) 100vw, 33vw"
-                />
-              </div>
-              <div className={styles.pathBody}>
-                <span className={styles.eyebrow}>POUR VOS ENVIES</span>
-                <h3>
-                  Une pièce.
-                  <br />
-                  100 % vous.
-                </h3>
-                <p>
-                  Un cadeau, un événement ou juste une idée à porter. Dès une
-                  seule pièce.
-                </p>
-                <span className={styles.pathAction}>
-                  Personnaliser ma pièce <b>↗</b>
-                </span>
-              </div>
-            </Link>
-          </div>
-        </section>
-
-        <section className={styles.light} aria-labelledby="products-title">
-          <div className={`c-wrap ${styles.section}`}>
-            <div className={styles.heading}>
-              <div>
-                <p className={styles.eyebrow}>
-                  02 / LE BON SUPPORT CHANGE TOUT
-                </p>
-                <h2 id="products-title">
-                  À vous de leur
-                  <br />
-                  donner du caractère.
-                </h2>
-              </div>
-              <Link href="/produits" className={styles.textLink}>
-                Explorer le catalogue <span>↗</span>
+              Ça se porte.
+            </h2>
+            <p>Vos uniformes. Votre logo. Une vraie identité.</p>
+            <div className={styles.actions}>
+              <Link href="/entreprises" className={styles.primary}>
+                Habiller mon équipe
               </Link>
-            </div>
-            <div className={styles.products}>
-              {products.map((p, index) => (
-                <Link
-                  key={p.name}
-                  href={`/configurateur?produit=${encodeURIComponent(p.name)}`}
-                  className={styles.product}
-                >
-                  <div className={styles.productImage}>
-                    <Image
-                      src={`/produits-photos/${p.image}.jpg`}
-                      alt={`${p.name} à personnaliser avec votre logo`}
-                      fill
-                      sizes="(max-width: 760px) 50vw, 25vw"
-                    />
-                    <span className={styles.productIndex}>0{index + 1}</span>
-                    <span className={styles.productArrow}>↗</span>
-                  </div>
-                  <div className={styles.productMeta}>
-                    <h3>{p.name}</h3>
-                    <span>{p.category}</span>
-                  </div>
-                  <p>{p.label}</p>
-                </Link>
-              ))}
-            </div>
-            <div className={styles.catalogueNote}>
-              <span>
-                Couleurs, tailles, quantités : composez votre projet en ligne.
-              </span>
-              <Link href="/devis-express">
-                Besoin d’un prix pour une série ? Demander un devis →
+              <Link href="/entreprises/commande" className={styles.textLink}>
+                Configurer ma commande <span aria-hidden="true">›</span>
               </Link>
             </div>
           </div>
-        </section>
-
-        <section
-          className={`c-wrap ${styles.section} ${styles.studio}`}
-          aria-labelledby="studio-title"
-        >
-          <div className={styles.studioVisual}>
+          <div className={styles.businessImage}>
             <Image
-              src="/pod/essentiel-tshirt-jogger-noir.jpg"
-              alt="T-shirt et pantalon noirs, base pour une identité textile sur mesure"
+              src="/images/campaign/entreprise.webp"
+              alt="Trois professionnels travaillent ensemble dans des tenues coordonnées portant le même logo"
               fill
-              sizes="(max-width: 760px) 100vw, 45vw"
+              sizes="(max-width: 760px) 100vw, 1200px"
             />
-            <span className={styles.studioLabel}>
-              LE SUPPORT. LE VISUEL. VOUS.
-            </span>
-          </div>
-          <div className={styles.studioCopy}>
-            <p className={styles.eyebrow}>03 / DU FICHIER À LA FIBRE</p>
-            <h2 id="studio-title">
-              Votre imagination.
-              <br />
-              <span>Notre savoir-faire.</span>
-            </h2>
-            <p>
-              Un logo discret sur le cœur ou une illustration qui prend toute la
-              place. Chaque projet mérite la bonne technique.
-            </p>
-            <div className={styles.technique}>
-              <span>01</span>
-              <div>
-                <h3>Impression DTF</h3>
-                <p>Couleurs, détails et dégradés. Faites parler vos visuels.</p>
-              </div>
-              <span aria-hidden="true">↗</span>
-            </div>
-            <div className={styles.technique}>
-              <span>02</span>
-              <div>
-                <h3>Broderie</h3>
-                <p>Du relief, de la texture et une signature soignée.</p>
-              </div>
-              <span aria-hidden="true">↗</span>
-            </div>
-            <Link href="/designer" className="c-btn c-btn-accent">
-              Essayer le studio de création <span>↗</span>
-            </Link>
           </div>
         </section>
-
-        <section className={styles.processSection}>
-          <div className={`c-wrap ${styles.section}`}>
-            <div className={styles.heading}>
-              <div>
-                <p className={styles.eyebrow}>04 / SIMPLE, DU DÉBUT À LA FIN</p>
-                <h2>
-                  Vous imaginez.
-                  <br />
-                  On concrétise.
-                </h2>
-              </div>
-              <Link href="/comment-ca-marche" className={styles.textLink}>
-                Le fonctionnement en détail ↗
+        <section className={styles.streetwear} aria-labelledby="brand-title">
+          <div className={styles.panelCopy}>
+            <p className={styles.eyebrow}>VOTRE MARQUE, PAR CARACTÈRE.</p>
+            <h2 id="brand-title">Portez votre vision.</h2>
+            <p>Du premier hoodie à votre première collection.</p>
+            <div className={styles.actions}>
+              <Link href="/print-on-demand" className={styles.primary}>
+                Lancer ma marque
+              </Link>
+              <Link href="/designer" className={styles.textLink}>
+                Créer mon design <span aria-hidden="true">›</span>
               </Link>
             </div>
-            <div className={styles.steps}>
-              {[
-                [
-                  "01",
-                  "Décrivez votre projet.",
-                  "Choisissez le vêtement, la quantité et le visuel. Ou demandez conseil à notre équipe.",
-                ],
-                [
-                  "02",
-                  "Validez votre simulation.",
-                  "Nous précisons le rendu, le prix et les délais avant de lancer la production.",
-                ],
-                [
-                  "03",
-                  "Portez votre caractère.",
-                  "Récupérez vos pièces à Alger ou faites-vous livrer dans votre wilaya.",
-                ],
-              ].map(([n, t, d]) => (
-                <div key={n}>
-                  <span className={styles.stepNumber}>{n}</span>
-                  <h3>{t}</h3>
-                  <p>{d}</p>
-                </div>
-              ))}
-            </div>
+          </div>
+          <div className={styles.streetImage}>
+            <Image
+              src="/images/campaign/streetwear.webp"
+              alt="Hoodie noir oversize avec grand imprimé typographique ivoire et bleu dans le dos"
+              fill
+              sizes="(max-width: 760px) 100vw, 1000px"
+            />
           </div>
         </section>
-
-        <section
-          className={`c-wrap ${styles.section} ${styles.faq}`}
-          aria-labelledby="faq-title"
-        >
-          <div>
-            <p className={styles.eyebrow}>AVANT DE VOUS LANCER</p>
-            <h2 id="faq-title">
-              Les bonnes
+        <div className={styles.duo}>
+          <section className={styles.personal} aria-labelledby="personal-title">
+            <div className={styles.panelCopy}>
+              <p className={styles.eyebrow}>UNE PIÈCE. RIEN QU’À VOUS.</p>
+              <h2 id="personal-title">100 % vous.</h2>
+              <p>Un cadeau. Une envie. Une création originale.</p>
+              <div className={styles.actions}>
+                <Link href="/configurateur" className={styles.primary}>
+                  Personnaliser ma pièce
+                </Link>
+                <Link href="/collection" className={styles.textLink}>
+                  La collection <span aria-hidden="true">›</span>
+                </Link>
+              </div>
+            </div>
+            <div className={styles.personalImage}>
+              <Image
+                src="/images/campaign/hero.webp"
+                alt="Supports textiles pour votre personnalisation à l’unité"
+                fill
+                sizes="(max-width: 760px) 100vw, 50vw"
+              />
+            </div>
+          </section>
+          <section className={styles.studio} aria-labelledby="studio-title">
+            <div className={styles.panelCopy}>
+              <p className={styles.eyebrow}>CARACTÈRE MEDIA</p>
+              <h2 id="studio-title">À vous la lumière.</h2>
+              <p>Podcasts. Vidéos. Vos idées prennent la parole.</p>
+              <div className={styles.actions}>
+                <a
+                  href={studio}
+                  className={styles.primary}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Réserver le studio
+                </a>
+              </div>
+            </div>
+            <div className={styles.studioImage}>
+              <Image
+                src="/images/campaign/studio.webp"
+                alt="Deux personnes enregistrent un podcast dans un studio avec microphones professionnels"
+                fill
+                sizes="(max-width: 760px) 100vw, 50vw"
+              />
+            </div>
+          </section>
+        </div>
+        <section className={styles.catalogue} aria-labelledby="products-title">
+          <div className={styles.sectionHead}>
+            <h2 id="products-title">
+              Le bon support.
               <br />
-              questions.
+              <span>Votre signature en plus.</span>
             </h2>
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.textLink}
-            >
-              Parlons de votre projet ↗
-            </a>
+            <Link href="/produits" className={styles.textLink}>
+              Tout le catalogue <span aria-hidden="true">›</span>
+            </Link>
           </div>
+          <div className={styles.products}>
+            {products.map((product) => (
+              <Link
+                href="/produits"
+                className={styles.product}
+                key={product.image}
+              >
+                <div className={styles.productImage}>
+                  <Image
+                    src={`/produits-photos/${product.image}.jpg`}
+                    alt={`${product.name} personnalisable`}
+                    fill
+                    sizes="(max-width: 760px) 65vw, 280px"
+                  />
+                </div>
+                <h3>{product.name}</h3>
+                <p>{product.detail}</p>
+                <span className={styles.textLink}>
+                  Découvrir <span aria-hidden="true">›</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section className={styles.process} aria-labelledby="process-title">
+          <p className={styles.eyebrow}>DE VOTRE IDÉE À LA PIÈCE.</p>
+          <h2 id="process-title">Simple. À chaque étape.</h2>
+          <div className={styles.steps}>
+            {[
+              [
+                "01",
+                "Envoyez votre logo.",
+                "Précisez le support, la quantité et votre idée. Notre équipe vous accompagne.",
+              ],
+              [
+                "02",
+                "Visualisez le résultat.",
+                "Votre simulation et votre devis sont gratuits. Vous validez avant la production.",
+              ],
+              [
+                "03",
+                "Portez votre identité.",
+                "Nous personnalisons vos pièces. Retirez-les à l’atelier ou faites-vous livrer.",
+              ],
+            ].map(([number, title, text]) => (
+              <article key={number}>
+                <span>{number}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+          <Link href="/comment-ca-marche" className={styles.textLink}>
+            Découvrir notre savoir-faire <span aria-hidden="true">›</span>
+          </Link>
+        </section>
+        <section className={styles.final}>
+          <p className={styles.eyebrow}>VOTRE PROCHAINE IDÉE COMMENCE ICI.</p>
+          <h2>
+            Envoyez votre logo.
+            <br />
+            <span>On lui donne vie.</span>
+          </h2>
+          <p>Votre simulation est gratuite. Le prochain pas est simple.</p>
+          <a
+            href={simulation}
+            className={styles.primary}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Obtenir ma simulation gratuite
+          </a>
+          <Link href="/devis-express" className={styles.textLink}>
+            Ou demander un devis en ligne <span aria-hidden="true">›</span>
+          </Link>
+        </section>
+        <section className={styles.faq}>
+          <h2>
+            Quelques réponses.
+            <br />
+            Avant de commencer.
+          </h2>
           <div>
-            {questions.map(([q, a]) => (
-              <details className={styles.question} key={q}>
+            {questions.map(([question, answer]) => (
+              <details key={question}>
                 <summary>
-                  {q}
+                  {question}
                   <span aria-hidden="true">+</span>
                 </summary>
-                <p>{a}</p>
+                <p>{answer}</p>
               </details>
             ))}
           </div>
         </section>
-        <section className={styles.final}>
-          <div className="c-wrap">
-            <p className={styles.eyebrow}>LA SUITE S’ÉCRIT AVEC VOUS.</p>
-            <h2>
-              Faites bonne
-              <br />
-              <span>impression.</span>
-            </h2>
-            <div className={styles.actions}>
-              <Link href="/devis-express" className="c-btn c-btn-primary">
-                Obtenir mon devis gratuit ↗
-              </Link>
-              <a
-                href={whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.textLink}
-              >
-                Discuter sur WhatsApp ↗
-              </a>
-            </div>
-            <p>Une idée suffit pour commencer.</p>
-          </div>
-        </section>
+        <p className={styles.disclaimer}>
+          Visuels de campagne générés à titre d’inspiration. Supports et
+          personnalisation à confirmer avec notre équipe.
+        </p>
       </main>
       <Footer />
-      <div className={styles.mobileCta}>
-        <Link href="/configurateur">Créer ma pièce ↗</Link>
-        <Link href="/devis-express">Devis gratuit ↗</Link>
-      </div>
     </div>
   );
 }

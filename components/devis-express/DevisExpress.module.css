@@ -1,3 +1,4 @@
+.page { --c-bg:#fff; --c-text:#1d1d1f; --c-text-dim:#6e6e73; --c-accent:#0071e3; --c-line-strong:#d2d2d7; background:#fff; color:#1d1d1f; min-height:100vh; }
 .layout {
   display: grid;
   grid-template-columns: 1fr 1.1fr;
@@ -10,7 +11,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 60px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .top button {
   border: 1px solid var(--c-line-strong);
@@ -18,7 +19,7 @@
   background: transparent;
   color: var(--c-text);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 14px;
 }
 .intro h1 {
   font-size: clamp(36px, 4vw, 56px);
@@ -44,7 +45,7 @@
   color: var(--c-accent);
 }
 .intro > a {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--c-accent);
   display: inline-block;
   padding: 12px 0;
@@ -54,9 +55,9 @@
   margin-top: 10px;
 }
 .card {
-  background: #f0f0e9;
-  color: #20251a;
-  border-radius: 5px;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  border-radius: 24px;
   padding: 32px;
 }
 .card form {
@@ -66,7 +67,7 @@
 .card label {
   display: grid;
   gap: 9px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   min-width: 0;
 }
@@ -83,10 +84,10 @@
   font-size: 16px;
   width: 100%;
   border: 1px solid #cdd1c5;
-  background: #fafbf6;
-  color: #20251a;
+  background: #fff;
+  color: #1d1d1f;
   padding: 13px 12px;
-  border-radius: 3px;
+  border-radius: 12px;
   min-height: 48px;
 }
 .card textarea {
@@ -95,17 +96,17 @@
 .card input:focus-visible,
 .card textarea:focus-visible,
 .card select:focus-visible {
-  outline: 2px solid #587827;
+  outline: 2px solid #0071e3;
   outline-offset: 2px;
 }
 .file {
   border: 1px dashed #a2ad94;
-  border-radius: 4px;
+  border-radius: 14px;
   padding: 18px;
-  background: #e8ece0;
+  background: #ecf4ff;
 }
 .file > span {
-  font-size: 10px;
+  font-size: 12px;
   color: #525b47;
   overflow-wrap: anywhere;
 }
@@ -134,7 +135,7 @@
 .card form > button {
   background: #20291a;
   color: #f3f4ed;
-  border-radius: 3px;
+  border-radius: 12px;
   width: 100%;
   font-size: 13px;
 }
@@ -144,12 +145,12 @@
 }
 .legal {
   text-align: center;
-  font-size: 10px;
+  font-size: 12px;
   color: #57614b;
   text-decoration: underline;
 }
 .error {
-  font-size: 12px;
+  font-size: 14px;
   color: #982720;
   line-height: 1.7;
 }
@@ -177,7 +178,7 @@
   font-size: 15px;
 }
 .success button {
-  font-size: 12px;
+  font-size: 14px;
   text-decoration: underline;
 }
 .layout[dir="rtl"] h1 {
@@ -222,3 +223,5 @@
 }
 
 .success strong { overflow-wrap: anywhere; max-width: 100%; }
+
+.page :global(.c-btn){border-radius:999px}.page :global(.c-btn-accent){background:#0071e3;color:#fff}.page :global(.c-btn-accent:hover){background:#0077ed}
