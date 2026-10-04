@@ -10,7 +10,7 @@ export interface B2BProduit extends Produit {
 // Grille Caractère fournie le 4 octobre 2026. Le palier « +50 »
 // commence à 50 pièces, comme la mention « à partir de 50 pièces ».
 const rows: [string, string, string, string, number[], number?][] = [
-  ['tshirt-premium', 'T-shirt Premium', 'tshirt', 'T-shirt', [2100, 1950, 1750]],
+  ['tshirt-premium', 'T-shirt Premium', 'tshirt-oversized', 'T-shirt', [2100, 1950, 1750]],
   ['tshirt-medium', 'T-shirt Medium', 'tshirt', 'T-shirt', [1950, 1750, 1550]],
   ['tshirt-events', 'T-shirt Events', 'tshirt', 'T-shirt', [750], 50],
   ['polo', 'Polo personnalisé', 'polo', 'Polo', [2350, 2050, 1950]],
