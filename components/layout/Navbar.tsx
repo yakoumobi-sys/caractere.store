@@ -11,6 +11,7 @@ const WHATSAPP = "https://wa.me/213557440522";
 // Barre principale : les quatre destinations qui font l'offre. Le reste des
 // parcours vit dans le panneau, pour ne pas surcharger l'en-tête.
 const PRIMAIRE = [
+  { href: "/entreprises/commande", label: "Configurateur" },
   { href: "/entreprises", label: "Entreprises" },
   { href: "/print-on-demand", label: "Créer sa marque" },
   { href: "/produits", label: "Catalogue" },
@@ -104,20 +105,12 @@ export default function Navbar() {
           >
             {user ? prenom : "Se connecter"}
           </Link>
-          <a
-            href={
-              WHATSAPP +
-              "?text=" +
-              encodeURIComponent(
-                "Bonjour Caractère, je souhaite obtenir ma simulation gratuite. Je vous envoie mon logo.",
-              )
-            }
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/entreprises/commande"
             className={`c-btn c-btn-accent ${styles.cta}`}
           >
-            Simulation gratuite
-          </a>
+            Configurer ma commande
+          </Link>
           <button
             ref={boutonRef}
             type="button"
@@ -179,11 +172,11 @@ export default function Navbar() {
           ))}
           <div className={styles.panneauCta}>
             <Link
-              href="/configurateur"
+              href="/entreprises/commande"
               className="c-btn c-btn-accent"
               onClick={fermer}
             >
-              Personnaliser une pièce
+              Configurer ma commande
             </Link>
             <Link
               href={user ? "/dashboard" : "/auth/login"}
