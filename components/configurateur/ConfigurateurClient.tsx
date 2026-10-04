@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabaseClient as supabase } from '@/lib/supabase'
 import type { Produit, Couleur, Taille } from '@/types'
 import Navbar from '@/components/layout/Navbar'
+import { B2B_PRODUITS, findB2BProduit, getB2BPrice, getB2BTiers } from '@/lib/b2b-catalogue'
 
 interface OrderState {
   step: number
@@ -39,8 +40,8 @@ const TECHNIQUES = ['Broderie', 'DTF', 'Conseil équipe']
 const WA = 'https://wa.me/213557440522'
 
 // Le configurateur sert deux entrées : /configurateur (tout public) et /entreprises
-// (commandes B2B). Seuls le contexte éditorial et la quantité de départ changent —
-// la logique de commande, elle, reste unique.
+// (commandes B2B). Le catalogue entreprises et ses paliers sont dédiés ;
+// le parcours de personnalisation et de commande reste partagé.
 export type ConfigurateurVariant = 'default' | 'b2b'
 
 const COPY = {
@@ -112,7 +113,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
   // Catalogue de repli affiché immédiatement : le configurateur est la page
   // d'entrée de /entreprises, il ne doit jamais rester vide si Supabase tarde
   // ou échoue. Les données de la base écrasent ce repli dès qu'elles arrivent.
-  const [produits, setProduits] = useState<Produit[]>(FALLBACK_PRODUITS)
+  const [produits, setProduits] = useState<Produit[]>(variant === 'b2b' ? B2B_PRODUITS : FALLBACK_PRODUITS)
   const [couleurs, setCouleurs] = useState<Couleur[]>(FALLBACK_COULEURS)
   const [tailles, setTailles] = useState<Taille[]>(FALLBACK_TAILLES)
   const [refCode, setRefCode] = useState('')
@@ -133,7 +134,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
 
   useEffect(() => {
     Promise.all([
-      supabase.from('produits').select('*').eq('actif', true).order('ordre'),
+      variant === 'b2b' ? Promise.resolve({ data: B2B_PRODUITS }) : supabase.from('produits').select('*').eq('actif', true).order('ordre'),
       supabase.from('couleurs').select('*').eq('actif', true).order('ordre'),
       supabase.from('tailles').select('*').eq('actif', true).order('ordre'),
     ]).then(([p, c, t]) => {
@@ -141,11 +142,11 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
       setCouleurs(c.data && c.data.length > 0 ? c.data : FALLBACK_COULEURS)
       setTailles(t.data && t.data.length > 0 ? t.data : FALLBACK_TAILLES)
     }).catch(() => {
-      setProduits(FALLBACK_PRODUITS)
+      setProduits(variant === 'b2b' ? B2B_PRODUITS : FALLBACK_PRODUITS)
       setCouleurs(FALLBACK_COULEURS)
       setTailles(FALLBACK_TAILLES)
     })
-  }, [])
+  }, [variant])
 
   useEffect(() => {
     if (prefilled.current || produits.length === 0 || couleurs.length === 0) return
@@ -155,10 +156,12 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
     if (!produitNom) return
     prefilled.current = true
     const matchProduit = produits.find(p => p.nom === produitNom)
+    if (!matchProduit) return
     const matchCouleur = couleurs.find(c => c.nom === couleurNom)
     setOrder(prev => ({
       ...prev,
-      produit: matchProduit ?? prev.produit,
+      produit: matchProduit,
+      quantite: Math.max(prev.quantite, variant === 'b2b' ? findB2BProduit(matchProduit.id)?.minimum ?? 1 : 1),
       couleur: couleurNom ?? prev.couleur,
       couleurHex: matchCouleur?.hex ?? prev.couleurHex,
       step: 2,
@@ -179,12 +182,18 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
     } catch (e) { }
     setFromDesigner(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [produits, couleurs])
+  }, [produits, couleurs, variant])
 
   const up = (patch: Partial<OrderState>) => setOrder(prev => ({ ...prev, ...patch }))
 
+  const b2bProduit = variant === 'b2b' ? findB2BProduit(order.produit?.id) : undefined
+  const minQuantite = b2bProduit?.minimum ?? 1
+  const setQuantite = (value: number) => up({ quantite: Math.min(100000, Math.max(minQuantite, Number.isFinite(value) ? Math.trunc(value) : minQuantite)) })
+  const productImage = (p: Produit) => (variant === 'b2b' ? findB2BProduit(p.id)?.image : undefined) || PRODUCT_IMAGES[p.nom] || FALLBACK_IMG
+
   const calcPrice = () => {
     if (!order.produit) return { unit: 0, total: 0, remise: 0 }
+    if (b2bProduit) return getB2BPrice(b2bProduit, order.quantite)
     const r = order.quantite >= 100 ? 0.10 : order.quantite >= 50 ? 0.05 : 0
     const unit = Math.round(order.produit.prix_base * (1 - r))
     return { unit, total: unit * order.quantite, remise: r }
@@ -248,6 +257,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          ...(variant === 'b2b' ? { catalogue: 'entreprises-2026-10' } : {}),
           reference: ref, produit: order.produit?.nom, quantite: order.quantite,
           couleur: order.couleur, tailles: order.tailles, position: order.position,
           technique: order.technique, urgent: order.urgent, nom_client: order.nom,
@@ -281,11 +291,11 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
 
   // ─── COULEURS FILTRÉES ────────────────────────────────────────────────────
   const couleursFiltrees = couleurs.filter(c =>
-    !order.produit || !c.produits || c.produits.length === 0 || c.produits.includes(order.produit.nom)
+    !order.produit || !c.produits || c.produits.length === 0 || c.produits.includes(order.produit.nom) || !!(b2bProduit && c.produits.includes(b2bProduit.famille))
   )
 
   // ─── PREVIEW IMAGE ────────────────────────────────────────────────────────
-  const previewImg = order.produit ? (PRODUCT_IMAGES[order.produit.nom] || FALLBACK_IMG) : null
+  const previewImg = order.produit ? productImage(order.produit) : null
 
   // ─── CONFIRMATION (STEP 6) ────────────────────────────────────────────────
   if (order.step === 6) {
@@ -457,12 +467,13 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {produits.map(p => {
-                      const imgUrl = PRODUCT_IMAGES[p.nom] || FALLBACK_IMG
+                      const imgUrl = productImage(p)
+                      const b2b = variant === 'b2b' ? findB2BProduit(p.id) : undefined
                       const selected = order.produit?.id === p.id
                       return (
                         <button
                           key={p.id}
-                          onClick={() => up({ produit: p, step: 2 })}
+                          onClick={() => up({ produit: p, quantite: Math.max(order.quantite, b2b?.minimum ?? 1), step: 2 })}
                           className={`text-left rounded-2xl border-2 transition-all bg-white overflow-hidden group
                             ${selected ? 'border-brand-dark shadow-md' : 'border-black/10 hover:border-black/30 hover:shadow-sm'}`}
                         >
@@ -491,7 +502,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                           <div className="p-3.5">
                             <p className="text-[14px] font-semibold tracking-tight leading-tight">{p.nom}</p>
                             <p className="text-[11px] text-brand-gray mt-0.5 leading-snug">{p.description}</p>
-                            <p className="text-[13px] font-bold mt-2 text-brand-dark">dès {p.prix_base.toLocaleString('fr-FR')} DA</p>
+                            <p className="text-[13px] font-bold mt-2 text-brand-dark">dès {(b2b ? b2b.paliers[b2b.paliers.length - 1].prix : p.prix_base).toLocaleString('fr-FR')} DA</p>
                           </div>
                         </button>
                       )
@@ -578,28 +589,29 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                     <p className="text-[12px] font-bold tracking-widest uppercase text-brand-gray mb-3">Quantité</p>
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => up({ quantite: Math.max(1, order.quantite - 1) })}
+                        onClick={() => setQuantite(order.quantite - 1)} disabled={order.quantite <= minQuantite} aria-label="Diminuer la quantité"
                         className="w-11 h-11 rounded-full border-2 border-black/15 flex items-center justify-center text-[20px] bg-white hover:border-black/30 transition-all font-light"
                       >−</button>
                       <input
-                        type="number" min={1} value={order.quantite}
-                        onChange={e => up({ quantite: Math.max(1, parseInt(e.target.value) || 1) })}
+                        type="number" aria-label="Quantité" min={minQuantite} max={100000} step={1} value={order.quantite}
+                        onChange={e => setQuantite(Number(e.target.value))}
                         className="w-20 text-center text-[20px] font-bold border-2 border-black/15 rounded-xl py-2 focus:outline-none focus:border-brand-dark"
                       />
                       <button
-                        onClick={() => up({ quantite: order.quantite + 1 })}
+                        onClick={() => setQuantite(order.quantite + 1)} disabled={order.quantite >= 100000} aria-label="Augmenter la quantité"
                         className="w-11 h-11 rounded-full border-2 border-black/15 flex items-center justify-center text-[20px] bg-white hover:border-black/30 transition-all font-light"
                       >+</button>
                       <span className="text-[13px] text-brand-gray">pièces</span>
                     </div>
 
-                    {/* Paliers remise */}
+                    {minQuantite > 1 && <p className="text-[13px] text-brand-gray mt-3">Disponible uniquement à partir de {minQuantite} pièces.</p>}
+                    {/* Prix unitaires du catalogue entreprises, sans remise supplémentaire. */}
                     <div className="flex gap-2 mt-4 flex-wrap">
-                      {[
+                      {(b2bProduit ? getB2BTiers(b2bProduit, order.quantite) : [
                         { label: '1–49 pcs', info: 'Prix normal', active: order.quantite < 50 },
                         { label: '50–99 pcs', info: '−5%', active: order.quantite >= 50 && order.quantite < 100 },
                         { label: '100+ pcs', info: '−10%', active: order.quantite >= 100 },
-                      ].map(tier => (
+                      ]).map(tier => (
                         <div key={tier.label} className={`px-3 py-2 rounded-xl border text-[12px] transition-all
                           ${tier.active ? 'border-green-400 bg-green-50 text-green-800' : 'border-black/10 bg-white text-brand-gray'}`}>
                           <span className="font-semibold">{tier.label}</span>

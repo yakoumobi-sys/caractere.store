@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { Resend } from 'resend'
 import { requireAdmin } from '@/lib/api-auth'
+import { applyB2BPricing } from '@/lib/b2b-catalogue'
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY)
@@ -9,7 +10,13 @@ function getResend() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    const input = await req.json()
+    let body: typeof input
+    try {
+      body = applyB2BPricing(input)
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : 'Commande invalide' }, { status: 400 })
+    }
 
     const { data, error } = await supabaseAdmin
       .from('commandes')
