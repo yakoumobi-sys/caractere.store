@@ -461,9 +461,9 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
               {/* ═══ ÉTAPE 1 : Produit ═══ */}
               {order.step === 1 && (
                 <div>
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-brand-gray mb-2">Étape 1</p>
-                  <h1 className="text-[26px] font-bold tracking-tight mb-1">{copy.step1Title}</h1>
-                  <p className="text-[14px] text-brand-gray mb-8">{copy.step1Sub}</p>
+                  <p className="text-[11px] font-bold tracking-widest uppercase text-[#5F6368] mb-2">Étape 1</p>
+                  <h1 className="text-[26px] md:text-[32px] font-bold tracking-tight leading-tight mb-2 text-[#111111]">{copy.step1Title}</h1>
+                  <p className="text-[14px] md:text-[15px] text-[#5F6368] mb-8">{copy.step1Sub}</p>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {produits.map(p => {
@@ -478,7 +478,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                             ${selected ? 'border-brand-dark shadow-md' : 'border-black/10 hover:border-black/30 hover:shadow-sm'}`}
                         >
                           {/* Image */}
-                          <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#F5F5F3]">
+                          <div className="relative w-full aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#F7F7F5] to-[#ECECE8]">
                             {imgErrors.includes(p.nom) ? (
                               <div className="w-full h-full flex items-center justify-center text-[12px] font-semibold text-brand-gray px-3 text-center">
                                 {p.nom}
@@ -487,7 +487,7 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                               <img
                                 src={imgUrl} alt={p.nom}
                                 onError={() => markImgError(p.nom)}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-contain p-2 group-hover:scale-[1.03] transition-transform duration-300"
                               />
                             )}
                             {selected && (
@@ -500,9 +500,9 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
                           </div>
                           {/* Infos */}
                           <div className="p-3.5">
-                            <p className="text-[14px] font-semibold tracking-tight leading-tight">{p.nom}</p>
-                            <p className="text-[11px] text-brand-gray mt-0.5 leading-snug">{p.description}</p>
-                            <p className="text-[13px] font-bold mt-2 text-brand-dark">dès {(b2b ? b2b.paliers[b2b.paliers.length - 1].prix : p.prix_base).toLocaleString('fr-FR')} DA</p>
+                            <p className="text-[14px] font-bold tracking-tight leading-tight text-[#111111]">{p.nom}</p>
+                            <p className="text-[11px] text-[#5F6368] mt-1 leading-snug">{p.description}</p>
+                            <p className="text-[13px] font-bold mt-2 text-[#111111]">dès {(b2b ? b2b.paliers[b2b.paliers.length - 1].prix : p.prix_base).toLocaleString('fr-FR')} DA</p>
                           </div>
                         </button>
                       )
