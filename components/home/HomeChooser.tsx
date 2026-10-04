@@ -48,11 +48,11 @@ export default function HomeChooser() {
       <Navbar />
       <main id="contenu">
         <div className={styles.announcement}>
-          Une pièce ou toute une équipe.{" "}
-          <span>Votre logo, notre savoir-faire.</span>{" "}
-          <a href={simulation} target="_blank" rel="noopener noreferrer">
-            Simulation offerte.
-          </a>
+          Commandez vos vêtements personnalisés en quelques étapes.{" "}
+          <span>Produit, quantité, personnalisation.</span>{" "}
+          <Link href="/entreprises/commande">
+            Ouvrir le configurateur.
+          </Link>
         </div>
         <section className={styles.hero} aria-labelledby="hero-title">
           <div className={styles.heroCopy}>
@@ -66,17 +66,17 @@ export default function HomeChooser() {
               Le textile personnalisé. Avec du caractère.
             </p>
             <div className={styles.actions}>
+              <Link href="/entreprises/commande" className={styles.primary}>
+                Configurer ma commande
+              </Link>
               <a
                 href={simulation}
-                className={styles.primary}
+                className={styles.textLink}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Obtenir ma simulation gratuite
+                Obtenir ma simulation gratuite <span aria-hidden="true">›</span>
               </a>
-              <Link href="/produits" className={styles.textLink}>
-                Découvrir les produits <span aria-hidden="true">›</span>
-              </Link>
             </div>
           </div>
           <div className={styles.heroImage}>
@@ -116,11 +116,11 @@ export default function HomeChooser() {
             </h2>
             <p>Vos uniformes. Votre logo. Une vraie identité.</p>
             <div className={styles.actions}>
-              <Link href="/entreprises" className={styles.primary}>
-                Habiller mon équipe
+              <Link href="/entreprises/commande" className={styles.primary}>
+                Configurer ma commande
               </Link>
-              <Link href="/entreprises/commande" className={styles.textLink}>
-                Configurer ma commande <span aria-hidden="true">›</span>
+              <Link href="/entreprises" className={styles.textLink}>
+                Découvrir Caractère Pro <span aria-hidden="true">›</span>
               </Link>
             </div>
           </div>
