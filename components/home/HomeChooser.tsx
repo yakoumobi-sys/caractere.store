@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from "./HomeChooser.module.css";
 
 const choices = [
-  { title: "Entreprise", description: "Habillez votre équipe.", action: "Configurer ma commande", href: "/entreprises/commande", image: "/images/campaign/entreprise.webp" },
+  { title: "Entreprise", description: "Habillez votre équipe.", action: "Configurer ma commande", href: "/entreprises/commande", image: "/images/campaign/entreprise-uniformes.webp" },
   { title: "Print on demand", description: "Lancez votre marque.", action: "Créer mon compte", href: "/auth/signup", image: "/images/campaign/streetwear.webp" },
   { title: "Produits", description: "Trouvez votre prochaine pièce.", action: "Découvrir le catalogue", href: "/produits", image: "/images/campaign/hero.webp" },
 ] as const;
