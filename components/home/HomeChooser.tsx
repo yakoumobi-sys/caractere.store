@@ -1,247 +1,246 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./HomeChooser.module.css";
 
-type Slide = {
-  number: string;
-  kicker: string;
-  title: string;
+type Product = {
+  id: string;
+  name: string;
+  kind: string;
   description: string;
-  button: string;
-  href: string;
-  secondary: string;
-  secondaryHref: string;
-  visual: "collection" | "hoodie" | "business";
+  src: string;
+  alt: string;
 };
 
-const slides: Slide[] = [
+const products: Product[] = [
   {
-    number: "01",
-    kicker: "VOTRE STYLE · NOTRE SAVOIR-FAIRE",
-    title: "Votre idée. Notre caractère.",
-    description: "T-shirts, hoodies, polos. Des pièces à votre image, personnalisées à Alger dès une seule pièce.",
-    button: "Personnaliser un vêtement",
-    href: "/configurateur",
-    secondary: "Explorer les produits",
-    secondaryHref: "/produits",
-    visual: "collection",
+    id: "oversized",
+    name: "T-shirt Oversized",
+    kind: "COLLECTION 01 — ESSENTIELS",
+    description: "La coupe qui fait la différence. Créez une pièce unique, à votre image.",
+    src: "/designer-mockups/tshirt_oversized_new.png",
+    alt: "T-shirt oversized Caractère détouré",
   },
   {
-    number: "02",
-    kicker: "CRÉEZ SANS LIMITES",
-    title: "Le hoodie. À votre image.",
-    description: "Choisissez votre couleur, ajoutez votre logo et visualisez votre prochaine pièce.",
-    button: "Créer mon hoodie",
-    href: "/configurateur?produit=Hoodie",
-    secondary: "Voir le catalogue",
-    secondaryHref: "/produits",
-    visual: "hoodie",
+    id: "hoodie",
+    name: "Hoodie",
+    kind: "COLLECTION 02 — STREETWEAR",
+    description: "Votre prochain hoodie préféré. Ajoutez un logo, un design ou votre signature.",
+    src: "/designer-mockups/hoodie_new.png",
+    alt: "Hoodie Caractère détouré",
   },
   {
-    number: "03",
-    kicker: "POUR LES ÉQUIPES QUI SE DÉMARQUENT",
-    title: "Votre équipe. Votre signature.",
-    description: "Des tenues professionnelles personnalisées en broderie ou en DTF. Du prototype à la grande série.",
-    button: "Configurer ma commande",
-    href: "/configurateur",
-    secondary: "Solutions entreprises",
-    secondaryHref: "/entreprises",
-    visual: "business",
+    id: "gilet",
+    name: "Gilet professionnel",
+    kind: "COLLECTION 03 — ENTREPRISES",
+    description: "Un vêtement qui représente votre équipe, sur le terrain comme au bureau.",
+    src: "/designer-mockups/gilet.png",
+    alt: "Gilet professionnel Caractère détouré",
+  },
+  {
+    id: "tshirt",
+    name: "T-shirt classique",
+    kind: "COLLECTION 04 — PERSONNALISATION",
+    description: "Votre idée mérite d'être portée. Impression ou broderie dès une pièce.",
+    src: "/designer-mockups/tshirt.png",
+    alt: "T-shirt classique Caractère détouré",
+  },
+  {
+    id: "casquette",
+    name: "Casquette",
+    kind: "COLLECTION 05 — ACCESSOIRES",
+    description: "Le détail qui complète votre identité, avec votre logo.",
+    src: "/designer-mockups/casquette_new.png",
+    alt: "Casquette Caractère détourée",
+  },
+  {
+    id: "tote",
+    name: "Tote bag",
+    kind: "COLLECTION 06 — ACCESSOIRES",
+    description: "Votre message, partout avec vous. Un accessoire à personnaliser.",
+    src: "/designer-mockups/totebag_new.png",
+    alt: "Tote bag Caractère détouré",
   },
 ];
 
-const colors = [
-  { name: "Sable", value: "#a99e8f" },
-  { name: "Bleu", value: "#61849a" },
-  { name: "Bordeaux", value: "#873c46" },
-  { name: "Noir", value: "#343333" },
-] as const;
+type Position = "left" | "center" | "right" | "hidden";
 
-const collages = {
-  collection: [
-    { src: "/designer-mockups/hoodie_new.png", alt: "Hoodie à personnaliser", cls: "lookLeft" },
-    { src: "/designer-mockups/tshirt_oversized_new.png", alt: "T-shirt oversized personnalisable", cls: "lookCenter" },
-    { src: "/designer-mockups/gilet.png", alt: "Gilet à personnaliser", cls: "lookRight" },
-  ],
-  business: [
-    { src: "/designer-mockups/gilet.png", alt: "Gilet professionnel", cls: "lookLeft" },
-    { src: "/designer-mockups/polo.jpg", alt: "Polo professionnel", cls: "lookCenter" },
-    { src: "/designer-mockups/tshirt.png", alt: "T-shirt pour entreprises", cls: "lookRight" },
-  ],
-} as const;
+function getPosition(index: number, active: number): Position {
+  const distance = (index - active + products.length) % products.length;
+  if (distance === 0) return "center";
+  if (distance === 1) return "right";
+  if (distance === products.length - 1) return "left";
+  return "hidden";
+}
+
+function getTransform(position: Position, drag: number): string {
+  const offset = Math.round(drag);
+  switch (position) {
+    case "left":
+      return `translate3d(calc(-50% - 67% + ${offset}px), 0, 0) rotate(-8deg) scale(.77)`;
+    case "right":
+      return `translate3d(calc(-50% + 67% + ${offset}px), 0, 0) rotate(8deg) scale(.77)`;
+    case "center":
+      return `translate3d(calc(-50% + ${offset}px), 0, 0) rotate(0deg) scale(1)`;
+    default:
+      return `translate3d(calc(-50% + ${offset}px), 0, 0) scale(.55)`;
+  }
+}
 
 export default function HomeChooser() {
-  const [current, setCurrent] = useState(0);
-  const [color, setColor] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const touchStartX = useRef<number | null>(null);
-  const selected = slides[current];
-  const collageItems = selected.visual === "business" ? collages.business : collages.collection;
+  const [active, setActive] = useState(0);
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const gesture = useRef<{ pointerId: number; startX: number } | null>(null);
+  const product = products[active];
 
-  useEffect(() => {
-    if (paused) return;
-    const id = window.setInterval(
-      () => setCurrent((previous) => (previous + 1) % slides.length),
-      9500
-    );
-    return () => window.clearInterval(id);
-  }, [paused, current]);
+  const change = useCallback((direction: number) => {
+    setActive((index) => (index + direction + products.length) % products.length);
+  }, []);
 
-  const next = () => setCurrent((old) => (old + 1) % slides.length);
-  const previous = () => setCurrent((old) => (old - 1 + slides.length) % slides.length);
+  const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+    gesture.current = { pointerId: event.pointerId, startX: event.clientX };
+    setDragging(true);
+    setDragX(0);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const moveDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!gesture.current || gesture.current.pointerId !== event.pointerId) return;
+    const dx = event.clientX - gesture.current.startX;
+    setDragX(Math.min(190, Math.max(-190, dx)));
+  };
+
+  const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!gesture.current || gesture.current.pointerId !== event.pointerId) return;
+    const dx = event.clientX - gesture.current.startX;
+    gesture.current = null;
+    setDragging(false);
+    setDragX(0);
+    if (dx < -55) change(1);
+    else if (dx > 55) change(-1);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const cancelDrag = () => {
+    gesture.current = null;
+    setDragging(false);
+    setDragX(0);
+  };
 
   return (
-    <main
-      className={styles.home}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
-      }}
-    >
+    <main className={styles.home}>
       <header className={styles.header}>
         <Link className={styles.brand} href="/" aria-label="Caractère, accueil">
-          CARACTÈRE<span className={styles.brandDot}>.</span>
+          CARACTÈRE<span>.</span>
         </Link>
-        <p className={styles.headerTag}>ATELIER DE PERSONNALISATION TEXTILE <span>—</span> ALGER</p>
-        <nav className={styles.topNav} aria-label="Navigation principale">
+        <nav className={styles.nav} aria-label="Navigation principale">
           <Link href="/entreprises">Entreprises</Link>
           <Link href="/print-on-demand">Print on Demand</Link>
           <Link href="/produits">Produits</Link>
-          <Link href="/configurateur" className={styles.navCta}>
-            Personnaliser <span aria-hidden="true">↗</span>
-          </Link>
         </nav>
+        <Link className={styles.headerCta} href="/configurateur">
+          Personnaliser <span aria-hidden="true">↗</span>
+        </Link>
       </header>
 
-      <section
-        className={styles.hero}
-        aria-roledescription="Carrousel"
-        aria-label="Découvrez Caractère"
-        onTouchStart={(event) => {
-          touchStartX.current = event.touches[0]?.clientX ?? null;
-        }}
-        onTouchEnd={(event) => {
-          if (touchStartX.current === null) return;
-          const delta = event.changedTouches[0].clientX - touchStartX.current;
-          if (Math.abs(delta) > 60) delta < 0 ? next() : previous();
-          touchStartX.current = null;
-        }}
-      >
-        <div className={styles.watermark} aria-hidden="true">CARACTÈRE</div>
-        <div className={styles.sideNote} aria-hidden="true">CONÇU POUR CRÉER • FAIT À ALGER</div>
-        <div className={styles.art} key={"art-" + current}>
-          {selected.visual === "hoodie" ? (
-            <div className={styles.singleLook}>
-              <div className={styles.hoodieImage}>
-                <Image
-                  src="/designer-mockups/hoodie_new.png"
-                  alt="Hoodie personnalisable Caractère"
-                  fill
-                  priority
-                  sizes="(max-width: 720px) 90vw, 60vw"
-                  className={styles.hoodieBase}
-                />
+      <section className={styles.hero} aria-label="Collection personnalisable Caractère">
+        <div className={styles.heading}>
+          <span className={styles.eyebrow}>CARACTÈRE — VOTRE ATELIER À ALGER</span>
+          <h1>À chaque idée, <em>son caractère.</em></h1>
+          <p>Glissez. Choisissez. Personnalisez.</p>
+        </div>
+
+        <div className={styles.showcase}>
+          <div className={styles.watermark} aria-hidden="true">CARACTÈRE</div>
+          <div className={styles.showcaseSide} aria-hidden="true">VOS IDÉES · NOTRE SAVOIR-FAIRE</div>
+
+          <div
+            className={[styles.stage, dragging ? styles.isDragging : ""].join(" ")}
+            role="group"
+            tabIndex={0}
+            aria-label="Vêtements à personnaliser. Glissez à gauche ou à droite, ou utilisez les flèches du clavier."
+            onPointerDown={startDrag}
+            onPointerMove={moveDrag}
+            onPointerUp={endDrag}
+            onPointerCancel={cancelDrag}
+            onLostPointerCapture={cancelDrag}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowRight") { event.preventDefault(); change(1); }
+              if (event.key === "ArrowLeft") { event.preventDefault(); change(-1); }
+            }}
+          >
+            {products.map((item, index) => {
+              const position = getPosition(index, active);
+              return (
                 <div
-                  className={styles.hoodieColor}
-                  style={{ backgroundColor: colors[color].value }}
-                  aria-hidden="true"
-                />
-              </div>
-              <div className={styles.orbit} aria-hidden="true" />
-            </div>
-          ) : (
-            <div className={styles.collage}>
-              {collageItems.map((item, index) => (
-                <div
-                  key={item.src}
-                  className={[styles.look, styles[item.cls]].join(" ")}
-                  style={{ animationDelay: String(index * 140) + "ms" }}
+                  key={item.id}
+                  className={styles.slot}
+                  data-position={position}
+                  style={{ transform: getTransform(position, dragX) }}
+                  aria-hidden={position !== "center"}
                 >
                   <Image
                     src={item.src}
-                    alt={item.alt}
+                    alt={position === "center" ? item.alt : ""}
                     fill
-                    priority={current === 0}
-                    sizes="(max-width: 720px) 55vw, 37vw"
-                    className={styles.garmentImage}
+                    priority={index < 3}
+                    draggable={false}
+                    sizes="(max-width: 720px) 76vw, (max-width: 1200px) 42vw, 570px"
+                    className={styles.productImage}
                   />
                 </div>
+              );
+            })}
+          </div>
+          <div className={styles.shadow} aria-hidden="true" />
+          <div className={styles.dragHint} aria-hidden="true">
+            <span>←</span> GLISSEZ LES ARTICLES <span>→</span>
+          </div>
+        </div>
+
+        <div className={styles.productFooter}>
+          <div className={styles.productInfo} key={product.id}>
+            <span className={styles.productKind}>{product.kind}</span>
+            <h2 aria-live="polite">{product.name}</h2>
+            <p>{product.description}</p>
+            <Link className={styles.primaryCta} href="/configurateur">
+              Personnaliser cet article <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          <div className={styles.controls}>
+            <div className={styles.counter}><strong>{String(active + 1).padStart(2, "0")}</strong> / {String(products.length).padStart(2, "0")}</div>
+            <div className={styles.dots} aria-label="Choisir un article">
+              {products.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={index === active ? styles.dotActive : ""}
+                  aria-label={"Voir " + item.name}
+                  aria-current={index === active ? "true" : undefined}
+                  onClick={() => setActive(index)}
+                />
               ))}
             </div>
-          )}
-          <div className={styles.groundShadow} aria-hidden="true" />
-        </div>
-
-        <div
-          className={[styles.details, selected.visual === "hoodie" ? styles.detailsHoodie : ""].join(" ")}
-          key={"details-" + current}
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <span className={styles.eyebrow}>{selected.kicker}</span>
-          <h1>{selected.title}</h1>
-          <p>{selected.description}</p>
-          {selected.visual === "hoodie" && (
-            <fieldset className={styles.swatches}>
-              <legend>Couleur d&apos;inspiration <span>— {colors[color].name}</span></legend>
-              <div className={styles.swatchRow}>
-                {colors.map((choice, index) => (
-                  <button
-                    key={choice.name}
-                    type="button"
-                    className={[styles.swatch, color === index ? styles.swatchSelected : ""].join(" ")}
-                    style={{ backgroundColor: choice.value }}
-                    title={choice.name}
-                    aria-label={"Couleur " + choice.name}
-                    aria-pressed={color === index}
-                    onClick={() => setColor(index)}
-                  />
-                ))}
-              </div>
-              <small>Aperçu d&apos;ambiance non contractuel</small>
-            </fieldset>
-          )}
-          <Link className={styles.primaryCta} href={selected.href}>
-            {selected.button}<span aria-hidden="true">↗</span>
-          </Link>
-          <Link className={styles.secondaryCta} href={selected.secondaryHref}>
-            {selected.secondary}<span aria-hidden="true">↗</span>
-          </Link>
-        </div>
-
-        <div className={styles.heroFooter}>
-          <div className={styles.counter}>
-            <strong>{selected.number}</strong><span>/</span><span>0{slides.length}</span>
-            <small>EXPLORER LES UNIVERS</small>
-          </div>
-          <div className={styles.pagination} aria-label="Sélectionner une collection">
-            {slides.map((slide, index) => (
-              <button
-                type="button"
-                key={slide.number}
-                className={[styles.pageDot, index === current ? styles.pageDotActive : ""].join(" ")}
-                aria-label={"Afficher l'univers " + slide.number}
-                aria-current={index === current ? "true" : undefined}
-                onClick={() => setCurrent(index)}
-              />
-            ))}
-          </div>
-          <div className={styles.arrows}>
-            <button type="button" onClick={previous} aria-label="Univers précédent">←</button>
-            <button type="button" onClick={next} aria-label="Univers suivant">→</button>
+            <div className={styles.arrows}>
+              <button type="button" aria-label="Article précédent" onClick={() => change(-1)}>←</button>
+              <button type="button" aria-label="Article suivant" onClick={() => change(1)}>→</button>
+            </div>
           </div>
         </div>
       </section>
-      <div className={styles.bottomBar}>
-        <span>FABRIQUÉ AVEC CARACTÈRE.</span>
+
+      <footer className={styles.footer}>
+        <span>VOTRE MARQUE. VOTRE ÉQUIPE. VOTRE IDENTITÉ.</span>
         <span>DTF · BRODERIE · PRINT ON DEMAND</span>
-        <Link href="/configurateur">VOTRE PIÈCE COMMENCE ICI ↗</Link>
-      </div>
+        <Link href="/entreprises">HABILLER MON ENTREPRISE ↗</Link>
+      </footer>
     </main>
   );
 }
