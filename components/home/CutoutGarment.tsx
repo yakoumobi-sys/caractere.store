@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getCutoutProduct } from "@/lib/remove-product-background";
 
 /**
- * Product renders only after a transparent, isolated version has been prepared.
- * The original image is never modified, so the configurator remains unchanged.
+ * Safe, immediate product image rendering.
+ * Do not run background segmentation in Safari at runtime.
+ * Only the home carousel uses this component; originals are kept intact.
+ * When verified static transparent assets exist, use their public URLs in src.
  */
 export default function CutoutGarment({
   src,
@@ -23,23 +23,10 @@ export default function CutoutGarment({
   sizes: string;
   visible: boolean;
 }) {
-  const [readySource, setReadySource] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!visible || readySource) return;
-    let alive = true;
-    getCutoutProduct(src).then((url) => {
-      if (alive) setReadySource(url);
-    });
-    return () => { alive = false; };
-  }, [src, visible, readySource]);
-
-  if (!readySource) return null;
-
   return (
     <Image
-      src={readySource}
-      alt={alt}
+      src={src}
+      alt={visible ? alt : ""}
       fill
       unoptimized
       draggable={false}
