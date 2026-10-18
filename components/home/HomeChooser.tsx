@@ -21,7 +21,7 @@ const products: Product[] = [
     name: "T-shirt Oversized",
     kind: "COLLECTION 01 — ESSENTIELS",
     description: "La coupe qui fait la différence. Créez une pièce unique, à votre image.",
-    src: "/designer-mockups/tshirt_oversized_new.png",
+    src: "/home-cutouts/tshirt-oversized.png",
     alt: "T-shirt oversized Caractère détouré",
   },
   {
@@ -29,7 +29,7 @@ const products: Product[] = [
     name: "Hoodie",
     kind: "COLLECTION 02 — STREETWEAR",
     description: "Votre prochain hoodie préféré. Ajoutez un logo, un design ou votre signature.",
-    src: "/designer-mockups/hoodie_new.png",
+    src: "/home-cutouts/hoodie.png",
     alt: "Hoodie Caractère détouré",
   },
   {
@@ -37,7 +37,7 @@ const products: Product[] = [
     name: "Gilet professionnel",
     kind: "COLLECTION 03 — ENTREPRISES",
     description: "Un vêtement qui représente votre équipe, sur le terrain comme au bureau.",
-    src: "/designer-mockups/gilet.png",
+    src: "/home-cutouts/gilet.png",
     alt: "Gilet professionnel Caractère détouré",
   },
   {
@@ -45,7 +45,7 @@ const products: Product[] = [
     name: "T-shirt classique",
     kind: "COLLECTION 04 — PERSONNALISATION",
     description: "Votre idée mérite d'être portée. Impression ou broderie dès une pièce.",
-    src: "/designer-mockups/tshirt.png",
+    src: "/home-cutouts/tshirt.png",
     alt: "T-shirt classique Caractère détouré",
   },
   {
@@ -53,7 +53,7 @@ const products: Product[] = [
     name: "Casquette",
     kind: "COLLECTION 05 — ACCESSOIRES",
     description: "Le détail qui complète votre identité, avec votre logo.",
-    src: "/designer-mockups/casquette_new.png",
+    src: "/home-cutouts/casquette.png",
     alt: "Casquette Caractère détourée",
   },
   {
@@ -61,7 +61,7 @@ const products: Product[] = [
     name: "Tote bag",
     kind: "COLLECTION 06 — ACCESSOIRES",
     description: "Votre message, partout avec vous. Un accessoire à personnaliser.",
-    src: "/designer-mockups/totebag_new.png",
+    src: "/home-cutouts/tote-bag.png",
     alt: "Tote bag Caractère détouré",
   },
 ];
