@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import Image from "next/image";
+import CutoutGarment from "./CutoutGarment";
 import Link from "next/link";
 import styles from "./HomeChooser.module.css";
 
@@ -186,12 +186,11 @@ export default function HomeChooser() {
                   style={{ transform: getTransform(position, dragX) }}
                   aria-hidden={position !== "center"}
                 >
-                  <Image
+                  <CutoutGarment
                     src={item.src}
                     alt={position === "center" ? item.alt : ""}
-                    fill
+                    visible={position !== "hidden"}
                     priority={index < 3}
-                    draggable={false}
                     sizes="(max-width: 720px) 76vw, (max-width: 1200px) 42vw, 570px"
                     className={styles.productImage}
                   />
