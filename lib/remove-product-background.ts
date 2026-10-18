@@ -84,7 +84,7 @@ function isolateLargestGarment(binary: Uint8Array, width: number, height: number
   const mask = new Uint8Array(count);
   const visitedGarment = new Uint8Array(count);
   const winner = walk(largestIndex, binary, visitedGarment, true);
-  for (const index of winner.points!) mask[index] = 1;
+  for (let j = 0; j < winner.points!.length; j += 1) mask[winner.points![j]] = 1;
 
   // Fabric interiors are often the same shade as the backdrop. Fill enclosed
   // empty islands rather than producing transparent holes in white clothing.
@@ -94,7 +94,7 @@ function isolateLargestGarment(binary: Uint8Array, width: number, height: number
     const hole = walk(i, mask, seenHoles, true);
     const realBagOpening = keepHandleHole && hole.size > count * 0.012 && hole.middleY < height * 0.52;
     if (!hole.touchesEdge && !realBagOpening) {
-      for (const point of hole.points!) mask[point] = 1;
+      for (let j = 0; j < hole.points!.length; j += 1) mask[hole.points![j]] = 1;
     }
   }
   return mask;
