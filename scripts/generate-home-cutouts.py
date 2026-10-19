@@ -7,7 +7,8 @@ load ready-made images. The original mockups stay untouched for the configurator
 from __future__ import annotations
 
 from pathlib import Path
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageOps
+import argparse
 from rembg import new_session, remove
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,7 @@ PRODUCTS = {
     "tshirt-oversized": "tshirt_oversized_new.png",
     "hoodie": "hoodie_new.png",
     "gilet": "gilet.png",
+    "polo": "polo.jpg",
     "tshirt": "tshirt.png",
     "casquette": "casquette_new.png",
     "tote-bag": "totebag_new.png",
@@ -43,6 +45,19 @@ def process(session, name: str, filename: str) -> None:
     ).convert("RGBA")
 
     alpha = extracted.getchannel("A")
+    if name == "tshirt-oversized":
+        # The model erases the RIGHT SLEEVE of this otherwise complete source
+        # photograph. Rebuild *only its alpha mask* from the intact left side.
+        # Keep original photograph pixels, so the right sleeve keeps its own
+        # fabric lighting and folds rather than duplicating the image.
+        midpoint = source.width // 2
+        mirrored_alpha = ImageOps.mirror(alpha)
+        original_right = alpha.crop((midpoint, 0, source.width, source.height))
+        mirrored_right = mirrored_alpha.crop((midpoint, 0, source.width, source.height))
+        repaired = ImageChops.lighter(original_right, mirrored_right)
+        alpha.paste(repaired, (midpoint, 0))
+        extracted.putalpha(alpha)
+        print("Repaired oversized right sleeve using mirrored left-side alpha mask.")
     # Guard against the original bug (a totally transparent rectangle).
     hist = alpha.histogram()
     total = extracted.width * extracted.height
@@ -60,7 +75,9 @@ def process(session, name: str, filename: str) -> None:
     bbox = alpha.point(lambda px: 255 if px > 25 else 0).getbbox()
     if bbox is None:
         raise RuntimeError(f"{name} resulted in empty alpha.")
-    pad = max(18, int(min(source.size) * 0.035))
+    # Oversized sleeves need generous invisible breathing room.
+    pad_ratio = 0.09 if name == "tshirt-oversized" else 0.055
+    pad = max(30, int(min(source.size) * pad_ratio))
     cropped = extracted.crop((
         max(0, bbox[0] - pad), max(0, bbox[1] - pad),
         min(extracted.width, bbox[2] + pad),
@@ -78,10 +95,14 @@ def process(session, name: str, filename: str) -> None:
 
 
 def main() -> None:
-    # One reusable model session for all six articles, precomputed off-line.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--only", nargs="*", choices=sorted(PRODUCTS))
+    args = parser.parse_args()
+    targets = args.only if args.only else list(PRODUCTS)
+    # One model session, but only regenerate the two changed articles.
     session = new_session("u2net")
-    for name, filename in PRODUCTS.items():
-        process(session, name, filename)
+    for name in targets:
+        process(session, name, PRODUCTS[name])
 
 
 if __name__ == "__main__":
