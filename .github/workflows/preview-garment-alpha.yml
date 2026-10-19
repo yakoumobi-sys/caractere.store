@@ -42,3 +42,5 @@ jobs:
           git add public/home-cutouts/_alpha-check.jpg
           git commit -m "test: preview alpha garment compositing"
           git push origin HEAD:fix/oversized-polo-carousel
+
+# Final transparency review after removing polo rack pixels.
