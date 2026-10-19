@@ -7,7 +7,7 @@ load ready-made images. The original mockups stay untouched for the configurator
 from __future__ import annotations
 
 from pathlib import Path
-from PIL import Image, ImageChops, ImageOps
+from PIL import Image, ImageChops, ImageOps, ImageDraw, ImageFilter
 import argparse
 from rembg import new_session, remove
 
@@ -56,8 +56,41 @@ def process(session, name: str, filename: str) -> None:
         mirrored_right = mirrored_alpha.crop((midpoint, 0, source.width, source.height))
         repaired = ImageChops.lighter(original_right, mirrored_right)
         alpha.paste(repaired, (midpoint, 0))
+        # rembg discards RGB pixels where it removed the right sleeve.
+        # Restore the original photograph RGB under the recovered alpha mask.
+        extracted = source.copy()
         extracted.putalpha(alpha)
-        print("Repaired oversized right sleeve using mirrored left-side alpha mask.")
+        print("Repaired oversized right sleeve using original pixels and symmetric alpha.")
+    if name == "polo":
+        # The polo photo is shot on a wooden rack. Generic matting preserves the
+        # rack, so trace the shirt outline explicitly, excluding the hanger.
+        # Points reference the full 512x512 source frame and scale to any size.
+        outline = [
+            (211, 134), (201, 140), (190, 147), (177, 152),
+            (157, 162), (145, 172), (130, 184), (116, 198),
+            (103, 211), (95, 223), (97, 231), (106, 239),
+            (116, 243), (128, 245), (141, 242), (154, 235),
+            (160, 230), (165, 248), (167, 282), (169, 324),
+            (173, 378), (175, 419), (176, 430), (179, 438),
+            (195, 441), (237, 441), (285, 441), (315, 443),
+            (329, 438), (335, 432), (337, 408), (339, 368),
+            (339, 313), (339, 268), (341, 244),
+            (350, 236), (362, 242), (373, 242), (386, 233),
+            (398, 224), (396, 214), (387, 201), (373, 183),
+            (360, 169), (347, 158), (329, 149), (307, 143),
+            (289, 135), (280, 131), (271, 140), (266, 149),
+            (253, 157), (244, 157), (236, 155), (222, 141)
+        ]
+        mask = Image.new("L", source.size, 0)
+        drawer = ImageDraw.Draw(mask)
+        coords = [(round(x * source.width / 512), round(y * source.height / 512)) for x, y in outline]
+        drawer.polygon(coords, fill=255)
+        mask = mask.filter(ImageFilter.GaussianBlur(radius=max(0.8, source.width / 650)))
+        alpha = mask
+        extracted = source.copy()
+        extracted.putalpha(alpha)
+        print("Isolated polo with custom garment contour (hanger + wooden rack excluded).")
+
     # Guard against the original bug (a totally transparent rectangle).
     hist = alpha.histogram()
     total = extracted.width * extracted.height
