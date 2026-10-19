@@ -85,6 +85,18 @@ def process(session, name: str, filename: str) -> None:
         drawer = ImageDraw.Draw(mask)
         coords = [(round(x * source.width / 512), round(y * source.height / 512)) for x, y in outline]
         drawer.polygon(coords, fill=255)
+        # Remove the last visible rail pixels that overlap the shirt outline.
+        # Brown wooden parts have high red/yellow saturation; white garment
+        # fibers do not. Only pixels inside the hand-traced contour are checked.
+        rgb = source.load()
+        mask_px = mask.load()
+        for py in range(source.height):
+            for px in range(source.width):
+                if mask_px[px, py] < 10:
+                    continue
+                r, g, b, _ = rgb[px, py]
+                if r - g > 18 and g - b > 18 and b < 202:
+                    mask_px[px, py] = 0
         mask = mask.filter(ImageFilter.GaussianBlur(radius=max(0.8, source.width / 650)))
         alpha = mask
         extracted = source.copy()
