@@ -7,7 +7,8 @@ load ready-made images. The original mockups stay untouched for the configurator
 from __future__ import annotations
 
 from pathlib import Path
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageOps, ImageDraw, ImageFilter
+import argparse
 from rembg import new_session, remove
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,7 @@ PRODUCTS = {
     "tshirt-oversized": "tshirt_oversized_new.png",
     "hoodie": "hoodie_new.png",
     "gilet": "gilet.png",
+    "polo": "polo.jpg",
     "tshirt": "tshirt.png",
     "casquette": "casquette_new.png",
     "tote-bag": "totebag_new.png",
@@ -43,6 +45,64 @@ def process(session, name: str, filename: str) -> None:
     ).convert("RGBA")
 
     alpha = extracted.getchannel("A")
+    if name == "tshirt-oversized":
+        # The model erases the RIGHT SLEEVE of this otherwise complete source
+        # photograph. Rebuild *only its alpha mask* from the intact left side.
+        # Keep original photograph pixels, so the right sleeve keeps its own
+        # fabric lighting and folds rather than duplicating the image.
+        midpoint = source.width // 2
+        mirrored_alpha = ImageOps.mirror(alpha)
+        original_right = alpha.crop((midpoint, 0, source.width, source.height))
+        mirrored_right = mirrored_alpha.crop((midpoint, 0, source.width, source.height))
+        repaired = ImageChops.lighter(original_right, mirrored_right)
+        alpha.paste(repaired, (midpoint, 0))
+        # rembg discards RGB pixels where it removed the right sleeve.
+        # Restore the original photograph RGB under the recovered alpha mask.
+        extracted = source.copy()
+        extracted.putalpha(alpha)
+        print("Repaired oversized right sleeve using original pixels and symmetric alpha.")
+    if name == "polo":
+        # The polo photo is shot on a wooden rack. Generic matting preserves the
+        # rack, so trace the shirt outline explicitly, excluding the hanger.
+        # Points reference the full 512x512 source frame and scale to any size.
+        outline = [
+            (211, 134), (201, 140), (190, 147), (177, 152),
+            (157, 162), (145, 172), (130, 184), (116, 198),
+            (103, 211), (95, 223), (97, 231), (106, 239),
+            (116, 243), (128, 245), (141, 242), (154, 235),
+            (160, 230), (165, 248), (167, 282), (169, 324),
+            (173, 378), (175, 419), (176, 430), (179, 438),
+            (195, 441), (237, 441), (285, 441), (315, 443),
+            (329, 438), (335, 432), (337, 408), (339, 368),
+            (339, 313), (339, 268), (341, 244),
+            (350, 236), (362, 242), (373, 242), (386, 233),
+            (398, 224), (396, 214), (387, 201), (373, 183),
+            (360, 169), (347, 158), (329, 149), (307, 143),
+            (289, 135), (280, 131), (271, 140), (266, 149),
+            (253, 157), (244, 157), (236, 155), (222, 141)
+        ]
+        mask = Image.new("L", source.size, 0)
+        drawer = ImageDraw.Draw(mask)
+        coords = [(round(x * source.width / 512), round(y * source.height / 512)) for x, y in outline]
+        drawer.polygon(coords, fill=255)
+        # Remove the last visible rail pixels that overlap the shirt outline.
+        # Brown wooden parts have high red/yellow saturation; white garment
+        # fibers do not. Only pixels inside the hand-traced contour are checked.
+        rgb = source.load()
+        mask_px = mask.load()
+        for py in range(source.height):
+            for px in range(source.width):
+                if mask_px[px, py] < 10:
+                    continue
+                r, g, b, _ = rgb[px, py]
+                if r - g > 18 and g - b > 18 and b < 202:
+                    mask_px[px, py] = 0
+        mask = mask.filter(ImageFilter.GaussianBlur(radius=max(0.8, source.width / 650)))
+        alpha = mask
+        extracted = source.copy()
+        extracted.putalpha(alpha)
+        print("Isolated polo with custom garment contour (hanger + wooden rack excluded).")
+
     # Guard against the original bug (a totally transparent rectangle).
     hist = alpha.histogram()
     total = extracted.width * extracted.height
@@ -60,7 +120,9 @@ def process(session, name: str, filename: str) -> None:
     bbox = alpha.point(lambda px: 255 if px > 25 else 0).getbbox()
     if bbox is None:
         raise RuntimeError(f"{name} resulted in empty alpha.")
-    pad = max(18, int(min(source.size) * 0.035))
+    # Oversized sleeves need generous invisible breathing room.
+    pad_ratio = 0.09 if name == "tshirt-oversized" else 0.055
+    pad = max(30, int(min(source.size) * pad_ratio))
     cropped = extracted.crop((
         max(0, bbox[0] - pad), max(0, bbox[1] - pad),
         min(extracted.width, bbox[2] + pad),
@@ -78,10 +140,14 @@ def process(session, name: str, filename: str) -> None:
 
 
 def main() -> None:
-    # One reusable model session for all six articles, precomputed off-line.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--only", nargs="*", choices=sorted(PRODUCTS))
+    args = parser.parse_args()
+    targets = args.only if args.only else list(PRODUCTS)
+    # One model session, but only regenerate the two changed articles.
     session = new_session("u2net")
-    for name, filename in PRODUCTS.items():
-        process(session, name, filename)
+    for name in targets:
+        process(session, name, PRODUCTS[name])
 
 
 if __name__ == "__main__":
