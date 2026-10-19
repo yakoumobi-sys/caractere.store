@@ -39,6 +39,12 @@
 .slot[data-position="hidden"] { z-index: 0; opacity: 0; visibility: hidden; }
 .isDragging .slot { transition: none; }
 .productImage { object-fit: contain; object-position: center; user-select: none; -webkit-user-drag: none; background: transparent !important; mix-blend-mode: normal; }
+/* Keep the complete sleeves comfortably inside the swipe frame. */
+.slot[data-product="oversized"] .productImage { transform: scale(.91); transform-origin: center; }
+@media (max-width: 720px) {
+  .slot[data-product="oversized"] .productImage { transform: scale(.90); }
+}
+
 .shadow { position: absolute; bottom: 7%; left: 50%; width: 33%; height: 19px; background: rgba(30,30,26,.1); filter: blur(19px); border-radius: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none; }
 .dragHint { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 18px; color: #85877d; letter-spacing: .17em; font-weight: 700; font-size: 9px; z-index: 3; white-space: nowrap; pointer-events: none; }
 .dragHint span { color: #33372f; font-size: 19px; font-weight: 400; letter-spacing: 0; }
