@@ -41,9 +41,17 @@ const products: Product[] = [
     alt: "Gilet professionnel Caractère détouré",
   },
   {
+    id: "polo",
+    name: "Polo",
+    kind: "COLLECTION 04 — ENTREPRISES",
+    description: "Un polo élégant, brodé ou imprimé avec votre identité.",
+    src: "/home-cutouts/polo.png",
+    alt: "Polo blanc Caractère détouré",
+  },
+  {
     id: "tshirt",
     name: "T-shirt classique",
-    kind: "COLLECTION 04 — PERSONNALISATION",
+    kind: "COLLECTION 05 — PERSONNALISATION",
     description: "Votre idée mérite d'être portée. Impression ou broderie dès une pièce.",
     src: "/home-cutouts/tshirt.png",
     alt: "T-shirt classique Caractère détouré",
@@ -51,7 +59,7 @@ const products: Product[] = [
   {
     id: "casquette",
     name: "Casquette",
-    kind: "COLLECTION 05 — ACCESSOIRES",
+    kind: "COLLECTION 06 — ACCESSOIRES",
     description: "Le détail qui complète votre identité, avec votre logo.",
     src: "/home-cutouts/casquette.png",
     alt: "Casquette Caractère détourée",
@@ -59,7 +67,7 @@ const products: Product[] = [
   {
     id: "tote",
     name: "Tote bag",
-    kind: "COLLECTION 06 — ACCESSOIRES",
+    kind: "COLLECTION 07 — ACCESSOIRES",
     description: "Votre message, partout avec vous. Un accessoire à personnaliser.",
     src: "/home-cutouts/tote-bag.png",
     alt: "Tote bag Caractère détouré",
@@ -183,6 +191,7 @@ export default function HomeChooser() {
                   key={item.id}
                   className={styles.slot}
                   data-position={position}
+                  data-product={item.id}
                   style={{ transform: getTransform(position, dragX) }}
                   aria-hidden={position !== "center"}
                 >
