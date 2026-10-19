@@ -1,0 +1,44 @@
+name: Preview generated transparency
+on:
+  push:
+    branches:
+      - fix/oversized-polo-carousel
+    paths:
+      - .github/workflows/preview-garment-alpha.yml
+
+permissions:
+  contents: write
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: true
+      - run: python -m pip install 'Pillow>=10,<13'
+      - name: Composite alpha for visual inspection
+        run: |
+          python - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          root=Path('public/home-cutouts')
+          dest=Image.new('RGB',(1000,560),(245,237,222))
+          for k,name in enumerate(['tshirt-oversized','polo']):
+              im=Image.open(root/(name+'.png')).convert('RGBA')
+              im.thumbnail((475,490))
+              patch=Image.new('RGBA',im.size,(62,179,163,255))
+              patch.alpha_composite(im)
+              dest.paste(patch.convert('RGB'),(k*500+(500-im.width)//2,50))
+              a=im.getchannel('A')
+              h=a.histogram()
+              print(name,'alpha zero:',round(sum(h[:5])/sum(h),3),'alpha opaque:',round(sum(h[250:])/sum(h),3))
+          ImageDraw.Draw(dest).text((15,20),'ACTUAL ALPHA COMPOSITED ON TURQUOISE',fill=(30,30,30))
+          dest.save(root/'_alpha-check.jpg',quality=80,optimize=True)
+          PY
+      - name: Commit diagnostic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/home-cutouts/_alpha-check.jpg
+          git commit -m "test: preview alpha garment compositing"
+          git push origin HEAD:fix/oversized-polo-carousel
