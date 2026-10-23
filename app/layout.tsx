@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Oswald } from 'next/font/google'
 import './globals.css'
+import WhatsAppContact from './components/WhatsAppContact'
 import { JsonLd, jsonLdGraph, organizationLd, localBusinessLd, SITE_URL, LOGO_URL } from '@/lib/seo'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap', weight: ['300','400','500','600','700'] })
@@ -61,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Google et les assistants IA lisent pour savoir qui publie le site. */}
         <JsonLd data={jsonLdGraph(organizationLd, localBusinessLd)} />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">{children}<WhatsAppContact /></body>
     </html>
   )
 }
