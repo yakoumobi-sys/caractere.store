@@ -23,10 +23,7 @@ export const metadata: Metadata = {
   },
   description: DEFAULT_DESCRIPTION,
   applicationName: 'Caractère Store',
-  // Canonique par défaut : chaque page qui a sa propre URL la surcharge via
-  // `alternates.canonical`. Évite que www/non-www et les paramètres de
-  // campagne créent des doublons aux yeux de Google.
-  alternates: { canonical: '/' },
+  // Les pages publiques définissent leur propre canonique. Ne pas forcer '/' sur toutes les routes.
   // Autorise les extraits longs et les grandes vignettes : c'est ce qui
   // alimente les résultats enrichis et les citations des moteurs IA.
   robots: {
