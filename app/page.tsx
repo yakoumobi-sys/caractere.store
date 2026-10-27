@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Footer from "@/components/layout/Footer";
 import HomeChooser from "@/components/home/HomeChooser";
 
 // Accueil — wrapper serveur pour exposer un title/description propres
@@ -25,5 +26,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeChooser />;
+  return <><HomeChooser /><Footer /></>;
 }
