@@ -43,6 +43,12 @@ ${PALIERS.map(p => `- ${p.volume} : ${p.remise} (${p.detail})`).join('\n')}
 Délais : 3 à 5 jours ouvrés en standard, option urgente 48h sur demande.
 Paiement : à la livraison, BaridiMob, CCP.
 
+## Pour les revendeurs et ateliers d'impression
+
+Caractère fournit des textiles vierges et des services DTF, broderie et production pour revendeurs, marques et ateliers d'impression.
+Les tarifs revendeur, stocks et délais sont étudiés selon chaque demande professionnelle.
+Page dédiée : ${SITE_URL}/revendeurs-imprimeurs
+
 ## Secteurs équipés
 
 ${SECTEURS.map(s => `- ${s.nom} : ${s.description} → ${SITE_URL}/entreprises/${s.slug}`).join('\n')}
