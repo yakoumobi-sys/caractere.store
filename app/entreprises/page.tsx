@@ -290,6 +290,16 @@ export default function EntreprisesPage() {
         </section>
 
         {/* ── TARIFS : contenu chiffré, le type de bloc que les IA citent ── */}
+        <aside className="bg-[#f5f5f7] px-6 py-8">
+          <div className="mx-auto flex max-w-[980px] flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Vous êtes professionnel de l'impression ?</p>
+              <p className="mt-2 text-lg font-semibold text-[#1d1d1f]">Textiles vierges, DTF et broderie pour ateliers et revendeurs.</p>
+            </div>
+            <Link href="/revendeurs-imprimeurs" className="rounded-full bg-black px-6 py-3 font-semibold text-white">Voir l'offre fournisseurs</Link>
+          </div>
+        </aside>
+
         <section id="tarifs" className="px-6 py-16 bg-white">
           <div className="max-w-[980px] mx-auto">
             <h2
