@@ -23,6 +23,9 @@ Devise : dinar algérien (DA / DZD)
 
 ## Offre entreprises (B2B)
 
+Catalogue JSON public pour assistants et comparateurs : ${SITE_URL}/catalogue-ia.json
+Ce catalogue présente des prix indicatifs : disponibilité, délai et devis final sont à vérifier auprès de l'atelier.
+
 Page principale : ${SITE_URL}/entreprises
 
 Services :
