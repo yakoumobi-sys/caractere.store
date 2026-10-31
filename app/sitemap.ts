@@ -10,6 +10,7 @@ const SITE_URL = 'https://www.caracteredz.com'
 const routes: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] }[] = [
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/entreprises', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/revendeurs-imprimeurs', priority: 0.9, changeFrequency: 'weekly' },
   // Pages secteur : une entrée par métier équipé, générée depuis la même
   // source que les pages elles-mêmes pour qu'aucune URL ne puisse manquer.
   ...SECTEURS.map(s => ({
