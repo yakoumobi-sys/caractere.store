@@ -19,6 +19,7 @@ const routes: { path: string; priority: number; changeFrequency: MetadataRoute.S
   })),
   { path: '/particuliers', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/print-on-demand', priority: 0.8, changeFrequency: 'weekly' },
+  { path: '/simulation', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/devis-express', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/produits', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/collection', priority: 0.7, changeFrequency: 'weekly' },
