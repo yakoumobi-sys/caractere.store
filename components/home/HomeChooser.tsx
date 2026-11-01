@@ -153,8 +153,8 @@ export default function HomeChooser() {
           <Link href="/print-on-demand">Print on Demand</Link>
           <Link href="/produits">Produits</Link>
         </nav>
-        <Link className={styles.headerCta} href="/configurateur">
-          Personnaliser <span aria-hidden="true">↗</span>
+        <Link className={styles.headerCta} href="/simulation">
+          Simulation gratuite <span aria-hidden="true">↗</span>
         </Link>
       </header>
 
@@ -163,6 +163,16 @@ export default function HomeChooser() {
           <span className={styles.eyebrow}>CARACTÈRE — VOTRE ATELIER À ALGER</span>
           <h1>À chaque idée, <em>son caractère.</em></h1>
           <p>Glissez. Choisissez. Personnalisez.</p>
+          <div className={styles.simulationPrompt}>
+            <Link className={styles.simulationCta} href="/simulation">
+              <span className={styles.simulationSymbol} aria-hidden="true">✦</span>
+              <span className={styles.simulationCopy}>
+                <strong>Obtenir ma simulation gratuite</strong>
+                <small>Ajoutez votre logo · Sans engagement</small>
+              </span>
+              <span className={styles.simulationArrow} aria-hidden="true">↗</span>
+            </Link>
+          </div>
         </div>
 
         <div className={styles.showcase}>
