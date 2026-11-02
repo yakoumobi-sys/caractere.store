@@ -13,11 +13,11 @@ const PRODUCTS = [
   { name: 'Gilet multipoche col haut', image: '/home-cutouts/gilet.png' },
   { name: 'Casquette', image: '/home-cutouts/casquette.png' },
   { name: 'Tote bag', image: '/home-cutouts/tote-bag.png' },
-  { name: 'Polo manches longues noir', image: '/home-cutouts/polo.png' },
+  { name: 'Polo manches longues noir', image: '' },
   { name: 'Hoodie', image: '/home-cutouts/hoodie.png' },
-  { name: 'Sweat sans capuche', image: '/home-cutouts/hoodie.png' },
-  { name: 'Combinaison mécanicien', image: '/home-cutouts/gilet.png' },
-  { name: 'Gilet jaune', image: '/home-cutouts/gilet.png' },
+  { name: 'Sweat sans capuche', image: '' },
+  { name: 'Combinaison mécanicien', image: '' },
+  { name: 'Gilet jaune', image: '' },
 ]
 
 export default function SimulationForm() {
@@ -140,7 +140,7 @@ export default function SimulationForm() {
                 <p className={styles.pickerTitle}>Choisissez votre article</p>
                 <div className={styles.productGrid} role="group" aria-label="Choisir un article">
                   {PRODUCTS.map(item => <button key={item.name} type="button" aria-pressed={product === item.name} className={`${styles.productChoice} ${product === item.name ? styles.selected : ''}`} onClick={() => setProduct(item.name)}>
-                    <span className={styles.productImage}><img src={item.image} alt="" loading="lazy" onError={event => { event.currentTarget.style.display = 'none' }} /></span>
+                    <span className={styles.productImage}>{item.image ? <img src={item.image} alt="" loading="lazy" /> : <span className={styles.imagePending}>Photo à venir</span>}</span>
                     <span>{item.name}</span>
                     {product === item.name && <span className={styles.check} aria-hidden="true">✓</span>}
                   </button>)}
