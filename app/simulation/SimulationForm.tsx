@@ -12,12 +12,12 @@ const PRODUCTS = [
   { name: 'T-shirt', image: '/home-cutouts/tshirt.png' },
   { name: 'Gilet multipoche col haut', image: '/home-cutouts/gilet.png' },
   { name: 'Casquette', image: '/home-cutouts/casquette.png' },
-  { name: 'Tote bag', image: '/home-cutouts/totebag.png' },
+  { name: 'Tote bag', image: '/home-cutouts/tote-bag.png' },
   { name: 'Polo manches longues noir', image: '/home-cutouts/polo.png' },
   { name: 'Hoodie', image: '/home-cutouts/hoodie.png' },
-  { name: 'Sweat sans capuche', image: '/home-cutouts/sweat.png' },
-  { name: 'Combinaison mécanicien', image: '/home-cutouts/combinaison.png' },
-  { name: 'Gilet jaune', image: '/home-cutouts/gilet-jaune.png' },
+  { name: 'Sweat sans capuche', image: '/home-cutouts/hoodie.png' },
+  { name: 'Combinaison mécanicien', image: '/home-cutouts/gilet.png' },
+  { name: 'Gilet jaune', image: '/home-cutouts/gilet.png' },
 ]
 
 export default function SimulationForm() {
