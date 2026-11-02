@@ -7,12 +7,23 @@ import styles from './simulation.module.css'
 const NUMBER = '213557440522'
 const MAX_BYTES = 4 * 1024 * 1024
 const TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf']
+const PRODUCTS = [
+  { name: 'Polo', image: '/home-cutouts/polo.png' },
+  { name: 'T-shirt', image: '/home-cutouts/tshirt.png' },
+  { name: 'Gilet multipoche col haut', image: '/home-cutouts/gilet.png' },
+  { name: 'Casquette', image: '/home-cutouts/casquette.png' },
+  { name: 'Tote bag', image: '/home-cutouts/totebag.png' },
+  { name: 'Polo manches longues noir', image: '/home-cutouts/polo.png' },
+  { name: 'Hoodie', image: '/home-cutouts/hoodie.png' },
+  { name: 'Sweat sans capuche', image: '/home-cutouts/sweat.png' },
+  { name: 'Combinaison mécanicien', image: '/home-cutouts/combinaison.png' },
+  { name: 'Gilet jaune', image: '/home-cutouts/gilet-jaune.png' },
+]
 
 export default function SimulationForm() {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState('')
   const [product, setProduct] = useState('Polo')
-  const [quantity, setQuantity] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [logoUrl, setLogoUrl] = useState('')
@@ -49,7 +60,7 @@ export default function SimulationForm() {
   }
 
   function message(url: string) {
-    return `Bonjour Caractère, je souhaite une simulation gratuite avec mon logo.\nArticle : ${product}\n${quantity ? `Quantité : ${quantity}\n` : ''}Mon logo : ${url}`
+    return `Bonjour Caractère, je souhaite une simulation gratuite avec mon logo.\nArticle : ${product}\nMon logo : ${url}`
   }
   function whatsapp(url: string) {
     return `https://wa.me/${NUMBER}?text=${encodeURIComponent(message(url))}`
@@ -106,7 +117,7 @@ export default function SimulationForm() {
           <h1>Votre logo mérite<br />du caractère.</h1>
           <p className={styles.lead}>Voyez votre logo sur nos vêtements<br className={styles.desktopBreak} /> avant de commander.</p>
           <div className={styles.productStage}>
-            <img src="/home-cutouts/polo.png" alt="Polo Caractère à personnaliser avec votre logo" className={styles.polo} />
+            <img src={PRODUCTS.find(item => item.name === product)?.image || "/home-cutouts/polo.png"} alt={`Article sélectionné : ${product}`} className={styles.polo} />
             <div className={styles.logoCard}>
               {preview ? <img src={preview} alt="Votre logo sélectionné" /> : <span>{file ? 'Votre logo PDF' : 'Votre logo ici'}</span>}
               <small>{file ? 'Logo sélectionné' : 'Et si on essayait ?'}</small>
@@ -125,9 +136,15 @@ export default function SimulationForm() {
                 <strong>{file ? file.name : 'Ajoutez votre logo'}</strong>
                 <span id="file-help">{file ? 'Appuyez pour changer de fichier' : 'PNG, JPG, WEBP ou PDF · 4 Mo maximum'}</span>
               </label>
-              <div className={styles.options}>
-                <label>Sur quel article ?<select value={product} onChange={event => setProduct(event.target.value)}>{['Polo', 'T-shirt', 'Gilet', 'Casquette', 'Hoodie', 'Tablier', 'Tote bag', 'Autre / À conseiller'].map(item => <option key={item}>{item}</option>)}</select></label>
-                <label>Quantité <span>(facultatif)</span><input type="number" min="1" max="100000" step="1" inputMode="numeric" placeholder="Ex. 20" value={quantity} onChange={event => setQuantity(event.target.value)} /></label>
+              <div className={styles.productPicker}>
+                <p className={styles.pickerTitle}>Choisissez votre article</p>
+                <div className={styles.productGrid} role="group" aria-label="Choisir un article">
+                  {PRODUCTS.map(item => <button key={item.name} type="button" aria-pressed={product === item.name} className={`${styles.productChoice} ${product === item.name ? styles.selected : ''}`} onClick={() => setProduct(item.name)}>
+                    <span className={styles.productImage}><img src={item.image} alt="" loading="lazy" onError={event => { event.currentTarget.style.display = 'none' }} /></span>
+                    <span>{item.name}</span>
+                    {product === item.name && <span className={styles.check} aria-hidden="true">✓</span>}
+                  </button>)}
+                </div>
               </div>
               <p className={styles.privacy}>En continuant, votre logo sera chargé pour que notre équipe puisse l’ouvrir depuis votre message WhatsApp.</p>
               <button type="submit" className={styles.submit} aria-busy={busy}>{busy ? 'Préparation de votre logo…' : 'Envoyer sur WhatsApp'}<span aria-hidden="true">↗</span></button>
