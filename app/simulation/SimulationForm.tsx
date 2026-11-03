@@ -8,6 +8,13 @@ const NUMBER = '213557440522'
 const MAX_BYTES = 4 * 1024 * 1024
 const TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf']
 
+function trackSimulation(event: string, parameters: Record<string, string> = {}) {
+  if (typeof window === 'undefined') return
+  const pixel = (window as Window & { fbq?: (action: string, name: string, data?: Record<string, string>) => void }).fbq
+  if (event === 'Lead') pixel?.('track', 'Lead', parameters)
+  else pixel?.('trackCustom', event, parameters)
+}
+
 export default function SimulationForm() {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState('')
@@ -40,6 +47,7 @@ export default function SimulationForm() {
       setError('Votre logo doit peser moins de 4 Mo. Choisissez un fichier plus léger.'); return
     }
     setFile(next)
+    trackSimulation('logo_selected', { product })
     if (next.type.startsWith('image/')) {
       const nextReader = new FileReader()
       reader.current = nextReader
@@ -59,6 +67,7 @@ export default function SimulationForm() {
     event.preventDefault()
     if (requestLock.current) return
     if (!file) { setError('Ajoutez votre logo pour demander votre simulation.'); input.current?.focus(); return }
+    trackSimulation('simulation_started', { product })
     requestLock.current = true; setBusy(true); setError('')
     try {
       let url = logoUrl
@@ -77,7 +86,9 @@ export default function SimulationForm() {
         } finally { window.clearTimeout(timeout) }
       }
       setPrepared(true)
-      window.location.assign(whatsapp(url))
+      trackSimulation('logo_uploaded', { product })
+      trackSimulation('Lead', { content_name: 'simulation_gratuite', product })
+      window.setTimeout(() => window.location.assign(whatsapp(url)), 250)
     } catch (cause) {
       setError(cause instanceof Error && cause.name !== 'AbortError' && cause.name !== 'TypeError' ? cause.message : 'Connexion interrompue. Votre logo est toujours ici : réessayez ou contactez-nous directement.')
     } finally { requestLock.current = false; setBusy(false) }
