@@ -18,8 +18,8 @@ const SAVOIR_FAIRE = [
 const NAVIGATION = [
   ['Configurateur', '/entreprises/commande'], ['Entreprises', '/entreprises'],
   ['Créer sa marque', '/print-on-demand'], ['Catalogue', '/produits'],
-  ['Collection', '/collection'], ['Designer', '/designer'],
-  ['Studio 3D', '/studio-3d'], ['Devis express', '/devis-express'],
+  ['Collection', '/collection'], ['Privilège', '/privilege'],
+  ['Devis express', '/devis-express'],
   ['Comment ça marche', '/comment-ca-marche'], ['Avis clients', '/avis'],
 ]
 const CONTACTS = [
@@ -32,7 +32,7 @@ const PIECES = [
   { label: 'Tous les supports', href: '/produits' },
   { label: 'La collection', href: '/collection' },
   { label: 'Personnaliser une pièce', href: '/configurateur' },
-  { label: 'Créer un design', href: '/designer' },
+  { label: 'Obtenir une simulation', href: '/simulation' },
 ]
 
 export default function Footer() {
