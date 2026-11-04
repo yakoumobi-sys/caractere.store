@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
   if (reference) {
     const { data, error } = await supabaseAdmin
       .from('commandes')
-      .select('*')
+      .select('reference,statut,produit,quantite,couleur,technique,prix_total')
       .eq('reference', reference)
       .single()
 
@@ -143,7 +143,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 })
     }
 
-    return NextResponse.json(data)
+    // Le suivi public par référence ne révèle ni contacts ni adresses.
+    return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } })
   }
 
   // Liste complète : réservée à l'admin

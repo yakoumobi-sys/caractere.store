@@ -151,7 +151,7 @@ export default function SuiviPage() {
                     Paiement
                   </p>
                   <p className="text-[13px] text-brand-gray">
-                    Notre équipe vous contacte par WhatsApp au {commande.telephone} pour finaliser
+                    Notre équipe vous contacte par WhatsApp pour finaliser
                     le paiement.
                   </p>
 
