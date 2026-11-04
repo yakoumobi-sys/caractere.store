@@ -67,10 +67,7 @@ export default function PrivilegeClient() {
     if (!window.confirm("Utiliser " + fmt(reward.cost_points) + " points pour demander « " + reward.title + " » ?")) return;
     setBusy(true); setError(""); setInfo("");
     try {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) throw new Error("Reconnectez-vous.");
-      const { error } = await supabaseClient.rpc("privilege_redeem", { p_reward_id: reward.id });
-      if (error) throw new Error(error.message || "Récompense indisponible.");
+      await request("POST", { action: "redeem", reward_id: reward.id });
       await reload();
       setInfo("Demande enregistrée. Notre équipe doit maintenant la valider.");
     } catch(e) { setError(e instanceof Error ? e.message : "Impossible de demander la récompense."); }

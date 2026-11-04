@@ -53,6 +53,16 @@ export async function POST(req: NextRequest) {
     if (error) return respond({ error: "Impossible d'activer la carte." }, 503);
     return respond({ success: true });
   }
+
+  if (payload.action === "redeem") {
+    if (typeof payload.reward_id !== "string" || !/^[0-9a-f-]{36}$/i.test(payload.reward_id))
+      return respond({ error: "Récompense invalide." }, 400);
+    const { data, error } = await supabaseAdmin.rpc("privilege_redeem", {
+      p_user_id: user.id, p_reward_id: payload.reward_id,
+    });
+    if (error) return respond({ error: error.message }, 400);
+    return respond({ success: true, request_id: data });
+  }
   if (payload.action === "preferences") {
     if (typeof payload.email_opt_in !== "boolean") return respond({ error: "Choix invalide." }, 400);
     const { data, error } = await supabaseAdmin.from("privilege_members")
