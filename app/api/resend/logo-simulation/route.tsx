@@ -40,7 +40,7 @@ function verifySignature(request: NextRequest, payload: string, secret: string):
   const id = request.headers.get('svix-id')
   const timestamp = request.headers.get('svix-timestamp')
   const signatures = request.headers.get('svix-signature')
-  if (!id || !timestamp || !signatures || !/^\\d{10}$/.test(timestamp)) return false
+  if (!id || !timestamp || !signatures || !/^\d{10}$/.test(timestamp)) return false
   if (Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp)) > 300) return false
   const key = Buffer.from(secret.replace(/^whsec_/, ''), 'base64')
   if (key.length < 16) return false
@@ -56,7 +56,7 @@ function verifySignature(request: NextRequest, payload: string, secret: string):
 
 function emailAddress(value: unknown): string | null {
   if (typeof value !== 'string') return null
-  const match = value.match(/(?:^|<)([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,})(?:>|$)/i)
+  const match = value.match(/(?:^|<)([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})(?:>|$)/i)
   const email = match?.[1]?.toLowerCase() ?? null
   if (!email || email.length > 254 || email.endsWith('@caracteredz.com')) return null
   return email
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       '/emails/receiving/' + encodeURIComponent(inboundId) + '/attachments?limit=15', key
     )
     const attachments = (list.data || []).filter(a =>
-      a.filename && /\\.(png|jpe?g)$/i.test(a.filename) &&
+      a.filename && /\.(png|jpe?g)$/i.test(a.filename) &&
       a.size && a.size > 0 && a.size <= MAX_LOGO_BYTES &&
       (a.content_type === 'image/png' || a.content_type === 'image/jpeg') &&
       a.download_url && a.download_url.startsWith('https://')
@@ -187,9 +187,9 @@ export async function POST(request: NextRequest) {
     const preview = await generatePreview(bytes, mime, product.file, product.label)
     const idempotency = 'caractere-logo-' + inboundId
     const replySubject = subject.toLowerCase().startsWith('re:') ? subject : 'Re: ' + subject
-    const text = 'Bonjour,\\n\\nMerci pour votre logo ! Vous trouverez ci-joint votre première simulation sur ' + product.label.toLowerCase() + '.\\n\\nCeci est un aperçu indicatif : nous pouvons ajuster le rendu avant production.\\n\\nPour recevoir votre devis, répondez avec la quantité souhaitée, la couleur et vos préférences de marquage.\\n\\nCaractère — Aïn Benian, Alger\\nhttps://www.caracteredz.com/simulation'
+    const text = 'Bonjour,\n\nMerci pour votre logo ! Vous trouverez ci-joint votre première simulation sur ' + product.label.toLowerCase() + '.\n\nCeci est un aperçu indicatif : nous pouvons ajuster le rendu avant production.\n\nPour recevoir votre devis, répondez avec la quantité souhaitée, la couleur et vos préférences de marquage.\n\nCaractère — Aïn Benian, Alger\nhttps://www.caracteredz.com/simulation'
     const headers: Record<string, string> = {}
-    if (email.message_id && /^<[^\\r\\n<>]+>$/.test(email.message_id)) {
+    if (email.message_id && /^<[^\r\n<>]+>$/.test(email.message_id)) {
       headers['In-Reply-To'] = email.message_id
       headers['References'] = email.message_id
     }
