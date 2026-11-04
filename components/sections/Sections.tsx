@@ -149,11 +149,11 @@ export function ProduitsSection({ produits }: { produits: Produit[] }) {
                     </Link>
                     {designerId && (
                       <Link
-                        href={`/designer?product=${designerId}`}
+                        href={`/simulation?product=${designerId}`}
                         className="flex-1 text-center text-[12px] font-semibold px-3 py-2 rounded-full no-underline transition-all text-white"
                         style={{ backgroundColor: BLUE_DARK }}
                       >
-                        ✏️ Designer
+                        ✦ Simulation
                       </Link>
                     )}
                   </div>

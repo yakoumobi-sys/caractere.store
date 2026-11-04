@@ -48,7 +48,7 @@ export default function MentionsLegalesPage() {
 
           <Section title="2. Conditions générales de vente">
             <p>
-              Toute commande passée sur Caractère Store (via le configurateur, le designer ou WhatsApp)
+              Toute commande passée sur Caractère Store (via le configurateur, la simulation gratuite ou WhatsApp)
               implique l'acceptation des présentes conditions.
             </p>
             <p>

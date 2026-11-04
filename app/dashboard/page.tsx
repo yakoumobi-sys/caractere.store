@@ -113,10 +113,10 @@ export default function DashboardPage() {
                 style={{ background: C.white, color: C.blue, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
                 Configurer ma commande →
               </Link>
-              <Link href="/designer"
+              <Link href="/privilege"
                 className="flex items-center justify-center px-5 py-3.5 rounded-full text-[14px] font-bold no-underline transition-all border-2"
                 style={{ color: C.white, borderColor: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.08)' }}>
-                Designer ✏️
+                Privilège ✦
               </Link>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
             <p className="text-[11px] font-bold tracking-widest uppercase mb-3" style={{ color: C.blue }}>Nos services</p>
             <div className="flex flex-col gap-2">
               {[
-                { emoji: '🚀', title: 'Print on Demand', desc: 'Lancez votre marque sans stock ni abonnement.', href: '/designer', cta: 'Commencer à vendre' },
+                { emoji: '🚀', title: 'Print on Demand', desc: 'Lancez votre marque sans stock ni abonnement.', href: '/print-on-demand', cta: 'Commencer à vendre' },
                 { emoji: '🏢', title: 'Entreprises & B2B', desc: 'Uniformes et vêtements personnalisés pour votre équipe.', href: '/configurateur', cta: 'Configurer' },
                 { emoji: '👕', title: 'Créez votre vêtement unique.', desc: '', href: '/produits', cta: 'Voir les produits' },
                 { emoji: '✨', title: 'Collection Caractère', desc: 'Pièces premium prêtes à porter.', href: '/collection', cta: 'Découvrir' },

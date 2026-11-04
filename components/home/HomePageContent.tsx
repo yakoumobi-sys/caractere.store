@@ -100,8 +100,8 @@ function IconChat({ size = 18 }: IconProps) {
 
 // ---------- DONNÉES ----------
 const quickLinks = [
-  { href: '/designer', label: 'Designer', desc: 'Crée ton design en 2 minutes', Icon: IconPen },
-  { href: '/studio-3d', label: 'Studio 3D', desc: 'Ton t-shirt animé en 3D', Icon: IconCube },
+  { href: '/simulation', label: 'Simulation gratuite', desc: 'Vois ton logo sur un vêtement', Icon: IconPen },
+  { href: '/privilege', label: 'Privilège', desc: 'Ton espace fidélité', Icon: IconCube },
   { href: '/produits', label: 'Produits', desc: 'T-shirts, hoodies, uniformes', Icon: IconShirt },
   { href: '/collection', label: 'Collection', desc: 'Nos designs prêts à porter', Icon: IconStar },
   { href: '/comment-ca-marche', label: 'Comment ça marche', desc: 'Le guide complet, étape par étape', Icon: IconBook },

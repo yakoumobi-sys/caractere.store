@@ -33,7 +33,7 @@ export default function NavbarPoD() {
 
       <div className="nav-right">
         <Link href="/auth/signup" className="btn-signup">📝 Créer un compte</Link>
-        <Link href="/designer" style={{ color: C.lime, textDecoration: 'none', fontWeight: 800, fontSize: 13 }}>🎨 Créer</Link>
+        <Link href="/simulation" style={{ color: C.lime, textDecoration: 'none', fontWeight: 800, fontSize: 13 }}>✦ Simulation</Link>
         
         <button 
           className="hamburger"

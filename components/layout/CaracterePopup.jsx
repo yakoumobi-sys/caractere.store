@@ -19,7 +19,7 @@ const SEGMENTS = [
   {
     id: "b2c",
     label: "Je personnalise un t-shirt/cadeau",
-    redirectUrl: "/designer",
+    redirectUrl: "/simulation",
     promoCode: "PERSO15",
     discount: "15%",
     resultTitle: "Créez le vôtre en 2 minutes.",
@@ -29,7 +29,7 @@ const SEGMENTS = [
   {
     id: "pod",
     label: "Je veux commencer le print on demand",
-    redirectUrl: "/designer",
+    redirectUrl: "/simulation",
     promoCode: "POD15",
     discount: "15%",
     resultTitle: "Lancez votre marque sans stock.",

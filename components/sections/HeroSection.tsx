@@ -49,14 +49,14 @@ export default function HeroSection({ config }: { config?: any }) {
           </a>
 
           <a
-            href="/designer"
+            href="/simulation"
             className="rounded-full border-2 py-3.5 text-[19px] font-semibold text-white no-underline backdrop-blur-sm transition"
             style={{
               borderColor: "rgba(255,255,255,0.4)",
               backgroundColor: "rgba(255,255,255,0.05)",
             }}
           >
-            Open Designer ✏️
+            Simulation gratuite ↗
           </a>
 
           <a
