@@ -51,6 +51,15 @@ export async function POST(req: NextRequest) {
       { onConflict: "user_id", ignoreDuplicates: true }
     );
     if (error) return respond({ error: "Impossible d'activer la carte." }, 503);
+    // Rattrapage idempotent des commandes déjà terminées et payées du membre.
+    // La fonction PostgreSQL rejette les doubles crédits.
+    const { data: eligible } = await supabaseAdmin.from("commandes")
+      .select("id").eq("user_id", user.id).eq("statut", "termine")
+      .not("paid_confirmed_at", "is", null).limit(100);
+    for (const order of eligible || []) {
+      const result = await supabaseAdmin.rpc("privilege_credit_order", { p_user_id: user.id, p_order_id: order.id });
+      if (result.error && result.error.code !== "23505") console.error("[privilege] credit after join", result.error.code);
+    }
     return respond({ success: true });
   }
 
