@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { Commande } from '@/types'
+
+type CommandePayee = Commande & { paid_confirmed_at?: string | null; loyalty_points_credited?: number | null; loyalty_warning?: string | null }
 import { adminFetch } from '@/lib/adminFetch'
 
 const STATUTS = ['nouveau', 'en_cours', 'termine', 'annule']
@@ -13,8 +15,8 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; 
 }
 
 export default function CommandesAdmin() {
-  const [commandes, setCommandes] = useState<Commande[]>([])
-  const [selected, setSelected] = useState<Commande | null>(null)
+  const [commandes, setCommandes] = useState<CommandePayee[]>([])
+  const [selected, setSelected] = useState<CommandePayee | null>(null)
   const [filter, setFilter] = useState('tous')
   const [search, setSearch] = useState('')
   const [updating, setUpdating] = useState(false)
@@ -26,17 +28,27 @@ export default function CommandesAdmin() {
       .catch(() => setCommandes([]))
   }, [])
 
-  const updateStatut = async (id: string, statut: string) => {
+  const updateCommande = async (id: string, patch: { statut?: string; confirm_payment?: boolean }) => {
     setUpdating(true)
-    await adminFetch(`/api/commandes/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ statut }),
-    })
-    setCommandes(prev => prev.map(c => c.id === id ? { ...c, statut: statut as any } : c))
-    if (selected?.id === id) setSelected(prev => prev ? { ...prev, statut: statut as any } : null)
-    setUpdating(false)
+    try {
+      const response = await adminFetch('/api/commandes/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Mise à jour impossible')
+      setCommandes(prev => prev.map(c => c.id === id ? { ...c, ...data } : c))
+      setSelected(prev => prev?.id === id ? { ...prev, ...data } : prev)
+      if (data.loyalty_warning) alert(data.loyalty_warning)
+      if (data.loyalty_points_credited) alert('Caractère Privilège : +' + data.loyalty_points_credited + ' points crédités au client.')
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Une erreur est survenue.')
+    } finally {
+      setUpdating(false)
+    }
   }
+  const updateStatut = (id: string, statut: string) => updateCommande(id, { statut })
 
   const filtered = commandes
     .filter(c => filter === 'tous' || c.statut === filter)
@@ -259,6 +271,31 @@ export default function CommandesAdmin() {
                     )
                   })}
                 </div>
+              </div>
+
+              {/* Confirmation manuelle avant attribution des points */}
+              <div className="px-6 py-4 border-b bg-white" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: '#9CA3AF' }}>
+                  Paiement et fidélité Privilège
+                </p>
+                {selected.paid_confirmed_at ? (
+                  <p className="text-green-700 text-[13px] font-semibold">
+                    ✓ Paiement confirmé le {new Date(selected.paid_confirmed_at).toLocaleDateString('fr-DZ')}
+                  </p>
+                ) : (
+                  <button type="button" disabled={updating}
+                    onClick={() => {
+                      if (window.confirm('Confirmez-vous que cette commande a bien été encaissée ?')) {
+                        void updateCommande(selected.id, { confirm_payment: true })
+                      }
+                    }}
+                    className="px-4 py-2.5 rounded-full bg-[#191919] text-white text-xs font-bold disabled:opacity-50">
+                    Confirmer le paiement encaissé
+                  </button>
+                )}
+                <p className="text-[11px] text-gray-500 mt-3">
+                  Les points sont crédités automatiquement uniquement si la commande est terminée, le paiement confirmé et le client connecté avec une carte Privilège active.
+                </p>
               </div>
 
               {/* Infos commande */}

@@ -68,7 +68,7 @@ export default function AdminPrivilege() {
       <div className="grid lg:grid-cols-2 gap-6 mt-7">
         <section className="bg-white rounded-2xl border border-black/10 p-6">
           <h2 className="text-xl font-bold">Créditer un achat vérifié</h2>
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">1 point / 100 DA encaissés. Une référence facture ne peut être créditée qu'une seule fois.</p>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">1 point / 100 DA encaissés. Seuls les clients ayant activé leur carte Privilège peuvent recevoir des points. Une référence facture ne peut être créditée qu'une seule fois.</p>
           <form onSubmit={submit} className="mt-6 space-y-4">
             <fieldset className="flex gap-5">
               <label className="text-sm"><input type="radio" checked={type==="credit_offline"} onChange={()=>setType("credit_offline")} /> Achat WhatsApp / boutique</label>
@@ -102,7 +102,7 @@ export default function AdminPrivilege() {
       </section>
       <section className="bg-white rounded-2xl border border-black/10 p-6 mt-7">
         <h2 className="text-xl font-bold">Commandes site éligibles</h2>
-        <p className="text-sm text-gray-500 mt-2">Seules les commandes marquées terminées peuvent être créditées après vérification du paiement.</p>
+        <p className="text-sm text-gray-500 mt-2">Seules les commandes terminées ET dont le paiement est confirmé peuvent être créditées.</p>
         {data?.orders.length ? <div className="mt-5 space-y-3">{data.orders.map(o=><p key={o.id} className="text-sm">{o.reference} • {o.nom_client} • {money(o.prix_total)} DA</p>)}</div> : <p className="mt-5 text-sm text-gray-500">Aucune commande terminée actuellement.</p>}
       </section>
     </div>
