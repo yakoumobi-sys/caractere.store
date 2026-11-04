@@ -22,8 +22,7 @@ const PRIMAIRE = [
 // `/outils` a été retiré : la route n'existe pas, le lien renvoyait un 404
 // depuis chaque page qui affiche cette barre.
 const SECONDAIRE = [
-  { href: "/designer", label: "Designer" },
-  { href: "/studio-3d", label: "Studio 3D" },
+  { href: "/privilege", label: "Privilège" },
   { href: "/devis-express", label: "Devis express" },
   { href: "/comment-ca-marche", label: "Comment ça marche" },
   { href: "/avis", label: "Avis clients" },

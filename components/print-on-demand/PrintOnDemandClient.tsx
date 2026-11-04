@@ -21,7 +21,7 @@ const STEPS = [
   {
     n: "1",
     title: "Tu crées ton design",
-    desc: "Dans le Designer en ligne, gratuitement. Ou tu nous envoies ton fichier.",
+    desc: "Envoie ton logo pour une simulation gratuite, ou transmets ton fichier sur WhatsApp.",
   },
   {
     n: "2",
@@ -113,7 +113,7 @@ const FAQS = [
   },
   {
     q: "Je ne sais pas créer un design, vous aidez ?",
-    a: "Oui. Le Designer en ligne suffit pour un texte ou un logo. Si vous bloquez, envoyez votre idée sur WhatsApp : on prépare le fichier d'impression avec vous.",
+    a: "Oui. Envoie ton idée pour une simulation gratuite ou contacte notre équipe sur WhatsApp.",
   },
   {
     q: "Qui livre le client final ?",
@@ -145,8 +145,8 @@ export default function PrintOnDemandClient() {
             <a href="#tarifs">Tarifs</a>
             <a href="#faq">Questions</a>
           </nav>
-          <Link href="/designer" className="btn btn-dark btn-sm">
-            Créer mon design
+          <Link href="/simulation" className="btn btn-dark btn-sm">
+            Obtenir une simulation
           </Link>
         </div>
       </header>
@@ -167,8 +167,8 @@ export default function PrintOnDemandClient() {
               48h et on livre ton client dans les 58 wilayas.
             </p>
             <div className="cta-row">
-              <Link href="/designer" className="btn btn-dark">
-                Créer mon design <span aria-hidden="true">↗</span>
+              <Link href="/simulation" className="btn btn-dark">
+                Obtenir une simulation <span aria-hidden="true">↗</span>
               </Link>
               <a
                 href={WA}
@@ -374,8 +374,8 @@ export default function PrintOnDemandClient() {
             </h2>
             <p>Teste avec une seule pièce avant de lancer ta marque dessus.</p>
             <div className="cta-row">
-              <Link href="/designer" className="btn btn-invert">
-                Créer mon design
+              <Link href="/simulation" className="btn btn-invert">
+                Obtenir une simulation
               </Link>
               <a
                 href={WA}

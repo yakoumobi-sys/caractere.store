@@ -152,6 +152,7 @@ export default function HomeChooser() {
           <Link href="/entreprises">Entreprises</Link>
           <Link href="/print-on-demand">Print on Demand</Link>
           <Link href="/produits">Produits</Link>
+          <Link href="/privilege">Privilège</Link>
         </nav>
         <Link className={styles.headerCta} href="/simulation">
           Simulation gratuite <span aria-hidden="true">↗</span>
@@ -173,6 +174,7 @@ export default function HomeChooser() {
               <span className={styles.simulationArrow} aria-hidden="true">↗</span>
             </Link>
           </div>
+          <Link href="/privilege" style={{ display: "inline-block", marginTop: 20, fontSize: 12, textDecoration: "underline", textUnderlineOffset: 4, fontWeight: 700 }}>Découvrir Caractère Privilège ↗</Link>
         </div>
 
         <div className={styles.showcase}>

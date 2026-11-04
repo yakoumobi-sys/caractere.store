@@ -30,8 +30,8 @@ function HeroParticuliers() {
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8" style={{ color: '#D1D5DB' }}>Zéro stock. Zéro investissement. Juste ta créativité + Caractère.</p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/designer" className="px-8 py-4 rounded-lg text-lg font-bold transition-all hover:scale-105 inline-block" style={{ background: PALETTE.lime, color: PALETTE.black }}>
-              Ouvrir Designer →
+            <Link href="/simulation" className="px-8 py-4 rounded-lg text-lg font-bold transition-all hover:scale-105 inline-block" style={{ background: PALETTE.lime, color: PALETTE.black }}>
+              Simulation gratuite →
             </Link>
             <Link href="/collection" className="px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block" style={{ background: 'rgba(255,255,255,0.1)', color: PALETTE.white, border: `2px solid rgba(255,255,255,0.2)` }}>
               Voir la collection
@@ -116,13 +116,13 @@ function Pricing() {
           <div className="p-6 rounded-lg" style={{ background: PALETTE.white }}>
             <p className="font-bold mb-1" style={{ color: PALETTE.black }}>DTF Simple</p>
             <p className="text-3xl font-black mb-4" style={{ color: PALETTE.black }}>1 950 <span className="text-lg">DA</span></p>
-            <Link href="/designer" className="w-full block py-2 rounded text-center font-bold text-sm" style={{ background: PALETTE.lime, color: PALETTE.black }}>Démarrer →</Link>
+            <Link href="/simulation" className="w-full block py-2 rounded text-center font-bold text-sm" style={{ background: PALETTE.lime, color: PALETTE.black }}>Démarrer →</Link>
           </div>
 
           <div className="p-6 rounded-lg" style={{ background: PALETTE.black, color: PALETTE.white, border: `2px solid ${PALETTE.lime}` }}>
             <p className="font-bold mb-1">DTF Full Color</p>
             <p className="text-3xl font-black mb-4" style={{ color: PALETTE.lime }}>2 450 <span className="text-lg">DA</span></p>
-            <Link href="/designer" className="w-full block py-2 rounded text-center font-bold text-sm" style={{ background: PALETTE.lime, color: PALETTE.black }}>Démarrer →</Link>
+            <Link href="/simulation" className="w-full block py-2 rounded text-center font-bold text-sm" style={{ background: PALETTE.lime, color: PALETTE.black }}>Démarrer →</Link>
           </div>
 
           <div className="p-6 rounded-lg" style={{ background: PALETTE.white }}>
@@ -174,8 +174,8 @@ function FinalCTA() {
         <p className="text-lg mb-8" style={{ color: '#D1D5DB' }}>Commence maintenant. Zéro risque.</p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/designer" className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105 inline-block" style={{ background: PALETTE.lime, color: PALETTE.black }}>
-            Ouvrir Designer →
+          <Link href="/simulation" className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105 inline-block" style={{ background: PALETTE.lime, color: PALETTE.black }}>
+            Simulation gratuite →
           </Link>
           <a href="https://wa.me/213557440522" className="px-8 py-4 rounded-lg font-bold transition-all hover:scale-105 inline-block" style={{ background: 'rgba(255,255,255,0.1)', color: PALETTE.white, border: `2px solid rgba(255,255,255,0.3)` }}>
             💬 WhatsApp
