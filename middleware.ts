@@ -6,6 +6,7 @@ import { Redis } from '@upstash/redis'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'yakoumobi@gmail.com').toLowerCase()
 
 // Rate limiter pour login (5 tentatives par 15 min)
 const loginRatelimit = new Ratelimit({
@@ -79,6 +80,9 @@ export async function middleware(request: NextRequest) {
       const loginUrl = new URL('/auth/login', request.url)
       return NextResponse.redirect(loginUrl)
     }
+    if (user.email?.toLowerCase() !== ADMIN_EMAIL) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
 
     return response
   }
@@ -103,12 +107,16 @@ export async function middleware(request: NextRequest) {
       },
     })
 
-    const { data: { user } } = await supabase.auth.getUser()
-
+    const { data: cookieData } = await supabase.auth.getUser()
+    let user = cookieData.user
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      const token = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim()
+      if (token) user = (await supabase.auth.getUser(token)).data.user
     }
-
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (user.email?.toLowerCase() !== ADMIN_EMAIL) {
+      return NextResponse.json({ error: 'Accès administrateur refusé' }, { status: 403 })
+    }
     return response
   }
 
