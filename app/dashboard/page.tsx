@@ -182,7 +182,7 @@ export default function DashboardPage() {
                 <p className="text-[32px] mb-3">📦</p>
                 <p className="text-[15px] font-bold mb-1" style={{ color: C.black }}>Aucune commande pour l'instant</p>
                 <p className="text-[13px] mb-6" style={{ color: C.gray4 }}>
-                  Commandez via le configurateur ou le designer
+                  Commandez via notre configurateur ou demandez une simulation gratuite
                 </p>
                 <Link href="/configurateur"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[14px] font-bold no-underline"

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { supabaseAdmin } from '@/lib/supabase'
 import { Resend } from 'resend'
 import { requireAdmin } from '@/lib/api-auth'
@@ -11,16 +12,45 @@ function getResend() {
 export async function POST(req: NextRequest) {
   try {
     const input = await req.json()
-    let body: typeof input
+    if (!input || typeof input !== 'object' || Array.isArray(input)) {
+      return NextResponse.json({ error: 'Commande invalide' }, { status: 400 })
+    }
+    // Un id client, un statut ou une validation de paiement venant du navigateur
+    // ne peuvent jamais être utilisés pour attribuer des points.
+    const { user_id: _ignored, statut: _status, paid_confirmed_at: _paid, ...orderInput } = input
+    let body: typeof orderInput
     try {
-      body = applyB2BPricing(input)
+      body = applyB2BPricing(orderInput)
     } catch (error) {
       return NextResponse.json({ error: error instanceof Error ? error.message : 'Commande invalide' }, { status: 400 })
     }
 
+    // Associe seulement les achats à une identité authentifiée auprès de Supabase.
+    // Les commandes invitées restent possibles sans lien de fidélité.
+    let verifiedUserId: string | null = null
+    try {
+      const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim()
+      if (token) {
+        const { data } = await supabaseAdmin.auth.getUser(token)
+        verifiedUserId = data.user?.id || null
+      } else if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        const auth = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          { cookies: {
+            get(name: string) { return req.cookies.get(name)?.value },
+            set() {},
+            remove() {},
+          } }
+        )
+        const { data } = await auth.auth.getUser()
+        verifiedUserId = data.user?.id || null
+      }
+    } catch { verifiedUserId = null }
+
     const { data, error } = await supabaseAdmin
       .from('commandes')
-      .insert([{ ...body, statut: 'nouveau' }])
+      .insert([{ ...body, user_id: verifiedUserId, statut: 'nouveau', paid_confirmed_at: null }])
       .select()
       .single()
 
@@ -105,7 +135,7 @@ export async function GET(req: NextRequest) {
   if (reference) {
     const { data, error } = await supabaseAdmin
       .from('commandes')
-      .select('*')
+      .select('reference,statut,produit,quantite,couleur,technique,prix_total')
       .eq('reference', reference)
       .single()
 
@@ -113,7 +143,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 })
     }
 
-    return NextResponse.json(data)
+    // Le suivi public par référence ne révèle ni contacts ni adresses.
+    return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } })
   }
 
   // Liste complète : réservée à l'admin

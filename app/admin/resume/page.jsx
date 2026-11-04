@@ -1,11 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { adminFetch } from "@/lib/adminFetch";
 
 const STATUS_CONFIG = {
   nouveau:  { label: "Nouveau",  color: "#3B82F6", bg: "#EFF6FF" },
@@ -118,14 +113,11 @@ export default function ResumeCommandes() {
   const [copyAll, setCopyAll] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from("commandes")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .then(({ data, error }) => {
-        if (!error) setOrders(data || []);
-        setLoading(false);
-      });
+    adminFetch("/api/admin/resume")
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Accès refusé")))
+      .then(data => setOrders(Array.isArray(data) ? data : []))
+      .catch(() => setOrders([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = orders.filter(o => {

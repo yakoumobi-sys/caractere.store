@@ -253,9 +253,13 @@ export default function ConfigurateurClient({ variant = 'default' }: { variant?:
     const ref = 'CAR-' + Date.now().toString(36).toUpperCase()
     const { unit, total } = calcPrice()
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch('/api/commandes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session ? { Authorization: 'Bearer ' + session.access_token } : {}),
+        },
         body: JSON.stringify({
           ...(variant === 'b2b' ? { catalogue: 'entreprises-2026-10' } : {}),
           reference: ref, produit: order.produit?.nom, quantite: order.quantite,

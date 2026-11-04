@@ -12,6 +12,7 @@ const navItems = [
   { href: '/admin/couleurs',  icon: '🎨', label: 'Couleurs'   },
   { href: '/admin/tailles',   icon: '📏', label: 'Tailles'    },
   { href: '/admin/marketing', icon: '📣', label: 'Marketing'  },
+  { href: '/admin/privilege', icon: '✦', label: 'Privilège'  },
   { href: '/admin/avis',      icon: '⭐', label: 'Avis'       },
 ]
 
