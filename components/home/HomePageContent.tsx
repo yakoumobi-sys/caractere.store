@@ -5,7 +5,7 @@ import Link from 'next/link'
 // ============================================
 // CARACTÈRE — HOMEPAGE V5 "NOIR"
 // Theme: noir / blanc / gris clair (style Huly)
-// CTA: "Designer mon tshirt" + "Collection"
+// CTA: "Simulation gratuite" + "Collection"
 // ============================================
 
 const C = {
@@ -175,21 +175,21 @@ export default function HomePageContent() {
           color: C.gray, maxWidth: '560px', lineHeight: 1.5,
           margin: '0 0 40px', animationDelay: '0.2s',
         }}>
-          Design ton t-shirt avec le <strong style={{ color: C.white }}>Designer</strong>.<br />
-          Anime-le avec notre <strong style={{ color: C.white }}>Studio 3D</strong>.<br />
+          Envoie ton logo pour une <strong style={{ color: C.white }}>simulation gratuite</strong>.<br />
+          Notre équipe prépare <strong style={{ color: C.white }}>ta proposition</strong>.<br />
           <span style={{ fontSize: '0.9em', color: C.grayDark }}>DTF • Broderie • Uniformes — Sans stock, sans risque.</span>
         </p>
 
         {/* CTA BUTTONS */}
         <div className="anim" style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', animationDelay: '0.3s' }}>
-          <Link href="/designer" className="btn-glow" style={{
+          <Link href="/simulation" className="btn-glow" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             background: C.white, color: C.black,
             padding: '16px 32px', borderRadius: '999px',
             fontWeight: 800, fontSize: '1rem', textDecoration: 'none',
             textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
-            Designer mon tshirt <IconArrow />
+            Simulation gratuite <IconArrow />
           </Link>
           <Link href="/collection" className="btn-outline" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
@@ -245,16 +245,16 @@ export default function HomePageContent() {
           Commencez maintenant
         </h2>
         <p style={{ position: 'relative', color: C.gray, fontWeight: 600, margin: '0 0 36px' }}>
-          Designer gratuit. Zéro risque. Zéro engagement.
+          Simulation gratuite. Zéro risque. Zéro engagement.
         </p>
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-          <Link href="/designer" className="btn-glow" style={{
+          <Link href="/simulation" className="btn-glow" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
             background: C.white, color: C.black,
             padding: '16px 32px', borderRadius: '999px',
             fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
-            Designer mon tshirt <IconArrow />
+            Simulation gratuite <IconArrow />
           </Link>
           <Link href="/collection" className="btn-outline" style={{
             display: 'inline-flex', alignItems: 'center', gap: '10px',
