@@ -148,10 +148,13 @@ export async function POST(request: NextRequest) {
   const acquired = await redis.set(lock, 'processing', { nx: true, ex: 900 })
   if (acquired !== 'OK') return NextResponse.json({ duplicate: true })
 
+  let dailyReservation: string | null = null
   try {
     const email = await apiGet<ReceivedMail>('/emails/receiving/' + encodeURIComponent(inboundId), key)
     const sender = emailAddress(email.from)
     if (!sender) return NextResponse.json({ ignored: 'invalid sender' })
+    const testEmail = process.env.CARACTERE_AUTO_SIMULATION_TEST_EMAIL?.trim().toLowerCase()
+    if (testEmail && sender !== testEmail) return NextResponse.json({ ignored: 'test-only mode' })
     const subject = (email.subject || '').slice(0, 200)
     const body = (email.text || '').slice(0, 1000)
     if (!/logo|simulation|polo|t.?shirt|tenue|personnalisation/i.test(subject + ' ' + body)) {
@@ -174,10 +177,6 @@ export async function POST(request: NextRequest) {
     const chosen = withLogoName.length === 1 ? withLogoName[0] : attachments.length === 1 ? attachments[0] : null
     if (!chosen || !chosen.download_url) return NextResponse.json({ ignored: 'missing or ambiguous logo' })
 
-    const perSender = 'caractere:mail-simulation:daily:' + sender + ':' + new Date().toISOString().slice(0, 10)
-    const count = await redis.incr(perSender)
-    if (count === 1) await redis.expire(perSender, 86400)
-    if (count > 1) return NextResponse.json({ ignored: 'daily sender cap' })
     const download = await fetch(chosen.download_url, { redirect: 'follow' })
     if (!download.ok || Number(download.headers.get('content-length') || '0') > MAX_LOGO_BYTES) throw new Error('Attachment download failed or exceeded size')
     const bytes = Buffer.from(await download.arrayBuffer())
@@ -185,6 +184,10 @@ export async function POST(request: NextRequest) {
     if (!mime || bytes.length > MAX_LOGO_BYTES) return NextResponse.json({ ignored: 'invalid image data' })
 
     const preview = await generatePreview(bytes, mime, product.file, product.label)
+    const perSender = 'caractere:mail-simulation:daily:' + sender + ':' + new Date().toISOString().slice(0, 10)
+    const reserved = await redis.set(perSender, 'reserved', { nx: true, ex: 86400 })
+    if (reserved !== 'OK') return NextResponse.json({ ignored: 'daily sender cap' })
+    dailyReservation = perSender
     const idempotency = 'caractere-logo-' + inboundId
     const replySubject = subject.toLowerCase().startsWith('re:') ? subject : 'Re: ' + subject
     const text = 'Bonjour,\n\nMerci pour votre logo ! Vous trouverez ci-joint votre première simulation sur ' + product.label.toLowerCase() + '.\n\nCeci est un aperçu indicatif : nous pouvons ajuster le rendu avant production.\n\nPour recevoir votre devis, répondez avec la quantité souhaitée, la couleur et vos préférences de marquage.\n\nCaractère — Aïn Benian, Alger\nhttps://www.caracteredz.com/simulation'
@@ -208,10 +211,12 @@ export async function POST(request: NextRequest) {
     })
     if (!sent.ok) throw new Error('Reply delivery failed with status ' + sent.status)
     await redis.set(lock, 'sent', { ex: 86400 * 30 })
+    await redis.set(perSender, 'sent', { ex: 86400 })
     return NextResponse.json({ sent: true })
   } catch (error) {
     // The original email is untrusted; never log its contents, address or attachment.
     console.error('Logo simulation failed', error instanceof Error ? error.message : 'Unexpected error')
+    if (dailyReservation) await redis.del(dailyReservation)
     await redis.del(lock)
     return NextResponse.json({ error: 'Processing failed' }, { status: 500 })
   }
