@@ -21,25 +21,37 @@ async function findUser(email: string) {
 export async function GET(req: NextRequest) {
   const denied = await requireAdmin(req);
   if (denied) return denied;
-  const [members, requests, rewards, orders] = await Promise.all([
+  const [members, requests, rewards, orders, purchases] = await Promise.all([
     supabaseAdmin.from("privilege_members").select("user_id,balance,lifetime_earned,email_opt_in,joined_at").order("joined_at", { ascending: false }).limit(150),
     supabaseAdmin.from("privilege_redemptions").select("id,user_id,reward_id,points_spent,status,requested_at").order("requested_at", { ascending: false }).limit(100),
     supabaseAdmin.from("privilege_rewards").select("id,title,cost_points,active"),
     supabaseAdmin.from("commandes").select("id,reference,nom_client,statut,prix_total,email").eq("statut", "termine").order("created_at", { ascending: false }).limit(50),
+    supabaseAdmin.from("privilege_transactions").select("user_id").in("kind", ["purchase", "offline"]).limit(10000),
   ]);
-  if (members.error || requests.error || rewards.error || orders.error) return respond({ error: "Données administrateur indisponibles." }, 503);
-  let emailMap: Record<string,string> = {};
+  if (members.error || requests.error || rewards.error || orders.error || purchases.error) return respond({ error: "Données administrateur indisponibles." }, 503);
+  const purchaseCount = new Map<string, number>();
+  for (const row of purchases.data || []) purchaseCount.set(row.user_id, (purchaseCount.get(row.user_id) || 0) + 1);
+  const userMap: Record<string, { email: string; name: string; phone: string }> = {};
   try {
     for (let page = 1; page <= 30; page++) {
       const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
       if (error) break;
-      for (const u of data.users) if (u.email) emailMap[u.id] = u.email;
+      for (const u of data.users) if (u.email) userMap[u.id] = {
+        email: u.email,
+        name: typeof u.user_metadata?.full_name === "string" ? u.user_metadata.full_name : "",
+        phone: typeof u.user_metadata?.phone === "string" ? u.user_metadata.phone : "",
+      };
       if (data.users.length < 1000) break;
     }
   } catch (e) { console.error("[privilege/admin] auth list failed"); }
   return respond({
-    members: (members.data || []).map(x => ({ ...x, email: emailMap[x.user_id] || "" })),
-    requests: (requests.data || []).map(x => ({ ...x, email: emailMap[x.user_id] || "" })),
+    members: (members.data || []).map(x => ({
+      ...x, email: userMap[x.user_id]?.email || "",
+      name: userMap[x.user_id]?.name || "",
+      phone: userMap[x.user_id]?.phone || "",
+      purchase_count: purchaseCount.get(x.user_id) || 0,
+    })),
+    requests: (requests.data || []).map(x => ({ ...x, email: userMap[x.user_id]?.email || "" })),
     rewards: rewards.data || [],
     orders: orders.data || [],
   });
@@ -52,6 +64,34 @@ export async function POST(req: NextRequest) {
   try { body = await req.json(); } catch { return respond({ error: "Requête invalide." }, 400); }
   if (!body || typeof body.action !== "string") return respond({ error: "Action invalide." }, 400);
   try {
+    if (body.action === "create_member") {
+      const name = typeof body.name === "string" ? body.name.trim().replace(/\\s+/g, " ") : "";
+      const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+      const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+      if (name.length < 2 || name.length > 100) return respond({ error: "Nom complet invalide (2 à 100 caractères)." }, 400);
+      if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return respond({ error: "E-mail client invalide." }, 400);
+      if (phone.length > 25 || (phone && !/^[+0-9 ()-]{6,25}$/.test(phone))) return respond({ error: "Téléphone invalide." }, 400);
+      let account = await findUser(email);
+      let invited = false;
+      if (!account) {
+        const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+          data: { full_name: name, ...(phone ? { phone } : {}) },
+        });
+        if (error || !data.user) return respond({ error: "Invitation impossible. Vérifiez la configuration d'envoi des e-mails." }, 503);
+        account = data.user;
+        invited = true;
+      } else {
+        // L'administrateur peut personnaliser une carte existante sans créer de doublon.
+        const { error } = await supabaseAdmin.auth.admin.updateUserById(account.id, {
+          user_metadata: { ...account.user_metadata, full_name: name, ...(phone ? { phone } : {}) },
+        });
+        if (error) return respond({ error: "Impossible de mettre à jour le nom de ce client." }, 503);
+      }
+      const { error } = await supabaseAdmin.from("privilege_members")
+        .upsert({ user_id: account.id }, { onConflict: "user_id", ignoreDuplicates: true });
+      if (error) return respond({ error: "Compte créé, mais activation de la carte impossible. Réessayez avec la même adresse." }, 503);
+      return respond({ success: true, invited, name, email });
+    }
     if (body.action === "review") {
       if (!validId(body.id) || typeof body.approved !== "boolean") return respond({ error: "Décision invalide." }, 400);
       const { error } = await supabaseAdmin.rpc("privilege_review_redemption", { p_request_id: body.id, p_approved: body.approved });
