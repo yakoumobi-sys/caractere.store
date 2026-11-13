@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 
-type Member = { user_id: string; email: string; balance: number; lifetime_earned: number; joined_at: string };
+type Member = { user_id: string; email: string; name: string; phone: string; purchase_count: number; balance: number; lifetime_earned: number; joined_at: string };
 type RequestItem = { id: string; user_id: string; reward_id: string; email: string; points_spent: number; status: string; requested_at: string };
 type Reward = { id: string; title: string; cost_points: number };
 type Order = { id: string; reference: string; nom_client: string; prix_total: number; email: string | null };
@@ -12,6 +12,9 @@ const money = (n: number) => new Intl.NumberFormat("fr-DZ").format(n);
 export default function AdminPrivilege() {
   const [data, setData] = useState<AdminData | null>(null);
   const [type, setType] = useState<"credit_order" | "credit_offline">("credit_offline");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [email, setEmail] = useState("");
   const [reference, setReference] = useState("");
   const [amount, setAmount] = useState("");
@@ -36,12 +39,19 @@ export default function AdminPrivilege() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Opération impossible.");
-      setSuccess(json.points ? "Crédit effectué : +" + money(json.points) + " points." : "Décision enregistrée.");
+      setSuccess(json.name
+        ? "Carte créée au nom de " + json.name + ". " + (json.invited ? "Invitation de connexion envoyée par e-mail." : "Compte client existant associé à sa carte.")
+        : json.points ? "Crédit effectué : +" + money(json.points) + " points." : "Décision enregistrée.");
+      if (json.name) { setCustomerName(""); setCustomerEmail(""); setCustomerPhone(""); }
       await refresh();
     } catch(e) { setError(e instanceof Error ? e.message : "Erreur"); }
     finally { setBusy(false); }
   };
 
+  const createMember = (event: React.FormEvent) => {
+    event.preventDefault();
+    void post({ action: "create_member", name: customerName.trim(), email: customerEmail.trim(), phone: customerPhone.trim() });
+  };
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     const payload: Record<string, unknown> = { action: type, email: email.trim(), reference: reference.trim(), confirmed };
@@ -58,6 +68,28 @@ export default function AdminPrivilege() {
       </div>
       {error && <div className="p-4 border border-red-200 bg-red-50 rounded-xl text-red-800 text-sm mb-5" role="alert">{error}</div>}
       {success && <div className="p-4 border border-green-200 bg-green-50 rounded-xl text-green-800 text-sm mb-5" role="status">{success}</div>}
+      <section className="bg-white rounded-2xl border border-black/10 p-6 mb-7">
+        <div className="flex flex-wrap gap-4 items-start justify-between">
+          <div>
+            <h2 className="text-xl font-bold">Créer une carte nominative</h2>
+            <p className="text-sm text-gray-500 mt-2 max-w-2xl">Créez le compte du client et sa carte Caractère Privilège en une fois. Si son adresse existe déjà, sa carte est activée sans doublon. Sinon, il reçoit une invitation par e-mail.</p>
+          </div>
+          <span className="text-xs bg-[#f7f1e9] text-[#805439] px-4 py-2 rounded-full font-semibold">0 / 3 achats au départ</span>
+        </div>
+        <form onSubmit={createMember} className="mt-6 grid md:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end">
+          <label className="text-sm font-semibold">Nom complet du client
+            <input required minLength={2} maxLength={100} autoComplete="name" value={customerName} onChange={e=>setCustomerName(e.target.value)} placeholder="Nom et prénom" className="block w-full mt-2 rounded-xl border border-black/20 p-3 text-sm font-normal" />
+          </label>
+          <label className="text-sm font-semibold">E-mail du client
+            <input required type="email" maxLength={254} autoComplete="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)} placeholder="client@exemple.dz" className="block w-full mt-2 rounded-xl border border-black/20 p-3 text-sm font-normal" />
+          </label>
+          <label className="text-sm font-semibold">Téléphone (facultatif)
+            <input type="tel" maxLength={25} autoComplete="tel" value={customerPhone} onChange={e=>setCustomerPhone(e.target.value)} placeholder="05 XX XX XX XX" className="block w-full mt-2 rounded-xl border border-black/20 p-3 text-sm font-normal" />
+          </label>
+          <button type="submit" disabled={busy} className="bg-[#191919] text-white rounded-xl px-5 py-3 text-sm font-semibold disabled:opacity-50 min-h-[46px]">{busy ? "Création…" : "Créer la carte ✦"}</button>
+        </form>
+        <p className="text-xs text-gray-500 mt-4">Premier achat payé et validé : 1/3 • Deuxième achat : 2/3 • Troisième achat : carte complète. Les points restent calculés séparément.</p>
+      </section>
       <div className="grid sm:grid-cols-3 gap-4">
         {[
           {label:"Membres actifs",value:data?.members.length ?? "—"},
@@ -98,7 +130,11 @@ export default function AdminPrivilege() {
       </div>
       <section className="bg-white rounded-2xl border border-black/10 p-6 mt-7">
         <h2 className="text-xl font-bold">Membres enregistrés</h2>
-        {data?.members.length ? <div className="mt-5 divide-y divide-black/10">{data.members.map(m=><div key={m.user_id} className="flex justify-between items-center gap-4 py-3 text-sm"><div><p className="font-semibold">{m.email || m.user_id}</p><p className="text-xs text-gray-500">Points gagnés : {money(m.lifetime_earned)}</p></div><strong>{money(m.balance)} pts</strong></div>)}</div> : <p className="mt-5 text-sm text-gray-500">Aucun membre encore inscrit. Les clients peuvent activer leur carte depuis /privilege.</p>}
+        {data?.members.length ? <div className="mt-5 divide-y divide-black/10">{data.members.map(m=><div key={m.user_id} className="flex flex-wrap justify-between items-center gap-4 py-4 text-sm">
+          <div className="min-w-[180px]"><p className="font-semibold">{m.name || m.email || m.user_id}</p><p className="text-xs text-gray-500 mt-1">{m.email}</p>{m.phone && <p className="text-xs text-gray-500">{m.phone}</p>}<p className="text-xs text-gray-500 mt-1">Points gagnés : {money(m.lifetime_earned)}</p></div>
+          <div className="min-w-[125px]"><p className="text-xs font-semibold mb-2">{Math.min(m.purchase_count,3)} / 3 achats</p><div className="flex gap-1.5" aria-label={"Carte remplie à " + Math.min(m.purchase_count,3) + " tiers"}>{[0,1,2].map(i=><span key={i} className={"h-2.5 w-10 rounded-full " + (m.purchase_count>i ? "bg-[#ad4336]" : "bg-gray-200")} />)}</div></div>
+          <strong>{money(m.balance)} pts</strong>
+        </div>)}</div> : <p className="mt-5 text-sm text-gray-500">Aucun membre encore inscrit. Les clients peuvent activer leur carte depuis /privilege.</p>}
       </section>
       <section className="bg-white rounded-2xl border border-black/10 p-6 mt-7">
         <h2 className="text-xl font-bold">Commandes site éligibles</h2>

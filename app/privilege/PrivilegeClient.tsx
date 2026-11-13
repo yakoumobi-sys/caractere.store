@@ -9,7 +9,7 @@ type Reward = { id: string; title: string; description: string; cost_points: num
 type Transaction = { id: string; kind: string; delta: number; description: string; created_at: string };
 type Redemption = { id: string; reward_id: string; points_spent: number; status: string; requested_at: string };
 type Notice = { id: string; title: string; message: string; read_at: string | null; created_at: string };
-type Wallet = { member: Member | null; rewards: Reward[]; transactions: Transaction[]; redemptions: Redemption[]; notifications: Notice[] };
+type Wallet = { member: Member | null; purchase_count: number; rewards: Reward[]; transactions: Transaction[]; redemptions: Redemption[]; notifications: Notice[] };
 const fmt = (n: number) => new Intl.NumberFormat("fr-DZ").format(n);
 const date = (text: string) => new Date(text).toLocaleDateString("fr-DZ", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -76,6 +76,7 @@ export default function PrivilegeClient() {
 
   const name = user?.user_metadata?.full_name?.toString().trim() || user?.email?.split("@")[0] || "Membre";
   const balance = wallet?.member?.balance || 0;
+  const purchases = Math.min(3, Math.max(0, wallet?.purchase_count || 0));
 
   return (
     <main className="bg-[#f7f6f3] text-[#1d1d1f] min-h-[80vh]">
@@ -126,6 +127,13 @@ export default function PrivilegeClient() {
                   <p className="text-white/50 text-[11px] uppercase tracking-[.2em] mb-3">Caractère Privilège</p>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{name}</h2>
                   <p className="text-white/50 text-xs mt-2">Membre depuis {date(wallet.member.joined_at)}</p>
+                </div>
+                <div className="relative mt-7">
+                  <div className="flex items-center justify-between text-xs mb-2.5"><span className="text-white/70 font-semibold">Ma carte fidélité</span><strong className="text-[#f3c1a8]">{purchases}/3 achats</strong></div>
+                  <div className="grid grid-cols-3 gap-2" role="progressbar" aria-label="Progression de la carte fidélité" aria-valuemin={0} aria-valuemax={3} aria-valuenow={purchases}>
+                    {[0,1,2].map(i=><div key={i} className={"h-3 rounded-full transition-colors " + (purchases>i ? "bg-[#f17a65]" : "bg-white/20")} />)}
+                  </div>
+                  <p className="text-xs text-white/55 mt-3">{purchases === 0 ? "Votre 1er achat vérifié remplira 1/3 de la carte." : purchases === 3 ? "Félicitations, votre carte est complète !" : "Encore " + (3-purchases) + " achat" + (3-purchases>1?"s":"") + " vérifié" + (3-purchases>1?"s":"") + " pour compléter votre carte."}</p>
                 </div>
               </div>
               <div className="rounded-[28px] bg-white border border-black/10 p-8 flex flex-col justify-between">
