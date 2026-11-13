@@ -32,7 +32,37 @@ export default function LoginPage() {
 
       if (data?.session) {
         const isAdmin = (data.session.user?.email || '').toLowerCase() === 'yakoumobi@gmail.com'
-        router.push(isAdmin ? '/admin' : '/dashboard')
+        if (isAdmin) {
+          router.replace('/admin')
+          return
+        }
+
+        // On ne redirige que vers une destination interne explicitement autorisée.
+        const requested = new URLSearchParams(window.location.search).get('next')
+        if (requested === '/privilege') {
+          router.replace('/privilege')
+          return
+        }
+
+        // Un client déjà inscrit à Privilège doit voir immédiatement sa carte
+        // animée après connexion, et non le dashboard général du site.
+        // Les autres clients conservent leur parcours habituel.
+        try {
+          const res = await fetch('/api/privilege', {
+            headers: { Authorization: 'Bearer ' + data.session.access_token },
+            cache: 'no-store',
+          })
+          if (res.ok) {
+            const wallet = await res.json()
+            if (wallet?.member) {
+              router.replace('/privilege')
+              return
+            }
+          }
+        } catch {
+          // Si Privilège est momentanément indisponible, la connexion reste possible.
+        }
+        router.replace('/dashboard')
       }
     } catch (err) {
       setError('Erreur de connexion. Réessaye.')
