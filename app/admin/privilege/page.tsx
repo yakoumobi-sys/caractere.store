@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/adminFetch";
+import { filledLoyaltyDots, LOYALTY_CARD_DOTS } from "@/lib/privilege-card";
 
 type Member = { user_id: string; email: string; name: string; phone: string; purchase_count: number; balance: number; lifetime_earned: number; joined_at: string };
 type RequestItem = { id: string; user_id: string; reward_id: string; email: string; points_spent: number; status: string; requested_at: string };
@@ -41,7 +42,7 @@ export default function AdminPrivilege() {
       if (!res.ok) throw new Error(json.error || "Opération impossible.");
       setSuccess(json.name
         ? "Carte créée au nom de " + json.name + ". " + (json.invited ? "Invitation de connexion envoyée par e-mail." : "Compte client existant associé à sa carte.")
-        : json.points ? "Crédit effectué : +" + money(json.points) + " points." : "Décision enregistrée.");
+        : json.points ? "Achat enregistré : +" + money(json.points) + " points. Carte mise à jour (3 ronds par achat, limite de 10)." : "Décision enregistrée.");
       if (json.name) { setCustomerName(""); setCustomerEmail(""); setCustomerPhone(""); }
       await refresh();
     } catch(e) { setError(e instanceof Error ? e.message : "Erreur"); }
@@ -74,7 +75,7 @@ export default function AdminPrivilege() {
             <h2 className="text-xl font-bold">Créer une carte nominative</h2>
             <p className="text-sm text-gray-500 mt-2 max-w-2xl">Créez le compte du client et sa carte Caractère Privilège en une fois. Si son adresse existe déjà, sa carte est activée sans doublon. Sinon, il reçoit une invitation par e-mail.</p>
           </div>
-          <span className="text-xs bg-[#f7f1e9] text-[#805439] px-4 py-2 rounded-full font-semibold">0 / 3 achats au départ</span>
+          <span className="text-xs bg-[#f7f1e9] text-[#805439] px-4 py-2 rounded-full font-semibold">0 / 10 ronds au départ</span>
         </div>
         <form onSubmit={createMember} className="mt-6 grid md:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end">
           <label className="text-sm font-semibold">Nom complet du client
@@ -88,7 +89,7 @@ export default function AdminPrivilege() {
           </label>
           <button type="submit" disabled={busy} className="bg-[#191919] text-white rounded-xl px-5 py-3 text-sm font-semibold disabled:opacity-50 min-h-[46px]">{busy ? "Création…" : "Créer la carte ✦"}</button>
         </form>
-        <p className="text-xs text-gray-500 mt-4">Premier achat payé et validé : 1/3 • Deuxième achat : 2/3 • Troisième achat : carte complète. Les points restent calculés séparément.</p>
+        <p className="text-xs text-gray-500 mt-4">Chaque achat payé et vérifié coche 3 ronds. Progression : 3/10 → 6/10 → 9/10 → 10/10 au quatrième achat. Les points restent calculés séparément.</p>
       </section>
       <div className="grid sm:grid-cols-3 gap-4">
         {[
@@ -98,9 +99,9 @@ export default function AdminPrivilege() {
         ].map(x=><div key={x.label} className="rounded-2xl bg-white p-6 border border-black/10"><p className="text-xs text-gray-500">{x.label}</p><p className="text-3xl font-bold mt-3">{x.value}</p></div>)}
       </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-7">
-        <section className="bg-white rounded-2xl border border-black/10 p-6">
-          <h2 className="text-xl font-bold">Créditer un achat vérifié</h2>
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">1 point / 100 DA encaissés. Seuls les clients ayant activé leur carte Privilège peuvent recevoir des points. Une référence facture ne peut être créditée qu'une seule fois.</p>
+        <section id="credit-purchase" className="bg-white rounded-2xl border border-black/10 p-6 scroll-mt-24">
+          <h2 className="text-xl font-bold">Ajouter un achat vérifié (+3 ronds)</h2>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">Le client gagne 3 ronds supplémentaires par achat, jusqu’à 10 au total, et 1 point par 100 DA encaissés. Une référence de facture ne peut être créditée qu’une seule fois. Vérifiez toujours le paiement.</p>
           <form onSubmit={submit} className="mt-6 space-y-4">
             <fieldset className="flex gap-5">
               <label className="text-sm"><input type="radio" checked={type==="credit_offline"} onChange={()=>setType("credit_offline")} /> Achat WhatsApp / boutique</label>
@@ -116,7 +117,7 @@ export default function AdminPrivilege() {
               <input type="number" min="100" max="100000000" step="1" required value={amount} onChange={e=>setAmount(e.target.value)} className="block w-full mt-2 rounded-xl border border-black/20 p-3 text-sm font-normal" />
             </label>}
             <label className="flex gap-3 items-start text-sm text-gray-600"><input type="checkbox" required checked={confirmed} onChange={e=>setConfirmed(e.target.checked)} className="mt-1" /> Je confirme avoir vérifié le paiement et l'identité du client avant d'attribuer ces points.</label>
-            <button type="submit" disabled={busy || !confirmed} className="rounded-full bg-[#191919] px-7 py-3.5 text-white font-semibold text-sm disabled:opacity-50">{busy?"Traitement…":"Créditer les points"}</button>
+            <button type="submit" disabled={busy || !confirmed} className="rounded-full bg-[#191919] px-7 py-3.5 text-white font-semibold text-sm disabled:opacity-50">{busy?"Traitement…":"Valider l’achat et ajouter les ronds"}</button>
           </form>
         </section>
         <section className="bg-white rounded-2xl border border-black/10 p-6">
@@ -132,7 +133,13 @@ export default function AdminPrivilege() {
         <h2 className="text-xl font-bold">Membres enregistrés</h2>
         {data?.members.length ? <div className="mt-5 divide-y divide-black/10">{data.members.map(m=><div key={m.user_id} className="flex flex-wrap justify-between items-center gap-4 py-4 text-sm">
           <div className="min-w-[180px]"><p className="font-semibold">{m.name || m.email || m.user_id}</p><p className="text-xs text-gray-500 mt-1">{m.email}</p>{m.phone && <p className="text-xs text-gray-500">{m.phone}</p>}<p className="text-xs text-gray-500 mt-1">Points gagnés : {money(m.lifetime_earned)}</p></div>
-          <div className="min-w-[125px]"><p className="text-xs font-semibold mb-2">{Math.min(m.purchase_count,3)} / 3 achats</p><div className="flex gap-1.5" aria-label={"Carte remplie à " + Math.min(m.purchase_count,3) + " tiers"}>{[0,1,2].map(i=><span key={i} className={"h-2.5 w-10 rounded-full " + (m.purchase_count>i ? "bg-[#ad4336]" : "bg-gray-200")} />)}</div></div>
+          <div className="min-w-[145px]">
+            <p className="text-xs font-semibold mb-2">{filledLoyaltyDots(m.purchase_count)} / 10 ronds • {m.purchase_count} achat{m.purchase_count > 1 ? "s" : ""}</p>
+            <div className="flex gap-1" role="progressbar" aria-label={"Ronds cochés pour " + (m.name || m.email)} aria-valuemin={0} aria-valuemax={LOYALTY_CARD_DOTS} aria-valuenow={filledLoyaltyDots(m.purchase_count)}>
+              {Array.from({length: LOYALTY_CARD_DOTS}, (_, i) => <span key={i} className={"h-3 w-3 rounded-full border " + (i < filledLoyaltyDots(m.purchase_count) ? "border-[#b9634d] bg-[#b9634d]" : "border-gray-300 bg-gray-100")} />)}
+            </div>
+            <a href="#credit-purchase" onClick={() => { setEmail(m.email); setReference(""); setAmount(""); setType("credit_offline"); setConfirmed(false); }} className="mt-3 inline-block text-xs font-bold text-[#a94639] underline underline-offset-2">+ Ajouter un achat</a>
+          </div>
           <strong>{money(m.balance)} pts</strong>
         </div>)}</div> : <p className="mt-5 text-sm text-gray-500">Aucun membre encore inscrit. Les clients peuvent activer leur carte depuis /privilege.</p>}
       </section>
