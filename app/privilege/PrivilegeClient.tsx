@@ -94,7 +94,7 @@ export default function PrivilegeClient() {
             <h2 className="text-2xl font-bold tracking-tight">Connectez-vous pour accéder à votre carte.</h2>
             <p className="text-[#76716b] text-sm leading-relaxed mt-3">Votre compte Caractère vous permet de retrouver vos avantages en toute sécurité.</p>
             <div className="flex gap-3 flex-wrap mt-7">
-              <Link href="/auth/login" className="px-6 py-3 bg-[#1d1d1f] text-white rounded-full text-sm font-semibold">Se connecter</Link>
+              <Link href="/auth/login?next=%2Fprivilege" className="px-6 py-3 bg-[#1d1d1f] text-white rounded-full text-sm font-semibold">Se connecter</Link>
               <Link href="/auth/signup" className="px-6 py-3 border border-black/20 rounded-full text-sm font-semibold">Créer un compte</Link>
             </div>
           </div>
