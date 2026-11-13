@@ -65,11 +65,11 @@ export async function POST(req: NextRequest) {
   if (!body || typeof body.action !== "string") return respond({ error: "Action invalide." }, 400);
   try {
     if (body.action === "create_member") {
-      const name = typeof body.name === "string" ? body.name.trim().replace(/\\s+/g, " ") : "";
+      const name = typeof body.name === "string" ? body.name.trim().replace(/\s+/g, " ") : "";
       const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
       const phone = typeof body.phone === "string" ? body.phone.trim() : "";
       if (name.length < 2 || name.length > 100) return respond({ error: "Nom complet invalide (2 à 100 caractères)." }, 400);
-      if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return respond({ error: "E-mail client invalide." }, 400);
+      if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return respond({ error: "E-mail client invalide." }, 400);
       if (phone.length > 25 || (phone && !/^[+0-9 ()-]{6,25}$/.test(phone))) return respond({ error: "Téléphone invalide." }, 400);
       let account = await findUser(email);
       let invited = false;
