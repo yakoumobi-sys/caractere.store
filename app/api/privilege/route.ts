@@ -17,20 +17,23 @@ function respond(data: unknown, status = 200) {
 export async function GET(req: NextRequest) {
   const user = await currentUser(req);
   if (!user) return respond({ error: "Connectez-vous pour voir votre carte." }, 401);
-  const [memberResult, rewardsResult, pointsResult, requestsResult, notificationsResult] = await Promise.all([
+  const [memberResult, rewardsResult, pointsResult, requestsResult, notificationsResult, purchaseCountResult] = await Promise.all([
     supabaseAdmin.from("privilege_members").select("balance,lifetime_earned,email_opt_in,joined_at").eq("user_id", user.id).maybeSingle(),
     supabaseAdmin.from("privilege_rewards").select("id,title,description,cost_points").eq("active", true).order("cost_points"),
     supabaseAdmin.from("privilege_transactions").select("id,kind,delta,description,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(30),
     supabaseAdmin.from("privilege_redemptions").select("id,reward_id,points_spent,status,requested_at").eq("user_id", user.id).order("requested_at", { ascending: false }).limit(30),
     supabaseAdmin.from("privilege_notifications").select("id,title,message,read_at,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(30),
+    supabaseAdmin.from("privilege_transactions").select("id", { count: "exact", head: true })
+      .eq("user_id", user.id).in("kind", ["purchase", "offline"]),
   ]);
-  const errors = [memberResult.error, rewardsResult.error, pointsResult.error, requestsResult.error, notificationsResult.error].filter(Boolean);
+  const errors = [memberResult.error, rewardsResult.error, pointsResult.error, requestsResult.error, notificationsResult.error, purchaseCountResult.error].filter(Boolean);
   if (errors.length) {
     console.error("[privilege] database read error", errors[0]?.code);
     return respond({ error: "Votre carte est momentanément indisponible." }, 503);
   }
   return respond({
     member: memberResult.data,
+    purchase_count: purchaseCountResult.count || 0,
     rewards: rewardsResult.data || [],
     transactions: pointsResult.data || [],
     redemptions: requestsResult.data || [],
