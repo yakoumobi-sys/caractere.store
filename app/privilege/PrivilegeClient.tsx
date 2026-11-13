@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import LoyaltyCard from "./LoyaltyCard";
 
 type Member = { balance: number; lifetime_earned: number; email_opt_in: boolean; joined_at: string };
 type Reward = { id: string; title: string; description: string; cost_points: number };
@@ -76,7 +77,6 @@ export default function PrivilegeClient() {
 
   const name = user?.user_metadata?.full_name?.toString().trim() || user?.email?.split("@")[0] || "Membre";
   const balance = wallet?.member?.balance || 0;
-  const purchases = Math.min(3, Math.max(0, wallet?.purchase_count || 0));
 
   return (
     <main className="bg-[#f7f6f3] text-[#1d1d1f] min-h-[80vh]">
@@ -120,22 +120,7 @@ export default function PrivilegeClient() {
         {!loading && user && wallet?.member && (
           <>
             <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-6 mt-10">
-              <div className="rounded-[28px] bg-[#181818] text-white p-7 sm:p-10 min-h-[270px] flex flex-col justify-between relative overflow-hidden">
-                <div aria-hidden className="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-[#a94639]/20 blur-3xl" />
-                <div className="relative flex justify-between items-start text-xl font-black tracking-[-.06em]"><span>CARACTÈRE<span className="text-[#f17a65]">.</span></span><span className="text-[#d5bda7] text-2xl">✦</span></div>
-                <div className="relative">
-                  <p className="text-white/50 text-[11px] uppercase tracking-[.2em] mb-3">Caractère Privilège</p>
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{name}</h2>
-                  <p className="text-white/50 text-xs mt-2">Membre depuis {date(wallet.member.joined_at)}</p>
-                </div>
-                <div className="relative mt-7">
-                  <div className="flex items-center justify-between text-xs mb-2.5"><span className="text-white/70 font-semibold">Ma carte fidélité</span><strong className="text-[#f3c1a8]">{purchases}/3 achats</strong></div>
-                  <div className="grid grid-cols-3 gap-2" role="progressbar" aria-label="Progression de la carte fidélité" aria-valuemin={0} aria-valuemax={3} aria-valuenow={purchases}>
-                    {[0,1,2].map(i=><div key={i} className={"h-3 rounded-full transition-colors " + (purchases>i ? "bg-[#f17a65]" : "bg-white/20")} />)}
-                  </div>
-                  <p className="text-xs text-white/55 mt-3">{purchases === 0 ? "Votre 1er achat vérifié remplira 1/3 de la carte." : purchases === 3 ? "Félicitations, votre carte est complète !" : "Encore " + (3-purchases) + " achat" + (3-purchases>1?"s":"") + " vérifié" + (3-purchases>1?"s":"") + " pour compléter votre carte."}</p>
-                </div>
-              </div>
+              <LoyaltyCard name={name} joinedAt={wallet.member.joined_at} purchaseCount={wallet.purchase_count} />
               <div className="rounded-[28px] bg-white border border-black/10 p-8 flex flex-col justify-between">
                 <p className="text-xs font-bold uppercase tracking-widest text-[#8d8680]">Votre solde</p>
                 <div><p className="text-6xl font-bold tracking-[-.07em]">{fmt(balance)}</p><p className="text-sm text-[#807a73] mt-2">points disponibles</p></div>

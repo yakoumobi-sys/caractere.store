@@ -188,3 +188,62 @@ body {
 /* Anchor and keyboard navigation clear the sticky header. */
 [id] { scroll-margin-top: 90px; }
 summary:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 4px; }
+
+
+/* ── Caractère Privilège : carte nominative et tampons animés ── */
+.privilege-premium-card {
+  background:
+    radial-gradient(ellipse at 91% 4%, rgba(238,178,133,.15), transparent 44%),
+    linear-gradient(133deg, #27211e 0%, #181818 58%, #0f1011 100%);
+  border: 1px solid rgba(232,187,153,.25);
+  animation: privilege-card-arrive 900ms cubic-bezier(.2,.75,.2,1) both;
+  transform-origin: 50% 70%;
+}
+.privilege-premium-card::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -30% auto -30% -75%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.065), transparent);
+  transform: skewX(-16deg);
+  pointer-events: none;
+  animation: privilege-card-shine 1450ms ease-out 250ms both;
+}
+.privilege-card-grain {
+  background-image: repeating-linear-gradient(127deg, transparent 0 12px, rgba(249,213,182,.04) 12px 13px);
+  opacity: .35;
+}
+.privilege-loyalty-dot {
+  border: 1px solid rgba(255,255,255,.22);
+  transition: border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+}
+.privilege-loyalty-dot-empty {
+  background: rgba(255,255,255,.055);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.25);
+}
+.privilege-loyalty-dot-checked {
+  border-color: #ffdfb8;
+  background: linear-gradient(145deg, #ffdeae, #e0a67e);
+  box-shadow: 0 0 0 3px rgba(233,170,127,.10), 0 5px 14px rgba(222,157,107,.23);
+  animation: privilege-dot-check 470ms cubic-bezier(.2,1.35,.35,1) both;
+}
+@keyframes privilege-card-arrive {
+  from { opacity: 0; transform: translateY(26px) perspective(900px) rotateX(7deg) scale(.97); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0) perspective(900px) rotateX(0) scale(1); filter: blur(0); }
+}
+@keyframes privilege-card-shine {
+  from { left: -75%; }
+  to { left: 160%; }
+}
+@keyframes privilege-dot-check {
+  0% { transform: scale(.55); opacity: .35; }
+  58% { transform: scale(1.22); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .privilege-premium-card,
+  .privilege-premium-card::after,
+  .privilege-loyalty-dot-checked { animation: none !important; }
+  .privilege-loyalty-dot { transition: none !important; }
+}
