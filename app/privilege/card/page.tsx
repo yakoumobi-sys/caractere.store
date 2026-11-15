@@ -1,6 +1,7 @@
 "use client";
 import { useEffect,useState } from "react";
 import LoyaltyCard from "../LoyaltyCard";
+import NextPurchaseGift from "../NextPurchaseGift";
 type Card={name:string;created_at:string;purchase_count:number;card_number:string;delivered:boolean};
 export default function DirectPrivilegeCard(){
  const [card,setCard]=useState<Card|null>(null);
@@ -19,6 +20,6 @@ export default function DirectPrivilegeCard(){
  <p className="mb-2 text-xs font-bold uppercase tracking-[.25em] text-[#a94639]">Caractère Privilège</p>
  <h1 className="mb-7 text-3xl font-bold tracking-tight">Votre carte de fidélité</h1>
  {loading&&<p>Chargement…</p>}{error&&<p role="alert">{error}</p>}
- {card&&<><LoyaltyCard name={card.name} joinedAt={card.created_at} purchaseCount={card.purchase_count} cardNumber={card.card_number} delivered={card.delivered}/><div className="mt-6 rounded-2xl bg-white p-6 shadow-sm"><h2 className="text-xl font-bold">{card.delivered?"Vos 5 T-shirts ont été remis !":card.purchase_count>=4?"Félicitations ! 5 T-shirts offerts.":"10 cases = 5 T-shirts offerts"}</h2><p className="mt-3 text-sm text-gray-600">{card.delivered?"Votre récompense a été utilisée.":card.purchase_count>=4?"Présentez cette carte à notre équipe pour récupérer votre récompense.":"Chaque achat payé et validé coche 3 cases. Votre récompense est débloquée au quatrième achat."}</p></div><p className="mt-5 text-xs text-gray-500">Gardez ce lien privé : il donne accès à votre carte personnelle.</p></>}
+ {card&&<><LoyaltyCard name={card.name} joinedAt={card.created_at} purchaseCount={card.purchase_count} cardNumber={card.card_number} delivered={card.delivered}/><NextPurchaseGift/><div className="mt-6 rounded-2xl bg-white p-6 shadow-sm"><h2 className="text-xl font-bold">{card.delivered?"Vos 5 T-shirts ont été remis !":card.purchase_count>=4?"Félicitations ! 5 T-shirts offerts.":"10 cases = 5 T-shirts offerts"}</h2><p className="mt-3 text-sm text-gray-600">{card.delivered?"Votre récompense a été utilisée.":card.purchase_count>=4?"Présentez cette carte à notre équipe pour récupérer votre récompense.":"Chaque achat payé et validé coche 3 cases. Votre récompense est débloquée au quatrième achat."}</p></div><p className="mt-5 text-xs text-gray-500">Gardez ce lien privé : il donne accès à votre carte personnelle.</p></>}
  </div></main>
 }

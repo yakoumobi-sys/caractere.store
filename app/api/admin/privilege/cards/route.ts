@@ -36,15 +36,23 @@ export async function POST(req: NextRequest) {
    const l=makeLink();
    const r=await cards().insert({full_name:name,phone:phone||null,token_hash:l.hash}).select("id").single();
    if(r.error) return reply({error:"Création impossible."},503);
+   const saved=await supabaseAdmin.rpc("privilege_admin_store_share_link",{p_card_id:r.data.id,p_token:l.link.split("#")[1]});
+   if(saved.error)return reply({id:r.data.id,link:l.link,warning:"Lien à copier maintenant."});
    return reply({id:r.data.id,link:l.link});
   }
   if(!uuid(b.id)) return reply({error:"Carte invalide."},400);
   const row=await cards().select("id,reward_delivered_at").eq("id",b.id).maybeSingle();
   if(row.error||!row.data) return reply({error:"Carte introuvable."},404);
+  if(b.action==="share"){
+   const s=await supabaseAdmin.rpc("privilege_admin_share_link",{p_card_id:b.id});
+   if(s.error||!s.data)return reply({error:"Ce lien ne peut pas être récupéré. Utilisez le lien déjà transmis ou confirmez la création d’un nouveau lien."},404);
+   return reply({link:s.data});
+  }
   if(b.action==="rotate"){
    const l=makeLink(); const r=await cards().update({token_hash:l.hash}).eq("id",b.id);
    if(r.error) return reply({error:"Lien indisponible."},503);
-   return reply({link:l.link});
+   const s=await supabaseAdmin.rpc("privilege_admin_store_share_link",{p_card_id:b.id,p_token:l.link.split("#")[1]});
+   return reply({link:l.link,...(s.error?{warning:"Lien à copier maintenant."}:{})});
   }
   if(b.action==="purchase"){
    const ref=typeof b.reference==="string"?b.reference.trim().toUpperCase():"";
