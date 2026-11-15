@@ -1,4 +1,5 @@
 "use client";
+import DirectCards from "./DirectCards";
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 import { filledLoyaltyDots, LOYALTY_CARD_DOTS } from "@/lib/privilege-card";
@@ -69,6 +70,7 @@ export default function AdminPrivilege() {
       </div>
       {error && <div className="p-4 border border-red-200 bg-red-50 rounded-xl text-red-800 text-sm mb-5" role="alert">{error}</div>}
       {success && <div className="p-4 border border-green-200 bg-green-50 rounded-xl text-green-800 text-sm mb-5" role="status">{success}</div>}
+      <DirectCards />
       <section className="bg-white rounded-2xl border border-black/10 p-6 mb-7">
         <div className="flex flex-wrap gap-4 items-start justify-between">
           <div>
