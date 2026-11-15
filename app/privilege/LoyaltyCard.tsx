@@ -7,6 +7,8 @@ type Props = {
   name: string;
   joinedAt: string;
   purchaseCount: number;
+  cardNumber?: string;
+  delivered?: boolean;
 };
 
 /**
@@ -15,7 +17,7 @@ type Props = {
  * l'autre. Si le client reçoit un autre achat sans quitter la page, seuls
  * les nouveaux ronds s'animent. Aucun point n'est modifiable depuis le client.
  */
-export default function LoyaltyCard({ name, joinedAt, purchaseCount }: Props) {
+export default function LoyaltyCard({ name, joinedAt, purchaseCount, cardNumber, delivered = false }: Props) {
   const targetDots = filledLoyaltyDots(purchaseCount);
   const [visibleDots, setVisibleDots] = useState(0);
   const previousTarget = useRef(0);
@@ -47,7 +49,7 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount }: Props) {
   });
 
   return (
-    <div className="privilege-premium-card relative isolate min-h-[350px] overflow-hidden rounded-[30px] p-6 text-white shadow-[0_26px_70px_rgba(35,24,19,0.24)] sm:p-9">
+    <div className="privilege-premium-card relative isolate aspect-[1.586] min-h-[225px] overflow-hidden rounded-[30px] p-4 text-white shadow-[0_26px_70px_rgba(35,24,19,0.24)] sm:p-6">
       <div className="privilege-card-grain pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#c88e67]/[0.12] blur-3xl" aria-hidden="true" />
       <div className="relative flex items-start justify-between gap-4">
@@ -58,19 +60,19 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount }: Props) {
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#ddb99d]/40 bg-[#d8a782]/10 text-2xl text-[#f7d2ae]">✦</span>
       </div>
 
-      <div className="relative mt-8">
+      <div className="relative mt-4">
         <p className="text-[10px] font-semibold uppercase tracking-[.24em] text-white/50">CARTE PERSONNELLE</p>
         <h2 className="mt-2 break-words text-[clamp(1.6rem,4vw,2.3rem)] font-semibold leading-tight tracking-[-.045em]">{name}</h2>
-        <p className="mt-2 text-xs text-[#c6b5ac]">Membre depuis {created}</p>
+        <p className="mt-2 text-xs text-[#c6b5ac]">Membre depuis {created}{cardNumber ? " • " + cardNumber : ""}</p>
       </div>
 
-      <div className="relative mt-8">
+      <div className="relative mt-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <span className="text-xs font-medium text-[#ead5c5]">Mes achats récompensés</span>
           <span className="text-sm font-bold tabular-nums text-[#f1c19d]">{visibleDots}<span className="text-white/50"> / 10</span></span>
         </div>
         <div
-          className="grid grid-cols-5 gap-2.5 sm:grid-cols-10 sm:gap-2"
+          className="grid grid-cols-10 gap-1.5"
           role="progressbar"
           aria-label="Ronds de fidélité cochés"
           aria-valuemin={0}
@@ -83,7 +85,7 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount }: Props) {
             return (
               <span
                 key={index}
-                className={"privilege-loyalty-dot flex aspect-square min-h-[36px] items-center justify-center rounded-full " + (checked ? "privilege-loyalty-dot-checked" : "privilege-loyalty-dot-empty")}
+                className={"privilege-loyalty-dot flex aspect-square min-h-0 items-center justify-center rounded-full " + (checked ? "privilege-loyalty-dot-checked" : "privilege-loyalty-dot-empty")}
                 aria-hidden="true"
               >
                 {checked && (
@@ -95,12 +97,12 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount }: Props) {
             );
           })}
         </div>
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-3 border-t border-white/10 pt-4">
+        <div className="mt-3 flex items-end justify-between gap-2 border-t border-white/10 pt-2">
           <p className="max-w-[320px] text-xs leading-relaxed text-[#c8b8ae]">
-            {targetDots === 0
+            {delivered ? "Récompense remise : 5 T-shirts." : targetDots === 0
               ? "Au premier achat validé, 3 ronds se cocheront sur votre carte."
               : targetDots === LOYALTY_CARD_DOTS
-                ? "Bravo ! Votre carte est complète. Contactez Caractère pour connaître vos avantages."
+                ? "Bravo ! 5 T-shirts offerts."
                 : "Encore " + remainingPurchases + " achat" + (remainingPurchases > 1 ? "s" : "") + " validé" + (remainingPurchases > 1 ? "s" : "") + " pour compléter votre carte."}
           </p>
           <span className="rounded-full border border-[#eac7ad]/25 bg-[#f5d0b4]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.13em] text-[#f0c29d]">
