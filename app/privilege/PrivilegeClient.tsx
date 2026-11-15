@@ -4,6 +4,7 @@ import Link from "next/link";
 import { supabaseClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import LoyaltyCard from "./LoyaltyCard";
+import NextPurchaseGift from "./NextPurchaseGift";
 
 type Member = { balance: number; lifetime_earned: number; email_opt_in: boolean; joined_at: string };
 type Reward = { id: string; title: string; description: string; cost_points: number };
@@ -120,7 +121,7 @@ export default function PrivilegeClient() {
         {!loading && user && wallet?.member && (
           <>
             <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-6 mt-10">
-              <LoyaltyCard name={name} joinedAt={wallet.member.joined_at} purchaseCount={wallet.purchase_count} />
+              <div><LoyaltyCard name={name} joinedAt={wallet.member.joined_at} purchaseCount={wallet.purchase_count} /><NextPurchaseGift/></div>
               <div className="rounded-[28px] bg-white border border-black/10 p-8 flex flex-col justify-between">
                 <p className="text-xs font-bold uppercase tracking-widest text-[#8d8680]">Votre solde</p>
                 <div><p className="text-6xl font-bold tracking-[-.07em]">{fmt(balance)}</p><p className="text-sm text-[#807a73] mt-2">points disponibles</p></div>
