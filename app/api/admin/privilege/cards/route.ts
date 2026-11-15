@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
    if(b.confirmed!==true||ref.length<3||ref.length>100||!Number.isSafeInteger(b.amount)||b.amount<1||b.amount>100000000) return reply({error:"Vérifiez la facture et le paiement."},400);
    if(row.data.reward_delivered_at) return reply({error:"Récompense déjà remise. Créez une nouvelle carte."},409);
    if(await count(b.id)>=4) return reply({error:"Carte complète. Remettez d’abord la récompense."},409);
-   const r=await purchases().insert({card_id:b.id,reference:ref,amount:b.amount});
-   if(r.error) return reply({error:r.error.code==="23505"?"Facture déjà utilisée.":"Achat non enregistré."},r.error.code==="23505"?409:503);
+   const r=await supabaseAdmin.rpc("privilege_direct_credit",{p_card_id:b.id,p_reference:ref,p_amount:b.amount});
+   if(r.error) return reply({error:r.error.code==="23505"?"Facture déjà utilisée.":"Carte complète ou achat non enregistré."},r.error.code==="23505"?409:503);
    return reply({success:true});
   }
   if(b.action==="deliver"){
