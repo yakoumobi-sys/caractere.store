@@ -49,7 +49,7 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount, cardNumber,
   });
 
   return (
-    <div className="privilege-premium-card relative isolate aspect-[1.586] min-h-[225px] overflow-hidden rounded-[30px] p-4 text-white shadow-[0_26px_70px_rgba(35,24,19,0.24)] sm:p-6">
+    <div className="privilege-premium-card relative isolate flex aspect-[1.586] min-h-[220px] flex-col justify-between overflow-hidden rounded-[22px] p-4 text-white shadow-[0_26px_70px_rgba(35,24,19,0.24)] sm:p-6">
       <div className="privilege-card-grain pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#c88e67]/[0.12] blur-3xl" aria-hidden="true" />
       <div className="relative flex items-start justify-between gap-4">
@@ -57,13 +57,13 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount, cardNumber,
           <p className="text-[10px] font-semibold uppercase tracking-[.34em] text-[#ebc7ac]">ÉDITION PRIVILÈGE</p>
           <p className="mt-2 text-[25px] font-black tracking-[-.07em] sm:text-[30px]">CARACTÈRE<span className="text-[#e9a57f]">.</span></p>
         </div>
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#ddb99d]/40 bg-[#d8a782]/10 text-2xl text-[#f7d2ae]">✦</span>
+        <svg aria-hidden="true" viewBox="0 0 58 44" className="h-9 w-12 shrink-0 sm:h-11 sm:w-[58px]"><rect x="1" y="1" width="56" height="42" rx="9" fill="#d5b17e" stroke="#f2d5a2"/><path d="M19 1v12l8 9-8 9v12M39 1v12l-8 9 8 9v12M1 15h16M1 29h16M41 15h16M41 29h16M27 22h4" stroke="#80613f" fill="none" strokeWidth="1.3"/></svg>
       </div>
 
       <div className="relative mt-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[.24em] text-white/50">CARTE PERSONNELLE</p>
-        <h2 className="mt-2 break-words text-[clamp(1.6rem,4vw,2.3rem)] font-semibold leading-tight tracking-[-.045em]">{name}</h2>
-        <p className="mt-2 text-xs text-[#c6b5ac]">Membre depuis {created}{cardNumber ? " • " + cardNumber : ""}</p>
+        <p className="text-[9px] font-semibold uppercase tracking-[.24em] text-white/50">{cardNumber ? "•••• •••• " + cardNumber : "CARTE PERSONNELLE"}</p>
+        <h2 className="mt-1 break-words text-[clamp(1rem,3.8vw,1.7rem)] font-semibold leading-tight tracking-[-.045em]">{name}</h2>
+        <p className="mt-2 text-xs text-[#c6b5ac]">Membre depuis {created}</p>
       </div>
 
       <div className="relative mt-4">
@@ -102,7 +102,7 @@ export default function LoyaltyCard({ name, joinedAt, purchaseCount, cardNumber,
             {delivered ? "Récompense remise : 5 T-shirts." : targetDots === 0
               ? "Au premier achat validé, 3 ronds se cocheront sur votre carte."
               : targetDots === LOYALTY_CARD_DOTS
-                ? "Bravo ! 5 T-shirts offerts."
+                ? (cardNumber ? "Bravo ! 5 T-shirts offerts." : "Bravo ! Votre carte est complète.")
                 : "Encore " + remainingPurchases + " achat" + (remainingPurchases > 1 ? "s" : "") + " validé" + (remainingPurchases > 1 ? "s" : "") + " pour compléter votre carte."}
           </p>
           <span className="rounded-full border border-[#eac7ad]/25 bg-[#f5d0b4]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.13em] text-[#f0c29d]">
