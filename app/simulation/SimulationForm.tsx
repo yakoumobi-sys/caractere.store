@@ -1,12 +1,29 @@
 'use client'
 
 import Link from 'next/link'
+import { CARACTERISE_PRODUCTS } from '@/lib/caracterise'
 import { useEffect, useRef, useState } from 'react'
 import styles from './simulation.module.css'
 
 const NUMBER = '213557440522'
 const MAX_BYTES = 4 * 1024 * 1024
 const TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf']
+const PRODUCTS = [
+  CARACTERISE_PRODUCTS[1],
+  CARACTERISE_PRODUCTS[0],
+  CARACTERISE_PRODUCTS[2],
+  { id: 'casquette', label: 'Casquette', cutout: '/home-cutouts/casquette.png' },
+  { id: 'hoodie', label: 'Hoodie', cutout: '/home-cutouts/hoodie.png' },
+  { id: 'tablier', label: 'Tablier', cutout: '/designer-mockups/tablier_new.png' },
+  { id: 'tote-bag', label: 'Tote bag', cutout: '/home-cutouts/tote-bag.png' },
+  { id: 'autre', label: 'Autre / À conseiller', cutout: '' },
+] as const
+
+const PRODUCT_ALIASES: Record<string, string> = {
+  tshirt_oversized: 'tshirt',
+  gilet_securite: 'gilet',
+  totebag: 'tote-bag',
+}
 
 function trackSimulation(event: string, parameters: Record<string, string> = {}) {
   if (typeof window === 'undefined') return
@@ -15,10 +32,15 @@ function trackSimulation(event: string, parameters: Record<string, string> = {})
   else pixel?.('trackCustom', event, parameters)
 }
 
-export default function SimulationForm() {
+export default function SimulationForm({ productId, caracterise }: { productId?: string; caracterise: boolean }) {
+  const products = caracterise ? CARACTERISE_PRODUCTS : PRODUCTS
+  const initialProduct = products.find(item => item.id === productId || item.id === PRODUCT_ALIASES[productId ?? ''])
+  const [product, setProduct] = useState<string>(initialProduct?.label ?? (caracterise ? '' : 'Polo'))
+  const selectedProduct = products.find(item => item.label === product)
+  const [color, setColor] = useState('')
+  const [details, setDetails] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState('')
-  const [product, setProduct] = useState('Polo')
   const [quantity, setQuantity] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -56,10 +78,20 @@ export default function SimulationForm() {
     }
   }
 
-  function message(url: string) {
-    return `Bonjour Caractère, je souhaite une simulation gratuite avec mon logo.\nArticle : ${product}\n${quantity ? `Quantité : ${quantity}\n` : ''}Mon logo : ${url}`
+  function message(url?: string) {
+    const request = caracterise
+      ? 'Bonjour Caractère, je souhaite une simulation gratuite pour un vêtement caractérisé.'
+      : 'Bonjour Caractère, je souhaite une simulation gratuite avec mon logo.'
+    return [
+      request,
+      product && `Article : ${product}`,
+      quantity && `Quantité : ${quantity}`,
+      color.trim() && `Couleur souhaitée : ${color.trim()}`,
+      details.trim() && `Précisions : ${details.trim()}`,
+      url ? `Mon logo : ${url}` : 'Je vais joindre mon logo ici.',
+    ].filter(Boolean).join('\n')
   }
-  function whatsapp(url: string) {
+  function whatsapp(url?: string) {
     return `https://wa.me/${NUMBER}?text=${encodeURIComponent(message(url))}`
   }
 
@@ -98,7 +130,7 @@ export default function SimulationForm() {
     if (!file) return
     setShareNote('')
     try {
-      await navigator.share({ files: [file], title: 'Simulation gratuite Caractère', text: `Bonjour Caractère, voici mon logo pour une simulation gratuite sur ${product.toLowerCase()}.` })
+      await navigator.share({ files: [file], title: 'Simulation gratuite Caractère', text: message().replace('Je vais joindre mon logo ici.', 'Mon logo est joint.') })
       setShareNote('Vérifiez l’envoi dans votre conversation WhatsApp avec Caractère.')
     } catch (cause) {
       if (!(cause instanceof Error && cause.name === 'AbortError')) setShareNote('Le partage est indisponible ici. Utilisez le bouton WhatsApp : le lien de votre logo sera inclus.')
@@ -106,27 +138,27 @@ export default function SimulationForm() {
   }
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} ${caracterise ? styles.caracterise : ''}`}>
       <header className={styles.header}>
         <Link href="/" className={styles.brand} aria-label="Caractère, accueil">Caractère<span>®</span></Link>
-        <Link href="/produits" className={styles.catalogue}>Voir les vêtements <span aria-hidden="true">↗</span></Link>
+        <Link href={caracterise ? "/#modeles" : "/produits"} className={styles.catalogue}>Voir les vêtements</Link>
       </header>
       <div className={styles.layout}>
         <section className={styles.intro}>
           <p className={styles.badge}><span aria-hidden="true" />Simulation gratuite</p>
-          <h1>Votre logo mérite<br />du caractère.</h1>
-          <p className={styles.lead}>Voyez votre logo sur nos vêtements<br className={styles.desktopBreak} /> avant de commander.</p>
-          <div className={styles.productStage}>
-            <img src="/home-cutouts/polo.png" alt="Polo Caractère à personnaliser avec votre logo" className={styles.polo} />
+          <h1>{caracterise ? "Créez votre vêtement caractérisé." : <>Votre logo mérite<br />du caractère.</>}</h1>
+          <p className={styles.lead}>{caracterise ? "L’atelier compose le design à partir des formes et des couleurs de votre logo. Vous validez la simulation avant de commander." : <>Voyez votre logo sur nos vêtements<br className={styles.desktopBreak} /> avant de commander.</>}</p>
+          {selectedProduct?.cutout && <div className={styles.productStage}>
+            <img src={selectedProduct.cutout} alt={`${selectedProduct.label} à personnaliser`} className={styles.polo} />
             <div className={styles.logoCard}>
               {preview ? <img src={preview} alt="Votre logo sélectionné" /> : <span>{file ? 'Votre logo PDF' : 'Votre logo ici'}</span>}
               <small>{file ? 'Logo sélectionné' : 'Et si on essayait ?'}</small>
             </div>
             <p className={styles.stageCaption}>La simulation sera préparée par notre équipe.</p>
-          </div>
+          </div>}
         </section>
         <section className={styles.formPanel} aria-labelledby="form-title">
-          <h2 id="form-title">On commence par votre logo.</h2>
+          <h2 id="form-title">{caracterise ? "Décrivez votre projet." : "On commence par votre logo."}</h2>
           <p className={styles.formIntro}>Ajoutez-le ici. Notre équipe vous accompagne sur WhatsApp.</p>
           <form onSubmit={send}>
             <fieldset disabled={busy} className={styles.fields}>
@@ -137,14 +169,27 @@ export default function SimulationForm() {
                 <span id="file-help">{file ? 'Appuyez pour changer de fichier' : 'PNG, JPG, WEBP ou PDF · 4 Mo maximum'}</span>
               </label>
               <div className={styles.options}>
-                <label>Sur quel article ?<select value={product} onChange={event => setProduct(event.target.value)}>{['Polo', 'T-shirt', 'Gilet', 'Casquette', 'Hoodie', 'Tablier', 'Tote bag', 'Autre / À conseiller'].map(item => <option key={item}>{item}</option>)}</select></label>
-                <label>Quantité <span>(facultatif)</span><input type="number" min="1" max="100000" step="1" inputMode="numeric" placeholder="Ex. 20" value={quantity} onChange={event => setQuantity(event.target.value)} /></label>
+                <label>Sur quel article ?
+                  <select value={product} required onChange={event => { setProduct(event.target.value); setPrepared(false) }}>
+                    {caracterise && <option value="" disabled>Choisir un vêtement</option>}
+                    {products.map(item => <option key={item.id} value={item.label}>{item.label}</option>)}
+                  </select>
+                </label>
+                <label>Quantité <span>(facultatif)</span><input type="number" min="1" max="100000" step="1" inputMode="numeric" placeholder="Ex. 20" value={quantity} onChange={event => { setQuantity(event.target.value); setPrepared(false) }} /></label>
               </div>
+              {caracterise && <div className={styles.preferences}>
+                <label>Couleur du vêtement <span>(facultatif)</span>
+                  <input type="text" maxLength={60} placeholder="Ex. bleu nuit" value={color} onChange={event => { setColor(event.target.value); setPrepared(false) }} />
+                </label>
+                <label>Précisions <span>(facultatif)</span>
+                  <textarea rows={2} maxLength={350} placeholder="Ex. polo manches longues, grand visuel au dos" value={details} onChange={event => { setDetails(event.target.value); setPrepared(false) }} />
+                </label>
+              </div>}
               <p className={styles.privacy}>En continuant, votre logo sera chargé pour que notre équipe puisse l’ouvrir depuis votre message WhatsApp.</p>
-              <button type="submit" className={styles.submit} aria-busy={busy}>{busy ? 'Préparation de votre logo…' : 'Envoyer sur WhatsApp'}<span aria-hidden="true">↗</span></button>
+              <button type="submit" className={styles.submit} aria-busy={busy}>{busy ? 'Préparation de votre logo…' : 'Envoyer sur WhatsApp'}</button>
             </fieldset>
             <p className={styles.hint}>Le message inclut le lien de votre logo. Confirmez l’envoi dans WhatsApp.</p>
-            {error && <div className={styles.error} role="alert">{error}<a href={`https://wa.me/${NUMBER}?text=${encodeURIComponent('Bonjour, je souhaite une simulation gratuite. Je vais joindre mon logo ici.')}`}>Contacter Caractère directement</a></div>}
+            {error && <div className={styles.error} role="alert">{error}<a href={whatsapp()}>Contacter Caractère directement</a></div>}
             {prepared && <div className={styles.ready} role="status"><strong>Votre demande est prête.</strong><p>Si WhatsApp ne s’est pas ouvert, utilisez le lien ci-dessous. Le message reste à envoyer.</p><a href={whatsapp(logoUrl)}>Ouvrir WhatsApp Caractère</a></div>}
             {file && canShare && <div className={styles.fileShare}><button type="button" disabled={busy} onClick={shareFile}>Partager aussi le fichier image ou PDF</button><p>Choisissez WhatsApp, puis Caractère au 0557 44 05 22.</p></div>}
             {shareNote && <p role="status" className={styles.hint}>{shareNote}</p>}

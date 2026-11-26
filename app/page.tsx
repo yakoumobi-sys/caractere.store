@@ -1,30 +1,30 @@
-import type { Metadata } from "next";
-import Footer from "@/components/layout/Footer";
-import HomeChooser from "@/components/home/HomeChooser";
+import type { Metadata } from 'next'
+import Footer from '@/components/layout/Footer'
+import CaracteriseHome from '@/components/home/CaracteriseHome'
 
-// Accueil — wrapper serveur pour exposer un title/description propres
-// (le contenu réel est un composant client, qui ne peut pas exporter `metadata`).
+const title = 'T-shirts, polos et gilets caractérisés en Algérie | Caractère'
+const description = 'Un design créé à partir de votre logo, sur T-shirt, polo ou gilet. Simulation gratuite, devis sur WhatsApp et livraison dans les 58 wilayas.'
+
 export const metadata: Metadata = {
-  title: { absolute: 'Vêtement personnalisé Algérie : T-shirts, Polos & Broderie | Caractère' },
-  description:
-    'Vêtement personnalisé en Algérie : t-shirts, polos, uniformes et casquettes avec votre logo. Broderie et impression DTF à Alger, dès 1 pièce. Simulation et devis gratuits.',
+  title: { absolute: title },
+  description,
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Vêtement personnalisé Algérie : T-shirts, Polos & Broderie | Caractère',
-    description: 'Vêtements personnalisés en Algérie pour entreprises et particuliers. T-shirts, polos, broderie et DTF. Simulation gratuite de votre logo.',
-    url: 'https://www.caracteredz.com/',
+    title,
+    description,
+    url: '/',
     type: 'website',
     locale: 'fr_DZ',
-    images: ['https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo.jpg'],
+    images: ['/images/caracterise/campagne.webp'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Vêtement personnalisé Algérie : T-shirts, Polos & Broderie | Caractère',
-    description: 'T-shirts, polos et uniformes personnalisés en Algérie. Broderie, DTF, simulation et devis gratuits.',
-    images: ['https://aijlvbipvqnvbywxhlbd.supabase.co/storage/v1/object/public/image/logo.jpg'],
+    title,
+    description,
+    images: ['/images/caracterise/campagne.webp'],
   },
-};
+}
 
 export default function Home() {
-  return <><HomeChooser /><Footer /></>;
+  return <><CaracteriseHome /><Footer compact /></>
 }

@@ -35,15 +35,15 @@ const PIECES = [
   { label: 'Obtenir une simulation', href: '/simulation' },
 ]
 
-export default function Footer() {
+export default function Footer({ compact = false }: { compact?: boolean } = {}) {
   return (
     <footer id="explorer" className={`c-scope ${styles.root}`}>
       <div className="c-wrap">
-        <div className={styles.intro}>
+        {!compact && <div className={styles.intro}>
           <p className={styles.titre}>Votre prochain projet commence ici</p>
           <h2>Ton logo mérite du caractère.</h2>
           <p>Une pièce, une collection ou toute une équipe. Donnons vie à votre idée.</p>
-        </div>
+        </div>}
         <nav aria-label="Explorer Caractère" className={styles.navigation}>
           {NAVIGATION.map(([label, href], index) => (
             <Link key={href} href={href} className={index < 5 ? styles.important : undefined}>
@@ -51,11 +51,11 @@ export default function Footer() {
             </Link>
           ))}
         </nav>
-        <div className={styles.actions}>
+        {!compact && <div className={styles.actions}>
           <Link className={styles.primary} href="/entreprises/commande">Configurer ma commande</Link>
           <Link href="/auth/login">Se connecter</Link>
           <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        </div>
+        </div>}
         <section className={styles.contacts} aria-label="Contacter le bon service">
           {CONTACTS.map(([label, phone, number]) => (
             <a key={number} href={`https://wa.me/${number}`} target="_blank" rel="noopener noreferrer">
@@ -111,6 +111,7 @@ export default function Footer() {
           <nav aria-label="Informations légales">
             <Link href="/mentions-legales">Mentions légales</Link>
             <Link href="/avis">Avis clients</Link>
+            {compact && <Link href="/auth/login">Se connecter</Link>}
             <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram</a>
           </nav>
         </div>
