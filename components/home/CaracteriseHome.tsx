@@ -3,6 +3,15 @@ import Link from 'next/link'
 import { CARACTERISE_PRODUCTS, caracteriseSimulationHref } from '@/lib/caracterise'
 import styles from './CaracteriseHome.module.css'
 
+const poloExamples = [
+  { name: 'La Vache qui rit', image: 'la-vache-qui-rit', alt: 'Polo rouge à manches longues avec la tête de La Vache qui rit agrandie sur le côté' },
+  { name: 'Twiza', image: 'twiza', alt: 'Polo noir à manches longues avec les pétales bleus et rouges de Twiza sur le flanc' },
+  { name: 'Unilever', image: 'unilever', alt: 'Polo noir à manches longues avec les motifs bleus du logo Unilever sur le flanc' },
+  { name: 'Force Xpress', image: 'force-xpress', alt: 'Polo bordeaux à manches longues avec le personnage et le X de Force Xpress' },
+  { name: 'Henkel', image: 'henkel', alt: 'Polo rouge à manches longues avec le lettrage Henkel et son ovale blanc sur le côté' },
+  { name: 'Swalis', image: 'swalis', alt: 'Polo bleu nuit à manches longues avec les vagues dorées de Swalis sur le flanc' },
+]
+
 const questions = [
   {
     question: 'Qu’est-ce qu’un vêtement caractérisé ?',
@@ -35,6 +44,7 @@ export default function CaracteriseHome() {
           </Link>
           <nav className={styles.navigation} aria-label="Navigation principale">
             <a href="#modeles">Les modèles</a>
+            <a href="#exemples">Exemples</a>
             <a href="#comment">Comment ça marche</a>
             <Link href="/entreprises">Entreprises</Link>
           </nav>
@@ -85,6 +95,26 @@ export default function CaracteriseHome() {
                 </div>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className={styles.gallery} id="exemples" aria-labelledby="titre-exemples">
+          <div className={styles.wrap}>
+            <div className={styles.sectionIntro}>
+              <h2 id="titre-exemples">Polos caractérisés en images</h2>
+              <p>Six exemples de polos manches longues, chacun composé à partir des formes et des couleurs du logo.</p>
+            </div>
+            <div className={styles.galleryGrid}>
+              {poloExamples.map(({ name, image, alt }) => (
+                <figure className={styles.galleryItem} key={image}>
+                  <div className={styles.galleryImage}>
+                    <Image src={`/images/caracterise/polos/${image}.webp`} alt={alt} fill sizes="(max-width: 680px) 46vw, (max-width: 1250px) 31vw, 400px" />
+                  </div>
+                  <figcaption>{name}</figcaption>
+                </figure>
+              ))}
+            </div>
+            <Link href={caracteriseSimulationHref('polo')} className={`${styles.cardCta} ${styles.galleryCta}`}>Créer mon polo caractérisé</Link>
           </div>
         </section>
 

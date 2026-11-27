@@ -175,3 +175,35 @@
   .benefits { padding-inline: .25rem; font-size: .875rem; }
   .benefits li { display: grid; align-content: center; padding-inline: .4rem; }
 }
+
+.gallery {
+  background: #efeae2;
+  border-top: 1px solid var(--rule);
+  padding-block: clamp(3.25rem, 6vw, 5.75rem);
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(.65rem, 2vw, 1.65rem);
+}
+
+.galleryItem {
+  background: #fbf9f5;
+  border: 1px solid var(--rule);
+}
+
+.galleryImage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: #e7e7ed;
+}
+
+.galleryImage img { object-fit: contain; }
+.galleryItem figcaption { padding: .8rem 1rem; font-weight: 700; line-height: 1.25; }
+.galleryCta { margin-top: 1.5rem; }
+
+@media (max-width: 680px) {
+  .galleryGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .galleryItem figcaption { padding-inline: .65rem; }
+}
